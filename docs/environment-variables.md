@@ -1,11 +1,23 @@
 # Environment Variables
 
+This project uses type-safe environment variables with isomorphic fetching, supporting both client and server environments.
+
 ## Server Configuration
 
 | Variable | Default     | Description |
 | -------- | ----------- | ----------- |
 | `HOST`   | `localhost` | Server host |
 | `PORT`   | `3000`      | Server port |
+
+## Environment Files
+
+Create a `.env` file in the project root:
+
+```bash
+# .env
+HOST=localhost
+PORT=3000
+```
 
 ## Setup
 
@@ -14,6 +26,65 @@ Copy `.env.example` to `.env` and adjust values:
 ```bash
 cp .env.example .env
 ```
+
+## Isomorphic Env Fetching
+
+The project uses `src/_env.ts` for type-safe environment variables that work in both client and server contexts:
+
+```typescript
+// src/_env.ts
+export const env = await _createEnv({
+  client: {
+    VITE_API_URL: t.String(), // Client-only vars
+  },
+  server: {
+    API_URL: t.String(), // Server-only vars
+    AUTH_SECRET: t.String(),
+    DATABASE_URL: t.String(),
+    PORT: t.Number(),
+  },
+  runtimeEnv: () => ({
+    VITE_API_URL: _getEnv("VITE_API_URL", ""),
+    API_URL: _getEnv("API_URL", "http://localhost:3000/api"),
+    AUTH_SECRET: _getAuthSecret(),
+    DATABASE_URL: _getEnv("DATABASE_URL", ""),
+    PORT: parseInt(_getEnv("PORT", "3000"), 10),
+  }),
+});
+```
+
+### Client Environment Variables
+
+Client-side variables must be prefixed with `VITE_`:
+
+```typescript
+// Access in client code
+import { env } from "~/_env";
+
+console.log(env.VITE_API_URL); // Available in browser
+// env.AUTH_SECRET would throw - server-only
+```
+
+### Server Environment Variables
+
+Server-only variables are protected from client access:
+
+```typescript
+// Server-side code has full access
+import { env } from "~/_env";
+
+console.log(env.API_URL); // Available on server
+console.log(env.AUTH_SECRET); // Available on server
+```
+
+## Runtime Detection
+
+The env module automatically detects the runtime:
+
+- **Bun**: Uses `Bun.env`
+- **Node.js**: Uses `process.env`
+- **Deno**: Uses `Deno.env`
+- **Browser**: Limited to client variables
 
 ## Usage
 
@@ -66,3 +137,17 @@ BASE_URL=http://localhost:3000 bun run test:load
 # Or
 bun run --env-file=.env test:load
 ```
+
+## Validation
+
+Environment variables are validated at runtime using Elysia's type system:
+
+- If validation fails, the app will throw an error with details
+- In production, missing required variables will cause startup failure
+- In development, missing optional variables use defaults with a warning
+
+## Security
+
+- Server-only variables (`AUTH_SECRET`, `DATABASE_URL`) are protected from client access
+- Accessing server variables from the browser throws an error
+- The env module uses a Proxy to enforce these boundaries

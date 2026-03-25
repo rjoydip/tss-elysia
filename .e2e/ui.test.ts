@@ -21,9 +21,9 @@ test.describe("Home Page UI", () => {
   });
 
   test("should have API link", async ({ page }) => {
-    const apiLink = page.getByRole("link", { name: "/api/test" });
+    const apiLink = page.getByRole("link", { name: "/api" });
     await expect(apiLink).toBeVisible();
-    await expect(apiLink).toHaveAttribute("href", "/api/test");
+    await expect(apiLink).toHaveAttribute("href", "/api");
   });
 });
 

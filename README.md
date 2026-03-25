@@ -42,6 +42,8 @@ Detailed documentation available in `docs/`:
 - [Testing](docs/testing.md)
 - [Environment Variables](docs/environment-variables.md)
 - [Project Overview](docs/project-overview.md)
+- [Middleware](docs/middleware.md)
+- [Architecture](docs/architecture.md)
 
 ## Tech Stack
 
@@ -56,13 +58,24 @@ Detailed documentation available in `docs/`:
 
 ```bash
 src/
+  _app.ts           # Elysia app factory with middlewares
+  _api.ts           # API routes definition
+  _config.ts        # Central configuration (logger, rate-limit, cors, helmet)
+  _env.ts           # Isomorphic env fetching with type-safe validation
+  router.tsx        # TanStack Router configuration
+  server.ts         # TanStack Start server entry
+  middlewares/      # Middleware implementations
+    _cors.ts        # CORS headers
+    _helmet.ts      # Security headers
+    _rate-limit.ts  # Rate limiting
+    _vite.ts        # Vite integration
+    index.ts        # Export barrel
   routes/           # File-based routing (TanStack Start)
     __root.tsx      # Root route
     index.tsx       # Home route
-  router.tsx        # Router configuration
+    api.$.ts        # API catch-all route
   styles/
     app.css         # Global styles
-server.ts           # Tanstack server entry
 vite.config.ts      # Vite configuration
 tsconfig.json       # TypeScript configuration
 ```

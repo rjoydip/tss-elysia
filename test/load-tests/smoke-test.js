@@ -15,17 +15,13 @@ const PORT = __ENV.PORT || "3000";
 const BASE_URL = __ENV.BASE_URL || `http://${HOST}:${PORT}`;
 
 export default function () {
-  const response = http.get(`${BASE_URL}/api/test`);
+  const response = http.get(`${BASE_URL}/api`);
 
   check(response, {
     "status is 200": (r) => r.status === 200,
-    "content-type is json": (r) => r.headers["Content-Type"]?.includes("application/json"),
+    "content-type is text": (r) => r.headers["Content-Type"]?.includes("text/plain"),
     "response has message": (r) => {
-      try {
-        return JSON.parse(r.body).message !== undefined;
-      } catch {
-        return false;
-      }
+      return r.body && r.body.includes("Welcome to");
     },
   });
 

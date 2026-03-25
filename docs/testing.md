@@ -171,7 +171,7 @@ Supported variables:
 ### Test Types
 
 - **Smoke Test** - Basic validation with low load (1 VU, 10s)
-- **API Test** - Tests `/api/test` endpoint
+- **API Test** - Tests `/api` endpoint
 - **Stress Test** - High load testing
 
 ## Best Practices

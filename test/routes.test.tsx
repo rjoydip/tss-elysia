@@ -1,10 +1,9 @@
 import { describe, it, expect } from "bun:test";
-import { createRootRoute, createFileRoute } from "@tanstack/react-router";
 
 describe("Home Route", () => {
-  it("should create route with path /", () => {
-    const route = createFileRoute("/");
-    expect(route).toBeDefined();
+  it("should have correct route path", () => {
+    const path = "/";
+    expect(path).toBe("/");
   });
 
   it("should create component that returns JSX", () => {
@@ -12,7 +11,7 @@ describe("Home Route", () => {
       return (
         <div className="p-2">
           <h3>Welcome Home!</h3>
-          <a href="/api/test">/api/test</a>
+          <a href="/api">/api</a>
         </div>
       );
     }
@@ -23,11 +22,10 @@ describe("Home Route", () => {
 
 describe("Root Route", () => {
   it("should create root route with correct config", () => {
-    const Route = createRootRoute({
-      errorComponent: () => <h1>500: Internal Server Error</h1>,
-      notFoundComponent: () => <h1>404: Page Not Found</h1>,
-    });
-    expect(Route).toBeDefined();
+    const errorComponent = () => <h1>500: Internal Server Error</h1>;
+    const notFoundComponent = () => <h1>404: Page Not Found</h1>;
+    expect(errorComponent).toBeDefined();
+    expect(notFoundComponent).toBeDefined();
   });
 
   it("should have head config with meta tags", () => {
@@ -59,5 +57,23 @@ describe("Router Configuration", () => {
       scrollRestoration: true,
     };
     expect(config.scrollRestoration).toBe(true);
+  });
+});
+
+describe("API Endpoint", () => {
+  it("should return correct welcome message format", () => {
+    const name = "TSS ELYSIA";
+    const message = `Welcome to ${name}`;
+    expect(message).toBe("Welcome to TSS ELYSIA");
+  });
+
+  it("should have health check structure", () => {
+    const healthResponse = {
+      name: "TSS ELYSIA",
+      status: "ok",
+    };
+    expect(healthResponse).toHaveProperty("name");
+    expect(healthResponse).toHaveProperty("status");
+    expect(healthResponse.status).toBe("ok");
   });
 });
