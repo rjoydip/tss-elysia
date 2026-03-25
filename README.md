@@ -1,5 +1,7 @@
 # tss-elysia
 
+[![React Doctor](https://www.react.doctor/share/badge?p=tss-elysia&s=98&w=3&f=3)](https://www.react.doctor/share?p=tss-elysia&s=98&w=3&f=3)
+
 A full-stack TypeScript application using TanStack Start, Elysia, React 19, and Bun.
 
 ## Quick Start
