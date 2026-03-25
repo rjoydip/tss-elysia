@@ -71,10 +71,11 @@
   "reactDoctor": {
     "ignore": {
       "files": [
-        ".opencode/**/*",
+        ".bun-install-cache/**/*",
         ".e2e/**/*",
-        "test/**/*",
+        ".opencode/**/*",
         "load-tests/**/*",
+        "test/**/*",
         "*.config.ts",
         "k6.config.js"
       ]
