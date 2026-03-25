@@ -71,7 +71,7 @@
   "reactDoctor": {
     "ignore": {
       "files": [
-        ".bun-install-cache/**/*",
+        "~/.bun-install-cache/**/*",
         ".e2e/**/*",
         ".opencode/**/*",
         "load-tests/**/*",
