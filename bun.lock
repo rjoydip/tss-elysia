@@ -5,11 +5,12 @@
     "": {
       "name": "tss-elysia",
       "dependencies": {
+        "@elysiajs/eden": "^1.4.8",
         "@elysiajs/static": "^1.4.7",
         "@tanstack/react-query": "^5.95.2",
-        "@tanstack/react-router": "^1.168.3",
+        "@tanstack/react-router": "^1.168.4",
         "@tanstack/react-router-devtools": "^1.166.11",
-        "@tanstack/react-start": "^1.167.6",
+        "@tanstack/react-start": "^1.167.7",
         "elysia": "^1.4.28",
         "elysia-connect-middleware": "^0.0.6",
         "elysia-rate-limit": "^4.5.1",
@@ -148,6 +149,8 @@
     "@csstools/css-syntax-patches-for-csstree": ["@csstools/css-syntax-patches-for-csstree@1.1.1", "", { "peerDependencies": { "css-tree": "^3.2.1" }, "optionalPeers": ["css-tree"] }, "sha512-BvqN0AMWNAnLk9G8jnUT77D+mUbY/H2b3uDTvg2isJkHaOufUE2R3AOwxWo7VBQKT1lOdwdvorddo2B/lk64+w=="],
 
     "@csstools/css-tokenizer": ["@csstools/css-tokenizer@4.0.0", "", {}, "sha512-QxULHAm7cNu72w97JUNCBFODFaXpbDg+dP8b/oWFAZ2MTRppA3U00Y2L1HqaS4J6yBqxwa/Y3nMBaxVKbB/NsA=="],
+
+    "@elysiajs/eden": ["@elysiajs/eden@1.4.8", "", { "peerDependencies": { "elysia": ">=1.4.19" } }, "sha512-a7oct2kFa49tH+GawZtSUCZR2rQgucNYgGLz8alXUqb4IrU3PASA0T4zXJw4MhdV1Xb6vyiR7p7kkqJcVjgbkA=="],
 
     "@elysiajs/static": ["@elysiajs/static@1.4.7", "", { "peerDependencies": { "elysia": ">= 1.4.0" } }, "sha512-Go4kIXZ0G3iWfkAld07HmLglqIDMVXdyRKBQK/sVEjtpDdjHNb+rUIje73aDTWpZYg4PEVHUpi9v4AlNEwrQug=="],
 
