@@ -1,0 +1,83 @@
+{
+  "name": "tss-elysia",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "prepare": "simple-git-hooks",
+    "postinstall": "[ -d .opencode ] && cd .opencode && bun install || true",
+    "build": "vite build",
+    "dev": "vite dev",
+    "preview": "vite preview",
+    "fmt": "oxfmt .",
+    "fmt:check": "oxfmt --check .",
+    "lint": "oxlint . --format=github",
+    "lint:ci": "bun run lint && bun run fmt:check",
+    "lint:fix": "oxlint . --fix && oxfmt . && actions-up",
+    "react:doctor": "react-doctor . -y",
+    "test:unit": "bun test",
+    "test:watch": "bun test --watch",
+    "test:coverage": "bun test --coverage",
+    "test:e2e": "bun playwright test",
+    "test:e2e:ui": "bun playwright test --ui",
+    "test:e2e:headed": "bun playwright test --headed",
+    "test:e2e:report": "bun playwright show-report",
+    "test:load": "./.artifacts/k6.exe run ./test/load-tests/smoke-test.js",
+    "test:load:api": "./.artifacts/k6.exe run ./test/load-tests/api-test.js",
+    "test:load:stress": "./.artifacts/k6.exe run ./test/load-tests/stress-test.js",
+    "typecheck": "tsgo --noEmit",
+    "changeset": "changeset",
+    "changesets": "changeset",
+    "version": "changeset version",
+    "release": "changeset publish",
+    "start": "node .output/server/index.mjs"
+  },
+  "dependencies": {
+    "@tanstack/react-router": "^1.168.3",
+    "@tanstack/react-router-devtools": "^1.166.11",
+    "@tanstack/react-start": "^1.167.6",
+    "elysia": "^1.4.28",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
+    "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "@changesets/changelog-github": "^0.6.0",
+    "@changesets/cli": "^2.30.0",
+    "@playwright/test": "^1.58.2",
+    "@tailwindcss/vite": "^4.2.2",
+    "@types/bun": "^1.3.11",
+    "@types/node": "^25.5.0",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "@typescript/native-preview": "^7.0.0-dev.20260325.1",
+    "@vitejs/plugin-react": "^6.0.1",
+    "actions-up": "^1.12.0",
+    "k6": "^0.0.0",
+    "oxfmt": "^0.42.0",
+    "oxlint": "^1.57.0",
+    "react-doctor": "^0.0.30",
+    "simple-git-hooks": "^2.13.1",
+    "tailwindcss": "^4.2.2",
+    "typescript": "^6.0.2",
+    "vite": "^8.0.2"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  },
+  "simple-git-hooks": {
+    "pre-commit": "bun run lint:ci && bun run typecheck && bun run react:doctor"
+  },
+  "reactDoctor": {
+    "ignore": {
+      "files": [
+        ".opencode/**/*",
+        ".e2e/**/*",
+        "test/**/*",
+        "load-tests/**/*",
+        "*.config.ts",
+        "k6.config.js"
+      ]
+    }
+  }
+}
