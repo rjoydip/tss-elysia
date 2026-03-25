@@ -61,9 +61,9 @@ jobs:
       matrix:
         include:
           - runtime: bun
-            build_cmd: build:bun
+            build_cmd: build
             artifact_name: server-bun
-            artifact_path: server
+            artifact_path: dist
           - runtime: node
             build_cmd: build:node
             artifact_name: server-node
@@ -100,14 +100,11 @@ jobs:
       - name: Install Playwright browsers
         run: bunx playwright install --with-deps chromium
 
-      - name: Build
-        run: bun run build
+      - name: Build (${{ matrix.runtime }})
+        run: bun run ${{ matrix.build_cmd }}
 
       - name: Run E2E tests
         run: bun run test:e2e
-
-      - name: Build (${{ matrix.runtime }})
-        run: bun run ${{ matrix.build_cmd }}
 
       - name: Upload ${{ matrix.artifact_name }} artifact
         uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0

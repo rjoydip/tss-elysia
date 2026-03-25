@@ -47,7 +47,7 @@ jobs:
           bun test
 
       - name: Build Bun binary
-        run: bun run build:bun
+        run: bun run build
 
       - name: Create production release
         uses: changesets/action@6a0a831ff30acef54f2c6aa1cbbc1096b066edaf # v1.7.0
