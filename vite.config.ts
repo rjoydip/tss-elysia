@@ -9,7 +9,7 @@ const port = parseInt(process.env.PORT || "3000", 10);
 export default defineConfig({
   plugins: [tanstackStart(), viteReact(), tailwindcss()],
   environments: {
-    ssr: { build: { rollupOptions: { input: "./server.ts" } } },
+    ssr: { build: { rollupOptions: { input: "./src/server.ts" } } },
   },
   resolve: {
     tsconfigPaths: true,
