@@ -67,6 +67,7 @@
     "oxlint": "^1.57.0",
     "react-doctor": "^0.0.30",
     "simple-git-hooks": "^2.13.1",
+    "std-env": "^4.0.0",
     "tailwindcss": "^4.2.2",
     "typescript": "^6.0.2",
     "vite": "^8.0.2"
