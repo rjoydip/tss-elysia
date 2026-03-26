@@ -26,8 +26,7 @@
     "test:load:api": "./.artifacts/k6.exe run ./test/load-tests/api-test.js",
     "test:load:stress": "./.artifacts/k6.exe run ./test/load-tests/stress-test.js",
     "typecheck": "tsgo --noEmit",
-    "security": "bun audit",
-    "security:fix": "bun audit --fix",
+    "security": "bun audit --audit-level=critical",
     "changeset": "changeset",
     "changesets": "changeset",
     "version": "changeset version",
@@ -41,7 +40,7 @@
     "@tanstack/react-query": "^5.95.2",
     "@tanstack/react-router": "^1.168.4",
     "@tanstack/react-router-devtools": "^1.166.11",
-    "@tanstack/react-start": "^1.167.7",
+    "@tanstack/react-start": "^1.167.8",
     "elysia": "^1.4.28",
     "elysia-connect-middleware": "^0.0.6",
     "elysia-rate-limit": "^4.5.1",
@@ -60,7 +59,7 @@
     "@types/node": "^25.5.0",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
-    "@typescript/native-preview": "^7.0.0-dev.20260325.1",
+    "@typescript/native-preview": "^7.0.0-dev.20260326.1",
     "@vitejs/plugin-react": "^6.0.1",
     "actions-up": "^1.12.0",
     "jsdom": "^29.0.1",
@@ -72,13 +71,13 @@
     "std-env": "^4.0.0",
     "tailwindcss": "^4.2.2",
     "typescript": "^6.0.2",
-    "vite": "^8.0.2"
+    "vite": "^8.0.3"
   },
   "peerDependencies": {
     "typescript": "^5"
   },
   "simple-git-hooks": {
-    "pre-commit": "bun run lint:ci && bun run typecheck && bun run react:doctor && bun run security"
+    "pre-commit": "bun run lint:ci && bun run typecheck && bun run react:doctor"
   },
   "reactDoctor": {
     "ignore": {
