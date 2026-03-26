@@ -26,6 +26,8 @@
     "test:load:api": "./.artifacts/k6.exe run ./test/load-tests/api-test.js",
     "test:load:stress": "./.artifacts/k6.exe run ./test/load-tests/stress-test.js",
     "typecheck": "tsgo --noEmit",
+    "security": "bun audit",
+    "security:fix": "bun audit --fix",
     "changeset": "changeset",
     "changesets": "changeset",
     "version": "changeset version",
@@ -76,7 +78,7 @@
     "typescript": "^5"
   },
   "simple-git-hooks": {
-    "pre-commit": "bun run lint:ci && bun run typecheck && bun run react:doctor"
+    "pre-commit": "bun run lint:ci && bun run typecheck && bun run react:doctor && bun run security"
   },
   "reactDoctor": {
     "ignore": {

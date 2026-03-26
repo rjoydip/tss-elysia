@@ -69,6 +69,24 @@ Test files: `test/load-tests/*.js`
 | `bun run lint:fix`  | Auto-fix lint issues |
 | `bun run typecheck` | Type checking        |
 
+## Security
+
+### Running Security Audit
+
+```bash
+bun run security     # Run security audit
+bun run security:fix # Fix vulnerabilities
+```
+
+The security audit uses Bun's built-in vulnerability scanner to check dependencies for known vulnerabilities.
+
+### CI Security Scanning
+
+Security scans run automatically in GitHub Actions on every PR and push to main. The scan includes:
+
+- Dependency vulnerability scanning
+- Advisory database checks
+
 ## Building
 
 ```bash
