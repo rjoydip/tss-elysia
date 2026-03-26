@@ -38,21 +38,21 @@ async function _createEnv(opts: EnvOptions) {
     return runtimeEnv as any;
   }
 
-  const _client = typeof opts.client === "object" ? opts.client : {};
-  const _server = typeof opts.server === "object" ? opts.server : {};
-  const _shared = typeof opts.shared === "object" ? opts.shared : {};
+  const client = typeof opts.client === "object" ? opts.client : {};
+  const server = typeof opts.server === "object" ? opts.server : {};
+  const shared = typeof opts.shared === "object" ? opts.shared : {};
   const isTest = typeof process !== "undefined" && process.env?.NODE_ENV === "test";
   const isServer = opts.isServer ?? (typeof window === "undefined" || isTest);
 
   const finalSchemaShape = isServer
     ? {
-        ..._server,
-        ..._shared,
-        ..._client,
+        ...server,
+        ...shared,
+        ...client,
       }
     : {
-        ..._client,
-        ..._shared,
+        ...client,
+        ...shared,
       };
 
   const schema = getSchemaValidator(t.Object(finalSchemaShape), runtimeEnv);
@@ -76,7 +76,7 @@ async function _createEnv(opts: EnvOptions) {
     });
 
   const isServerAccess = (prop: string) => {
-    return !(prop in _client) && !(prop in _shared);
+    return !(prop in client) && !(prop in shared);
   };
   const isValidServerAccess = (prop: string) => {
     return isServer || !isServerAccess(prop);

@@ -22,10 +22,12 @@ export default defineConfig({
       use: { ...devices["Desktop Chrome"] },
     },
   ],
-  webServer: {
-    command: !isCI ? `bun preview --host=${host} --port=${port}` : "",
-    url: E2E_BASE_URL,
-    reuseExistingServer: !isCI,
-    timeout: 120 * 1000,
-  },
+  webServer: isCI
+    ? undefined
+    : {
+        command: `bun preview --host=${host} --port=${port}`,
+        url: E2E_BASE_URL,
+        reuseExistingServer: !isCI,
+        timeout: 120 * 1000,
+      },
 });
