@@ -41,7 +41,8 @@ async function _createEnv(opts: EnvOptions) {
   const _client = typeof opts.client === "object" ? opts.client : {};
   const _server = typeof opts.server === "object" ? opts.server : {};
   const _shared = typeof opts.shared === "object" ? opts.shared : {};
-  const isServer = opts.isServer ?? typeof window === "undefined";
+  const isTest = typeof process !== "undefined" && process.env?.NODE_ENV === "test";
+  const isServer = opts.isServer ?? (typeof window === "undefined" || isTest);
 
   const finalSchemaShape = isServer
     ? {
