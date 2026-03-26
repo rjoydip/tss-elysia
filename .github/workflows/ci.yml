@@ -16,7 +16,7 @@ env:
   BUN_INSTALL_CACHE_DIR: ~/.bun-install-cache
   E2E_HOST: "0.0.0.0"
   E2E_PORT: "4173"
-  E2E_BASE_URL: "http://0.0.0.0:4173"
+  E2E_BASE_URL: "http://localhost:4173"
 
 jobs:
   quality:
