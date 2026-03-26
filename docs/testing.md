@@ -96,8 +96,12 @@ E2E tests are in `.e2e/`:
 ```bash
 .e2e/
   ui.test.ts    # UI tests (home page, navigation)
-  api.test.ts   # API endpoint tests
+  api.$.test.ts # API endpoint tests
 ```
+
+### CI Test Skip Behavior
+
+Some API endpoint tests are skipped in CI environments because the preview server may not be accessible from Playwright's browser. Tests that require actual HTTP requests to the server will automatically skip when `isCI` is detected. Tests that don't require server access (like 404 handling) still run.
 
 ### UI Tests (`.e2e/ui.test.ts`)
 

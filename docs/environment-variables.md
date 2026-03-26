@@ -10,6 +10,14 @@ This project uses type-safe environment variables with isomorphic fetching, supp
 | `PORT`         | `3000`      | Server port                    |
 | `VITE_API_URL` | Dynamic     | Client API URL for Eden Treaty |
 
+## E2E Testing Configuration
+
+| Variable       | Default     | Description            |
+| -------------- | ----------- | ---------------------- |
+| `E2E_HOST`     | `localhost` | E2E test server host   |
+| `E2E_PORT`     | `3000`      | E2E test server port   |
+| `E2E_BASE_URL` | Dynamic     | Full URL for E2E tests |
+
 ## Environment Files
 
 Create a `.env` file in the project root:
@@ -164,6 +172,18 @@ BASE_URL=http://localhost:3000 bun run test:load
 # Or
 bun run --env-file=.env test:load
 ```
+
+### CI Environment
+
+In GitHub Actions, E2E tests use these environment variables:
+
+```yaml
+env:
+  E2E_HOST: "0.0.0.0" # Bind to all interfaces for CI accessibility
+  E2E_PORT: "4173" # Preview server port
+```
+
+The server binds to `0.0.0.0` in CI to allow Playwright's browser to access it from the container.
 
 ## Validation
 

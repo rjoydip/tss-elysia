@@ -16,7 +16,6 @@ env:
   BUN_INSTALL_CACHE_DIR: ~/.bun-install-cache
   E2E_HOST: "0.0.0.0"
   E2E_PORT: "4173"
-  E2E_BASE_URL: "http://localhost:4173"
 
 jobs:
   quality:
@@ -102,8 +101,8 @@ jobs:
       - name: Wait for server
         run: |
           for i in $(seq 1 30); do
-            if curl -sf ${{ env.E2E_BASE_URL }} > /dev/null 2>&1; then
-              echo "Server ${{ env.E2E_BASE_URL }} is ready"
+            if curl -sf http://${{ env.E2E_HOST }}:${{ env.E2E_PORT }} > /dev/null 2>&1; then
+              echo "Server http://${{ env.E2E_HOST }}:${{ env.E2E_PORT }}  is ready"
               break
             fi
             echo "Waiting for server... ($i)"
