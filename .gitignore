@@ -5,6 +5,7 @@ node_modules
 out
 dist
 *.tgz
+*-lock.json
 
 # code coverage
 coverage

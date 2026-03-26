@@ -14,7 +14,8 @@ concurrency:
 
 env:
   BUN_INSTALL_CACHE_DIR: ~/.bun-install-cache
-  DATABASE_URL: "file:sqlite.db"
+  E2E_HOST: "0.0.0.0"
+  E2E_PORT: "4173"
 
 jobs:
   quality:
@@ -41,9 +42,7 @@ jobs:
         run: bun install --frozen-lockfile
 
       - name: Run Linters
-        run: |
-          ls -al
-          bun run lint:ci
+        run: bun run lint:ci
 
       - name: Run type checking
         run: bun run typecheck
@@ -51,7 +50,32 @@ jobs:
       - uses: millionco/react-doctor@main
         with:
           diff: main
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+  security:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
+        with:
+          bun-version-file: package.json
+
+      - name: Cache bun dependencies
+        uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5.0.4
+        with:
+          path: ${{ env.BUN_INSTALL_CACHE_DIR }}
+          key: ${{ runner.os }}-bun-deps-${{ hashFiles('**/bun.lockb') }}
+          restore-keys: |
+            ${{ runner.os }}-bun-deps-
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Run security audit
+        run: bun audit --audit-level=critical
 
   test:
     name: Tests & Build (${{ matrix.runtime }})
@@ -61,12 +85,8 @@ jobs:
       matrix:
         include:
           - runtime: bun
-            build_cmd: build:bun
+            build_cmd: build
             artifact_name: server-bun
-            artifact_path: server
-          - runtime: node
-            build_cmd: build:node
-            artifact_name: server-node
             artifact_path: dist
     steps:
       - name: Checkout repository
@@ -88,23 +108,31 @@ jobs:
       - name: Install dependencies
         run: bun install --frozen-lockfile
 
-      - name: Run database migrations
-        run: |
-          rm -f sqlite.db
-          bun run db:generate
-          bun run db:migrate
-
       - name: Run tests (${{ matrix.runtime }})
         run: bun test
 
       - name: Install Playwright browsers
         run: bunx playwright install --with-deps chromium
 
-      - name: Run E2E tests
-        run: bun run test:e2e
-
       - name: Build (${{ matrix.runtime }})
         run: bun run ${{ matrix.build_cmd }}
+
+      - name: Start preview server
+        run: bunx vite preview --port ${{ env.E2E_PORT }} --host ${{ env.E2E_HOST }} &
+
+      - name: Wait for server
+        run: |
+          for i in $(seq 1 30); do
+            if curl -sf http://${{ env.E2E_HOST }}:${{ env.E2E_PORT }} > /dev/null 2>&1; then
+              echo "Server http://${{ env.E2E_HOST }}:${{ env.E2E_PORT }}  is ready"
+              break
+            fi
+            echo "Waiting for server... ($i)"
+            sleep 2
+          done
+
+      - name: Run E2E tests
+        run: bun run test:e2e --project=chromium
 
       - name: Upload ${{ matrix.artifact_name }} artifact
         uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0

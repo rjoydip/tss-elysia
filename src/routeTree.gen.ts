@@ -10,43 +10,43 @@
 
 import { Route as rootRouteImport } from "./routes/__root";
 import { Route as IndexRouteImport } from "./routes/index";
-import { Route as ApiTestRouteImport } from "./routes/api/test";
+import { Route as ApiSplatRouteImport } from "./routes/api.$";
 
 const IndexRoute = IndexRouteImport.update({
   id: "/",
   path: "/",
   getParentRoute: () => rootRouteImport,
 } as any);
-const ApiTestRoute = ApiTestRouteImport.update({
-  id: "/api/test",
-  path: "/api/test",
+const ApiSplatRoute = ApiSplatRouteImport.update({
+  id: "/api/$",
+  path: "/api/$",
   getParentRoute: () => rootRouteImport,
 } as any);
 
 export interface FileRoutesByFullPath {
   "/": typeof IndexRoute;
-  "/api/test": typeof ApiTestRoute;
+  "/api/$": typeof ApiSplatRoute;
 }
 export interface FileRoutesByTo {
   "/": typeof IndexRoute;
-  "/api/test": typeof ApiTestRoute;
+  "/api/$": typeof ApiSplatRoute;
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport;
   "/": typeof IndexRoute;
-  "/api/test": typeof ApiTestRoute;
+  "/api/$": typeof ApiSplatRoute;
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath;
-  fullPaths: "/" | "/api/test";
+  fullPaths: "/" | "/api/$";
   fileRoutesByTo: FileRoutesByTo;
-  to: "/" | "/api/test";
-  id: "__root__" | "/" | "/api/test";
+  to: "/" | "/api/$";
+  id: "__root__" | "/" | "/api/$";
   fileRoutesById: FileRoutesById;
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute;
-  ApiTestRoute: typeof ApiTestRoute;
+  ApiSplatRoute: typeof ApiSplatRoute;
 }
 
 declare module "@tanstack/react-router" {
@@ -58,11 +58,11 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof IndexRouteImport;
       parentRoute: typeof rootRouteImport;
     };
-    "/api/test": {
-      id: "/api/test";
-      path: "/api/test";
-      fullPath: "/api/test";
-      preLoaderRoute: typeof ApiTestRouteImport;
+    "/api/$": {
+      id: "/api/$";
+      path: "/api/$";
+      fullPath: "/api/$";
+      preLoaderRoute: typeof ApiSplatRouteImport;
       parentRoute: typeof rootRouteImport;
     };
   }
@@ -70,7 +70,7 @@ declare module "@tanstack/react-router" {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  ApiTestRoute: ApiTestRoute,
+  ApiSplatRoute: ApiSplatRoute,
 };
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

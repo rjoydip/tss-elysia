@@ -19,7 +19,7 @@ const PORT = __ENV.PORT || "3000";
 const BASE_URL = __ENV.BASE_URL || `http://${HOST}:${PORT}`;
 
 export default function () {
-  const response = http.get(`${BASE_URL}/api/test`);
+  const response = http.get(`${BASE_URL}/api`);
 
   check(response, {
     "status is 200": (r) => r.status === 200,

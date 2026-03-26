@@ -6,10 +6,12 @@ This project uses TanStack Start with file-based routing. Routes are defined in 
 
 ### Current Routes
 
-| Method | Path        | Description       |
-| ------ | ----------- | ----------------- |
-| GET    | `/`         | Home page (SSR)   |
-| GET    | `/api/test` | Test API endpoint |
+| Method | Path          | Description       |
+| ------ | ------------- | ----------------- |
+| GET    | `/`           | Home page (SSR)   |
+| GET    | `/api`        | API root endpoint |
+| GET    | `/api/*`      | API catch-all     |
+| GET    | `/api/health` | Health check      |
 
 ### Route File Structure
 
@@ -17,8 +19,39 @@ This project uses TanStack Start with file-based routing. Routes are defined in 
 src/routes/
   __root.tsx        # Root route (layout)
   index.tsx         # Home page (/)
-  api/
-    test.ts         # API endpoint (/api/test)
+  api.$.ts         # API catch-all route (/api/*)
+```
+
+### API Route Implementation
+
+The API uses Elysia with the following structure:
+
+```typescript
+// src/routes/api.$.ts
+import { createFileRoute } from "@tanstack/react-router";
+import { createApp } from "~/_app";
+import { API_PREFIX, API_NAME } from "~/_config";
+
+export const app = createApp({
+  prefix: API_PREFIX,
+})
+  .state("name", API_NAME)
+  .get("/health", async ({ store: { name } }) => ({ name, status: "ok" }))
+  .get("/", ({ store: { name }, set }) => {
+    set.headers["Content-Type"] = "text/plain; charset=utf-8";
+    return `Welcome to ${name}`;
+  });
+
+const handle = ({ request }: { request: Request }) => app.fetch(request);
+
+export const Route = createFileRoute("/api/$")({
+  server: {
+    handlers: {
+      GET: handle,
+      POST: handle,
+    },
+  },
+});
 ```
 
 ### Adding a New Route
@@ -40,7 +73,7 @@ function AboutPage() {
 
 ### Adding an API Route
 
-Create a new file in `src/routes/api/`:
+Extend the API in `src/routes/api.$.ts` or create a new file in `src/routes/api/`:
 
 ```typescript
 // src/routes/api/users.ts
@@ -111,5 +144,60 @@ Configure in `src/router.tsx`:
 const router = createRouter({
   defaultErrorComponent: () => <div>Internal Server Error</div>,
   defaultNotFoundComponent: () => <div>Not Found</div>,
+});
+```
+
+## Configuration
+
+### App Config (`src/_config.ts`)
+
+Central configuration for the application:
+
+```typescript
+export const API_PREFIX = `/api`;
+export const API_NAME = "TSS ELYSIA";
+
+export const appConfig: ElysiaConfig<any> = {
+  normalize: true,
+  prefix: "",
+  nativeStaticResponse: true,
+  websocket: { idleTimeout: 30 },
+};
+
+export const rateLimitConfig = {
+  duration: 60_000,
+  max: 100,
+};
+
+export const corsConfig = {
+  origin: "*",
+  methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+  exposedHeaders: ["X-Request-Id", "X-Response-Time"],
+  credentials: true,
+  maxAge: 86400,
+};
+```
+
+### Environment Variables (`src/_env.ts`)
+
+Type-safe environment variable handling:
+
+```typescript
+export const env = await _createEnv({
+  client: { VITE_API_URL: t.String() },
+  server: {
+    API_URL: t.String(),
+    AUTH_SECRET: t.String(),
+    DATABASE_URL: t.String(),
+    PORT: t.Number(),
+  },
+  runtimeEnv: () => ({
+    VITE_API_URL: _getEnv("VITE_API_URL", ""),
+    API_URL: _getEnv("API_URL", "http://localhost:3000/api"),
+    AUTH_SECRET: _getAuthSecret(),
+    DATABASE_URL: _getEnv("DATABASE_URL", ""),
+    PORT: parseInt(_getEnv("PORT", "3000"), 10),
+  }),
 });
 ```
