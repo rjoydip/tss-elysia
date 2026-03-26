@@ -75,7 +75,6 @@ Test files: `test/load-tests/*.js`
 
 ```bash
 bun run security     # Run security audit
-bun run security:fix # Fix vulnerabilities
 ```
 
 The security audit uses Bun's built-in vulnerability scanner to check dependencies for known vulnerabilities.
