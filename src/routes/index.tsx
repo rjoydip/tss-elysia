@@ -13,7 +13,7 @@ function Home() {
     queryFn: () => getAPI().get(),
   });
 
-  console.log(response?.data);
+  if (response?.data) console.log(response?.data);
 
   return (
     <div className="p-2">

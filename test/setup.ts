@@ -1,7 +1,11 @@
 import { JSDOM } from "jsdom";
+import { HOST, isBrowser, PORT } from "../src/config";
+
+const url =
+  import.meta.env.VITE_API_URL || (isBrowser ? window.location.origin : `http://${HOST}:${PORT}`);
 
 const dom = new JSDOM("<!DOCTYPE html><html><body></body></html>", {
-  url: "http://localhost",
+  url,
 });
 
 globalThis.document = dom.window.document;

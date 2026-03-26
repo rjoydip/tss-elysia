@@ -18,10 +18,12 @@ Tests are located in `test/`:
 
 ```bash
 test/
-  load-tests/       # k6 load tests
-    smoke-test.js   # Smoke test
-    api-test.js    # API load test
-    stress-test.js # Stress test
+  api.$.test.ts        # API logic tests
+  setup.ts             # Test setup
+  load-tests/          # k6 load tests
+    smoke-test.js     # Smoke test
+    api-test.js      # API load test
+    stress-test.js   # Stress test
 ```
 
 ### Writing Tests
@@ -34,6 +36,33 @@ describe("Home Route", () => {
   it("should create route with path /", () => {
     const route = createFileRoute("/");
     expect(route).toBeDefined();
+  });
+});
+```
+
+### Eden Treaty Tests
+
+Use Eden Treaty for end-to-end type-safe API testing:
+
+```typescript
+import { describe, expect, it } from "bun:test";
+import { treaty } from "@elysiajs/eden";
+import { app } from "../src/routes/api.$.ts";
+
+const api = treaty(app);
+
+describe("API Endpoints", () => {
+  it("should return welcome message", async () => {
+    const { data, error, status } = await api.api.get();
+    expect(error).toBeNull();
+    expect(status).toBe(200);
+    expect(data).toContain("Welcome to");
+  });
+
+  it("should return health status", async () => {
+    const { data, error } = await api.api.health.get();
+    expect(error).toBeNull();
+    expect(data).toHaveProperty("status", "ok");
   });
 });
 ```

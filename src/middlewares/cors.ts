@@ -1,5 +1,5 @@
 import Elysia from "elysia";
-import { corsConfig } from "~/_config";
+import { corsConfig } from "~/config";
 
 export const cors = new Elysia({ name: "cors" }).onRequest(({ set }) => {
   set.headers["Access-Control-Allow-Origin"] = corsConfig.origin;

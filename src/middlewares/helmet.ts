@@ -1,5 +1,5 @@
 import Elysia from "elysia";
-import { helmetConfig } from "~/_config";
+import { helmetConfig } from "~/config";
 
 export const helmet = new Elysia({ name: "helmet" }).onRequest(({ set }) => {
   if (helmetConfig.contentSecurityPolicy) {

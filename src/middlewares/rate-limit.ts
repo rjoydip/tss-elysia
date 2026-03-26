@@ -1,7 +1,7 @@
 import { Elysia } from "elysia";
 import type { SocketAddress } from "elysia/universal";
 import { type Generator, rateLimit, DefaultContext } from "elysia-rate-limit";
-import { rateLimitConfig } from "~/_config";
+import { rateLimitConfig } from "~/config";
 
 const ipGenerator: Generator<{ ip: SocketAddress }> = (_r, _s, { ip }) => ip?.address ?? "unknown";
 

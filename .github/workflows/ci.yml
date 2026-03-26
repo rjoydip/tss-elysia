@@ -15,6 +15,8 @@ concurrency:
 env:
   BUN_INSTALL_CACHE_DIR: ~/.bun-install-cache
   DATABASE_URL: "file:sqlite.db"
+  E2E_HOST: "0.0.0.0"
+  E2E_PORT: "4173"
 
 jobs:
   quality:
@@ -85,12 +87,6 @@ jobs:
       - name: Install dependencies
         run: bun install --frozen-lockfile
 
-      # - name: Run database migrations
-      #   run: |
-      #     rm -f sqlite.db
-      #     bun run db:generate
-      #     bun run db:migrate
-
       - name: Run tests (${{ matrix.runtime }})
         run: bun test
 
@@ -100,8 +96,25 @@ jobs:
       - name: Build (${{ matrix.runtime }})
         run: bun run ${{ matrix.build_cmd }}
 
+      - name: Start preview server
+        run: bun run preview --port ${{ env.E2E_PORT }} --host ${{ env.E2E_HOST }} &
+
+      - name: Wait for server
+        run: |
+          for i in $(seq 1 15); do
+            if curl -sf http://${{ env.E2E_HOST }}:${{ env.E2E_PORT }} > /dev/null 2>&1; then
+              echo "Server is ready"
+              break
+            fi
+            echo "Waiting for server... ($i)"
+            sleep 2
+          done
+
       - name: Run E2E tests
-        run: bun run test:e2e
+        run: bun run test:e2e --project=chromium
+        env:
+          E2E_HOST: ${{ env.E2E_HOST }}
+          E2E_PORT: ${{ env.E2E_PORT }}
 
       - name: Upload ${{ matrix.artifact_name }} artifact
         uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0

@@ -4,10 +4,11 @@ This project uses type-safe environment variables with isomorphic fetching, supp
 
 ## Server Configuration
 
-| Variable | Default     | Description |
-| -------- | ----------- | ----------- |
-| `HOST`   | `localhost` | Server host |
-| `PORT`   | `3000`      | Server port |
+| Variable       | Default     | Description                    |
+| -------------- | ----------- | ------------------------------ |
+| `HOST`         | `localhost` | Server host                    |
+| `PORT`         | `3000`      | Server port                    |
+| `VITE_API_URL` | Dynamic     | Client API URL for Eden Treaty |
 
 ## Environment Files
 
@@ -63,6 +64,32 @@ import { env } from "~/_env";
 
 console.log(env.VITE_API_URL); // Available in browser
 // env.AUTH_SECRET would throw - server-only
+```
+
+#### Eden Treaty Dynamic URL
+
+The client-side API client uses a dynamic URL resolution:
+
+1. First checks `VITE_API_URL` environment variable
+2. Falls back to `window.location.origin` in browser
+3. Defaults to `http://localhost:3000` for SSR
+
+```typescript
+// src/routes/api.$.ts
+export const getAPI = createIsomorphicFn()
+  .server(() => treaty(app).api)
+  .client(() => {
+    const url =
+      import.meta.env.VITE_API_URL ||
+      (typeof window !== "undefined" ? window.location.origin : "http://localhost:3000");
+    return treaty<typeof app>(url).api;
+  });
+```
+
+Set `VITE_API_URL` for production or custom preview servers:
+
+```bash
+VITE_API_URL=http://custom-server:4000 bun run preview
 ```
 
 ### Server Environment Variables

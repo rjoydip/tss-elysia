@@ -1,12 +1,5 @@
 import { t, getSchemaValidator, type TSchema } from "elysia";
-
-const isBun = typeof Bun !== "undefined";
-const isNode = typeof process !== "undefined" && process.versions?.node;
-const isProduction = isBun
-  ? Bun.env.NODE_ENV === "production"
-  : isNode
-    ? process.env.NODE_ENV === "production"
-    : false;
+import { isBun, isNode, isProduction, PORT } from "./config";
 
 export interface EnvOptions {
   server?: Record<string, TSchema>;
@@ -113,8 +106,7 @@ const _getEnv = (key: string, defaultValue: string = ""): string => {
   return value ?? defaultValue;
 };
 
-const _DEFAULT_PORT = import.meta.env.PORT || 3000;
-const _BASE_URL = `http://localhost:${_DEFAULT_PORT}`;
+const _BASE_URL = `http://localhost:${PORT}`;
 
 function _getAuthSecret(): string {
   const secret = _getEnv("AUTH_SECRET", "");
@@ -145,7 +137,7 @@ export const env = await _createEnv({
     API_URL: _getEnv("API_URL", `${_BASE_URL}/api`),
     AUTH_SECRET: _getAuthSecret(),
     DATABASE_URL: _getEnv("DATABASE_URL", ""),
-    PORT: parseInt(_getEnv("PORT", String(_DEFAULT_PORT)), 10),
+    PORT: parseInt(_getEnv("PORT", String(PORT)), 10),
   }),
 });
 

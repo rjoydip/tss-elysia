@@ -2,8 +2,8 @@ import { treaty } from "@elysiajs/eden";
 import { createFileRoute } from "@tanstack/react-router";
 import { createIsomorphicFn } from "@tanstack/react-start";
 
-import { createApp } from "~/_app";
-import { API_PREFIX, API_NAME } from "~/_config";
+import { createApp } from "~/app";
+import { API_PREFIX, API_NAME, HOST, PORT, isBrowser } from "~/config";
 
 export const app = createApp({
   prefix: API_PREFIX,
@@ -50,4 +50,9 @@ export const Route = createFileRoute(`/api/$`)({
 
 export const getAPI = createIsomorphicFn()
   .server(() => treaty(app).api)
-  .client(() => treaty<typeof app>("localhost:3000").api);
+  .client(() => {
+    const url =
+      import.meta.env.VITE_API_URL ||
+      (isBrowser ? window.location.origin : `http://${HOST}:${PORT}`);
+    return treaty<typeof app>(url).api;
+  });

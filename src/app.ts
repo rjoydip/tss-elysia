@@ -1,5 +1,6 @@
 import { Elysia, type ElysiaConfig } from "elysia";
-import { appConfig, logger } from "~/_config";
+import { openapi } from "@elysiajs/openapi";
+import { appConfig, logger } from "~/config";
 import { cors, helmet, rateLimitMiddleware } from "~/middlewares";
 
 export const createApp = (config?: ElysiaConfig<any>) =>
@@ -9,6 +10,7 @@ export const createApp = (config?: ElysiaConfig<any>) =>
   })
     .use(cors)
     .use(helmet)
+    .use(openapi())
     .use(rateLimitMiddleware)
     .trace(async ({ onBeforeHandle, onAfterHandle, onError, onHandle, set }) => {
       onBeforeHandle(({ begin, onStop }) => {
