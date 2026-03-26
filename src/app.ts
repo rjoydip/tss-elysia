@@ -1,6 +1,9 @@
-import { Elysia, type ElysiaConfig } from "elysia";
+import { Elysia, file, type ElysiaConfig } from "elysia";
 import { openapi } from "@elysiajs/openapi";
-import { appConfig, logger } from "~/config";
+import { opentelemetry } from "@elysiajs/opentelemetry";
+import { BatchSpanProcessor } from "@opentelemetry/sdk-trace-node";
+import { OTLPTraceExporter } from "@opentelemetry/exporter-trace-otlp-proto";
+import { API_NAME, appConfig, logger } from "~/config";
 import { cors, helmet, rateLimitMiddleware } from "~/middlewares";
 
 export const createApp = (config?: ElysiaConfig<any>) =>
@@ -10,8 +13,32 @@ export const createApp = (config?: ElysiaConfig<any>) =>
   })
     .use(cors)
     .use(helmet)
-    .use(openapi())
+    .use(
+      openapi({
+        documentation: {
+          info: {
+            title: `${API_NAME} API Documentation`,
+            version: "v1",
+          },
+        },
+      }),
+    )
     .use(rateLimitMiddleware)
+    .get("/favicon.ico", file("../public/favicon.svg"))
+    .use(
+      opentelemetry({
+        spanProcessors: [
+          new BatchSpanProcessor(
+            new OTLPTraceExporter({
+              /* url: "https://api.axiom.co/v1/traces",
+              headers: {
+                Authorization: `Bearer ${process.env.AXIOM_TOKEN}`,
+              }, */
+            }),
+          ),
+        ],
+      }),
+    )
     .trace(async ({ onBeforeHandle, onAfterHandle, onError, onHandle, set }) => {
       onBeforeHandle(({ begin, onStop }) => {
         onStop(({ end }) => {

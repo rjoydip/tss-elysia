@@ -4,11 +4,30 @@ This project uses type-safe environment variables with isomorphic fetching, supp
 
 ## Server Configuration
 
-| Variable       | Default     | Description                    |
-| -------------- | ----------- | ------------------------------ |
-| `HOST`         | `localhost` | Server host                    |
-| `PORT`         | `3000`      | Server port                    |
-| `VITE_API_URL` | Dynamic     | Client API URL for Eden Treaty |
+| Variable        | Default                    | Description                              |
+| --------------- | -------------------------- | ---------------------------------------- |
+| `HOST`          | `localhost`                | Server host                              |
+| `PORT`          | `3000`                     | Server port                              |
+| `VITE_API_URL`  | Dynamic                    | Client API URL for Eden Treaty           |
+| `DATABASE_NAME` | `.artifacts/tss-elysia.db` | SQLite database file path                |
+| `DATABASE_URL`  | -                          | Database connection URL (future use)     |
+| `AUTH_SECRET`   | Auto-generated             | Authentication secret for session tokens |
+
+## Database Configuration
+
+| Variable        | Default                    | Description                  |
+| --------------- | -------------------------- | ---------------------------- |
+| `DATABASE_NAME` | `.artifacts/tss-elysia.db` | Path to SQLite database file |
+
+The database path can be customized via environment variables:
+
+```bash
+# Use custom database location
+DATABASE_NAME=./custom/path/database.db bun run dev
+
+# Use in-memory database for testing
+DATABASE_NAME=:memory: bun run dev
+```
 
 ## E2E Testing Configuration
 
@@ -45,6 +64,7 @@ The project uses `src/_env.ts` for type-safe environment variables that work in 
 export const env = await _createEnv({
   client: {
     VITE_API_URL: t.String(), // Client-only vars
+    DATABASE_NAME: t.String(), // Available on both client and server
   },
   server: {
     API_URL: t.String(), // Server-only vars
@@ -57,9 +77,32 @@ export const env = await _createEnv({
     API_URL: _getEnv("API_URL", "http://localhost:3000/api"),
     AUTH_SECRET: _getAuthSecret(),
     DATABASE_URL: _getEnv("DATABASE_URL", ""),
+    DATABASE_NAME: _getEnv("DATABASE_NAME", ".artifacts/tss-elysia.db"),
     PORT: parseInt(_getEnv("PORT", "3000"), 10),
   }),
 });
+```
+
+### Database Setup
+
+The database path is configurable via `DATABASE_NAME`:
+
+```bash
+# Default location
+DATABASE_NAME=.artifacts/tss-elysia.db bun run db:migrate
+
+# Custom location
+DATABASE_NAME=./.artifacts/production.db bun run db:migrate
+
+# In-memory (for testing)
+DATABASE_NAME=:memory: bun run seed
+```
+
+After setting `DATABASE_NAME`, run migrations and seed:
+
+```bash
+DATABASE_NAME=.artifacts/tss-elysia.db bun run db:migrate
+DATABASE_NAME=.artifacts/tss-elysia.db bun run db:seed
 ```
 
 ### Client Environment Variables
@@ -127,7 +170,7 @@ The env module automatically detects the runtime:
 
 ```bash
 # Run on custom port
-PORT=3001 bun run dev
+PORT=3000 bun run dev
 # Or
 bun run --env-file=.env dev
 
@@ -137,7 +180,7 @@ HOST=0.0.0.0 bun run dev
 bun run --env-file=.env dev
 
 # Both
-HOST=0.0.0.0 PORT=3001 bun run dev
+HOST=0.0.0.0 PORT=3000 bun run dev
 # Or
 bun run --env-file=.env dev
 ```
@@ -146,7 +189,7 @@ bun run --env-file=.env dev
 
 ```bash
 # Build and run with custom port
-bun run build && PORT=3001 bun run start
+bun run build && PORT=3000 bun run start
 ```
 
 ### Testing
@@ -155,12 +198,12 @@ Load tests and E2E tests also support these variables:
 
 ```bash
 # Run load test on custom port
-PORT=3001 bun run test:load
+PORT=3000 bun run test:load
 # Or
 bun run --env-file=.env test:load
 
 # Run E2E tests on custom host/port
-HOST=localhost PORT=3001 bun run test:e2e
+HOST=localhost PORT=3000 bun run test:e2e
 # Or
 bun run --env-file=.env test:e2e
 ```

@@ -1,7 +1,6 @@
 import { treaty } from "@elysiajs/eden";
 import { createFileRoute } from "@tanstack/react-router";
 import { createIsomorphicFn } from "@tanstack/react-start";
-
 import { createApp } from "~/app";
 import { API_PREFIX, API_NAME, HOST, PORT, isBrowser } from "~/config";
 

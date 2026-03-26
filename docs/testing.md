@@ -189,10 +189,10 @@ Configure using environment variables:
 
 ```bash
 # Use custom host/port
-HOST=localhost PORT=3001 bun run test:load
+HOST=localhost PORT=3000 bun run test:load
 
 # Or use BASE_URL directly
-BASE_URL=http://localhost:3001 bun run test:load
+BASE_URL=http://localhost:3000 bun run test:load
 ```
 
 Supported variables:

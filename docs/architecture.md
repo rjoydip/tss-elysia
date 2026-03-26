@@ -149,8 +149,3 @@ src/
 - Rate limiting prevents abuse
 
 ## Performance
-
-- Vite HMR for fast development
-- Tailwind CSS v4 for optimized CSS
-- Elysia's native static response
-- Rate limiting for DoS prevention

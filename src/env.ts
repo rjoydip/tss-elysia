@@ -108,6 +108,7 @@ const _getEnv = (key: string, defaultValue: string = ""): string => {
 };
 
 const _BASE_URL = `http://localhost:${PORT}`;
+const _DEFAULT_DB_NAME = ".artifacts/tss-elysia.db";
 
 function _getAuthSecret(): string {
   const secret = _getEnv("AUTH_SECRET", "");
@@ -126,6 +127,7 @@ function _getAuthSecret(): string {
 export const env = await _createEnv({
   client: {
     VITE_API_URL: t.String(),
+    DATABASE_NAME: t.String(),
   },
   server: {
     API_URL: t.String(),
@@ -138,6 +140,7 @@ export const env = await _createEnv({
     API_URL: _getEnv("API_URL", `${_BASE_URL}/api`),
     AUTH_SECRET: _getAuthSecret(),
     DATABASE_URL: _getEnv("DATABASE_URL", ""),
+    DATABASE_NAME: _getEnv("DATABASE_NAME", _DEFAULT_DB_NAME),
     PORT: parseInt(_getEnv("PORT", String(PORT)), 10),
   }),
 });

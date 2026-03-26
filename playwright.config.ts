@@ -25,7 +25,7 @@ export default defineConfig({
   webServer: isCI
     ? undefined
     : {
-        command: `bun preview --host=${host} --port=${port}`,
+        command: `bun run src/api-server.ts --host=${host} --port=${port}`,
         url: E2E_BASE_URL,
         reuseExistingServer: !isCI,
         timeout: 120 * 1000,

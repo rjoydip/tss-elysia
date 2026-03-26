@@ -16,7 +16,18 @@
     }
   },
   "instructions": ["CONTRIBUTING.md", ".opencode/rules/*.md"],
-  "mcp": {},
+  "mcp": {
+    "chrome-devtools": {
+      "type": "local",
+      "command": [
+        "bunx",
+        "-y",
+        "chrome-devtools-mcp@latest",
+        "--autoConnect",
+        "--user-data-dir=./artifacts/chrome-profile-stable"
+      ]
+    }
+  },
   "lsp": {},
   "agent": {}
 }

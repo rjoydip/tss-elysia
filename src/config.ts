@@ -1,10 +1,12 @@
 import { type ElysiaConfig } from "elysia";
 
 export const API_PREFIX = import.meta.env.API_PREFIX ?? `/api`;
+export const AUTH_PREFIX = `${API_PREFIX}/auth/*`;
 export const API_NAME = import.meta.env.VITE_APP_NAME ?? "TSS ELYSIA";
 export const HOST = import.meta.env.HOST || "localhost";
 export const PORT = parseInt(import.meta.env.PORT || "3000", 10);
 export const isBrowser = typeof window !== "undefined" && window.document !== undefined;
+export const isServer = typeof window === "undefined";
 export const isBun = typeof Bun !== "undefined";
 export const isNode = typeof process !== "undefined" && !!process.versions?.node;
 export const isProduction = isBun
