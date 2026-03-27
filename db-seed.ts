@@ -1,7 +1,12 @@
 import { faker } from "@faker-js/faker";
 import { Database } from "bun:sqlite";
 
-const dbName = process.env.DATABASE_NAME || ".artifacts/tss-elysia.db";
+const dbName =
+  process.env.DATABASE_PATH && process.env.DATABASE_NAME
+    ? `${process.env.DATABASE_PATH}/${process.env.DATABASE_NAME}`
+    : process.env.DATABASE_NAME && !process.env.DATABASE_PATH
+      ? `.artifacts/${process.env.DATABASE_NAME}`
+      : ".artifacts/tss-elysia.db";
 const db = new Database(dbName);
 
 const PLAN_DATA = [
@@ -40,6 +45,10 @@ const PLAN_DATA = [
   },
 ];
 
+const insertPlanStmt = db.prepare(
+  `INSERT INTO subscription_plan (id, name, description, price, currency, interval, intervalCount, rateLimit, rateLimitDuration, createdAt, updatedAt, features) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+);
+
 function seedPlans() {
   const now = Date.now();
   console.log("Seeding subscription plans...");
@@ -48,9 +57,19 @@ function seedPlans() {
     const existing = db.query("SELECT id FROM subscription_plan WHERE id = ?").get(plan.id);
 
     if (!existing) {
-      db.exec(
-        `INSERT INTO subscription_plan (id, name, description, price, currency, interval, intervalCount, rateLimit, rateLimitDuration, createdAt, updatedAt, features)
-         VALUES ('${plan.id}', '${plan.name}', '${plan.description}', ${plan.price}, '${plan.currency}', '${plan.interval}', ${plan.intervalCount}, ${plan.rateLimit}, ${plan.rateLimitDuration}, ${now}, ${now}, '{}')`,
+      insertPlanStmt.run(
+        plan.id,
+        plan.name,
+        plan.description,
+        plan.price,
+        plan.currency,
+        plan.interval,
+        plan.intervalCount,
+        plan.rateLimit,
+        plan.rateLimitDuration,
+        now,
+        now,
+        "{}",
       );
       console.log(`Inserted plan: ${plan.name}`);
     } else {
@@ -58,6 +77,10 @@ function seedPlans() {
     }
   }
 }
+
+const insertUserStmt = db.prepare(
+  `INSERT OR IGNORE INTO user (id, name, email, emailVerified, image, createdAt, updatedAt, subscriptionTier, subscriptionId, subscriptionStatus, subscriptionExpiresAt) VALUES (?, ?, ?, ?, '', ?, ?, ?, ?, ?, ?)`,
+);
 
 function seedUsers(count: number = 10) {
   const now = Date.now();
@@ -69,15 +92,23 @@ function seedUsers(count: number = 10) {
     const tier = faker.helpers.arrayElement(tiers);
     const userId = faker.string.uuid();
     const email = faker.internet.email().toLowerCase();
-    const name = faker.person.fullName().replace(/'/g, "''");
+    const name = faker.person.fullName();
     const emailVerified = faker.datatype.boolean() ? 1 : 0;
-    const subscriptionId = tier !== "free" ? `'${faker.string.uuid()}'` : "NULL";
-    const subscriptionStatus = tier !== "free" ? "'active'" : "NULL";
-    const subscriptionExpiresAt = tier !== "free" ? now + 30 * 24 * 60 * 60 * 1000 : "NULL";
+    const subscriptionId = tier !== "free" ? faker.string.uuid() : null;
+    const subscriptionStatus = tier !== "free" ? "active" : null;
+    const subscriptionExpiresAt = tier !== "free" ? now + 30 * 24 * 60 * 60 * 1000 : null;
 
-    db.exec(
-      `INSERT OR IGNORE INTO user (id, name, email, emailVerified, image, createdAt, updatedAt, subscriptionTier, subscriptionId, subscriptionStatus, subscriptionExpiresAt)
-       VALUES ('${userId}', '${name}', '${email}', ${emailVerified}, '', ${now}, ${now}, '${tier}', ${subscriptionId}, ${subscriptionStatus}, ${subscriptionExpiresAt})`,
+    insertUserStmt.run(
+      userId,
+      name,
+      email,
+      emailVerified,
+      now,
+      now,
+      tier,
+      subscriptionId,
+      subscriptionStatus,
+      subscriptionExpiresAt,
     );
   }
 

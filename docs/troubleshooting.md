@@ -86,6 +86,8 @@ Error [ERR_MODULE_NOT_FOUND]: Cannot find module 'dist/server/server.js'
 **Solution**: Update `playwright.config.ts` to build first:
 
 ```typescript
+import { E2E_BASE_URL, E2E_HOST, E2E_PORT } from "./.e2e/config";
+
 webServer: {
   command: "bun run build && bun run preview",
   url: E2E_BASE_URL,

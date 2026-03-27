@@ -12,7 +12,8 @@ services:
       - PORT=3000
       - NODE_ENV=production
       - AUTH_SECRET=${AUTH_SECRET}
-      - DATABASE_NAME=.artifacts/tss-elysia.db
+      - DATABASE_PATH=.artifacts
+      - DATABASE_NAME=tss-elysia.db
     volumes:
       - db-data:/app/data
     restart: unless-stopped
@@ -33,7 +34,8 @@ services:
       - PORT=3000
       - NODE_ENV=development
       - AUTH_SECRET=${AUTH_SECRET:-dev-secret-min-32-characters-long}
-      - DATABASE_NAME=.artifacts/tss-elysia.db
+      - DATABASE_PATH=.artifacts
+      - DATABASE_NAME=tss-elysia.db
     volumes:
       - .:/app
       - bun-cache:/root/.bun

@@ -1,9 +1,6 @@
 import { defineConfig, devices } from "@playwright/test";
 import { isCI } from "std-env";
-
-const host = process.env.E2E_HOST || process.env.HOST || "localhost";
-const port = process.env.E2E_PORT || process.env.PORT || "3000";
-const E2E_BASE_URL = process.env.E2E_BASE_URL || `http://${host}:${port}`;
+import { E2E_BASE_URL, E2E_HOST, E2E_PORT } from "./.e2e/config";
 
 export default defineConfig({
   testDir: "./.e2e",
@@ -25,7 +22,7 @@ export default defineConfig({
   webServer: isCI
     ? undefined
     : {
-        command: `bun run src/api-server.ts --host=${host} --port=${port}`,
+        command: `bun run preview --host=${E2E_HOST} --port=${E2E_PORT}`,
         url: E2E_BASE_URL,
         reuseExistingServer: !isCI,
         timeout: 120 * 1000,

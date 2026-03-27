@@ -14,6 +14,8 @@ concurrency:
 
 env:
   BUN_INSTALL_CACHE_DIR: ~/.bun-install-cache
+  DATABASE_PATH: ".artifacts"
+  DATABASE_NAME: "tss-elysia-test.db"
   E2E_HOST: "0.0.0.0"
   E2E_PORT: "4173"
 
@@ -108,8 +110,8 @@ jobs:
       - name: Install dependencies
         run: bun install --frozen-lockfile
 
-      - name: Run database migrations
-        run: bun run db:reset
+      - name: Run database setup
+        run: bun run db:setup
 
       - name: Run tests (${{ matrix.runtime }})
         run: bun test
@@ -143,3 +145,7 @@ jobs:
           name: ${{ matrix.artifact_name }}
           path: ${{ matrix.artifact_path }}
           retention-days: 1
+
+      - name: Cleanup database
+        if: always()
+        run: bun run scripts/remove-db.ts

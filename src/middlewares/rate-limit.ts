@@ -1,7 +1,7 @@
 import { Elysia } from "elysia";
 import type { SocketAddress } from "elysia/universal";
 import { type Generator, rateLimit, DefaultContext } from "elysia-rate-limit";
-import { SUBSCRIPTION_TIERS, DEFAULT_TIER } from "~/lib/auth/types";
+import { SUBSCRIPTION_TIERS, DEFAULT_TIER } from "~/types/subscription";
 import { getUserSubscriptionTier } from "~/lib/auth";
 
 async function getRateLimitConfig(userId?: string): Promise<{ max: number; duration: number }> {

@@ -50,14 +50,16 @@ Database configuration is managed via environment variables:
 
 ```bash
 # .env file
-DATABASE_NAME=.artifacts/tss-elysia.db
+DATABASE_PATH=.artifacts
+DATABASE_NAME=tss-elysia.db
 AUTH_SECRET=your-secret-key
 ```
 
 ### Key Variables
 
-| Variable        | Default                    | Description          |
-| --------------- | -------------------------- | -------------------- |
-| `DATABASE_NAME` | `.artifacts/tss-elysia.db` | SQLite database path |
-| `PORT`          | `3000`                     | Server port          |
-| `HOST`          | `localhost`                | Server host          |
+| Variable        | Default         | Description          |
+| --------------- | --------------- | -------------------- |
+| `DATABASE_PATH` | `.artifacts`    | SQLite database path |
+| `DATABASE_NAME` | `tss-elysia.db` | SQLite database name |
+| `PORT`          | `3000`          | Server port          |
+| `HOST`          | `localhost`     | Server host          |

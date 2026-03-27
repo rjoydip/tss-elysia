@@ -2,7 +2,7 @@ import { faker } from "@faker-js/faker";
 import { drizzle } from "drizzle-orm/bun-sqlite";
 import { Database } from "bun:sqlite";
 import * as schema from "../../src/lib/db/schema";
-import type { SubscriptionTier } from "../../src/lib/auth/types";
+import type { SubscriptionTier } from "../../src/types/subscription";
 
 const TEST_DB_PATH = ":memory:";
 
@@ -79,6 +79,8 @@ const CREATE_TABLES_SQL = `
     updatedAt INTEGER NOT NULL
   );
 `;
+
+export { CREATE_TABLES_SQL };
 
 export function createTestDatabase(): ReturnType<typeof drizzle> {
   const sqlite = new Database(TEST_DB_PATH);

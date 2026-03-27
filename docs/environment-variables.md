@@ -4,20 +4,22 @@ This project uses type-safe environment variables with isomorphic fetching, supp
 
 ## Server Configuration
 
-| Variable        | Default                    | Description                              |
-| --------------- | -------------------------- | ---------------------------------------- |
-| `HOST`          | `localhost`                | Server host                              |
-| `PORT`          | `3000`                     | Server port                              |
-| `VITE_API_URL`  | Dynamic                    | Client API URL for Eden Treaty           |
-| `DATABASE_NAME` | `.artifacts/tss-elysia.db` | SQLite database file path                |
-| `DATABASE_URL`  | -                          | Database connection URL (future use)     |
-| `AUTH_SECRET`   | Auto-generated             | Authentication secret for session tokens |
+| Variable        | Default         | Description                              |
+| --------------- | --------------- | ---------------------------------------- |
+| `HOST`          | `localhost`     | Server host                              |
+| `PORT`          | `3000`          | Server port                              |
+| `VITE_API_URL`  | Dynamic         | Client API URL for Eden Treaty           |
+| `DATABASE_PATH` | `.artifacts`    | SQLite database file path                |
+| `DATABASE_NAME` | `tss-elysia.db` | SQLite database file name                |
+| `DATABASE_URL`  | -               | Database connection URL (future use)     |
+| `AUTH_SECRET`   | Auto-generated  | Authentication secret for session tokens |
 
 ## Database Configuration
 
-| Variable        | Default                    | Description                  |
-| --------------- | -------------------------- | ---------------------------- |
-| `DATABASE_NAME` | `.artifacts/tss-elysia.db` | Path to SQLite database file |
+| Variable        | Default         | Description                  |
+| --------------- | --------------- | ---------------------------- |
+| `DATABASE_PATH` | `.artifacts`    | Path to SQLite database file |
+| `DATABASE_NAME` | `tss-elysia.db` | Path to SQLite database name |
 
 The database path can be customized via environment variables:
 
@@ -31,11 +33,23 @@ DATABASE_NAME=:memory: bun run dev
 
 ## E2E Testing Configuration
 
+E2E configuration is centralized in `.e2e/config.ts` and consumed by both `playwright.config.ts` and test files.
+
 | Variable       | Default     | Description            |
 | -------------- | ----------- | ---------------------- |
 | `E2E_HOST`     | `localhost` | E2E test server host   |
 | `E2E_PORT`     | `3000`      | E2E test server port   |
 | `E2E_BASE_URL` | Dynamic     | Full URL for E2E tests |
+
+```typescript
+// .e2e/config.ts
+const host = process.env.E2E_HOST || process.env.HOST || "localhost";
+const port = process.env.E2E_PORT || process.env.PORT || "3000";
+
+export const E2E_BASE_URL = process.env.E2E_BASE_URL || `http://${host}:${port}`;
+export const E2E_HOST = host;
+export const E2E_PORT = port;
+```
 
 ## Environment Files
 
@@ -68,16 +82,20 @@ export const env = await _createEnv({
   },
   server: {
     API_URL: t.String(), // Server-only vars
-    AUTH_SECRET: t.String(),
+    BETTER_AUTH_URL: t.String(),
+    BETTER_AUTH_SECRET: t.String(),
     DATABASE_URL: t.String(),
+    DATABASE_PATH: t.String(),
     PORT: t.Number(),
   },
   runtimeEnv: () => ({
     VITE_API_URL: _getEnv("VITE_API_URL", ""),
     API_URL: _getEnv("API_URL", "http://localhost:3000/api"),
-    AUTH_SECRET: _getAuthSecret(),
+    BETTER_AUTH_URL: _getEnv("BETTER_AUTH_URL", "http://localhost:3000/api/auth"),
+    BETTER_AUTH_SECRET: _getAuthSecret(),
     DATABASE_URL: _getEnv("DATABASE_URL", ""),
-    DATABASE_NAME: _getEnv("DATABASE_NAME", ".artifacts/tss-elysia.db"),
+    DATABASE_PATH: _getEnv("DATABASE_PATH", ".artifacts"),
+    DATABASE_NAME: _getEnv("DATABASE_NAME", "tss-elysia.db"),
     PORT: parseInt(_getEnv("PORT", "3000"), 10),
   }),
 });
@@ -89,10 +107,10 @@ The database path is configurable via `DATABASE_NAME`:
 
 ```bash
 # Default location
-DATABASE_NAME=.artifacts/tss-elysia.db bun run db:migrate
+DATABASE_PATH=.artifacts DATABASE_NAME=tss-elysia.db bun run db:migrate
 
 # Custom location
-DATABASE_NAME=./.artifacts/production.db bun run db:migrate
+DATABASE_PATH=.artifacts DATABASE_NAME=production.db bun run db:migrate
 
 # In-memory (for testing)
 DATABASE_NAME=:memory: bun run seed
@@ -101,8 +119,8 @@ DATABASE_NAME=:memory: bun run seed
 After setting `DATABASE_NAME`, run migrations and seed:
 
 ```bash
-DATABASE_NAME=.artifacts/tss-elysia.db bun run db:migrate
-DATABASE_NAME=.artifacts/tss-elysia.db bun run db:seed
+DATABASE_PATH=.artifacts DATABASE_NAME=tss-elysia.db bun run db:migrate
+DATABASE_PATH=.artifacts DATABASE_NAME=tss-elysia.db bun run db:seed
 ```
 
 ### Client Environment Variables

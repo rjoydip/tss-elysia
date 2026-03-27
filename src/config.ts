@@ -1,7 +1,7 @@
 import { type ElysiaConfig } from "elysia";
 
 export const API_PREFIX = import.meta.env.API_PREFIX ?? `/api`;
-export const AUTH_PREFIX = `${API_PREFIX}/auth/*`;
+export const AUTH_PREFIX = "/auth/*";
 export const API_NAME = import.meta.env.VITE_APP_NAME ?? "TSS ELYSIA";
 export const HOST = import.meta.env.HOST || "localhost";
 export const PORT = parseInt(import.meta.env.PORT || "3000", 10);
@@ -14,7 +14,7 @@ export const isProduction = isBun
   : isNode
     ? process.env.NODE_ENV === "production"
     : false;
-
+export const AUTH_ALLOWED_METHODS = ["GET", "POST", "PUT", "DELETE"];
 export function log(message: string, level: "info" | "warn" | "error" = "info") {
   const timestamp = new Date().toISOString();
   const prefix = `[${timestamp}] [${level.toUpperCase()}]`;
