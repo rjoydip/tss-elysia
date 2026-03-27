@@ -122,6 +122,12 @@ jobs:
       - name: Build (${{ matrix.runtime }})
         run: bun run ${{ matrix.build_cmd }}
 
+      - name: Resolve host IP
+        run: |
+          HOST_IP=$(ip route get 1.1.1.1 | awk '{for(i=1;i<=NF;i++) if($i=="src") print $(i+1)}')
+          echo "E2E_HOST=$HOST_IP" >> $GITHUB_ENV
+          echo "Resolved host IP: $HOST_IP"
+
       - name: Start preview server
         run: bun run preview --port ${{ env.E2E_PORT }} --host ${{ env.E2E_HOST }} &
 
