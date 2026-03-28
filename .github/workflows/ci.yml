@@ -112,7 +112,7 @@ jobs:
         run: bun install --frozen-lockfile --ignore-scripts
 
       - name: Install better-sqlite3
-        run: cd node_modules/better-sqlite3 && npm run build
+        run: cd node_modules/better-sqlite3 && npm run build-release
 
       - name: Run database setup
         run: bun run db:setup

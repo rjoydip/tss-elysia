@@ -6,32 +6,6 @@ import tailwindcss from "@tailwindcss/vite";
 const host = process.env.HOST || "localhost";
 const port = parseInt(process.env.PORT || "3000", 10);
 
-const os = require("os");
-
-function getNetworkHostIp() {
-  const networkInterfaces = os.networkInterfaces();
-  let ipAddress;
-
-  // Iterate over network interfaces
-  Object.keys(networkInterfaces).forEach((interfaceName) => {
-    // Iterate over addresses within the interface
-    networkInterfaces[interfaceName].forEach(
-      (iface: { family: string; internal: any; address: any }) => {
-        // Filter for IPv4 addresses that are not internal (i.e., not 127.0.0.1)
-        if (iface.family === "IPv4" && !iface.internal) {
-          ipAddress = iface.address;
-          // You can break out of the loops here if the first non-internal IPv4 is sufficient
-        }
-      },
-    );
-  });
-
-  return ipAddress;
-}
-
-const hostIp = getNetworkHostIp();
-console.log(`Local Network Host IP Address: ${hostIp}`);
-
 export default defineConfig(() => ({
   plugins: [tanstackStart(), viteReact(), tailwindcss()],
   ssr: {
