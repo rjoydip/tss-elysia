@@ -18,9 +18,13 @@ Tests are located in `test/`:
 
 ```bash
 test/
-  api.$.test.ts        # API logic tests
-  setup.ts             # Test setup
-  load-tests/          # k6 load tests
+  db.test.ts          # Database CRUD tests
+  auth.test.ts        # Auth unit tests (Better Auth)
+  env.test.ts         # Environment variable tests
+  setup.ts            # Test setup (JSDOM)
+  fixtures/           # Shared test fixtures
+    db.ts             # In-memory DB, seed helpers
+  load-tests/         # k6 load tests
     smoke-test.js     # Smoke test
     api-test.js      # API load test
     stress-test.js   # Stress test
@@ -95,8 +99,23 @@ E2E tests are in `.e2e/`:
 
 ```bash
 .e2e/
-  ui.test.ts    # UI tests (home page, navigation)
-  api.$.test.ts # API endpoint tests
+  config.ts       # Shared E2E configuration (host, port, base URL)
+  ui.test.ts      # UI tests (home page, navigation)
+  api.$.test.ts   # API endpoint tests
+  auth.test.ts    # Authentication E2E tests
+```
+
+E2E configuration is centralized in `.e2e/config.ts` and shared by both `playwright.config.ts` and test files:
+
+```typescript
+// .e2e/config.ts
+const host = process.env.E2E_HOST || process.env.HOST || "localhost";
+const port = process.env.E2E_PORT || process.env.PORT || "3000";
+
+export const E2E_BASE_URL = process.env.E2E_BASE_URL || `http://${host}:${port}`;
+export const E2E_HOST = host;
+export const E2E_PORT = port;
+export const E2E_AUTH_URL = process.env.BETTER_AUTH_URL || `${E2E_BASE_URL}/api/auth`;
 ```
 
 ### CI Test Skip Behavior
@@ -138,16 +157,26 @@ test("should respond to /api/test", async ({ request }) => {
 Edit `playwright.config.ts`:
 
 ```typescript
+import { E2E_BASE_URL, E2E_HOST, E2E_PORT } from "./.e2e/config";
+
 export default defineConfig({
   testDir: "./.e2e",
-  baseURL: "http://localhost:3000",
+  baseURL: E2E_BASE_URL,
   projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }],
   webServer: {
-    command: "bun run dev",
-    url: "http://localhost:3000",
+    command: `bun run preview --host=${E2E_HOST} --port=${E2E_PORT}`,
+    url: E2E_BASE_URL,
     reuseExistingServer: !process.env.CI,
   },
 });
+```
+
+Override via environment variables:
+
+```bash
+E2E_HOST=0.0.0.0 E2E_PORT=4173 bun run test:e2e
+# Or use full URL
+E2E_BASE_URL=http://custom:4173 bun run test:e2e
 ```
 
 ## CI Integration
@@ -189,10 +218,10 @@ Configure using environment variables:
 
 ```bash
 # Use custom host/port
-HOST=localhost PORT=3001 bun run test:load
+HOST=localhost PORT=3000 bun run test:load
 
 # Or use BASE_URL directly
-BASE_URL=http://localhost:3001 bun run test:load
+BASE_URL=http://localhost:3000 bun run test:load
 ```
 
 Supported variables:

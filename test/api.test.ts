@@ -1,10 +1,48 @@
 import { describe, it, expect } from "bun:test";
 import { treaty } from "@elysiajs/eden";
-import { app } from "../src/routes/api.$.ts";
+import { apiApp } from "../src/routes/api/$.ts";
 
 const getHealthData = () => ({
   name: "TSS ELYSIA",
   status: "ok",
+});
+
+describe("API Flows", () => {
+  it("should return 404 for unknown routes", async () => {
+    const response = await apiApp.handle(new Request("http://localhost/unknown-route"));
+
+    expect(response.status).toBe(404);
+    const body = await response.json();
+    expect(body.error).toBe("Endpoint not found");
+  });
+
+  it("should include CORS headers", async () => {
+    const response = await apiApp.handle(
+      new Request("http://localhost/api/health", {
+        method: "OPTIONS",
+        headers: {
+          Origin: "http://localhost:3000",
+          "Access-Control-Request-Method": "GET",
+        },
+      }),
+    );
+
+    expect(response.headers.get("Access-Control-Allow-Origin")).toBe("http://localhost:3000");
+  });
+
+  it("should handle error response format", async () => {
+    const response = await apiApp.handle(new Request("http://localhost/api/nonexistent"));
+
+    expect(response.status).toBe(404);
+    const body = await response.json();
+    expect(body).toHaveProperty("error");
+  });
+
+  it("should include trace headers in response", async () => {
+    const response = await apiApp.handle(new Request("http://localhost/api/health"));
+
+    expect(response.headers.get("X-Elapsed")).toBeDefined();
+  });
 });
 
 describe("API Health", () => {
@@ -33,7 +71,7 @@ describe("API Root", () => {
   });
 });
 
-const api = treaty(app);
+const api = treaty(apiApp);
 
 describe("Eden Treaty - API Endpoints", () => {
   describe("GET /api", () => {

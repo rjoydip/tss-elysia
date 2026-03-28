@@ -48,11 +48,12 @@ The application follows a server-side rendering (SSR) architecture using TanStac
 
 ### 2. Server Layer
 
-| Component    | File                  | Purpose                     |
-| ------------ | --------------------- | --------------------------- |
-| Server Entry | `src/server.ts`       | TanStack Start entry        |
-| App Factory  | `src/_app.ts`         | Elysia app with middlewares |
-| API Routes   | `src/routes/api.$.ts` | API endpoints               |
+| Component    | File                       | Purpose                                    |
+| ------------ | -------------------------- | ------------------------------------------ |
+| Server Entry | `src/server.ts`            | TanStack Start entry with auth method gate |
+| App Factory  | `src/_app.ts`              | Elysia app with middlewares                |
+| API Routes   | `src/routes/api.$.ts`      | API endpoints                              |
+| Auth Routes  | `src/routes/api/auth/$.ts` | Auth endpoints (Better Auth)               |
 
 ### 3. Configuration Layer
 
@@ -75,12 +76,13 @@ The application follows a server-side rendering (SSR) architecture using TanStac
 ### Request Flow
 
 1. **Client Request** → Browser sends HTTP request to server
-2. **Vite Middleware** (dev) or **Static** (prod) handles request
-3. **CORS** → Validates cross-origin headers
-4. **Helmet** → Adds security headers
-5. **Rate Limit** → Checks request limits
-6. **Route Handler** → Processes API or SSR route
-7. **Response** → Returns JSON (API) or HTML (SSR)
+2. **Server Entry** (`src/server.ts`) → Rejects unsupported methods for `/api/auth/*` (405)
+3. **Vite Middleware** (dev) or **Static** (prod) handles request
+4. **CORS** → Validates cross-origin headers
+5. **Helmet** → Adds security headers
+6. **Rate Limit** → Checks request limits
+7. **Route Handler** → Processes API or SSR route
+8. **Response** → Returns JSON (API) or HTML (SSR)
 
 ### Environment Flow
 
@@ -116,10 +118,10 @@ src/routes/api.$.ts (API routes)
 src/
 ├── _app.ts           # Elysia app factory
 ├── _api.ts           # Base API definition
-├── _config.ts        # Central configuration
+├── _config.ts        # Central configuration (AUTH_ALLOWED_METHODS, etc.)
 ├── _env.ts           # Environment variables
 ├── router.tsx        # TanStack Router
-├── server.ts         # Server entry point
+├── server.ts         # Server entry point (auth method gate)
 ├── middlewares/      # Middleware implementations
 │   ├── _cors.ts
 │   ├── _helmet.ts
@@ -129,7 +131,11 @@ src/
 ├── routes/           # TanStack Start routes
 │   ├── __root.tsx
 │   ├── index.tsx
-│   └── api.$.ts
+│   ├── api.$.ts
+│   └── api/auth/$.ts # Auth routes (Better Auth)
+├── lib/
+│   ├── auth.ts       # Better Auth instance
+│   └── db/           # Database (Drizzle + SQLite)
 └── styles/
     └── app.css
 ```
@@ -149,8 +155,3 @@ src/
 - Rate limiting prevents abuse
 
 ## Performance
-
-- Vite HMR for fast development
-- Tailwind CSS v4 for optimized CSS
-- Elysia's native static response
-- Rate limiting for DoS prevention

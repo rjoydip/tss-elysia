@@ -20,3 +20,46 @@ All necessary information is in [README.md](./README.md), including:
 3. Run `bun run typecheck` to verify types
 4. Run `bun run fmt` to ensure formatting
 5. Commit changes (hooks will verify)
+
+## Skills & Agents
+
+This project uses a skill-based architecture. Skills are located in `.agents/skills/`.
+
+### Available Skills
+
+| Skill              | Description                    | Usage                        |
+| ------------------ | ------------------------------ | ---------------------------- |
+| `expect`           | Adversarial browser testing    | Test changes in real browser |
+| `land-pr`          | Land a PR with proper workflow | Merge PRs to main            |
+| `code-review`      | Code quality review            | Review PRs and code          |
+| `docs-writer`      | Documentation creation         | Write/update docs            |
+| `security-auditor` | Security audit                 | Find vulnerabilities         |
+
+### Loading Skills
+
+Use the `skill` tool to load a skill when a task matches its description:
+
+```bash
+Load skill "expect" for browser testing
+Load skill "land-pr" for PR merging
+```
+
+## Environment Configuration
+
+Database configuration is managed via environment variables:
+
+```bash
+# .env file
+DATABASE_PATH=.artifacts
+DATABASE_NAME=tss-elysia.db
+AUTH_SECRET=your-secret-key
+```
+
+### Key Variables
+
+| Variable        | Default         | Description          |
+| --------------- | --------------- | -------------------- |
+| `DATABASE_PATH` | `.artifacts`    | SQLite database path |
+| `DATABASE_NAME` | `tss-elysia.db` | SQLite database name |
+| `PORT`          | `3000`          | Server port          |
+| `HOST`          | `localhost`     | Server host          |

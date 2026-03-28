@@ -108,15 +108,17 @@ const _getEnv = (key: string, defaultValue: string = ""): string => {
 };
 
 const _BASE_URL = `http://localhost:${PORT}`;
+const _DEFAULT_DB_PATH = ".artifacts";
+const _DEFAULT_DB_NAME = "tss-elysia.db";
 
 function _getAuthSecret(): string {
-  const secret = _getEnv("AUTH_SECRET", "");
+  const secret = _getEnv("BETTER_AUTH_SECRET", "");
   if (!secret) {
     if (isProduction) {
-      throw new Error("AUTH_SECRET is required in production");
+      throw new Error("BETTER_AUTH_SECRET is required in production");
     }
     console.warn(
-      "AUTH_SECRET not set, using random value (sessions will be invalidated on restart)",
+      "BETTER_AUTH_SECRET not set, using random value (sessions will be invalidated on restart)",
     );
     return crypto.randomUUID();
   }
@@ -126,18 +128,24 @@ function _getAuthSecret(): string {
 export const env = await _createEnv({
   client: {
     VITE_API_URL: t.String(),
+    DATABASE_NAME: t.String(),
   },
   server: {
     API_URL: t.String(),
-    AUTH_SECRET: t.String(),
+    BETTER_AUTH_URL: t.String(),
+    BETTER_AUTH_SECRET: t.String(),
     DATABASE_URL: t.String(),
+    DATABASE_PATH: t.String(),
     PORT: t.Number(),
   },
   runtimeEnv: () => ({
     VITE_API_URL: _getEnv("VITE_API_URL", ""),
     API_URL: _getEnv("API_URL", `${_BASE_URL}/api`),
-    AUTH_SECRET: _getAuthSecret(),
+    BETTER_AUTH_URL: _getEnv("BETTER_AUTH_URL", `${_BASE_URL}/api/auth`),
+    BETTER_AUTH_SECRET: _getAuthSecret(),
     DATABASE_URL: _getEnv("DATABASE_URL", ""),
+    DATABASE_PATH: _getEnv("DATABASE_PATH", _DEFAULT_DB_PATH),
+    DATABASE_NAME: _getEnv("DATABASE_NAME", _DEFAULT_DB_NAME),
     PORT: parseInt(_getEnv("PORT", String(PORT)), 10),
   }),
 });
