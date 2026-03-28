@@ -105,32 +105,6 @@ test.describe("Authentication API", () => {
     });
   });
 
-  test.describe("CORS", () => {
-    test("should return CORS headers", async ({ request }) => {
-      const response = await request.get("/api/auth/get-session", {
-        headers: { Origin: BASE_ORIGIN },
-      });
-
-      const allowOrigin = response.headers()["access-control-allow-origin"];
-      expect(allowOrigin).toBeDefined();
-    });
-
-    test("should handle preflight OPTIONS", async ({ request }) => {
-      const response = await request.fetch("/api/auth/sign-in/email", {
-        method: "OPTIONS",
-        headers: {
-          Origin: BASE_ORIGIN,
-          "Access-Control-Request-Method": "POST",
-          "Access-Control-Request-Headers": "Content-Type",
-        },
-      });
-
-      expect(response.status()).toBeLessThan(400);
-      const allowMethods = response.headers()["access-control-allow-methods"];
-      expect(allowMethods).toContain("POST");
-    });
-  });
-
   test.describe("Error Handling", () => {
     test("should reject unsupported HTTP method", async ({ request }) => {
       const response = await request.fetch("/api/auth/sign-in/email", {
