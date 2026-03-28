@@ -144,9 +144,13 @@ jobs:
           done
 
       - name: Run smoke test
-        run: |
-          chmod +x .artifacts/k6.exe
-          .artifacts/k6.exe run test/load-tests/smoke-test.js -e HOST=$E2E_HOST -e PORT=$E2E_PORT
+        uses: k6io/action@v0.2.0
+        with:
+          smokeTest: true
+          files: test/load-tests/smoke-test.js
+        env:
+          HOST: ${{ env.E2E_HOST }}
+          PORT: ${{ env.E2E_PORT }}
 
       - name: Run E2E tests
         run: bun run test:e2e --project=chromium
