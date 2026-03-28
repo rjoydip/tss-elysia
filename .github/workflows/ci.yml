@@ -129,13 +129,11 @@ jobs:
           echo "Resolved host IP: $HOST_IP"
 
       - name: Start preview server
-        run: bun run preview --port ${{ env.E2E_PORT }} --host ${{ env.E2E_HOST }} &
-
-      - name: Wait for server
         run: |
+          bun run preview --port $E2E_PORT --host $E2E_HOST &
           for i in $(seq 1 30); do
-            if curl -sf http://${{ env.E2E_HOST }}:${{ env.E2E_PORT }} > /dev/null 2>&1; then
-              echo "Server http://${{ env.E2E_HOST }}:${{ env.E2E_PORT }}  is ready"
+            if curl -sf http://$E2E_HOST:$E2E_PORT > /dev/null 2>&1; then
+              echo "Server http://$E2E_HOST:$E2E_PORT is ready"
               break
             fi
             echo "Waiting for server... ($i)"
