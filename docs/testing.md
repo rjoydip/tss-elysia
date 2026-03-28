@@ -51,7 +51,7 @@ Use Eden Treaty for end-to-end type-safe API testing:
 ```typescript
 import { describe, expect, it } from "bun:test";
 import { treaty } from "@elysiajs/eden";
-import { app } from "../src/routes/api.$.ts";
+import { app } from "../src/routes/api/$.ts";
 
 const api = treaty(app);
 

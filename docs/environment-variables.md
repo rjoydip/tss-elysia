@@ -72,10 +72,10 @@ cp .env.example .env
 
 ## Isomorphic Env Fetching
 
-The project uses `src/_env.ts` for type-safe environment variables that work in both client and server contexts:
+The project uses `src/env.ts` for type-safe environment variables that work in both client and server contexts:
 
 ```typescript
-// src/_env.ts
+// src/env.ts
 export const env = await _createEnv({
   client: {
     VITE_API_URL: t.String(), // Client-only vars
@@ -145,7 +145,7 @@ The client-side API client uses a dynamic URL resolution:
 3. Defaults to `http://localhost:3000` for SSR
 
 ```typescript
-// src/routes/api.$.ts
+// src/routes/api/$.ts
 export const getAPI = createIsomorphicFn()
   .server(() => treaty(app).api)
   .client(() => {

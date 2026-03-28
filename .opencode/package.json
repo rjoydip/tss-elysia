@@ -1,4 +1,50 @@
 {
+  "name": "tss-elysia-opencode",
+  "version": "0.0.0",
+  "description": "OpenCode plugin for TSS Elysia",
+  "keywords": [
+    "agents",
+    "ai-coding",
+    "automation",
+    "developer-tools",
+    "hooks",
+    "opencode",
+    "plugin",
+    "tss-elysia"
+  ],
+  "license": "MIT",
+  "files": [
+    "dist",
+    "commands",
+    "prompts",
+    "instructions",
+    "opencode.json",
+    "README.md"
+  ],
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./plugins": {
+      "types": "./dist/plugins/index.d.ts",
+      "import": "./dist/plugins/index.js"
+    },
+    "./tools": {
+      "types": "./dist/tools/index.d.ts",
+      "import": "./dist/tools/index.js"
+    }
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "tsc",
+    "clean": "rm -rf dist",
+    "prepublishOnly": "bun run build"
+  },
   "dependencies": {
     "@opencode-ai/plugin": "1.3.3"
   },

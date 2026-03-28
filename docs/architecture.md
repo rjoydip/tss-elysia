@@ -51,32 +51,31 @@ The application follows a server-side rendering (SSR) architecture using TanStac
 | Component    | File                       | Purpose                                    |
 | ------------ | -------------------------- | ------------------------------------------ |
 | Server Entry | `src/server.ts`            | TanStack Start entry with auth method gate |
-| App Factory  | `src/_app.ts`              | Elysia app with middlewares                |
-| API Routes   | `src/routes/api.$.ts`      | API endpoints                              |
+| App Factory  | `src/server.ts`            | Elysia app with middlewares                |
+| API Routes   | `src/routes/api/$.ts`      | API endpoints                              |
 | Auth Routes  | `src/routes/api/auth/$.ts` | Auth endpoints (Better Auth)               |
 
 ### 3. Configuration Layer
 
-| Component | File             | Purpose                                              |
-| --------- | ---------------- | ---------------------------------------------------- |
-| Config    | `src/_config.ts` | Central config (API name, rate limits, CORS, helmet) |
-| Env       | `src/_env.ts`    | Type-safe environment variables                      |
+| Component | File            | Purpose                                              |
+| --------- | --------------- | ---------------------------------------------------- |
+| Config    | `src/config.ts` | Central config (API name, rate limits, CORS, helmet) |
+| Env       | `src/env.ts`    | Type-safe environment variables                      |
 
 ### 4. Middleware Layer
 
-| Middleware | File                             | Purpose                |
-| ---------- | -------------------------------- | ---------------------- |
-| CORS       | `src/middlewares/_cors.ts`       | Cross-Origin headers   |
-| Helmet     | `src/middlewares/_helmet.ts`     | Security headers       |
-| Rate Limit | `src/middlewares/_rate-limit.ts` | Request throttling     |
-| Vite       | `src/middlewares/_vite.ts`       | Dev server integration |
+| Middleware | File                            | Purpose              |
+| ---------- | ------------------------------- | -------------------- |
+| CORS       | `src/middlewares/cors.ts`       | Cross-Origin headers |
+| Helmet     | `src/middlewares/helmet.ts`     | Security headers     |
+| Rate Limit | `src/middlewares/rate-limit.ts` | Request throttling   |
 
 ## Data Flow
 
 ### Request Flow
 
 1. **Client Request** → Browser sends HTTP request to server
-2. **Server Entry** (`src/server.ts`) → Rejects unsupported methods for `/api/auth/*` (405)
+2. **Server Entry** (`src/server.ts`) → Rejects unsupported methods for `/api/auth/*` (405), sets up Elysia app with middlewares
 3. **Vite Middleware** (dev) or **Static** (prod) handles request
 4. **CORS** → Validates cross-origin headers
 5. **Helmet** → Adds security headers
@@ -100,42 +99,48 @@ package.json
 vite.config.ts
     │
     ▼
-src/_config.ts (API_PREFIX, rateLimitConfig, corsConfig, helmetConfig)
+src/config.ts (API_PREFIX, rateLimitConfig, corsConfig, helmetConfig)
     │
     ▼
-src/_env.ts (runtimeEnv)
+src/env.ts (runtimeEnv)
     │
     ▼
-src/_app.ts (createApp with middleware)
+src/server.ts (createApp with middleware)
     │
     ▼
-src/routes/api.$.ts (API routes)
+src/routes/api/$.ts (API routes)
 ```
 
 ## File Structure
 
 ```bash
 src/
-├── _app.ts           # Elysia app factory
-├── _api.ts           # Base API definition
-├── _config.ts        # Central configuration (AUTH_ALLOWED_METHODS, etc.)
-├── _env.ts           # Environment variables
-├── router.tsx        # TanStack Router
-├── server.ts         # Server entry point (auth method gate)
-├── middlewares/      # Middleware implementations
-│   ├── _cors.ts
-│   ├── _helmet.ts
-│   ├── _rate-limit.ts
-│   ├── _vite.ts
+├── config.ts         # Central configuration (AUTH_ALLOWED_METHODS, rate limits, CORS, helmet)
+├── env.ts            # Type-safe environment variables
+├── lib/              # Library code
+│   ├── auth.ts       # Better Auth instance
+│   └── db/           # Database (Drizzle + SQLite)
+│       ├── index.ts
+│       └── schema.ts
+├── logger.ts        # Logger configuration
+├── middlewares/     # Middleware implementations
+│   ├── cors.ts
+│   ├── helmet.ts
+│   ├── rate-limit.ts
 │   └── index.ts
+├── router.tsx        # TanStack Router
+├── routeTree.gen.ts # Auto-generated route tree
 ├── routes/           # TanStack Start routes
 │   ├── __root.tsx
 │   ├── index.tsx
-│   ├── api.$.ts
-│   └── api/auth/$.ts # Auth routes (Better Auth)
-├── lib/
-│   ├── auth.ts       # Better Auth instance
-│   └── db/           # Database (Drizzle + SQLite)
+│   ├── api/
+│   │   ├── $.ts     # API catch-all route
+│   │   └── auth/
+│   │       └── $.ts # Auth routes (Better Auth)
+├── server.ts         # Server entry point (auth method gate)
+├── types/            # TypeScript type definitions
+│   └── subscription.ts
+├── utils.ts          # Utility functions
 └── styles/
     └── app.css
 ```

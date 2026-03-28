@@ -76,26 +76,26 @@ Options:
 - `--full` - Full reset including `node_modules` (rarely needed)
 
 > **Note:** Executable files like `k9.exe` in `.artifacts/` are automatically preserved during cleanup.
-
 > Before load test make sure to ran vite preview `bun preview --host`
 
 ## Documentation
 
 Detailed documentation available in `docs/`:
 
-| Document                                               | Description                  |
-| ------------------------------------------------------ | ---------------------------- |
-| [API Reference](docs/api-reference.md)                 | API endpoints and usage      |
-| [Architecture](docs/architecture.md)                   | System architecture overview |
-| [Authentication](docs/authentication.md)               | Auth setup and configuration |
-| [Development](docs/development.md)                     | Development guide            |
-| [Docker](docs/docker.md)                               | Docker deployment guide      |
-| [Environment Variables](docs/environment-variables.md) | Environment configuration    |
-| [Middleware](docs/middleware.md)                       | Middleware documentation     |
-| [Opencode](docs/opencode.md)                           | Opencode documentation       |
-| [Project Overview](docs/project-overview.md)           | Project introduction         |
-| [Testing](docs/testing.md)                             | Testing guide                |
-| [Troubleshooting](docs/troubleshooting.md)             | Common issues and solutions  |
+| Document                                               | Description                     |
+| ------------------------------------------------------ | ------------------------------- |
+| [Agent Skills](docs/agent-skills.md)                   | AI agent skills and usage guide |
+| [API Reference](docs/api-reference.md)                 | API endpoints and usage         |
+| [Architecture](docs/architecture.md)                   | System architecture overview    |
+| [Authentication](docs/authentication.md)               | Auth setup and configuration    |
+| [Development](docs/development.md)                     | Development guide               |
+| [Docker](docs/docker.md)                               | Docker deployment guide         |
+| [Environment Variables](docs/environment-variables.md) | Environment configuration       |
+| [Middleware](docs/middleware.md)                       | Middleware documentation        |
+| [Opencode](docs/opencode.md)                           | Opencode documentation          |
+| [Project Overview](docs/project-overview.md)           | Project introduction            |
+| [Testing](docs/testing.md)                             | Testing guide                   |
+| [Troubleshooting](docs/troubleshooting.md)             | Common issues and solutions     |
 
 ## Tech Stack
 
@@ -110,26 +110,36 @@ Detailed documentation available in `docs/`:
 
 ```bash
 src/
-  _app.ts           # Elysia app factory with middlewares
-  _api.ts           # API routes definition
-  _config.ts        # Central configuration (logger, rate-limit, cors, helmet)
-  _env.ts           # Isomorphic env fetching with type-safe validation
-  router.tsx        # TanStack Router configuration
-  server.ts         # TanStack Start server entry
-  middlewares/      # Middleware implementations
-    _cors.ts        # CORS headers
-    _helmet.ts      # Security headers
-    _rate-limit.ts  # Rate limiting
-    _vite.ts        # Vite integration
-    index.ts        # Export barrel
-  routes/           # File-based routing (TanStack Start)
-    __root.tsx      # Root route
-    index.tsx       # Home route
-    api.$.ts        # API catch-all route
-  styles/
-    app.css         # Global styles
-vite.config.ts      # Vite configuration
-tsconfig.json       # TypeScript configuration
+├── config.ts          # Central configuration (logger, rate-limit, cors, helmet)
+├── env.ts             # Isomorphic env fetching with type-safe validation
+├── lib/                # Library code
+│   ├── auth.ts        # Better Auth instance
+│   └── db/            # Database (Drizzle + SQLite)
+│       ├── index.ts
+│       └── schema.ts
+├── logger.ts          # Logger configuration
+├── middlewares/       # Middleware implementations
+│   ├── cors.ts        # CORS headers
+│   ├── helmet.ts      # Security headers
+│   ├── index.ts       # Export barrel
+│   └── rate-limit.ts  # Rate limiting
+├── router.tsx         # TanStack Router configuration
+├── routeTree.gen.ts   # Auto-generated route tree
+├── routes/            # File-based routing (TanStack Start)
+│   ├── __root.tsx     # Root route
+│   ├── index.tsx      # Home route
+│   └── api/           # API routes
+│       ├── $.ts       # API catch-all route
+│       └── auth/      # Auth routes (Better Auth)
+│           └── $.ts
+├── server.ts          # TanStack Start server entry
+├── types/             # TypeScript type definitions
+│   └── subscription.ts
+├── utils.ts           # Utility functions
+└── styles/
+    └── app.css        # Global styles
+vite.config.ts         # Vite configuration
+tsconfig.json          # TypeScript configuration
 ```
 
 ## Code Style
