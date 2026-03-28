@@ -6,20 +6,20 @@ This project implements middleware based on the try-elysia architecture, providi
 
 Located in `src/middlewares/`:
 
-| Middleware | File             | Purpose                               |
-| ---------- | ---------------- | ------------------------------------- |
-| CORS       | `_cors.ts`       | Cross-Origin Resource Sharing headers |
-| Helmet     | `_helmet.ts`     | Security HTTP headers                 |
-| Rate Limit | `_rate-limit.ts` | Request rate limiting                 |
+| Middleware | File            | Purpose                               |
+| ---------- | --------------- | ------------------------------------- |
+| CORS       | `cors.ts`       | Cross-Origin Resource Sharing headers |
+| Helmet     | `helmet.ts`     | Security HTTP headers                 |
+| Rate Limit | `rate-limit.ts` | Request rate limiting                 |
 
 ## CORS Middleware
 
 Configures CORS headers for cross-origin requests:
 
 ```typescript
-// src/middlewares/_cors.ts
+// src/middlewares/cors.ts
 import Elysia from "elysia";
-import { corsConfig } from "~/_config";
+import { corsConfig } from "~/config";
 
 export const cors = new Elysia({ name: "cors" }).onRequest(({ set }) => {
   set.headers["Access-Control-Allow-Origin"] = corsConfig.origin;
@@ -29,7 +29,7 @@ export const cors = new Elysia({ name: "cors" }).onRequest(({ set }) => {
 });
 ```
 
-### CORS Configuration (`src/_config.ts`)
+### CORS Configuration (`src/config.ts`)
 
 ```typescript
 export const corsConfig = {
@@ -47,7 +47,7 @@ export const corsConfig = {
 Adds security HTTP headers:
 
 ```typescript
-// src/middlewares/_helmet.ts
+// src/middlewares/helmet.ts
 export const helmet = new Elysia({ name: "helmet" }).onRequest(({ set }) => {
   set.headers["X-Content-Type-Options"] = "nosniff";
   set.headers["X-Frame-Options"] = "DENY";
@@ -66,7 +66,7 @@ export const helmet = new Elysia({ name: "helmet" }).onRequest(({ set }) => {
 - `Referrer-Policy`
 - `X-Permitted-Cross-Domain-Policies`
 
-### Helmet Configuration (`src/_config.ts`)
+### Helmet Configuration (`src/config.ts`)
 
 ```typescript
 export const helmetConfig = {
@@ -86,7 +86,7 @@ export const helmetConfig = {
 Prevents abuse by limiting request rates:
 
 ```typescript
-// src/middlewares/_rate-limit.ts
+// src/middlewares/rate-limit.ts
 export const rateLimitMiddleware = new Elysia({ name: "rate-limit" }).use(
   rateLimit({
     duration: rateLimitConfig.duration,
@@ -99,7 +99,7 @@ export const rateLimitMiddleware = new Elysia({ name: "rate-limit" }).use(
 );
 ```
 
-### Configuration (`src/_config.ts`)
+### Configuration (`src/config.ts`)
 
 ```typescript
 export const rateLimitConfig = {
@@ -114,19 +114,19 @@ All middlewares are exported from `src/middlewares/index.ts`:
 
 ```typescript
 // src/middlewares/index.ts
-export { cors, corsWithCredentials } from "./_cors";
-export { helmet } from "./_helmet";
-export { rateLimitMiddleware } from "./_rate-limit";
+export { cors, corsWithCredentials } from "./cors";
+export { helmet } from "./helmet";
+export { rateLimitMiddleware } from "./rate-limit";
 ```
 
 ## App Factory
 
-Middlewares are integrated in `src/_app.ts`:
+Middlewares are integrated in `src/server.ts`:
 
 ```typescript
-// src/_app.ts
+// src/server.ts
 import { Elysia } from "elysia";
-import { appConfig, logger } from "~/_config";
+import { appConfig, logger } from "~/config";
 import { cors, helmet, rateLimitMiddleware } from "~/middlewares";
 
 export const createApp = (config?: ElysiaConfig<any>) =>
@@ -147,10 +147,10 @@ To add a custom middleware:
 
 1. Create a new file in `src/middlewares/`
 2. Export an Elysia instance
-3. Import and use in `src/_app.ts`
+3. Import and use in `src/server.ts`
 
 ```typescript
-// src/middlewares/_custom.ts
+// src/middlewares/custom.ts
 import Elysia from "elysia";
 
 export const customMiddleware = new Elysia({ name: "custom" }).onRequest(({ set }) => {
@@ -159,7 +159,7 @@ export const customMiddleware = new Elysia({ name: "custom" }).onRequest(({ set 
 ```
 
 ```typescript
-// src/_app.ts
+// src/server.ts
 import { customMiddleware } from "~/middlewares";
 
 export const createApp = (config) =>

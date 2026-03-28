@@ -1,5 +1,6 @@
 import { existsSync, unlinkSync } from "node:fs";
 import { resolve } from "node:path";
+import { logger } from "./lib/logger";
 
 const dbPath =
   process.env.DATABASE_PATH && process.env.DATABASE_NAME
@@ -12,7 +13,7 @@ const fullPath = resolve(dbPath);
 
 if (existsSync(fullPath)) {
   unlinkSync(fullPath);
-  console.log(`Removed ${fullPath}`);
+  logger.success(`Removed ${fullPath}`);
 } else {
-  console.log(`No database file found at ${fullPath}, skipping`);
+  logger.warn(`No database file found at ${fullPath}, skipping`);
 }

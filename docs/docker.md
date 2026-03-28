@@ -2,52 +2,93 @@
 
 This document covers Docker setup for the tss-elysia application.
 
+## What's New (v2.0)
+
+The Docker setup has been optimized for:
+
+- **Smaller image size** - Multi-stage builds reduce final image
+- **Faster builds** - Better layer caching with .dockerignore
+- **Better security** - Runs as non-root user (UID 1000)
+- **Resource limits** - Memory constraints in production
+- **Health checks** - Improved container health monitoring
+
 ## Prerequisites
 
 - [Docker](https://docs.docker.com/get-docker/) installed
 - [Docker Compose](https://docs.docker.com/compose/install/) installed
-- Bun (for local development)
+- Enable [BuildKit](https://docs.docker.com/build/buildkit/) for faster builds:
+
+```bash
+export DOCKER_BUILDKIT=1
+```
 
 ## Quick Start
 
 ### Production
 
 ```bash
-# Build the image
-docker build -t tss-elysia .
+# Build and run
+docker-compose -f docker/docker-compose.yml up app --build
 
-# Run the container
-docker run -p 3000:3000 \
-  -e AUTH_SECRET=your-secret-key \
-  -e DATABASE_NAME=data/.db \
-  tss-elysia
+# Or use docker directly
+docker build -f docker/Dockerfile -t tss-elysia .
+docker run -p 3000:3000 -e AUTH_SECRET=your-secret-key-min-32chars tss-elysia
 ```
 
 ### Development
 
 ```bash
-# Start development server
-docker-compose up dev
+# Start development server with hot reload
+docker-compose -f docker/docker-compose.yml up dev --build
 
 # Start in background
-docker-compose up -d dev
+docker-compose -f docker/docker-compose.yml up -d dev
+
+# View logs
+docker-compose -f docker/docker-compose.yml logs -f dev
 ```
 
-## Dockerfile Variants
+## Dockerfile Architecture
 
 ### Production (Dockerfile)
 
-- Uses `oven/bun:1.3.11-debian` base image
-- Runs `bun run build` for production build
-- Starts with `bun run start`
-- Health checks enabled
+Multi-stage build for minimal image size:
+
+```bash
+┌─────────────────┐
+│   oven/bun      │  Stage 1: Dependencies
+│  (deps layer)   │  Install all packages
+└────────┬────────┘
+         │
+         ▼
+┌─────────────────┐
+│   oven/bun      │  Stage 2: Builder
+│  (builder)      │  Build application
+└────────┬────────┘
+         │
+         ▼
+┌─────────────────┐
+│   oven/bun      │  Stage 3: Production
+│  (production)   │  Minimal runtime + non-root user
+└─────────────────┘
+```
+
+**Optimizations:**
+
+- Multi-stage build (smaller final image)
+- Non-root user (security)
+- Layer caching (faster rebuilds)
+- Health checks (reliability)
 
 ### Development (Dockerfile.dev)
 
-- Uses `oven/bun:1.3.11-debian` base image
-- Mounts source code for hot reload
-- Runs `bun run dev`
-- Volume caching for Bun
+Single-stage for quick iteration:
+
+**Optimizations:**
+
+- Non-root user (matches production)
+- Volume mounts for hot reload
+- Node modules cached
 
 ## Docker Compose Services
 
@@ -55,7 +96,9 @@ docker-compose up -d dev
 
 ```yaml
 app:
-  build: .
+  build:
+    context: ..
+    dockerfile: docker/Dockerfile
   ports:
     - "3000:3000"
   environment:
@@ -63,12 +106,22 @@ app:
     - PORT=3000
     - NODE_ENV=production
     - AUTH_SECRET=${AUTH_SECRET}
-    - DATABASE_NAME=data/.db
+    - DATABASE_PATH=.artifacts
+    - DATABASE_NAME=tss-elysia.db
   volumes:
-    - db-data:/app/data
+    - app-data:/app/.artifacts
+  deploy:
+    resources:
+      limits:
+        memory: 512M
+      reservations:
+        memory: 256M
   restart: unless-stopped
   healthcheck:
     test: ["CMD", "wget", "-q", "--spider", "http://localhost:3000/api/health"]
+    interval: 30s
+    timeout: 10s
+    retries: 3
 ```
 
 ### dev (Development)
@@ -76,116 +129,148 @@ app:
 ```yaml
 dev:
   build:
-    context: .
-    dockerfile: Dockerfile.dev
+    context: ..
+    dockerfile: docker/Dockerfile.dev
   ports:
     - "3000:3000"
   environment:
     - HOST=0.0.0.0
     - PORT=3000
     - NODE_ENV=development
-    - AUTH_SECRET=${AUTH_SECRET:-dev-secret-min-32-characters-long}
-    - DATABASE_NAME=data/.db
+    - AUTH_SECRET=${AUTH_SECRET:-dev-secret-min-32-chars-here}
   volumes:
-    - .:/app
+    - ..:/app
     - bun-cache:/root/.bun
-  command: bun run dev
+    - node-modules:/app/node_modules
   restart: on-failure
 ```
 
 ## Environment Variables
 
-Configure via `.env` file or environment:
-
-| Variable        | Default      | Description      |
-| --------------- | ------------ | ---------------- |
-| `HOST`          | `0.0.0.0`    | Server host      |
-| `PORT`          | `3000`       | Server port      |
-| `NODE_ENV`      | `production` | Environment mode |
-| `AUTH_SECRET`   | Required     | Session secret   |
-| `DATABASE_NAME` | `data/.db`   | Database path    |
+| Variable        | Default                     | Description        |
+| --------------- | --------------------------- | ------------------ |
+| `HOST`          | `0.0.0.0`                   | Server host        |
+| `PORT`          | `3000`                      | Server port        |
+| `NODE_ENV`      | `production`                | Environment mode   |
+| `AUTH_SECRET`   | **Required** (min 32 chars) | Session secret     |
+| `DATABASE_PATH` | `.artifacts`                | Database directory |
+| `DATABASE_NAME` | `tss-elysia.db`             | Database filename  |
 
 ## Usage Examples
 
-### Basic Production Run
+### Production with Docker Compose
 
 ```bash
-docker run -d \
-  --name tss-elysia \
-  -p 3000:3000 \
-  -e AUTH_SECRET=my-super-secret-key-32chars \
-  tss-elysia
-```
+# Create .env file
+cat > .env << EOF
+AUTH_SECRET=your-production-secret-min-32-chars
+EOF
 
-### With Custom Database
+# Build and start
+docker-compose -f docker/docker-compose.yml up app --build -d
 
-```bash
-docker run -d \
-  --name tss-elysia \
-  -p 3000:3000 \
-  -e AUTH_SECRET=my-super-secret-key-32chars \
-  -e DATABASE_NAME=/data/custom.db \
-  -v custom-data:/data \
-  tss-elysia
+# View logs
+docker-compose -f docker/docker-compose.yml logs -f app
+
+# Stop
+docker-compose -f docker/docker-compose.yml down
 ```
 
 ### Development with Docker Compose
 
 ```bash
-# Create .env file
-cat > .env << EOF
-AUTH_SECRET=dev-secret-min-32-characters-long
-EOF
+# Start with hot reload
+docker-compose -f docker/docker-compose.yml up dev --build
 
-# Start development
-docker-compose up dev
+# Run in background
+docker-compose -f docker/docker-compose.yml up -d dev
 
 # View logs
-docker-compose logs -f dev
+docker-compose -f docker/docker-compose.yml logs -f dev
 
 # Stop
-docker-compose down
+docker-compose -f docker/docker-compose.yml down
+
+# Full reset (remove volumes too)
+docker-compose -f docker/docker-compose.yml down -v
 ```
 
-### Run Migrations in Container
+### Direct Docker Run
+
+```bash
+# Build
+docker build -f docker/Dockerfile -t tss-elysia .
+
+# Run
+docker run -d \
+  --name tss-elysia \
+  -p 3000:3000 \
+  -e AUTH_SECRET=my-super-secret-key-32chars \
+  -v tss-elysia-data:/app/.artifacts \
+  tss-elysia
+```
+
+### Database Operations in Container
 
 ```bash
 # Run migrations
-docker-compose exec dev bun run db:migrate
+docker-compose -f docker/docker-compose.yml exec app bun run db:migrate
 
 # Seed database
-docker-compose exec dev bun run db:seed
-```
+docker-compose -f docker/docker-compose.yml exec app bun run db:seed
 
-### Production with Docker Compose
-
-```bash
-# Create production .env
-cat > .env << EOF
-AUTH_SECRET=your-production-secret-key-min-32-chars
-EOF
-
-# Build and start
-docker-compose build app
-docker-compose up -d app
-
-# View logs
-docker-compose logs -f app
-
-# Stop
-docker-compose down
+# Open database studio
+docker-compose -f docker/docker-compose.yml exec app bun run db:studio
 ```
 
 ## Health Checks
 
-The production container includes health checks:
+Production containers include health checks:
 
 ```bash
 # Check health status
-docker inspect --format='{{.State.Health.Status}}' tss-elysia-app-1
+docker inspect --format='{{.State.Health.Status}}' tss-elysia-prod
 
-# Check health from inside container
-docker exec tss-elysia-app-1 wget -q --spider http://localhost:3000/api/health
+# Manual health check
+docker exec tss-elysia-prod wget -q --spider http://localhost:3000/api/health
+```
+
+## Performance Optimization
+
+### BuildKit (Required for best results)
+
+```bash
+# Enable BuildKit globally
+export DOCKER_BUILDKIT=1
+
+# Or per-build
+docker build --build-arg BUILDKIT_INLINE_CACHE=1 -f docker/Dockerfile .
+```
+
+### Build Cache
+
+The optimized Dockerfile uses layer caching:
+
+1. Dependencies (package.json, bun.lock) - cached unless changed
+2. Source code - cached unless changed
+3. Build step - only runs when source changes
+
+### Memory Limits
+
+Production containers have memory limits:
+
+- Limit: 512MB
+- Reservation: 256MB
+
+Adjust in docker-compose.yml:
+
+```yaml
+deploy:
+  resources:
+    limits:
+      memory: 1G
+    reservations:
+      memory: 512M
 ```
 
 ## Troubleshooting
@@ -195,69 +280,84 @@ docker exec tss-elysia-app-1 wget -q --spider http://localhost:3000/api/health
 1. Check AUTH_SECRET is set:
 
    ```bash
-   docker logs tss-elysia
+   docker logs tss-elysia-prod
    ```
 
 2. Verify port is available:
+
    ```bash
    lsof -i :3000
    ```
 
-### Database Issues
-
-1. Ensure volume is mounted:
+3. Check health status:
 
    ```bash
-   docker volume ls | grep tss-elysia_db-data
+   docker inspect --format='{{.State.Health.Status}}' tss-elysia-prod
+   ```
+
+### Database Issues
+
+1. Check volume is mounted:
+
+   ```bash
+   docker volume ls | grep tss-elysia
+   docker inspect tss-elysia-prod | grep -A 10 Mounts
    ```
 
 2. Check permissions:
+
    ```bash
-   docker exec tss-elysia ls -la data/
+   docker exec tss-elysia-prod ls -la .artifacts/
+   ```
+
+### Build Issues
+
+1. Clear BuildKit cache:
+
+   ```bash
+   docker builder prune
+   ```
+
+2. Rebuild without cache:
+
+   ```bash
+   docker build --no-cache -f docker/Dockerfile .
    ```
 
 ### Performance Issues
 
-1. Increase memory for Bun:
+1. Enable BuildKit:
 
-   ```yaml
-   environment:
-     - BUN_CONFIG_MEMORY_LIMIT=2048
-   ```
-
-2. Enable BuildKit for faster builds:
    ```bash
-   DOCKER_BUILDKIT=1 docker build .
+   export DOCKER_BUILDKIT=1
    ```
 
-## Security Considerations
+2. Check memory usage:
 
-1. **Never commit secrets** - Use environment variables
-2. **Use strong AUTH_SECRET** - Minimum 32 characters
-3. **Run as non-root** - User is bun (UID 1000)
-4. **Use TLS in production** - Add reverse proxy (nginx, traefik)
-5. **Regular updates** - Keep base image updated
+   ```bash
+   docker stats tss-elysia-prod
+   ```
 
-## Production Deployment
+3. Increase memory limit in docker-compose.yml
 
-For production, consider:
+## Security Features
 
-- Using a reverse proxy (nginx, traefik)
-- Adding TLS/HTTPS
-- Setting up log aggregation
-- Configuring resource limits
-- Using secrets management
-- Implementing backup strategy
+1. **Non-root user** - Runs as `appuser` (UID 1000)
+2. **Minimal image** - Multi-stage build reduces attack surface
+3. **Resource limits** - Prevents DoS from runaway processes
+4. **Health checks** - Automatic container health monitoring
 
-Example with nginx proxy:
+## Advanced: Custom Production Setup
+
+### With nginx Reverse Proxy
 
 ```yaml
 # docker-compose.production.yml
-version: "3.8"
-
 services:
   app:
-    build: .
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
     restart: unless-stopped
 
   nginx:
@@ -270,3 +370,36 @@ services:
     depends_on:
       - app
 ```
+
+### With PostgreSQL (Production)
+
+```yaml
+# docker-compose.production.yml
+services:
+  app:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    environment:
+      - DATABASE_URL=postgresql://user:pass@db:5432/tss
+    depends_on:
+      - db
+
+  db:
+    image: postgres:16-alpine
+    environment:
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=pass
+      - POSTGRES_DB=tss
+    volumes:
+      - pg-data:/var/lib/postgresql/data
+```
+
+## Image Size Comparison
+
+| Version  | Image Size | Notes                  |
+| -------- | ---------- | ---------------------- |
+| v1 (old) | ~300MB+    | Single stage           |
+| v2 (new) | ~180MB     | Multi-stage, optimized |
+
+Run `docker images tss-elysia` to check your image size.

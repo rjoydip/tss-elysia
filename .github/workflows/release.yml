@@ -1,9 +1,33 @@
 name: Release
 
+# =============================================================================
+# Release Workflow
+# =============================================================================
+# Triggers:
+#   - Push to main branch (automatic)
+#   - Manual workflow_dispatch
+#
+# Process:
+#   1. Validate working tree (no uncommitted changes)
+#   2. Run quality checks (lint, typecheck, tests)
+#   3. Run security audit
+#   4. Build application
+#   5. Version bump with changesets
+#   6. Create Git tag (vX.Y.Z)
+#   7. Publish to npm (if configured)
+#   8. Create GitHub Release
+# =============================================================================
+
 on:
   push:
     branches: [main]
   workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Dry run (skip publishing)"
+        required: false
+        default: "false"
+        type: boolean
 
 concurrency:
   group: release-${{ github.ref }}
@@ -13,11 +37,15 @@ env:
   BUN_INSTALL_CACHE_DIR: ~/.bun-install-cache
 
 jobs:
-  release:
-    name: Release
+  # ---------------------------------------------------------------------------
+  # Pre-release Validations
+  # ---------------------------------------------------------------------------
+  validate:
+    name: Validate Release
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
+    outputs:
+      has_changesets: ${{ steps.check_changesets.outputs.has_changesets }}
+      version: ${{ steps.get_version.outputs.version }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
@@ -38,24 +66,238 @@ jobs:
             ${{ runner.os }}-bun-deps-
 
       - name: Install dependencies
-        run: bun install --frozen-lockfile
+        run: bun install --frozen-lockfile --ignore-scripts
 
-      - name: Run quality checks
+      # Check for uncommitted changes (except for workflow_dispatch)
+      - name: Check working tree status
+        if: github.event_name != 'workflow_dispatch'
         run: |
-          bun run lint
-          bun run typecheck
-          bun test
+          if [[ -n $(git status --porcelain) ]]; then
+            echo "❌ Working tree is not clean. Please commit or stash changes."
+            git status
+            exit 1
+          fi
+          echo "✅ Working tree is clean"
 
-      - name: Build Bun binary
+      # Check if there are changesets to release
+      - name: Check for changesets
+        id: check_changesets
+        run: |
+          if [ -d ".changeset" ] && [ "$(ls -A .changeset)" ]; then
+            echo "has_changesets=true" >> $GITHUB_OUTPUT
+            echo "✅ Changesets found"
+          else
+            echo "has_changesets=false" >> $GITHUB_OUTPUT
+            echo "ℹ️ No changesets found - nothing to release"
+          fi
+
+      - name: Get current version
+        id: get_version
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Current version: $VERSION"
+
+  # ---------------------------------------------------------------------------
+  # Quality Checks
+  # ---------------------------------------------------------------------------
+  quality:
+    name: Quality Checks
+    needs: validate
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
+        with:
+          bun-version-file: package.json
+
+      - name: Cache bun dependencies
+        uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5.0.4
+        with:
+          path: ${{ env.BUN_INSTALL_CACHE_DIR }}
+          key: ${{ runner.os }}-bun-deps-${{ hashFiles('**/bun.lockb') }}
+          restore-keys: |
+            ${{ runner.os }}-bun-deps-
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile --ignore-scripts
+
+      - name: Run linters
+        run: bun run lint:ci
+
+      - name: Run type checking
+        run: bun run typecheck
+
+      - name: Run tests
+        run: bun test
+
+  # ---------------------------------------------------------------------------
+  # Security Audit
+  # ---------------------------------------------------------------------------
+  security:
+    name: Security Audit
+    needs: validate
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
+        with:
+          bun-version-file: package.json
+
+      - name: Cache bun dependencies
+        uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5.0.4
+        with:
+          path: ${{ env.BUN_INSTALL_CACHE_DIR }}
+          key: ${{ runner.os }}-bun-deps-${{ hashFiles('**/bun.lockb') }}
+          restore-keys: |
+            ${{ runner.os }}-bun-deps-
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile --ignore-scripts
+
+      - name: Run security audit
+        run: bun audit --audit-level=critical
+
+  # ---------------------------------------------------------------------------
+  # Build
+  # ---------------------------------------------------------------------------
+  build:
+    name: Build
+    needs: [quality, security]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
+        with:
+          bun-version-file: package.json
+
+      - name: Cache bun dependencies
+        uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5.0.4
+        with:
+          path: ${{ env.BUN_INSTALL_CACHE_DIR }}
+          key: ${{ runner.os }}-bun-deps-${{ hashFiles('**/bun.lockb') }}
+          restore-keys: |
+            ${{ runner.os }}-bun-deps-
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile --ignore-scripts
+
+      - name: Setup database
+        run: bun run db:setup
+
+      - name: Build application
         run: bun run build
 
-      - name: Create production release
-        uses: changesets/action@6a0a831ff30acef54f2c6aa1cbbc1096b066edaf # v1.7.0
+      - name: Upload build artifact
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
         with:
-          publish: bun run release
-          commit-message: "chore: release version ${ changeset_changes_sha }"
-          title: "chore: release version ${ changeset_changes_sha }"
-          createGitHubReleases: true
-          setupGitHubForNPM: false
+          name: build-artifact
+          path: |
+            dist
+            .output
+            public
+          retention-days: 7
+
+  # ---------------------------------------------------------------------------
+  # Release (only if there are changesets)
+  # ---------------------------------------------------------------------------
+  release:
+    name: Create Release
+    needs: [validate, quality, security, build]
+    if: needs.validate.outputs.has_changesets == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
+        with:
+          bun-version-file: package.json
+
+      - name: Cache bun dependencies
+        uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5.0.4
+        with:
+          path: ${{ env.BUN_INSTALL_CACHE_DIR }}
+          key: ${{ runner.os }}-bun-deps-${{ hashFiles('**/bun.lockb') }}
+          restore-keys: |
+            ${{ runner.os }}-bun-deps-
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile --ignore-scripts
+
+      # Version bump with changesets
+      - name: Version bump
+        run: bun changeset version
+
+      # Get the new version for tagging
+      - name: Get new version
+        id: version
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          echo "new_version=$VERSION" >> $GITHUB_OUTPUT
+          echo "New version: $VERSION"
+
+      # Commit version changes
+      - name: Commit version changes
+        run: |
+          git add .
+          git commit -m "chore: release v${{ steps.version.outputs.new_version }}"
+          git push
+
+      # Create and push git tag
+      - name: Create Git tag
+        run: |
+          git tag -a "v${{ steps.version.outputs.new_version }}" -m "Release v${{ steps.version.outputs.new_version }}"
+          git push origin "v${{ steps.version.outputs.new_version }}"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # Create GitHub Release
+      - name: Create GitHub Release
+        uses: actions/create-release@5d65a2c8e67e0cfc9a6bab5b5ed2d5a3e96dc0b # v1.0.1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: v${{ steps.version.outputs.new_version }}
+          release_name: Release v${{ steps.version.outputs.new_version }}
+          draft: false
+          prerelease: false
+          generate_release_notes: true
+
+      # Publish to npm (if configured) - Optional step
+      # Uncomment and configure NPM_TOKEN secret to enable
+      # - name: Publish to npm
+      #   if: github.event.inputs.dry_run != 'true'
+      #   run: bun run release
+      #   env:
+      #     NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+  # ---------------------------------------------------------------------------
+  # No Release Needed
+  # ---------------------------------------------------------------------------
+  no_release:
+    name: No Release Needed
+    needs: validate
+    if: needs.validate.outputs.has_changesets != 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Notify no release
+        run: |
+          echo "ℹ️ No changesets found - skipping release"
+          echo "To create a release, add a changeset:"
+          echo "  bun changeset add"

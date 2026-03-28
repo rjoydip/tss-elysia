@@ -324,8 +324,32 @@ Releases are **automatically** created when:
 
 1. A PR with a changeset is merged to `main`
 2. The GitHub Actions workflow runs
-3. Version is bumped and changelog is updated
-4. A GitHub Release is created
+3. All quality checks pass (lint, typecheck, tests)
+4. Security audit passes
+5. Build completes successfully
+6. Version is bumped and changelog is updated
+7. **Git tag is created** (e.g., `v1.2.0`)
+8. A GitHub Release is created with release notes
+
+### Release Workflow Steps
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                    RELEASE WORKFLOW                              │
+└─────────────────────────────────────────────────────────────────┘
+
+ 1. VALIDATION         2. QUALITY          3. BUILD
+    ├─ Working tree      ├─ Lint            ├─ Run db:setup
+    └─ Changesets       ├─ Typecheck       └─ Build app
+                       ├─ Tests
+                       └─ Security audit
+
+ 4. VERSION BUMP      5. GIT TAG          6. GITHUB RELEASE
+    ├─ Run changeset   ├─ Create tag       ├─ Create release
+    │  version         │  vX.Y.Z           └─ Add release notes
+    ├─ Update CHANGELOG
+    └─ Update package.json
+```
 
 ### Version Bump Types
 
@@ -334,6 +358,17 @@ Releases are **automatically** created when:
 | `patch` | Bug fixes, small changes          | 1.0.0 → 1.0.1   |
 | `minor` | New features, backward compatible | 1.0.0 → 1.1.0   |
 | `major` | Breaking changes                  | 1.0.0 → 2.0.0   |
+
+### Automated Tag Creation
+
+The release workflow automatically:
+
+1. **Creates a semantic version tag** (e.g., `v1.2.0`)
+2. **Pushes the tag to remote** (`git push origin v1.2.0`)
+3. **Creates GitHub Release** with the tag
+4. **Generates release notes** from CHANGELOG.md
+
+Tags follow [SemVer](https://semver.org/) format: `vMAJOR.MINOR.PATCH`
 
 ### Nightly Builds
 
@@ -345,6 +380,27 @@ Dev builds are automatically created daily at midnight UTC:
 
 ### Manual Release (Maintainers)
 
+Using the release script:
+
+```bash
+# Full release (recommended)
+bun run release
+
+# Dry run (preview changes)
+bun run release --dry-run
+
+# Skip quality checks (not recommended)
+bun run release --skip-tests
+
+# Skip git tagging
+bun run release --skip-tag
+
+# Skip push to remote
+bun run release --skip-push
+```
+
+Or using changesets directly:
+
 ```bash
 # Add changeset
 bun changeset add
@@ -353,8 +409,22 @@ bun changeset add
 bun changeset version
 
 # Publish (creates git tags and pushes)
-bun release
+bun run release
 ```
+
+### Release Validation
+
+Before releasing, the workflow validates:
+
+1. ✅ Working tree is clean (no uncommitted changes)
+2. ✅ Changesets exist (nothing to release if not)
+3. ✅ Linting passes
+4. ✅ TypeScript type checking passes
+5. ✅ Unit tests pass
+6. ✅ Security audit passes
+7. ✅ Build completes successfully
+
+If any step fails, the release is aborted.
 
 ---
 

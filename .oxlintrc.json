@@ -2,5 +2,8 @@
   "$schema": "https://unpkg.com/oxlint/configuration_schema.json",
   "plugins": ["unicorn", "typescript", "oxc"],
   "ignorePatterns": ["**/.bun-install-cache"],
-  "rules": {}
+  "rules": {
+    "no-unused-vars": "warn",
+    "no-unused-imports": "warn"
+  }
 }

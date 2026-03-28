@@ -19,7 +19,10 @@ This project uses TanStack Start with file-based routing. Routes are defined in 
 src/routes/
   __root.tsx        # Root route (layout)
   index.tsx         # Home page (/)
-  api.$.ts         # API catch-all route (/api/*)
+  api/
+    $.ts           # API catch-all route (/api/*)
+    auth/
+      $.ts         # Auth route (/api/auth/*)
 ```
 
 ### API Route Implementation
@@ -27,10 +30,10 @@ src/routes/
 The API uses Elysia with the following structure:
 
 ```typescript
-// src/routes/api.$.ts
+// src/routes/api/$.ts
 import { createFileRoute } from "@tanstack/react-router";
-import { createApp } from "~/_app";
-import { API_PREFIX, API_NAME } from "~/_config";
+import { createApp } from "~/server";
+import { API_PREFIX, API_NAME } from "~/config";
 
 export const app = createApp({
   prefix: API_PREFIX,
@@ -73,7 +76,7 @@ function AboutPage() {
 
 ### Adding an API Route
 
-Extend the API in `src/routes/api.$.ts` or create a new file in `src/routes/api/`:
+Extend the API in `src/routes/api/$.ts` or create a new file in `src/routes/api/`:
 
 ```typescript
 // src/routes/api/users.ts
@@ -149,7 +152,7 @@ const router = createRouter({
 
 ## Configuration
 
-### App Config (`src/_config.ts`)
+### App Config (`src/config.ts`)
 
 Central configuration for the application:
 
@@ -179,7 +182,7 @@ export const corsConfig = {
 };
 ```
 
-### Environment Variables (`src/_env.ts`)
+### Environment Variables (`src/env.ts`)
 
 Type-safe environment variable handling:
 

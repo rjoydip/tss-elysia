@@ -1,0 +1,98 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "default_agent": "build",
+  "skills": {
+    "paths": [".agents/skills"]
+  },
+  "plugin": [
+    "./plugins",
+    "@franlol/opencode-md-table-formatter@latest",
+    "opencode-helicone-session",
+    "opencode-pty",
+    "opencode-vibeguard",
+    "opencode-wakatime"
+  ],
+  "permission": {
+    "skill": {
+      "*": "allow",
+      "pr-review": "allow",
+      "internal-*": "deny",
+      "experimental-*": "ask"
+    }
+  },
+  "instructions": ["AGENTS.md", "CONTRIBUTING.md", ".opencode/rules/*.md"],
+  "mcp": {
+    "chrome-devtools": {
+      "type": "local",
+      "command": [
+        "bunx",
+        "-y",
+        "chrome-devtools-mcp@latest",
+        "--autoConnect",
+        "--user-data-dir=./artifacts/chrome-profile-stable"
+      ]
+    },
+    "github": {
+      "type": "local",
+      "command": ["bunx", "-y", "@modelcontextprotocol/server-github"]
+    },
+    "filesystem": {
+      "type": "local",
+      "command": ["bunx", "-y", "@modelcontextprotocol/server-filesystem", "./src"]
+    },
+    "sqlite": {
+      "type": "local",
+      "command": ["bunx", "-y", "sqlite-mcp-server"]
+    }
+  },
+  "lsp": {
+    "typescript": {
+      "command": ["typescript-language-server", "--stdio"],
+      "extensions": [".ts", ".tsx", ".js", ".jsx"]
+    },
+    "json": {
+      "command": ["vscode-json-languageserver", "--stdio"],
+      "extensions": [".json"]
+    },
+    "tailwindcss": {
+      "command": ["tailwindcss-language-server", "--stdio"],
+      "extensions": [".css", ".html"]
+    },
+    "html": {
+      "command": ["vscode-html-languageserver", "--stdio"],
+      "extensions": [".html", "htm"]
+    },
+    "css": {
+      "command": ["vscode-css-languageserver", "--stdio"],
+      "extensions": [".css"]
+    },
+    "yaml": {
+      "command": ["yaml-language-server", "--stdio"],
+      "extensions": [".yml", ".yaml"]
+    }
+  },
+  "agent": {
+    "build": {
+      "description": "Default primary agent for development work",
+      "mode": "primary",
+      "model": "opencode/minimax-m2.5-free"
+    },
+    "secondary": {
+      "description": "Fallback model when primary is unavailable",
+      "mode": "primary",
+      "model": "opencode/mimo-v2-omni-free"
+    },
+    "mimo-pro": {
+      "description": "Specialized subagent for complex tasks",
+      "mode": "subagent",
+      "model": "opencode/mimo-v2-pro-free"
+    },
+    "nemotron": {
+      "description": "Subagent with fallback capability for reasoning tasks",
+      "mode": "subagent",
+      "model": "opencode/nemotron-3-super-free"
+    }
+  },
+  "model": "opencode/minimax-m2.5-free",
+  "small_model": "opencode/mimo-v2-omni-free"
+}

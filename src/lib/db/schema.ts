@@ -1,6 +1,16 @@
+/**
+ * Database schema definitions using Drizzle ORM.
+ * Defines tables for users, sessions, accounts, and subscriptions.
+ * Includes relational definitions for foreign key connections.
+ */
+
 import { sqliteTable, text, integer } from "drizzle-orm/sqlite-core";
 import { relations } from "drizzle-orm";
 
+/**
+ * User table - stores authenticated user information.
+ * Contains profile data and subscription tier information.
+ */
 export const users = sqliteTable("user", {
   id: text("id").primaryKey(),
   name: text("name"),
@@ -15,6 +25,10 @@ export const users = sqliteTable("user", {
   subscriptionExpiresAt: integer("subscriptionExpiresAt", { mode: "timestamp" }),
 });
 
+/**
+ * Session table - stores active user sessions.
+ * Links to users and tracks session metadata (IP, user agent).
+ */
 export const sessions = sqliteTable("session", {
   id: text("id").primaryKey(),
   expiresAt: integer("expiresAt", { mode: "timestamp" }).notNull(),
@@ -28,6 +42,10 @@ export const sessions = sqliteTable("session", {
     .references(() => users.id, { onDelete: "cascade" }),
 });
 
+/**
+ * Account table - stores OAuth and password credentials.
+ * Links to users and tracks external provider accounts.
+ */
 export const accounts = sqliteTable("account", {
   id: text("id").primaryKey(),
   accountId: text("accountId").notNull(),
@@ -46,6 +64,10 @@ export const accounts = sqliteTable("account", {
   updatedAt: integer("updatedAt", { mode: "timestamp" }).notNull(),
 });
 
+/**
+ * Verification table - stores email verification and password reset tokens.
+ * Temporary records that expire after use or timeout.
+ */
 export const verifications = sqliteTable("verification", {
   id: text("id").primaryKey(),
   identifier: text("identifier").notNull(),
@@ -55,6 +77,10 @@ export const verifications = sqliteTable("verification", {
   updatedAt: integer("updatedAt", { mode: "timestamp" }),
 });
 
+/**
+ * Subscription Plans table - defines available pricing tiers.
+ * Contains plan details and rate limiting configuration.
+ */
 export const subscriptionPlans = sqliteTable("subscription_plan", {
   id: text("id").primaryKey(),
   name: text("name").notNull(),
@@ -70,6 +96,10 @@ export const subscriptionPlans = sqliteTable("subscription_plan", {
   updatedAt: integer("updatedAt", { mode: "timestamp" }).notNull(),
 });
 
+/**
+ * Subscriptions table - tracks user subscription status.
+ * Links users to plans and tracks billing period information.
+ */
 export const subscriptions = sqliteTable("subscription", {
   id: text("id").primaryKey(),
   userId: text("userId")
@@ -86,12 +116,20 @@ export const subscriptions = sqliteTable("subscription", {
   updatedAt: integer("updatedAt", { mode: "timestamp" }).notNull(),
 });
 
+/**
+ * User relations - defines one-to-many relationships from users.
+ * A user can have multiple sessions, accounts, and subscriptions.
+ */
 export const usersRelations = relations(users, ({ many }) => ({
   sessions: many(sessions),
   accounts: many(accounts),
   subscriptions: many(subscriptions),
 }));
 
+/**
+ * Session relations - defines many-to-one relationship to users.
+ * Each session belongs to exactly one user.
+ */
 export const sessionsRelations = relations(sessions, ({ one }) => ({
   user: one(users, {
     fields: [sessions.userId],
@@ -99,6 +137,10 @@ export const sessionsRelations = relations(sessions, ({ one }) => ({
   }),
 }));
 
+/**
+ * Account relations - defines many-to-one relationship to users.
+ * Each account (OAuth provider) belongs to exactly one user.
+ */
 export const accountsRelations = relations(accounts, ({ one }) => ({
   user: one(users, {
     fields: [accounts.userId],
@@ -106,6 +148,10 @@ export const accountsRelations = relations(accounts, ({ one }) => ({
   }),
 }));
 
+/**
+ * Subscription relations - defines many-to-one relationships.
+ * Each subscription belongs to one user and references one plan.
+ */
 export const subscriptionsRelations = relations(subscriptions, ({ one }) => ({
   user: one(users, {
     fields: [subscriptions.userId],
@@ -117,12 +163,15 @@ export const subscriptionsRelations = relations(subscriptions, ({ one }) => ({
   }),
 }));
 
+// Type exports for runtime type inference
 export type User = typeof users.$inferSelect;
 export type Session = typeof sessions.$inferSelect;
 export type Account = typeof accounts.$inferSelect;
 export type Verification = typeof verifications.$inferSelect;
 export type SubscriptionPlan = typeof subscriptionPlans.$inferSelect;
 export type Subscription = typeof subscriptions.$inferSelect;
+
+// Union type for all table types
 export type DBType =
   | typeof users
   | typeof sessions
