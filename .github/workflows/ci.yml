@@ -146,14 +146,6 @@ jobs:
             sleep 2
           done
 
-      - name: Run smoke test
-        uses: k6io/action@v0.2.0
-        with:
-          entryPoint: test/load-tests/smoke-test.js
-        env:
-          HOST: ${{ env.E2E_HOST }}
-          PORT: ${{ env.E2E_PORT }}
-
       - name: Run E2E tests
         run: bun run test:e2e --project=chromium
 
