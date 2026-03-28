@@ -69,6 +69,8 @@ What users need before starting.
 
 Common issues and solutions.
 
-```
-
+```bash
+# Example troubleshooting
+bun run dev
+# Check for errors
 ```
