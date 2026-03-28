@@ -46,3 +46,6 @@ test-results
 
 # Tanstack
 .tanstack
+
+# Opencode
+.opencode/bun.lock

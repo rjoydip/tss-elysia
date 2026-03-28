@@ -1,13 +1,82 @@
+# =============================================================================
+# Docker Ignore - Exclude unnecessary files from Docker builds
+# =============================================================================
+
+# Dependencies
 node_modules
-.git
+.npm
+.yarn
+.pnp
+.pnp.js
+
+# Build outputs (rebuilt in Docker)
+dist
+.output
+.vite
+coverage
+
+# Test & Development artifacts
 .e2e
 test
-drizzle
+test-results
+playwright-report
+*.test.ts
+*.spec.ts
+__tests__
+
+# Database & Artifacts
 .artifacts
+*.db
+*.sqlite
+
+# Version Control
+.git
+.gitignore
+
+# Environment files
 .env
 .env.local
-*.log
+.env.*.local
+.env.example
+
+# IDE & Editor
+.idea
+.vscode
+*.swp
+*.swo
 .DS_Store
-coverage
-.vite
-.output
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Documentation (not needed in image)
+docs
+README.md
+CHANGELOG.md
+CONTRIBUTING.md
+AGENTS.md
+PLAN.md
+
+# Docker files (not needed in image)
+docker
+Dockerfile
+docker-compose*
+.dockerignore
+
+# OpenCode & Agent files
+.opencode
+.agents
+skills-lock.json
+
+# TanStack
+.tanstack
+
+# Changesets
+.changeset
+
+# Misc
+*.tmp
+.cache

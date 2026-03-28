@@ -1,0 +1,12 @@
+{
+  "dependencies": {
+    "@opencode-ai/plugin": "1.3.3"
+  },
+  "devDependencies": {
+    "@tailwindcss/language-server": "^0.14.29",
+    "opencode-ai": "^1.3.3",
+    "typescript-language-server": "^5.1.3",
+    "vscode-langservers-extracted": "^4.10.0",
+    "yaml-language-server": "^1.21.0"
+  }
+}

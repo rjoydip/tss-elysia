@@ -12,8 +12,8 @@ import {
   rateLimitConfig,
   corsConfig,
   helmetConfig,
-  logger,
 } from "../src/config.ts";
+import { logger } from "../src/logger.ts";
 
 describe("_config", () => {
   describe("API Configuration", () => {

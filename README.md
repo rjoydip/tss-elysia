@@ -1,8 +1,13 @@
 # tss-elysia
 
 [![React Doctor](https://www.react.doctor/share/badge?p=tss-elysia&s=98&w=3&f=3)](https://www.react.doctor/share?p=tss-elysia&s=98&w=3&f=3)
+[![License](https://img.shields.io/github/license/rjoydip/tss-elysia)](https://github.com/rjoydip/tss-elysia/blob/main/LICENSE)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.7-blue)](https://www.typescriptlang.org/)
+[![Bun](https://img.shields.io/badge/Bun-1.2+-green)](https://bun.sh)
 
 A full-stack TypeScript application using TanStack Start, Elysia, React 19, and Bun.
+
+> **Project Roadmap**: See [PLAN.md](./PLAN.md) for detailed feature planning and progress tracking.
 
 ## Quick Start
 
@@ -15,6 +20,8 @@ bun run dev
 
 | Command                | Description                              |
 | ---------------------- | ---------------------------------------- |
+| `bun run setup`        | Run full project setup (recommended)     |
+| `bun run cleanup`      | Clean up build/test artifacts            |
 | `bun run dev`          | Start Vite dev server                    |
 | `bun run build`        | Build for production                     |
 | `bun run start`        | Run production server                    |
@@ -31,19 +38,64 @@ bun run dev
 | `bun run test:e2e`     | E2E tests with Playwright                |
 | `bun run test:load`    | Load tests with k6                       |
 
+### Setup Script
+
+Run once after cloning the project to set up everything:
+
+```bash
+bun run setup
+```
+
+What it does:
+
+1. Checks Bun runtime is installed
+2. Installs project dependencies
+3. Installs OpenCode LSP packages for enhanced IDE support
+4. Creates `.env` from `.env.example`
+5. Generates database schema and runs migrations
+6. Seeds the database with initial data
+7. Sets up git hooks
+8. Runs typecheck to verify setup
+
+Options:
+
+- `--skip-db` - Skip database setup (if you want to set it up manually)
+
+### Cleanup Script
+
+Clean up build artifacts, test results, and temporary files:
+
+```bash
+bun run cleanup
+```
+
+Options:
+
+- `--dry-run` - Show what would be deleted without actually deleting
+- `--keep-db` - Preserve database files (`.artifacts/*.db`)
+- `--full` - Full reset including `node_modules` (rarely needed)
+
+> **Note:** Executable files like `k9.exe` in `.artifacts/` are automatically preserved during cleanup.
+
 > Before load test make sure to ran vite preview `bun preview --host`
 
 ## Documentation
 
 Detailed documentation available in `docs/`:
 
-- [API Reference](docs/api-reference.md)
-- [Development](docs/development.md)
-- [Testing](docs/testing.md)
-- [Environment Variables](docs/environment-variables.md)
-- [Project Overview](docs/project-overview.md)
-- [Middleware](docs/middleware.md)
-- [Architecture](docs/architecture.md)
+| Document                                               | Description                  |
+| ------------------------------------------------------ | ---------------------------- |
+| [API Reference](docs/api-reference.md)                 | API endpoints and usage      |
+| [Architecture](docs/architecture.md)                   | System architecture overview |
+| [Authentication](docs/authentication.md)               | Auth setup and configuration |
+| [Development](docs/development.md)                     | Development guide            |
+| [Docker](docs/docker.md)                               | Docker deployment guide      |
+| [Environment Variables](docs/environment-variables.md) | Environment configuration    |
+| [Middleware](docs/middleware.md)                       | Middleware documentation     |
+| [Opencode](docs/opencode.md)                           | Opencode documentation       |
+| [Project Overview](docs/project-overview.md)           | Project introduction         |
+| [Testing](docs/testing.md)                             | Testing guide                |
+| [Troubleshooting](docs/troubleshooting.md)             | Common issues and solutions  |
 
 ## Tech Stack
 
@@ -142,7 +194,11 @@ tsconfig.json       # TypeScript configuration
   bun run release     # Publish to npm
   ```
 
-## Common Issues
+## Troubleshooting
+
+For more detailed troubleshooting guide, see [Troubleshooting](docs/troubleshooting.md).
+
+Common issues:
 
 - If imports fail, ensure `bun install` has run
 - Path alias `~/*` requires TypeScript paths configuration
@@ -151,3 +207,5 @@ tsconfig.json       # TypeScript configuration
 ## For AI Agents
 
 For detailed agent coding guidelines, see [AGENTS.md](./AGENTS.md).
+
+For feature planning and progress tracking, see [PLAN.md](./PLAN.md).

@@ -6,7 +6,7 @@ This document covers common issues and their solutions.
 
 ### Large Bundle Size Warning
 
-```
+```txt
 (!) Some chunks are larger than 500 kB after minification.
 ```
 
@@ -43,7 +43,7 @@ If warnings persist, increase the limit or consider:
 
 ### Bun:sqlite Externalized Warning
 
-```
+```txt
 Module "bun:sqlite" has been externalized for browser compatibility
 ```
 
@@ -77,7 +77,7 @@ if (typeof window !== "undefined") {
 
 ### Module Not Found Error
 
-```
+```txt
 Error [ERR_MODULE_NOT_FOUND]: Cannot find module 'dist/server/server.js'
 ```
 
@@ -120,6 +120,7 @@ If E2E tests fail to start the server:
    ```
 
 3. Check logs:
+
    ```bash
    bun run test:e2e 2>&1
    ```
@@ -130,7 +131,7 @@ If E2E tests fail to start the server:
 
 ### Migration Failed
 
-```
+```txt
 Error: unable to open database file
 ```
 
@@ -149,6 +150,7 @@ Error: unable to open database file
    ```
 
 3. Set DATABASE_NAME in environment:
+
    ```bash
    DATABASE_NAME=data/.db bun run db:migrate
    ```
@@ -157,7 +159,7 @@ Error: unable to open database file
 
 ### Seeding Failed
 
-```
+```txt
 SQLiteError: UNIQUE constraint failed
 ```
 
@@ -192,6 +194,7 @@ bun run db:reset
    ```
 
 3. Check volume permissions:
+
    ```bash
    docker exec tss-elysia ls -la /app/data
    ```
@@ -224,6 +227,7 @@ volumes:
    ```
 
 2. Check file watcher limits (Linux):
+
    ```bash
    echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf
    sudo sysctl -p
