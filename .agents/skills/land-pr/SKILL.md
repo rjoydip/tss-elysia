@@ -4,7 +4,7 @@ description: Land a PR (merge with proper workflow)
 license: MIT
 metadata:
   author: tss-elysia
-  version: 1.0.0
+  version: 0.0.0
 ---
 
 # Land PR

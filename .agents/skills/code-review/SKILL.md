@@ -4,7 +4,7 @@ description: Reviews code for quality and best practices
 license: MIT
 metadata:
   author: tss-elysia
-  version: 1.0.0
+  version: 0.0.0
 ---
 
 # Code Review

@@ -4,7 +4,7 @@ description: Writes and maintains project documentation
 license: MIT
 metadata:
   author: tss-elysia
-  version: 1.0.0
+  version: 0.0.0
 ---
 
 # Docs Writer

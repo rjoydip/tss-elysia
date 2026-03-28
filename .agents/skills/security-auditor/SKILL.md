@@ -4,7 +4,7 @@ description: Performs security audits and identifies vulnerabilities
 license: MIT
 metadata:
   author: tss-elysia
-  version: 1.0.0
+  version: 0.0.0
 ---
 
 # Security Auditor

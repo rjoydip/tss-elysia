@@ -16,7 +16,7 @@ env:
   BUN_INSTALL_CACHE_DIR: ~/.bun-install-cache
   DATABASE_PATH: ".artifacts"
   DATABASE_NAME: "tss-elysia-test.db"
-  E2E_HOST: "0.0.0.0"
+  E2E_HOST: "localhost"
   E2E_PORT: "4173"
   BETTER_AUTH_SECRET: "test-secret-min-32-chars-for-ci"
 
@@ -127,6 +127,8 @@ jobs:
         run: |
           HOST_IP=$(ip route get 1.1.1.1 | awk '{for(i=1;i<=NF;i++) if($i=="src") print $(i+1)}')
           echo "E2E_HOST=$HOST_IP" >> $GITHUB_ENV
+          echo "E2E_BASE_URL=http://$HOST_IP:$E2E_PORT" >> $GITHUB_ENV
+          echo "BETTER_AUTH_URL=http://$HOST_IP:$E2E_PORT/api/auth" >> $GITHUB_ENV
           echo "Resolved host IP: $HOST_IP"
 
       - name: Start preview server
@@ -140,6 +142,11 @@ jobs:
             echo "Waiting for server... ($i)"
             sleep 2
           done
+
+      - name: Run smoke test
+        run: |
+          chmod +x .artifacts/k6.exe
+          .artifacts/k6.exe run test/load-tests/smoke-test.js -e HOST=$E2E_HOST -e PORT=$E2E_PORT
 
       - name: Run E2E tests
         run: bun run test:e2e --project=chromium

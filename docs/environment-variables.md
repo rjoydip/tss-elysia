@@ -35,11 +35,12 @@ DATABASE_NAME=:memory: bun run dev
 
 E2E configuration is centralized in `.e2e/config.ts` and consumed by both `playwright.config.ts` and test files.
 
-| Variable       | Default     | Description            |
-| -------------- | ----------- | ---------------------- |
-| `E2E_HOST`     | `localhost` | E2E test server host   |
-| `E2E_PORT`     | `3000`      | E2E test server port   |
-| `E2E_BASE_URL` | Dynamic     | Full URL for E2E tests |
+| Variable          | Default                    | Description              |
+| ----------------- | -------------------------- | ------------------------ |
+| `E2E_HOST`        | `localhost`                | E2E test server host     |
+| `E2E_PORT`        | `3000`                     | E2E test server port     |
+| `E2E_BASE_URL`    | Dynamic                    | Full URL for E2E tests   |
+| `BETTER_AUTH_URL` | `${E2E_BASE_URL}/api/auth` | Auth service URL for E2E |
 
 ```typescript
 // .e2e/config.ts
@@ -49,6 +50,7 @@ const port = process.env.E2E_PORT || process.env.PORT || "3000";
 export const E2E_BASE_URL = process.env.E2E_BASE_URL || `http://${host}:${port}`;
 export const E2E_HOST = host;
 export const E2E_PORT = port;
+export const E2E_AUTH_URL = process.env.BETTER_AUTH_URL || `${E2E_BASE_URL}/api/auth`;
 ```
 
 ## Environment Files
@@ -240,11 +242,12 @@ In GitHub Actions, E2E tests use these environment variables:
 
 ```yaml
 env:
-  E2E_HOST: "0.0.0.0" # Bind to all interfaces for CI accessibility
+  E2E_HOST: "localhost" # Resolved to container IP dynamically
   E2E_PORT: "4173" # Preview server port
+  BETTER_AUTH_SECRET: "your-secret-min-32-chars" # Required in production
 ```
 
-The server binds to `0.0.0.0` in CI to allow Playwright's browser to access it from the container.
+The CI workflow resolves the container's host IP dynamically and sets `E2E_BASE_URL` and `BETTER_AUTH_URL` accordingly.
 
 ## Validation
 
