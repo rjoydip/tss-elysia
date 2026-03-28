@@ -149,8 +149,7 @@ jobs:
       - name: Run smoke test
         uses: k6io/action@v0.2.0
         with:
-          smokeTest: true
-          files: test/load-tests/smoke-test.js
+          entryPoint: test/load-tests/smoke-test.js
         env:
           HOST: ${{ env.E2E_HOST }}
           PORT: ${{ env.E2E_PORT }}
