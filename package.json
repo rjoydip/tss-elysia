@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "prepare": "simple-git-hooks",
-    "postinstall": "[ -d .opencode ] && cd .opencode && bun install || true",
+    "postinstall": "[ -d .opencode ] && [ ! -d .opencode/node_modules ] && cd .opencode && bun install || true",
     "build": "bun --bun vite build",
     "dev": "bun --bun vite dev",
     "preview": "bun --bun vite preview",
