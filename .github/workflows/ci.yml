@@ -42,7 +42,7 @@ jobs:
             ${{ runner.os }}-bun-deps-
 
       - name: Install dependencies
-        run: bun install --frozen-lockfile
+        run: bun install --frozen-lockfile --ignore-scripts
 
       - name: Run Linters
         run: bun run lint:ci
@@ -75,7 +75,7 @@ jobs:
             ${{ runner.os }}-bun-deps-
 
       - name: Install dependencies
-        run: bun install --frozen-lockfile
+        run: bun install --frozen-lockfile --ignore-scripts
 
       - name: Run security audit
         run: bun audit --audit-level=critical
@@ -109,7 +109,7 @@ jobs:
             ${{ runner.os }}-bun-deps-
 
       - name: Install dependencies
-        run: bun install --frozen-lockfile
+        run: bun install --frozen-lockfile --ignore-scripts
 
       - name: Run database setup
         run: bun run db:setup
