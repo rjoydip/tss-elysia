@@ -29,7 +29,8 @@ jobs:
         if: steps.check.outputs.result == 'true'
         with:
           persist-credentials: false
-      - uses: fregante/setup-git-user@v2
+      - run: git config --global user.email ${{ vars.GH_USER_EMAIL }}
+      - run: git config --global user.name ${{ vars.GH_USER_NAME }}
       - uses: anomalyco/opencode/github@latest
         if: steps.check.outputs.result == 'true'
         with:
