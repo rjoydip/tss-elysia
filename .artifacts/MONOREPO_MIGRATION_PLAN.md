@@ -75,7 +75,7 @@ tss-elysia-nitro/
 ├── turbo.json                  # Turborepo config
 ├── tsconfig/
 │   └── base.json              # Shared TypeScript config
-└── bun.lockb
+└── bun.lock
 ```
 
 ---

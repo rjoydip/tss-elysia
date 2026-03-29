@@ -40,7 +40,7 @@ jobs:
         uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5.0.4
         with:
           path: ~/.bun-install-cache
-          key: ${{ runner.os }}-bun-deps-${{ hashFiles('**/bun.lockb') }}
+          key: ${{ runner.os }}-bun-deps-${{ hashFiles('**/bun.lock') }}
           restore-keys: |
             ${{ runner.os }}-bun-deps-
 

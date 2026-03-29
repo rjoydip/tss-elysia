@@ -99,7 +99,7 @@ export default tool({
 
 async function detectPackageManager(cwd: string): Promise<string> {
   const lockFiles: Record<string, string> = {
-    "bun.lockb": "bun",
+    "bun.lock": "bun",
     "pnpm-lock.yaml": "pnpm",
     "package-lock.json": "npm",
     "yarn.lock": "yarn",

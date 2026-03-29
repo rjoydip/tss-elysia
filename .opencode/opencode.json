@@ -21,12 +21,6 @@
     }
   },
   "instructions": ["AGENTS.md", "CONTRIBUTING.md", ".opencode/rules/*.md"],
-  "formatter": {
-    "oxfmt": {
-      "command": ["bunx", "-y", "oxfmt", "$FILE"],
-      "extensions": [".md", ".ts", ".tsx", ".js", ".jsx", ".json", ".css", ".html", ".yml", ".yaml"]
-    }
-  },
   "mcp": {
     "filesystem": {
       "type": "local",

@@ -54,7 +54,7 @@ echo '{"packageManager": "yarn"}' > ~/.opencode/package-manager.json
 
 | Manager | Lock File      | Commands                   |
 | ------- | -------------- | -------------------------- |
-| bun     | bun.lockb      | `bun install`, `bun run`   |
+| bun     | bun.lock       | `bun install`, `bun run`   |
 | pnpm    | pnpm-lock.yaml | `pnpm install`, `pnpm run` |
 | yarn    | yarn.lock      | `yarn install`, `yarn run` |
 

@@ -17,7 +17,7 @@ Use when: adopting Bun, migrating from Node, writing or debugging Bun scripts/te
 ## How It Works
 
 - **Runtime**: Drop-in Node-compatible runtime (built on JavaScriptCore, implemented in Zig).
-- **Package manager**: `bun install` is significantly faster than npm/yarn. Lockfile is `bun.lock` (text) by default in current Bun; older versions used `bun.lockb` (binary).
+- **Package manager**: `bun install` is significantly faster than npm/yarn. Lockfile is `bun.lock` (text) by default in current Bun; older versions used `bun.lock` (binary).
 - **Bundler**: Built-in bundler and transpiler for apps and libraries.
 - **Test runner**: Built-in `bun test` with Jest-like API.
 
@@ -30,7 +30,7 @@ Use when: adopting Bun, migrating from Node, writing or debugging Bun scripts/te
 ### Run and install
 
 ```bash
-# Install dependencies (creates/updates bun.lock or bun.lockb)
+# Install dependencies (creates/updates bun.lock or bun.lock)
 bun install
 
 # Run a script or file
@@ -78,6 +78,6 @@ Bun.serve({
 
 ## Best Practices
 
-- Commit the lockfile (`bun.lock` or `bun.lockb`) for reproducible installs.
+- Commit the lockfile (`bun.lock` or `bun.lock`) for reproducible installs.
 - Prefer `bun run` for scripts. For TypeScript, Bun runs `.ts` natively.
 - Keep dependencies up to date; Bun and the ecosystem evolve quickly.

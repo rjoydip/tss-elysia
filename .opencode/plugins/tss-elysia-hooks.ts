@@ -314,7 +314,7 @@ export const TEHooksPlugin = async ({ client, $, directory, worktree }: PluginIn
 
       // Detect package manager
       const lockfiles: Record<string, string> = {
-        "bun.lockb": "bun",
+        "bun.lock": "bun",
         "pnpm-lock.yaml": "pnpm",
         "yarn.lock": "yarn",
         "package-lock.json": "npm",
