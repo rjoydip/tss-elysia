@@ -15,7 +15,7 @@
     "fmt": "oxfmt .",
     "fmt:check": "oxfmt --check .",
     "lint": "oxlint . --format=github",
-    "lint:ci": "bun run lint && bun run fmt:check",
+    "lint:ci": "bun run lint && bun run fmt:check && actions-up",
     "lint:fix": "oxlint . --fix && oxfmt . && actions-up",
     "typecheck": "tsgo --noEmit",
     "react:doctor": "react-doctor . -y",
