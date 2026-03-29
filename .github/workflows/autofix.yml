@@ -6,11 +6,9 @@ on:
     types: [opened, synchronize, reopened]
     paths-ignore:
       - "**.md"
-      - "**.ts"
       - "**.tsx"
       - "**.js"
       - "**.jsx"
-      - "**.json"
       - "**.css"
       - "**.scss"
       - ".opencode/opencode.json"

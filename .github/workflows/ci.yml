@@ -51,6 +51,7 @@ jobs:
         run: bun run typecheck
 
       - uses: millionco/react-doctor@main
+        if: always()
 
   security:
     name: Security Scan
