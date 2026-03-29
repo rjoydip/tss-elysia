@@ -4,6 +4,17 @@ on:
   pull_request:
     branches: [main]
     types: [opened, synchronize, reopened]
+    paths-ignore:
+      - "**.md"
+      - "**.ts"
+      - "**.tsx"
+      - "**.js"
+      - "**.jsx"
+      - "**.json"
+      - "**.css"
+      - "**.scss"
+      - ".opencode/opencode.json"
+      - ".opencode/tui.json"
   workflow_dispatch:
 
 concurrency:

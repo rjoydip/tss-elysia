@@ -41,9 +41,9 @@ jobs:
           git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
       - uses: anomalyco/opencode/github@0bc2f99f2d314800071426de1e27c1d17c2eff85 # v1.3.5
         if: steps.check.outputs.result == 'true'
+        timeout-minutes: 10
         with:
           model: ${{ vars.OPENCODE_MODEL }}
-          timeout-minutes: 10
           prompt: |
             Review this issue. If there's a clear fix or relevant docs:
             - Provide documentation links
