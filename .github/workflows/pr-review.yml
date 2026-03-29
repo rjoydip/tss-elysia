@@ -3,6 +3,15 @@ name: pr-review
 on:
   pull_request:
     types: [opened, synchronize, reopened, ready_for_review]
+    paths-ignore:
+      - "**.md"
+      - ".github/workflows/*.yml"
+      - ".opencode/package.json"
+      - ".opencode/opencode.json"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   review:

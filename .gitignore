@@ -49,3 +49,6 @@ test-results
 
 # Opencode
 .opencode/bun.lock
+
+# Tilde temp directories
+~
