@@ -43,7 +43,7 @@ jobs:
         if: steps.check.outputs.result == 'true'
         timeout-minutes: 10
         with:
-          model: ${{ vars.OPENCODE_MODEL }}
+          model: ${{ vars.OPENCODE_MODEL || 'anthropic/claude-sonnet-4-20250514' }}
           prompt: |
             Review this issue. If there's a clear fix or relevant docs:
             - Provide documentation links

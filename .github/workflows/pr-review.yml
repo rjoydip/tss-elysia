@@ -35,7 +35,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          model: ${{ vars.OPENCODE_MODEL }}
+          model: ${{ vars.OPENCODE_MODEL || 'anthropic/claude-sonnet-4-20250514' }}
           use_github_token: true
           prompt: |
             You are performing a professional code review for a pull request.

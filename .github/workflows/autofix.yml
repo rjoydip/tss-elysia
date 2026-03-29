@@ -2,7 +2,6 @@ name: Auto-fix
 
 on:
   pull_request:
-    branches: [main]
     types: [opened, synchronize, reopened]
     paths-ignore:
       - "**.md"
@@ -23,7 +22,6 @@ jobs:
   autofix:
     name: Auto-fix Lint Issues
     runs-on: ubuntu-latest
-    if: ${{ github.event_name == 'pull_request' }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
@@ -66,7 +64,6 @@ jobs:
           commit_message: "chore: apply automated lint fixes"
           commit_options: "--no-verify"
           file_pattern: "*.ts *.tsx *.js *.jsx *.json *.css *.scss"
-          skip_dirty_check: false
           skip_fetch: false
           push_options: |
             force-with-lease=true
