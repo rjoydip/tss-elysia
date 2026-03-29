@@ -36,6 +36,7 @@ jobs:
         with:
           model: ${{ vars.OPENCODE_MODEL }}
           use_github_token: true
+          timeout-minutes: 10
           prompt: |
             Review this pull request:
             - Check for code quality issues
