@@ -160,14 +160,15 @@ Triggered on PR opened/synchronized. The workflow:
 
 ### Configuration
 
-To configure the AI model used:
-
 1. Go to: Repository → Settings → Variables → **Actions**
-2. Add variable:
-   - Name: `OPENCODE_MODEL`
-   - Value: `anthropic/claude-sonnet-4-20250514` (or your preferred model)
+2. Add the following required variables:
+
+| Variable         | Description                         | Example Value                                  |
+| ---------------- | ----------------------------------- | ---------------------------------------------- |
+| `GH_USER_EMAIL`  | Git user email for git operations   | `github-actions[bot]@users.noreply.github.com` |
+| `GH_USER_NAME`   | Git user name for git operations    | `github-actions[bot]`                          |
+| `OPENCODE_MODEL` | AI model for code review (optional) | `anthropic/claude-sonnet-4-20250514`           |
 
 Required secrets:
 
-- `ANTHROPIC_API_KEY` - API key for Anthropic models
 - `GITHUB_TOKEN` - GitHub token for workflow operations
