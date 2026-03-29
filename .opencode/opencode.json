@@ -28,20 +28,6 @@
     }
   },
   "mcp": {
-    "chrome-devtools": {
-      "type": "local",
-      "command": [
-        "bunx",
-        "-y",
-        "chrome-devtools-mcp@latest",
-        "--autoConnect",
-        "--user-data-dir=./artifacts/chrome-profile-stable"
-      ]
-    },
-    "github": {
-      "type": "local",
-      "command": ["bunx", "-y", "@modelcontextprotocol/server-github"]
-    },
     "filesystem": {
       "type": "local",
       "command": ["bunx", "-y", "@modelcontextprotocol/server-filesystem", "./src"]
@@ -49,10 +35,6 @@
     "sqlite": {
       "type": "local",
       "command": ["bunx", "-y", "sqlite-mcp-server"]
-    },
-    "browser-mcp": {
-      "type": "local",
-      "command": ["bunx", "-y", "@browsermcp/mcp@latest"]
     }
   },
   "lsp": {
