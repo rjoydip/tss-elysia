@@ -46,7 +46,7 @@
     "prepublishOnly": "bun run build"
   },
   "dependencies": {
-    "@opencode-ai/plugin": "1.3.3"
+    "@opencode-ai/plugin": "1.3.5"
   },
   "devDependencies": {
     "@tailwindcss/language-server": "^0.14.29",

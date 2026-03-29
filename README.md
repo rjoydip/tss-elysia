@@ -88,6 +88,7 @@ Detailed documentation available in `docs/`:
 | [API Reference](docs/api-reference.md)                 | API endpoints and usage         |
 | [Architecture](docs/architecture.md)                   | System architecture overview    |
 | [Authentication](docs/authentication.md)               | Auth setup and configuration    |
+| [CI/CD](docs/ci-cd.md)                                 | CI/CD pipelines and releases    |
 | [Development](docs/development.md)                     | Development guide               |
 | [Docker](docs/docker.md)                               | Docker deployment guide         |
 | [Environment Variables](docs/environment-variables.md) | Environment configuration       |

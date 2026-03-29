@@ -21,6 +21,12 @@
     }
   },
   "instructions": ["AGENTS.md", "CONTRIBUTING.md", ".opencode/rules/*.md"],
+  "formatter": {
+    "oxfmt": {
+      "command": ["bunx", "-y", "oxfmt", "$FILE"],
+      "extensions": [".md", ".ts", ".tsx", ".js", ".jsx", ".json", ".css", ".html", ".yml", ".yaml"]
+    }
+  },
   "mcp": {
     "chrome-devtools": {
       "type": "local",
@@ -43,6 +49,10 @@
     "sqlite": {
       "type": "local",
       "command": ["bunx", "-y", "sqlite-mcp-server"]
+    },
+    "browser-mcp": {
+      "type": "local",
+      "command": ["bunx", "-y", "@browsermcp/mcp@latest"]
     }
   },
   "lsp": {
