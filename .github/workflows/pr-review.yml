@@ -24,9 +24,13 @@ jobs:
     steps:
       - uses: actions/checkout@v6
         with:
-          persist-credentials: false
-      - run: git config --global user.email ${{ vars.GH_USER_EMAIL }}
-      - run: git config --global user.name ${{ vars.GH_USER_NAME }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+          persist-credentials: true
+      - name: Configure Git
+        run: |
+          git config --global user.email "${{ vars.GH_USER_EMAIL }}"
+          git config --global user.name "${{ vars.GH_USER_NAME }}"
+          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
       - uses: anomalyco/opencode/github@latest
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
