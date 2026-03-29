@@ -6,11 +6,7 @@ on:
     types: [opened, synchronize, reopened]
     paths-ignore:
       - "**.md"
-      - "**.tsx"
-      - "**.js"
-      - "**.jsx"
-      - "**.css"
-      - "**.scss"
+      - ".github/workflows/*.yml"
       - ".opencode/opencode.json"
       - ".opencode/tui.json"
   workflow_dispatch:
