@@ -49,6 +49,8 @@ jobs:
 
       - name: Run auto-fix
         run: bun run lint:fix
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Create commit
         uses: stefanzweifel/git-auto-commit-action@04702edda442b2e678b25b537cec683a1493fcb9 # v7.1.0
