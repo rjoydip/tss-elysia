@@ -1,5 +1,9 @@
 name: Auto-fix
 
+# Required GitHub Variables (set in repository settings -> Secrets and variables -> Actions):
+#   GH_USER_EMAIL - Email for git config (fallback: github-actions[bot]@users.noreply.github.com)
+#   GH_USER_NAME  - Name for git config (fallback: github-actions[bot])
+
 on:
   pull_request:
     types: [opened, synchronize, reopened]
@@ -61,7 +65,7 @@ jobs:
         run: bun run lint:fix
 
       - name: Create commit
-        uses: stefanzweifel/git-auto-commit-action@e9154e8368a4ba7b6b30f336885a5b3a6a00de6b # v5.0.0
+        uses: stefanzweifel/git-auto-commit-action@04702edda442b2e678b25b537cec683a1493fcb9 # v7.1.0
         with:
           commit_message: "chore: apply automated lint fixes"
           file_pattern: "*.ts *.tsx *.js *.jsx *.json *.css *.scss"
