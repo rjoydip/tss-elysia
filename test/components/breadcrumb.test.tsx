@@ -5,11 +5,11 @@
 
 import { describe, expect, it } from "bun:test";
 import { renderToString } from "react-dom/server";
-import { Breadcrumb } from "../../src/components/ui/breadcrumb";
+import { BreadcrumbNav } from "../../src/components/breadcrumb";
 
 describe("Breadcrumb", () => {
   it("should return null for empty items array", () => {
-    const html = renderToString(<Breadcrumb items={[]} />);
+    const html = renderToString(<BreadcrumbNav items={[]} />);
     expect(html).toBe("");
   });
 
@@ -17,7 +17,7 @@ describe("Breadcrumb", () => {
     // Breadcrumb uses <Link> from TanStack Router which needs router context.
     // Testing the null guard and type contracts is sufficient here;
     // E2E tests in .e2e/ui/docs.spec.ts cover full rendering.
-    const html = renderToString(<Breadcrumb items={[]} />);
+    const html = renderToString(<BreadcrumbNav items={[]} />);
     expect(html).toBe("");
   });
 
@@ -35,7 +35,7 @@ describe("Breadcrumb", () => {
 
   it("should accept className prop", () => {
     // Verify className is accepted in the interface
-    const html = renderToString(<Breadcrumb items={[]} className="test-class" />);
+    const html = renderToString(<BreadcrumbNav items={[]} className="test-class" />);
     expect(html).toBe(""); // still null because items is empty
   });
 });

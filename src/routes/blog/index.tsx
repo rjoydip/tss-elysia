@@ -16,8 +16,8 @@ function BlogCard({ post }: { post: BlogPost }) {
   return (
     <article className="group cursor-pointer">
       <a href={`/blog/${post.slug}`}>
-        <div className="border rounded-xl overflow-hidden hover:border-brand/50 hover:shadow-lg hover:shadow-brand/5 transition-all duration-300 h-full flex flex-col">
-          <div className="aspect-video bg-gradient-to-br from-brand/20 to-brand-hover/10 flex items-center justify-center">
+        <div className="border rounded-xl overflow-hidden hover:border-primary/50 hover:shadow-lg hover:shadow-primary/5 transition-all duration-300 h-full flex flex-col">
+          <div className="aspect-video bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="48"
@@ -28,7 +28,7 @@ function BlogCard({ post }: { post: BlogPost }) {
               strokeWidth="1.5"
               strokeLinecap="round"
               strokeLinejoin="round"
-              className="text-brand/30"
+              className="text-primary/30"
             >
               <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
               <polyline points="14 2 14 8 20 8" />
@@ -42,13 +42,13 @@ function BlogCard({ post }: { post: BlogPost }) {
               {post.tags.slice(0, 2).map((tag) => (
                 <span
                   key={tag}
-                  className="text-xs font-medium px-2 py-1 rounded-full bg-brand/10 text-brand"
+                  className="text-xs font-medium px-2 py-1 rounded-full bg-primary/10 text-primary"
                 >
                   {tag}
                 </span>
               ))}
             </div>
-            <h3 className="text-lg font-semibold mb-2 text-foreground group-hover:text-brand transition-colors line-clamp-2">
+            <h3 className="text-lg font-semibold mb-2 text-foreground group-hover:text-primary transition-colors line-clamp-2">
               {post.title}
             </h3>
             <p className="text-sm text-muted-foreground mb-4 line-clamp-2 flex-1">{post.excerpt}</p>
@@ -76,8 +76,8 @@ function FeaturedPost({ post }: { post: BlogPost }) {
   return (
     <article className="group cursor-pointer mb-12">
       <a href={`/blog/${post.slug}`}>
-        <div className="grid md:grid-cols-2 gap-8 items-center border rounded-2xl overflow-hidden hover:border-brand/50 hover:shadow-xl hover:shadow-brand/5 transition-all duration-300">
-          <div className="aspect-video md:aspect-auto bg-gradient-to-br from-brand/20 to-brand-hover/10 flex items-center justify-center">
+        <div className="grid md:grid-cols-2 gap-8 items-center border rounded-2xl overflow-hidden hover:border-primary/50 hover:shadow-xl hover:shadow-primary/5 transition-all duration-300">
+          <div className="aspect-video md:aspect-auto bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="64"
@@ -88,7 +88,7 @@ function FeaturedPost({ post }: { post: BlogPost }) {
               strokeWidth="1.5"
               strokeLinecap="round"
               strokeLinejoin="round"
-              className="text-brand/30"
+              className="text-primary/30"
             >
               <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
               <polyline points="14 2 14 8 20 8" />
@@ -99,7 +99,7 @@ function FeaturedPost({ post }: { post: BlogPost }) {
           </div>
           <div className="p-8">
             <div className="flex items-center gap-2 mb-4">
-              <span className="text-xs font-semibold px-3 py-1 rounded-full bg-brand text-black">
+              <span className="text-xs font-semibold px-3 py-1 rounded-full bg-primary text-primary-foreground">
                 Featured
               </span>
               {post.tags.slice(0, 1).map((tag) => (
@@ -111,7 +111,7 @@ function FeaturedPost({ post }: { post: BlogPost }) {
                 </span>
               ))}
             </div>
-            <h2 className="text-2xl md:text-3xl font-bold mb-3 text-foreground group-hover:text-brand transition-colors">
+            <h2 className="text-2xl md:text-3xl font-bold mb-3 text-foreground group-hover:text-primary transition-colors">
               {post.title}
             </h2>
             <p className="text-muted-foreground mb-6 text-lg leading-relaxed">{post.excerpt}</p>

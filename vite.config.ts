@@ -45,11 +45,36 @@ export default defineConfig(() => ({
             if (id.includes("better-auth")) {
               return "vendor-auth";
             }
-            if (id.includes("@tanstack")) {
+            if (id.includes("@tanstack/react-router")) {
               return "vendor-router";
             }
-            if (id.includes("react")) {
+            if (id.includes("@tanstack/react-start")) {
+              return "vendor-start";
+            }
+            if (id.includes("@tanstack/react-query")) {
+              return "vendor-query";
+            }
+            if (id.includes("react") && !id.includes("@radix")) {
               return "vendor-react";
+            }
+            if (id.includes("@radix-ui")) {
+              return "vendor-radix";
+            }
+            if (id.includes("lucide-react")) {
+              return "vendor-icons";
+            }
+            if (
+              id.includes("class-variance-authority") ||
+              id.includes("clsx") ||
+              id.includes("tailwind-merge")
+            ) {
+              return "vendor-utils";
+            }
+            if (id.includes("shiki")) {
+              return "vendor-shiki";
+            }
+            if (id.includes("react-markdown") || id.includes("remark-") || id.includes("rehype-")) {
+              return "vendor-markdown";
             }
             if (id.includes("drizzle")) {
               return "vendor-db";
@@ -60,7 +85,16 @@ export default defineConfig(() => ({
             if (id.includes("@libsql") || id.includes("bun:sqlite")) {
               return "vendor-sqlite";
             }
-            return "vendor";
+            if (id.includes("shadcn") || id.includes("cmdk") || id.includes("embla")) {
+              return "vendor-ui";
+            }
+            if (id.includes("@opentelemetry")) {
+              return "vendor-telemetry";
+            }
+            if (id.includes("@tanstack/router-devtools")) {
+              return "vendor-devtools";
+            }
+            return "vendor-misc";
           }
         },
         chunkFileNames: "chunks/[name]-[hash].js",
@@ -68,6 +102,6 @@ export default defineConfig(() => ({
         assetFileNames: "assets/[name]-[hash][extname]",
       },
     },
-    chunkSizeWarningLimit: 1000,
+    chunkSizeWarningLimit: 600,
   },
 }));

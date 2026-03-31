@@ -108,7 +108,6 @@ export const AUTH_ALLOWED_METHODS = ["GET", "POST", "PUT", "DELETE"];
  */
 export const navItems = [
   { name: "Documentation", href: "/docs" },
-  { name: "API", href: "/docs/api/reference" },
   { name: "Blog", href: "/blog" },
   { name: "Changelog", href: "/changelog" },
 ];

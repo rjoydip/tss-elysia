@@ -187,15 +187,15 @@ function Home() {
         <div className="max-w-5xl mx-auto text-center">
           <Badge
             variant="outline"
-            className="mb-8 px-4 py-1.5 border-brand/30 bg-brand/10 text-brand text-sm font-medium"
+            className="mb-8 px-4 py-1.5 border-primary bg-primary text-primary text-sm font-medium"
           >
             <span className="flex items-center gap-2">
-              <span className="w-1.5 h-1.5 rounded-full bg-brand animate-pulse self-center" />v
-              {APP_VERSION} Released
+              <span className="w-3 h-3 mt-1 rounded-full bg-background dark:bg-ring animate-pulse self-center" />
+              v{APP_VERSION} Released
             </span>
           </Badge>
           <h1 className="text-5xl md:text-7xl font-bold tracking-tight mb-6 text-foreground">
-            Build faster with <span className="text-brand">TypeScript</span>
+            Build faster with <span className="text-primary">TypeScript</span>
           </h1>
           <p className="text-xl md:text-2xl text-muted-foreground max-w-2xl mx-auto mb-10 leading-relaxed">
             A modern full-stack application built with ElysiaJS, React 19, and Better Auth.
@@ -206,7 +206,7 @@ function Home() {
               to="/docs"
               className={cn(
                 buttonVariants({ size: "lg" }),
-                "bg-brand hover:bg-brand-hover text-black font-semibold",
+                "bg-primary hover:bg-primary/90 text-primary-foreground font-semibold",
               )}
             >
               Get Started
@@ -257,9 +257,9 @@ function Home() {
             {features.map((feature) => (
               <div
                 key={feature.title}
-                className="p-8 rounded-2xl border bg-background hover:border-brand/50 hover:shadow-lg hover:shadow-brand/5 transition-all duration-300 group"
+                className="p-8 rounded-2xl border bg-background hover:border-primary/50 hover:shadow-lg hover:shadow-primary/5 transition-all duration-300 group"
               >
-                <div className="w-12 h-12 rounded-lg bg-brand/10 flex items-center justify-center mb-4 text-brand group-hover:scale-110 transition-transform duration-300">
+                <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4 text-primary group-hover:scale-110 transition-transform duration-300">
                   {feature.icon}
                 </div>
                 <h3 className="font-semibold text-lg mb-2 text-foreground">{feature.title}</h3>
@@ -275,19 +275,19 @@ function Home() {
         <div className="max-w-4xl mx-auto">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
             <div>
-              <div className="text-4xl font-bold text-brand mb-2">10x</div>
+              <div className="text-4xl font-bold text-primary mb-2">10x</div>
               <div className="text-sm text-muted-foreground">Faster Development</div>
             </div>
             <div>
-              <div className="text-4xl font-bold text-brand mb-2">100%</div>
+              <div className="text-4xl font-bold text-primary mb-2">100%</div>
               <div className="text-sm text-muted-foreground">Type-Safe</div>
             </div>
             <div>
-              <div className="text-4xl font-bold text-brand mb-2">0</div>
+              <div className="text-4xl font-bold text-primary mb-2">0</div>
               <div className="text-sm text-muted-foreground">Runtime Errors</div>
             </div>
             <div>
-              <div className="text-4xl font-bold text-brand mb-2">24/7</div>
+              <div className="text-4xl font-bold text-primary mb-2">24/7</div>
               <div className="text-sm text-muted-foreground">Support</div>
             </div>
           </div>
@@ -308,7 +308,7 @@ function Home() {
               to="/docs"
               className={cn(
                 buttonVariants({ size: "lg" }),
-                "bg-brand hover:bg-brand-hover text-black font-semibold px-8",
+                "bg-primary hover:bg-primary/90 text-primary-foreground font-semibold px-8",
               )}
             >
               Read the Docs

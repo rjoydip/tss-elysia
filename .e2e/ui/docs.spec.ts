@@ -18,21 +18,31 @@ test.describe("Docs Sidebar", () => {
 
   test("should expand Getting Started section on click", async ({ page }) => {
     // Getting Started auto-expands on /docs since its Overview item href="/docs" matches the path
-    await expect(page.getByRole("link", { name: "Development", exact: true })).toBeVisible();
-    await expect(page.getByRole("link", { name: "Overview", exact: true })).toBeVisible();
+    await expect(
+      page.locator("aside").getByRole("link", { name: "Development", exact: true }),
+    ).toBeVisible();
+    await expect(
+      page.locator("aside").getByRole("link", { name: "Overview", exact: true }),
+    ).toBeVisible();
   });
 
   test("should collapse section on second click", async ({ page }) => {
     // Getting Started auto-expands on /docs since its Overview item matches the current path
     const section = page.getByRole("button", { name: "Getting Started" });
     // Verify it starts expanded (auto-expanded due to path match)
-    await expect(page.getByRole("link", { name: "Development", exact: true })).toBeVisible();
+    await expect(
+      page.locator("aside").getByRole("link", { name: "Development", exact: true }),
+    ).toBeVisible();
     // Click to collapse
     await section.click();
-    await expect(page.getByRole("link", { name: "Development", exact: true })).not.toBeVisible();
+    await expect(
+      page.locator("aside").getByRole("link", { name: "Development", exact: true }),
+    ).not.toBeVisible();
     // Click again to re-expand
     await section.click();
-    await expect(page.getByRole("link", { name: "Development", exact: true })).toBeVisible();
+    await expect(
+      page.locator("aside").getByRole("link", { name: "Development", exact: true }),
+    ).toBeVisible();
   });
 
   test("should expand Authentication section", async ({ page }) => {
@@ -48,7 +58,7 @@ test.describe("Docs Sidebar", () => {
 
   test("should navigate to Development page via sidebar", async ({ page }) => {
     // Getting Started auto-expands on /docs, no need to click
-    await page.getByRole("link", { name: "Development", exact: true }).click();
+    await page.locator("aside").getByRole("link", { name: "Development", exact: true }).click();
     await page.waitForLoadState("networkidle");
     expect(page.url()).toContain("/docs/development");
     await expect(page.getByRole("heading", { name: "Development", exact: true })).toBeVisible();
@@ -57,12 +67,14 @@ test.describe("Docs Sidebar", () => {
   test("should auto-expand section containing current page", async ({ page }) => {
     await page.goto("/docs/development");
     await page.waitForLoadState("networkidle");
-    await expect(page.getByRole("link", { name: "Development", exact: true })).toBeVisible();
+    await expect(
+      page.locator("aside").getByRole("link", { name: "Development", exact: true }),
+    ).toBeVisible();
   });
 
   test("should navigate between different doc sections", async ({ page }) => {
     // Getting Started auto-expands on /docs, no need to click
-    await page.getByRole("link", { name: "Development", exact: true }).click();
+    await page.locator("aside").getByRole("link", { name: "Development", exact: true }).click();
     await page.waitForLoadState("networkidle");
     await expect(page.getByRole("heading", { name: "Development", exact: true })).toBeVisible();
 
@@ -78,14 +90,14 @@ test.describe("Docs Breadcrumbs", () => {
   test("should show breadcrumb nav on child pages", async ({ page }) => {
     await page.goto("/docs/development");
     await page.waitForLoadState("networkidle");
-    await expect(page.locator("nav[aria-label='Breadcrumb']")).toBeVisible();
+    await expect(page.locator("nav[aria-label='breadcrumb']")).toBeVisible();
   });
 
   test("should show Docs label in breadcrumb", async ({ page }) => {
     await page.goto("/docs/development");
     await page.waitForLoadState("networkidle");
     await expect(
-      page.locator("nav[aria-label='Breadcrumb']").getByText("Docs", { exact: true }),
+      page.locator("nav[aria-label='breadcrumb']").getByText("Docs", { exact: true }),
     ).toBeVisible();
   });
 });
@@ -115,7 +127,7 @@ test.describe("Docs Layout", () => {
     await expect(page.getByRole("button", { name: "Getting Started" })).toBeVisible();
 
     // Getting Started auto-expands on /docs, no need to click
-    await page.getByRole("link", { name: "Development", exact: true }).click();
+    await page.locator("aside").getByRole("link", { name: "Development", exact: true }).click();
     await page.waitForLoadState("networkidle");
 
     await expect(page.getByRole("button", { name: "Getting Started" })).toBeVisible();
@@ -173,7 +185,7 @@ test.describe("Docs Theme Toggle", () => {
     const labelAfterToggle = await themeToggle.getAttribute("aria-label");
 
     // Getting Started auto-expands on /docs, no need to click
-    await page.getByRole("link", { name: "Development", exact: true }).click();
+    await page.locator("aside").getByRole("link", { name: "Development", exact: true }).click();
     await page.waitForLoadState("networkidle");
 
     const labelAfterNav = await page

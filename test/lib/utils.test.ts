@@ -4,7 +4,7 @@
  */
 
 import { describe, expect, it } from "bun:test";
-import { cn, titleCase, brand } from "../../src/lib/utils";
+import { cn, titleCase } from "../../src/lib/utils";
 
 describe("cn", () => {
   it("should merge class names", () => {
@@ -119,46 +119,5 @@ describe("titleCase", () => {
 
   it("should handle strings with numbers", () => {
     expect(titleCase("version 2 release")).toBe("Version 2 Release");
-  });
-});
-
-describe("brand", () => {
-  it("should have bg class", () => {
-    expect(brand.bg).toBe("bg-[--brand]");
-  });
-
-  it("should have text class", () => {
-    expect(brand.text).toBe("text-[--brand]");
-  });
-
-  it("should have border class", () => {
-    expect(brand.border).toBe("border-[--brand]");
-  });
-
-  it("should have hover class", () => {
-    expect(brand.hover).toBe("hover:bg-[--brand-hover]");
-  });
-
-  it("should have foreground class", () => {
-    expect(brand.foreground).toBe("text-[--brand-foreground]");
-  });
-
-  it("should have bgHover class", () => {
-    expect(brand.bgHover).toBe("bg-[--brand] hover:bg-[--brand-hover]");
-  });
-
-  it("should have ring class", () => {
-    expect(brand.ring).toBe("ring-[--brand]");
-  });
-
-  it("should have exactly 7 properties", () => {
-    expect(Object.keys(brand)).toHaveLength(7);
-  });
-
-  it("should have all string values", () => {
-    for (const value of Object.values(brand)) {
-      expect(typeof value).toBe("string");
-      expect(value.length).toBeGreaterThan(0);
-    }
   });
 });

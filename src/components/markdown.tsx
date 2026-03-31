@@ -9,7 +9,7 @@ import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeRaw from "rehype-raw";
 import rehypeSlug from "rehype-slug";
-import { codeToHtml } from "shiki";
+import { getShikiHighlighter } from "~/lib/shiki";
 
 interface MarkdownRendererProps {
   content: string;
@@ -41,22 +41,29 @@ function CodeBlock({ children, className }: CodeBlockProps) {
   useEffect(() => {
     if (!code) return;
 
+    let cancelled = false;
+
     const highlight = async () => {
       try {
-        const html = await codeToHtml(code.trim(), {
+        const highlighter = await getShikiHighlighter();
+        if (cancelled) return;
+        const html = highlighter.codeToHtml(code.trim(), {
           lang: language,
           themes: {
             light: "github-light",
             dark: "github-dark",
           },
         });
-        setHighlightedCode(html);
+        if (!cancelled) setHighlightedCode(html);
       } catch {
-        setHighlightedCode(`<pre><code>${code}</code></pre>`);
+        if (!cancelled) setHighlightedCode(`<pre><code>${code}</code></pre>`);
       }
     };
 
     highlight();
+    return () => {
+      cancelled = true;
+    };
   }, [code, language]);
 
   if (!code) return null;
@@ -129,7 +136,7 @@ export function MarkdownRenderer({ content }: MarkdownRendererProps) {
             return <>{children}</>;
           },
           blockquote: ({ children }) => (
-            <blockquote className="border-l-4 border-brand pl-4 my-4 italic text-muted-foreground bg-brand/5 py-2 rounded-r-md">
+            <blockquote className="border-l-4 border-primary pl-4 my-4 italic text-muted-foreground bg-primary/5 py-2 rounded-r-md">
               {children}
             </blockquote>
           ),
@@ -147,7 +154,7 @@ export function MarkdownRenderer({ content }: MarkdownRendererProps) {
           a: ({ children, href }) => (
             <a
               href={href}
-              className="text-brand hover:underline"
+              className="text-primary hover:underline"
               target={href?.startsWith("http") ? "_blank" : undefined}
               rel={href?.startsWith("http") ? "noopener noreferrer" : undefined}
             >

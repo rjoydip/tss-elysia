@@ -24,7 +24,7 @@ describe("Badge", () => {
   it("should render with default variant", () => {
     const html = renderToString(<Badge>Test</Badge>);
     expect(html).toContain("Test");
-    expect(html).toContain("rounded-md");
+    expect(html).toContain("rounded-full");
   });
 
   it("should render with secondary variant", () => {
@@ -43,18 +43,6 @@ describe("Badge", () => {
     const html = renderToString(<Badge variant="outline">Outline</Badge>);
     expect(html).toContain("Outline");
     expect(html).toContain("text-foreground");
-  });
-
-  it("should render with success variant", () => {
-    const html = renderToString(<Badge variant="success">Success</Badge>);
-    expect(html).toContain("Success");
-    expect(html).toContain("bg-emerald-500");
-  });
-
-  it("should render with warning variant", () => {
-    const html = renderToString(<Badge variant="warning">Warning</Badge>);
-    expect(html).toContain("Warning");
-    expect(html).toContain("bg-amber-500");
   });
 
   it("should apply custom className", () => {
@@ -115,29 +103,18 @@ describe("Button", () => {
 
   it("should render with small size", () => {
     const html = renderToString(<Button size="sm">Small</Button>);
-    expect(html).toContain("h-8");
+    expect(html).toContain("h-9");
   });
 
   it("should render with large size", () => {
     const html = renderToString(<Button size="lg">Large</Button>);
-    expect(html).toContain("h-10");
+    expect(html).toContain("h-11");
   });
 
   it("should render with icon size", () => {
     const html = renderToString(<Button size="icon">I</Button>);
-    expect(html).toContain("h-9");
-    expect(html).toContain("w-9");
-  });
-
-  it("should show loading spinner when isLoading is true", () => {
-    const html = renderToString(<Button isLoading>Submit</Button>);
-    expect(html).toContain("animate-spin");
-    expect(html).toContain("Submit");
-  });
-
-  it("should be disabled when isLoading is true", () => {
-    const html = renderToString(<Button isLoading>Submit</Button>);
-    expect(html).toContain("disabled");
+    expect(html).toContain("h-10");
+    expect(html).toContain("w-10");
   });
 
   it("should be disabled when disabled prop is true", () => {
@@ -166,7 +143,7 @@ describe("Card", () => {
   it("should render Card container", () => {
     const html = renderToString(<Card>Content</Card>);
     expect(html).toContain("Content");
-    expect(html).toContain("rounded-xl");
+    expect(html).toContain("rounded-lg");
     expect(html).toContain("border");
   });
 
@@ -176,18 +153,18 @@ describe("Card", () => {
     expect(html).toContain("flex");
   });
 
-  it("should render CardTitle as h3", () => {
+  it("should render CardTitle with correct classes", () => {
     const html = renderToString(<CardTitle>Title</CardTitle>);
     expect(html).toContain("Title");
     expect(html).toContain("font-semibold");
-    expect(html).toContain("<h3");
+    expect(html).toContain("text-2xl");
   });
 
-  it("should render CardDescription", () => {
+  it("should render CardDescription with correct classes", () => {
     const html = renderToString(<CardDescription>Description</CardDescription>);
     expect(html).toContain("Description");
     expect(html).toContain("text-sm");
-    expect(html).toContain("<p");
+    expect(html).toContain("text-muted-foreground");
   });
 
   it("should render CardContent", () => {
@@ -261,14 +238,14 @@ describe("Separator", () => {
     expect(html).toContain('role="separator"');
   });
 
-  it("should set aria-orientation", () => {
+  it("should set vertical data-orientation", () => {
     const html = renderToString(<Separator orientation="vertical" decorative={false} />);
-    expect(html).toContain('aria-orientation="vertical"');
+    expect(html).toContain('data-orientation="vertical"');
   });
 
-  it("should set horizontal aria-orientation", () => {
+  it("should set horizontal data-orientation", () => {
     const html = renderToString(<Separator orientation="horizontal" decorative={false} />);
-    expect(html).toContain('aria-orientation="horizontal"');
+    expect(html).toContain('data-orientation="horizontal"');
   });
 
   it("should apply custom className", () => {

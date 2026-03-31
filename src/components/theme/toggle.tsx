@@ -21,8 +21,8 @@ export function ThemeToggle() {
     return <div className="w-9 h-9" />;
   }
 
-  const themes: Array<"light" | "dark" | "system"> = ["light", "dark", "system"];
-  const currentIndex = themes.indexOf(theme as "light" | "dark" | "system");
+  const themes: Array<"light" | "dark"> = ["light", "dark"];
+  const currentIndex = themes.indexOf(theme as "light" | "dark");
   const nextTheme = themes[(currentIndex + 1) % themes.length];
 
   const icons = {
@@ -64,23 +64,6 @@ export function ThemeToggle() {
         <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" />
       </svg>
     ),
-    system: (
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        width="18"
-        height="18"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      >
-        <rect width="20" height="14" x="2" y="3" rx="2" />
-        <path d="M8 21h8" />
-        <path d="M12 17v4" />
-      </svg>
-    ),
   };
 
   return (
@@ -93,7 +76,7 @@ export function ThemeToggle() {
       )}
       aria-label={`Switch to ${nextTheme} theme`}
     >
-      {icons[theme as keyof typeof icons] || icons.system}
+      {icons[theme as keyof typeof icons] || icons.light}
     </button>
   );
 }

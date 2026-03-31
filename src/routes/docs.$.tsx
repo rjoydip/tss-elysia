@@ -5,7 +5,8 @@
  */
 
 import { createFileRoute } from "@tanstack/react-router";
-import { MarkdownRenderer } from "~/lib/markdown";
+import { MarkdownRenderer } from "~/components/markdown";
+import { Skeleton } from "~/components/ui/skeleton";
 import { useEffect, useState } from "react";
 
 /**
@@ -78,13 +79,11 @@ function DocsPage() {
 
   if (!mounted) {
     return (
-      <div className="max-w-4xl">
-        <div className="animate-pulse space-y-4">
-          <div className="h-8 bg-muted rounded w-3/4" />
-          <div className="h-4 bg-muted rounded w-full" />
-          <div className="h-4 bg-muted rounded w-5/6" />
-          <div className="h-32 bg-muted rounded w-full" />
-        </div>
+      <div className="max-w-4xl space-y-4">
+        <Skeleton className="h-8 w-3/4" />
+        <Skeleton className="h-4 w-full" />
+        <Skeleton className="h-4 w-5/6" />
+        <Skeleton className="h-32 w-full" />
       </div>
     );
   }

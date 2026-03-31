@@ -5,7 +5,7 @@
  */
 
 import { useEffect, useState } from "react";
-import { codeToHtml } from "shiki";
+import { getShikiHighlighter } from "~/lib/shiki";
 
 interface CodeHighlightProps {
   /** Code string to highlight */
@@ -31,7 +31,8 @@ export function CodeHighlight({
 
     const highlight = async () => {
       try {
-        const html = await codeToHtml(code.trim(), {
+        const highlighter = await getShikiHighlighter();
+        const html = highlighter.codeToHtml(code.trim(), {
           lang: language,
           themes: {
             light: "github-light",
