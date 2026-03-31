@@ -9,19 +9,91 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as StatusRouteImport } from './routes/status'
+import { Route as DocsRouteImport } from './routes/docs'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as DocsIndexRouteImport } from './routes/docs/index'
+import { Route as ChangelogIndexRouteImport } from './routes/changelog/index'
+import { Route as BlogIndexRouteImport } from './routes/blog/index'
+import { Route as DocsDevelopmentRouteImport } from './routes/docs/development'
 import { Route as ApiSplatRouteImport } from './routes/api/$'
+import { Route as DocsAuthIndexRouteImport } from './routes/docs/auth/index'
+import { Route as DocsAuthTokenRouteImport } from './routes/docs/auth/token'
+import { Route as DocsAuthRegisterRouteImport } from './routes/docs/auth/register'
+import { Route as DocsAuthMiddlewareRouteImport } from './routes/docs/auth/middleware'
+import { Route as DocsAuthLoginRouteImport } from './routes/docs/auth/login'
+import { Route as DocsApiReferenceRouteImport } from './routes/docs/api/reference'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 
+const StatusRoute = StatusRouteImport.update({
+  id: '/status',
+  path: '/status',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DocsRoute = DocsRouteImport.update({
+  id: '/docs',
+  path: '/docs',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DocsIndexRoute = DocsIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => DocsRoute,
+} as any)
+const ChangelogIndexRoute = ChangelogIndexRouteImport.update({
+  id: '/changelog/',
+  path: '/changelog/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BlogIndexRoute = BlogIndexRouteImport.update({
+  id: '/blog/',
+  path: '/blog/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DocsDevelopmentRoute = DocsDevelopmentRouteImport.update({
+  id: '/development',
+  path: '/development',
+  getParentRoute: () => DocsRoute,
+} as any)
 const ApiSplatRoute = ApiSplatRouteImport.update({
   id: '/api/$',
   path: '/api/$',
   getParentRoute: () => rootRouteImport,
+} as any)
+const DocsAuthIndexRoute = DocsAuthIndexRouteImport.update({
+  id: '/auth/',
+  path: '/auth/',
+  getParentRoute: () => DocsRoute,
+} as any)
+const DocsAuthTokenRoute = DocsAuthTokenRouteImport.update({
+  id: '/auth/token',
+  path: '/auth/token',
+  getParentRoute: () => DocsRoute,
+} as any)
+const DocsAuthRegisterRoute = DocsAuthRegisterRouteImport.update({
+  id: '/auth/register',
+  path: '/auth/register',
+  getParentRoute: () => DocsRoute,
+} as any)
+const DocsAuthMiddlewareRoute = DocsAuthMiddlewareRouteImport.update({
+  id: '/auth/middleware',
+  path: '/auth/middleware',
+  getParentRoute: () => DocsRoute,
+} as any)
+const DocsAuthLoginRoute = DocsAuthLoginRouteImport.update({
+  id: '/auth/login',
+  path: '/auth/login',
+  getParentRoute: () => DocsRoute,
+} as any)
+const DocsApiReferenceRoute = DocsApiReferenceRouteImport.update({
+  id: '/api/reference',
+  path: '/api/reference',
+  getParentRoute: () => DocsRoute,
 } as any)
 const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   id: '/api/auth/$',
@@ -31,36 +103,134 @@ const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/docs': typeof DocsRouteWithChildren
+  '/status': typeof StatusRoute
   '/api/$': typeof ApiSplatRoute
+  '/docs/development': typeof DocsDevelopmentRoute
+  '/blog/': typeof BlogIndexRoute
+  '/changelog/': typeof ChangelogIndexRoute
+  '/docs/': typeof DocsIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/docs/api/reference': typeof DocsApiReferenceRoute
+  '/docs/auth/login': typeof DocsAuthLoginRoute
+  '/docs/auth/middleware': typeof DocsAuthMiddlewareRoute
+  '/docs/auth/register': typeof DocsAuthRegisterRoute
+  '/docs/auth/token': typeof DocsAuthTokenRoute
+  '/docs/auth/': typeof DocsAuthIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/status': typeof StatusRoute
   '/api/$': typeof ApiSplatRoute
+  '/docs/development': typeof DocsDevelopmentRoute
+  '/blog': typeof BlogIndexRoute
+  '/changelog': typeof ChangelogIndexRoute
+  '/docs': typeof DocsIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/docs/api/reference': typeof DocsApiReferenceRoute
+  '/docs/auth/login': typeof DocsAuthLoginRoute
+  '/docs/auth/middleware': typeof DocsAuthMiddlewareRoute
+  '/docs/auth/register': typeof DocsAuthRegisterRoute
+  '/docs/auth/token': typeof DocsAuthTokenRoute
+  '/docs/auth': typeof DocsAuthIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/docs': typeof DocsRouteWithChildren
+  '/status': typeof StatusRoute
   '/api/$': typeof ApiSplatRoute
+  '/docs/development': typeof DocsDevelopmentRoute
+  '/blog/': typeof BlogIndexRoute
+  '/changelog/': typeof ChangelogIndexRoute
+  '/docs/': typeof DocsIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/docs/api/reference': typeof DocsApiReferenceRoute
+  '/docs/auth/login': typeof DocsAuthLoginRoute
+  '/docs/auth/middleware': typeof DocsAuthMiddlewareRoute
+  '/docs/auth/register': typeof DocsAuthRegisterRoute
+  '/docs/auth/token': typeof DocsAuthTokenRoute
+  '/docs/auth/': typeof DocsAuthIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/api/$' | '/api/auth/$'
+  fullPaths:
+    | '/'
+    | '/docs'
+    | '/status'
+    | '/api/$'
+    | '/docs/development'
+    | '/blog/'
+    | '/changelog/'
+    | '/docs/'
+    | '/api/auth/$'
+    | '/docs/api/reference'
+    | '/docs/auth/login'
+    | '/docs/auth/middleware'
+    | '/docs/auth/register'
+    | '/docs/auth/token'
+    | '/docs/auth/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/api/$' | '/api/auth/$'
-  id: '__root__' | '/' | '/api/$' | '/api/auth/$'
+  to:
+    | '/'
+    | '/status'
+    | '/api/$'
+    | '/docs/development'
+    | '/blog'
+    | '/changelog'
+    | '/docs'
+    | '/api/auth/$'
+    | '/docs/api/reference'
+    | '/docs/auth/login'
+    | '/docs/auth/middleware'
+    | '/docs/auth/register'
+    | '/docs/auth/token'
+    | '/docs/auth'
+  id:
+    | '__root__'
+    | '/'
+    | '/docs'
+    | '/status'
+    | '/api/$'
+    | '/docs/development'
+    | '/blog/'
+    | '/changelog/'
+    | '/docs/'
+    | '/api/auth/$'
+    | '/docs/api/reference'
+    | '/docs/auth/login'
+    | '/docs/auth/middleware'
+    | '/docs/auth/register'
+    | '/docs/auth/token'
+    | '/docs/auth/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  DocsRoute: typeof DocsRouteWithChildren
+  StatusRoute: typeof StatusRoute
   ApiSplatRoute: typeof ApiSplatRoute
+  BlogIndexRoute: typeof BlogIndexRoute
+  ChangelogIndexRoute: typeof ChangelogIndexRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/status': {
+      id: '/status'
+      path: '/status'
+      fullPath: '/status'
+      preLoaderRoute: typeof StatusRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/docs': {
+      id: '/docs'
+      path: '/docs'
+      fullPath: '/docs'
+      preLoaderRoute: typeof DocsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -68,12 +238,82 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/docs/': {
+      id: '/docs/'
+      path: '/'
+      fullPath: '/docs/'
+      preLoaderRoute: typeof DocsIndexRouteImport
+      parentRoute: typeof DocsRoute
+    }
+    '/changelog/': {
+      id: '/changelog/'
+      path: '/changelog'
+      fullPath: '/changelog/'
+      preLoaderRoute: typeof ChangelogIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/blog/': {
+      id: '/blog/'
+      path: '/blog'
+      fullPath: '/blog/'
+      preLoaderRoute: typeof BlogIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/docs/development': {
+      id: '/docs/development'
+      path: '/development'
+      fullPath: '/docs/development'
+      preLoaderRoute: typeof DocsDevelopmentRouteImport
+      parentRoute: typeof DocsRoute
+    }
     '/api/$': {
       id: '/api/$'
       path: '/api/$'
       fullPath: '/api/$'
       preLoaderRoute: typeof ApiSplatRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/docs/auth/': {
+      id: '/docs/auth/'
+      path: '/auth'
+      fullPath: '/docs/auth/'
+      preLoaderRoute: typeof DocsAuthIndexRouteImport
+      parentRoute: typeof DocsRoute
+    }
+    '/docs/auth/token': {
+      id: '/docs/auth/token'
+      path: '/auth/token'
+      fullPath: '/docs/auth/token'
+      preLoaderRoute: typeof DocsAuthTokenRouteImport
+      parentRoute: typeof DocsRoute
+    }
+    '/docs/auth/register': {
+      id: '/docs/auth/register'
+      path: '/auth/register'
+      fullPath: '/docs/auth/register'
+      preLoaderRoute: typeof DocsAuthRegisterRouteImport
+      parentRoute: typeof DocsRoute
+    }
+    '/docs/auth/middleware': {
+      id: '/docs/auth/middleware'
+      path: '/auth/middleware'
+      fullPath: '/docs/auth/middleware'
+      preLoaderRoute: typeof DocsAuthMiddlewareRouteImport
+      parentRoute: typeof DocsRoute
+    }
+    '/docs/auth/login': {
+      id: '/docs/auth/login'
+      path: '/auth/login'
+      fullPath: '/docs/auth/login'
+      preLoaderRoute: typeof DocsAuthLoginRouteImport
+      parentRoute: typeof DocsRoute
+    }
+    '/docs/api/reference': {
+      id: '/docs/api/reference'
+      path: '/api/reference'
+      fullPath: '/docs/api/reference'
+      preLoaderRoute: typeof DocsApiReferenceRouteImport
+      parentRoute: typeof DocsRoute
     }
     '/api/auth/$': {
       id: '/api/auth/$'
@@ -85,9 +325,37 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface DocsRouteChildren {
+  DocsDevelopmentRoute: typeof DocsDevelopmentRoute
+  DocsIndexRoute: typeof DocsIndexRoute
+  DocsApiReferenceRoute: typeof DocsApiReferenceRoute
+  DocsAuthLoginRoute: typeof DocsAuthLoginRoute
+  DocsAuthMiddlewareRoute: typeof DocsAuthMiddlewareRoute
+  DocsAuthRegisterRoute: typeof DocsAuthRegisterRoute
+  DocsAuthTokenRoute: typeof DocsAuthTokenRoute
+  DocsAuthIndexRoute: typeof DocsAuthIndexRoute
+}
+
+const DocsRouteChildren: DocsRouteChildren = {
+  DocsDevelopmentRoute: DocsDevelopmentRoute,
+  DocsIndexRoute: DocsIndexRoute,
+  DocsApiReferenceRoute: DocsApiReferenceRoute,
+  DocsAuthLoginRoute: DocsAuthLoginRoute,
+  DocsAuthMiddlewareRoute: DocsAuthMiddlewareRoute,
+  DocsAuthRegisterRoute: DocsAuthRegisterRoute,
+  DocsAuthTokenRoute: DocsAuthTokenRoute,
+  DocsAuthIndexRoute: DocsAuthIndexRoute,
+}
+
+const DocsRouteWithChildren = DocsRoute._addFileChildren(DocsRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  DocsRoute: DocsRouteWithChildren,
+  StatusRoute: StatusRoute,
   ApiSplatRoute: ApiSplatRoute,
+  BlogIndexRoute: BlogIndexRoute,
+  ChangelogIndexRoute: ChangelogIndexRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
 }
 export const routeTree = rootRouteImport

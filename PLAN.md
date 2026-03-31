@@ -12,7 +12,6 @@ Complete the authentication system with additional security features, set up use
 - [ ] Implement organization/team management for multi-tenant support
 - [x] Enhance security with rate limiting, CSRF protection, and audit logging
 - [ ] Complete E2E test coverage for auth flows
-- [ ] Replace React with Preact for better performance
 - [ ] Integrate shadcn/ui component library
 - [ ] Build admin and user dashboards with user management
 - [ ] Implement enterprise SASS product features
@@ -29,7 +28,6 @@ Complete the authentication system with additional security features, set up use
 
 - [x] Create setup script (`scripts/setup.ts`) for automated project initialization
 - [x] Create cleanup script (`scripts/cleanup.ts`) for removing artifacts
-- [x] Enhance setup script to install OpenCode LSP (`opencode-ai` package)
 - [x] Add AI/LLM coding guidelines to AGENTS.md
 - [x] Add npm scripts for setup and cleanup (`bun run setup`, `bun run cleanup`)
 - [x] Add code comments to all existing source files explaining intent and purpose
@@ -38,7 +36,6 @@ Complete the authentication system with additional security features, set up use
 - [x] Create manual release script (`scripts/release.ts`)
 - [x] Update documentation (CONTRIBUTING.md, docker.md)
 - [x] Enable dead code detection (TypeScript + oxlint rules)
-- [x] Add dead code prevention instructions to AGENTS.md and .opencode/rules/
 
 ### Phase 1: Preparation
 
@@ -99,23 +96,31 @@ Complete the authentication system with additional security features, set up use
 
 ### Phase 4: UI/Component Library
 
-#### Preact Migration
-
-- [ ] Install Preact and @preact/preset-vite
-- [ ] Configure Vite to use Preact JSX runtime
-- [ ] Update alias from react to preact/compat
-- [ ] Install preact-render-to-string for SSR
-- [ ] Migrate React components to Preact equivalents
-- [ ] Test all React-dependent libraries with Preact
-- [ ] Verify performance improvements
-
 #### UI Library (shadcn/ui)
 
-- [ ] Install shadcn/ui with Preact configuration
-- [ ] Set up Tailwind CSS v4 with shadcn themes
-- [ ] Add required shadcn components (Button, Card, Form, etc.)
+**Status: In Progress**
+
+- [x] Set up Tailwind CSS v4 with shadcn themes (already configured in `src/styles/app.css`)
+- [x] Create cn utility function (`src/lib/utils.ts`)
+- [x] Create essential shadcn/ui components:
+  - [x] Button component (`src/components/ui/button.tsx`)
+  - [x] Card components (`src/components/ui/card.tsx`)
+  - [x] Badge component (`src/components/ui/badge.tsx`)
+  - [x] Separator component (`src/components/ui/separator.tsx`)
+- [ ] Add required shadcn components:
+  - [ ] Input component
+  - [ ] Label component
+  - [ ] Form components (Form, Field, etc.)
+  - [ ] Dialog component
+  - [ ] Dropdown Menu component
+  - [ ] Avatar component
+  - [ ] Table component
+  - [ ] Tabs component
+  - [ ] Sheet component (sidebar)
 - [ ] Create reusable component library
 - [ ] Implement design tokens (colors, spacing, typography)
+- [ ] Add Preact configuration (future optimization)
+- [ ] Document component usage patterns
 
 #### Dashboards & User Management
 

@@ -1,6 +1,6 @@
 # Architecture
 
-This document describes the system architecture of the tss-elysia project, following patterns from try-elysia.
+This document describes the system architecture of the tss-elysia project.
 
 ## Overview
 

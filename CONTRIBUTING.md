@@ -49,7 +49,7 @@ bun run dev
    ```
 
    Follow the prompts:
-   - Select the `try-elysia` package
+   - Select the `tss-elysia` package
    - Choose bump type: `patch`, `minor`, or `major`
    - Write a description of what changed
 
@@ -98,7 +98,7 @@ Each changeset is a markdown file in `.changeset/` with:
 
 ```markdown
 ---
-"try-elysia": minor
+"tss-elysia": minor
 ---
 
 Your description of the changes.
@@ -137,7 +137,7 @@ Interactive prompts:
 
 ```bash
 🦋 Select the package(s) you want to include in this changeset
-    ❯ ● try-elysia (press <space> to select)
+    ❯ ● tss-elysia (press <space> to select)
 
 🦋 What kind of change is this?
     ❯ ○ patch - fix: bug fixes
@@ -152,7 +152,7 @@ Creates file: `.changeset/funny-flowers-speak.md`
 
 ```markdown
 ---
-"try-elysia": minor
+"tss-elysia": minor
 ---
 
 Added pagination to user endpoints
@@ -388,7 +388,7 @@ This creates:
 
 ```markdown
 ---
-"try-elysia": major
+"tss-elysia": major
 ---
 
 BREAKING: Removed deprecated /api/old endpoint
@@ -456,8 +456,8 @@ git revert <commit-hash>
 
 ## Questions?
 
-- Open an [issue](https://github.com/rjoydip/try-elysia/issues)
-- Check existing [discussions](https://github.com/rjoydip/try-elysia/discussions)
+- Open an [issue](https://github.com/rjoydip/tss-elysia/issues)
+- Check existing [discussions](https://github.com/rjoydip/tss-elysia/discussions)
 
 ## License
 

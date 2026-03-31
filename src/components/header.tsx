@@ -1,0 +1,162 @@
+/**
+ * Common Header Component
+ * Reused across all pages for consistent navigation
+ */
+
+import { Link } from "@tanstack/react-router";
+import { useState, useEffect } from "react";
+import { cn } from "~/lib/utils";
+import { useTheme } from "~/components/theme-provider";
+import { APP_NAME, GITHUB_REPO_URL } from "~/config";
+import { navItems } from "~/config/docs";
+
+function ThemeToggle() {
+  const { theme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) {
+    return <div className="w-9 h-9" />;
+  }
+
+  const themes: Array<"light" | "dark" | "system"> = ["light", "dark", "system"];
+  const currentIndex = themes.indexOf(theme as "light" | "dark" | "system");
+  const nextTheme = themes[(currentIndex + 1) % themes.length];
+
+  const icons = {
+    light: (
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="18"
+        height="18"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <circle cx="12" cy="12" r="4" />
+        <path d="M12 2v2" />
+        <path d="M12 20v2" />
+        <path d="m4.93 4.93 1.41 1.41" />
+        <path d="m17.66 17.66 1.41 1.41" />
+        <path d="M2 12h2" />
+        <path d="M20 12h2" />
+        <path d="m6.34 17.66-1.41 1.41" />
+        <path d="m19.07 4.93-1.41 1.41" />
+      </svg>
+    ),
+    dark: (
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="18"
+        height="18"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" />
+      </svg>
+    ),
+    system: (
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="18"
+        height="18"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <rect width="20" height="14" x="2" y="3" rx="2" />
+        <path d="M8 21h8" />
+        <path d="M12 17v4" />
+      </svg>
+    ),
+  };
+
+  return (
+    <button
+      onClick={() => setTheme(nextTheme)}
+      className={cn(
+        "inline-flex items-center justify-center w-9 h-9 rounded-md",
+        "bg-transparent hover:bg-accent border-0 cursor-pointer",
+        "transition-colors duration-200",
+      )}
+      aria-label={`Switch to ${nextTheme} theme`}
+    >
+      {icons[theme as keyof typeof icons] || icons.system}
+    </button>
+  );
+}
+
+interface HeaderProps {
+  className?: string;
+}
+
+export function Header({ className }: HeaderProps) {
+  return (
+    <header
+      className={cn(
+        "fixed top-0 left-0 right-0 z-50 h-16 bg-background/95 backdrop-blur-sm",
+        className,
+      )}
+    >
+      <div className="flex items-center justify-between h-full px-6 max-w-7xl mx-auto">
+        <div className="flex items-center gap-8">
+          <Link to="/" className="flex items-center gap-1 font-bold text-xl">
+            <div className="w-8 h-8 bg-gradient-to-br flex items-center justify-center">
+              <svg xmlns="http://www.w3.org/2000/svg" width={24} height={24} viewBox="0 0 24 24">
+                <path
+                  fill="hsl(154, 52%, 51%)"
+                  d="M12.89 5.64a.184.184 0 0 1-.166-.238a23 23 0 0 1 1.292-3.065a.264.264 0 0 1 .288-.144a19.95 19.95 0 0 1 7.499 2.415a.36.36 0 0 1 .195.363a20.1 20.1 0 0 1-8.721 16.365a.185.185 0 0 1-.283-.086a24 24 0 0 1-.946-3.181a.29.29 0 0 1 .107-.328a16.5 16.5 0 0 0 6.152-10.875a16.5 16.5 0 0 0-5.422-1.226ZM6.301 9.697A13.6 13.6 0 0 1 10.4 8.545c.149-.023.212.081.194.2a26 26 0 0 0-.337 3.209a.23.23 0 0 1-.216.228a10.3 10.3 0 0 0-2.329.759a16.6 16.6 0 0 0 2.617 3.442a.76.76 0 0 1 .211.44a25 25 0 0 0 1.3 4.883a.17.17 0 0 1-.013.2a.19.19 0 0 1-.225 0a20.1 20.1 0 0 1-9.6-16.935a.38.38 0 0 1 .193-.367a20.16 20.16 0 0 1 10.283-2.541a.177.177 0 0 1 .151.274a22 22 0 0 0-1.224 3.099a.24.24 0 0 1-.247.189a16.6 16.6 0 0 0-5.467 1.236a17 17 0 0 0 .61 2.832v.01Z"
+                ></path>
+              </svg>
+            </div>
+            <span className="text-foreground">{APP_NAME}</span>
+          </Link>
+          <nav className="hidden md:flex items-center gap-6">
+            {navItems.map((item) => (
+              <Link
+                key={item.href}
+                to={item.href}
+                className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+              >
+                {item.name}
+              </Link>
+            ))}
+          </nav>
+        </div>
+        <div className="flex items-center gap-3">
+          <a
+            href={GITHUB_REPO_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="p-2 hover:bg-accent rounded-md transition-colors text-brand"
+            aria-label="GitHub"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+            >
+              <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" />
+            </svg>
+          </a>
+          <ThemeToggle />
+        </div>
+      </div>
+    </header>
+  );
+}

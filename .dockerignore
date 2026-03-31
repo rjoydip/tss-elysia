@@ -66,8 +66,7 @@ Dockerfile
 docker-compose*
 .dockerignore
 
-# OpenCode & Agent files
-.opencode
+# Agent files
 .agents
 skills-lock.json
 

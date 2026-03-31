@@ -490,8 +490,7 @@ export * from "./api";
     "@tanstack/react-query": "^5.95.2",
     "@tanstack/react-router": "^1.168.4",
     "@tanstack/react-router-devtools": "^1.166.11",
-    "react": "^19.2.4",
-    "react-dom": "^19.2.4"
+    "react": "^19.2.4"
   }
 }
 ```

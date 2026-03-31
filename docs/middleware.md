@@ -1,6 +1,6 @@
 # Middleware
 
-This project implements middleware based on the try-elysia architecture, providing security, performance, and functionality layers for the Elysia server.
+This project implements middleware for the Elysia server, providing security, performance, and functionality layers.
 
 ## Middleware Overview
 
