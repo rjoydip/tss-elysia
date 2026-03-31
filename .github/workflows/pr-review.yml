@@ -30,7 +30,7 @@ jobs:
           git config --global user.email "${{ vars.GH_USER_EMAIL || 'github-actions[bot]@users.noreply.github.com' }}"
           git config --global user.name "${{ vars.GH_USER_NAME || 'github-actions[bot]' }}"
           git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
-      - uses: anomalyco/opencode/github@e7f94f9b9a3bd8742330e4a7ba8573ac21042c01 # v1.3.6
+      - uses: anomalyco/opencode/github@057848deb847d59250e7db08ab2402f4a69bfcda # v1.3.9
         if: ${{ !github.event.pull_request.merged }}
         timeout-minutes: 10
         env:
