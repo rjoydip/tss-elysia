@@ -1,13 +1,12 @@
 /**
- * Documentation Index Page
- * Renders the main documentation overview
- * Following Supabase docs UI design: https://supabase.com/docs
+ * Documentation Landing Page
+ * Getting Started overview with quick-start steps, features, and next steps
  */
 
 import { createFileRoute, Link } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/docs/")({
-  component: DocsIndexPage,
+  component: DocsLandingPage,
 });
 
 const quickStartSteps = [
@@ -117,7 +116,7 @@ const features = [
   },
 ];
 
-function DocsIndexPage() {
+function DocsLandingPage() {
   return (
     <div className="max-w-4xl">
       {/* Title */}
@@ -191,7 +190,7 @@ function DocsIndexPage() {
             </p>
           </Link>
           <Link
-            to="/docs/auth"
+            to="/docs/auth/overview"
             className="block p-5 border rounded-lg hover:border-brand hover:bg-brand/5 transition-all group"
           >
             <h3 className="font-semibold mb-1 text-foreground group-hover:text-brand transition-colors">

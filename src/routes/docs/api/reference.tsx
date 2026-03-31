@@ -1,6 +1,6 @@
 /**
  * API Reference
- * Following Supabase API docs UI design: https://supabase.com/docs/guides/api/sql-to-rest
+ * Complete reference for all API endpoints with parameters and responses
  */
 
 import { createFileRoute } from "@tanstack/react-router";

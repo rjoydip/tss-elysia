@@ -174,7 +174,7 @@ git push origin feat/user-pagination
 
 #### Step 4: CI Runs
 
-For details on CI/CD pipelines, see [CI/CD Documentation](docs/ci-cd.md).
+For details on CI/CD pipelines, see [CI/CD Documentation](docs/infra/ci-cd.md).
 
 #### Step 5: Changesets Magic
 
@@ -304,7 +304,7 @@ bun run typecheck         # TypeScript check
 
 ## Release Process
 
-For detailed CI/CD and release documentation, see [CI/CD Documentation](docs/ci-cd.md).
+For detailed CI/CD and release documentation, see [CI/CD Documentation](docs/infra/ci-cd.md).
 
 ---
 

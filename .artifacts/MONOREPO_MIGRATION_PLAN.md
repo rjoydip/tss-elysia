@@ -222,15 +222,15 @@ bun add turbo -D
 
 #### 2.1 Package: `packages/config`
 
-| Action | Description                                       |
-| ------ | ------------------------------------------------- |
-| Create | `packages/config/package.json`                    |
-| Create | `packages/config/tsconfig.json`                   |
-| Create | `packages/config/src/index.ts`                    |
-| Move   | `src/env.ts` → `packages/config/src/env.ts`       |
-| Move   | `src/config.ts` → `packages/config/src/config.ts` |
-| Move   | `src/logger.ts` → `packages/config/src/logger.ts` |
-| Move   | `src/utils.ts` → `packages/config/src/utils.ts`   |
+| Action | Description                                            |
+| ------ | ------------------------------------------------------ |
+| Create | `packages/config/package.json`                         |
+| Create | `packages/config/tsconfig.json`                        |
+| Create | `packages/config/src/index.ts`                         |
+| Move   | `src/env.ts` → `packages/config/src/env.ts`            |
+| Move   | `src/config/index.ts` → `packages/config/src/index.ts` |
+| Move   | `src/logger.ts` → `packages/config/src/logger.ts`      |
+| Move   | `src/utils.ts` → `packages/config/src/utils.ts`        |
 
 **`packages/config/package.json`**:
 

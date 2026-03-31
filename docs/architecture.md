@@ -57,10 +57,10 @@ The application follows a server-side rendering (SSR) architecture using TanStac
 
 ### 3. Configuration Layer
 
-| Component | File            | Purpose                                              |
-| --------- | --------------- | ---------------------------------------------------- |
-| Config    | `src/config.ts` | Central config (API name, rate limits, CORS, helmet) |
-| Env       | `src/env.ts`    | Type-safe environment variables                      |
+| Component | File                  | Purpose                                              |
+| --------- | --------------------- | ---------------------------------------------------- |
+| Config    | `src/config/index.ts` | Central config (API name, rate limits, CORS, helmet) |
+| Env       | `src/env.ts`          | Type-safe environment variables                      |
 
 ### 4. Middleware Layer
 
@@ -99,7 +99,7 @@ package.json
 vite.config.ts
     │
     ▼
-src/config.ts (API_PREFIX, rateLimitConfig, corsConfig, helmetConfig)
+src/config/index.ts (API_PREFIX, rateLimitConfig, corsConfig, helmetConfig)
     │
     ▼
 src/env.ts (runtimeEnv)

@@ -58,7 +58,6 @@ README.md
 CHANGELOG.md
 CONTRIBUTING.md
 AGENTS.md
-PLAN.md
 
 # Docker files (not needed in image)
 docker

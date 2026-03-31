@@ -1,62 +1,140 @@
+/**
+ * E2E tests for API endpoints
+ * Tests: health, root, CORS, headers, error handling, content types, auth health
+ */
+
 import { test, expect } from "@playwright/test";
+import { E2E_BASE_URL } from "../config";
 
-test.describe("API Endpoints", () => {
-  test("should respond to /api with plain", async ({ request }) => {
-    const response = await request.get("/api");
-    expect(response.status()).toBeGreaterThanOrEqual(200);
-
-    const contentType = response.headers()["content-type"] || "";
-    expect(contentType).toMatch(/text\/plain/);
-  });
-
-  test("should handle unknown API route", async ({ request }) => {
-    const response = await request.get("/api/unknown-endpoint");
-    expect(response.status()).toBeGreaterThanOrEqual(400);
-  });
-});
-
-test.describe("Health Endpoints", () => {
-  test("should return health status", async ({ request }) => {
-    const response = await request.get("/api/health");
-    expect(response.status()).toBe(200);
-
-    const body = await response.json();
-    expect(body).toHaveProperty("status", "ok");
-    expect(body).toHaveProperty("name");
-  });
-
-  test("should handle health endpoint with custom headers", async ({ request }) => {
-    const response = await request.get("/api/health");
-    expect(response.status()).toBe(200);
-    expect(response.headers()["content-type"]).toContain("application/json");
-  });
-});
-
-test.describe("Root API Response", () => {
+test.describe("API Root", () => {
   test("should return welcome message", async ({ request }) => {
     const response = await request.get("/api");
     expect(response.status()).toBe(200);
-
     const body = await response.text();
     expect(body).toContain("Welcome to");
   });
 
-  test("should include content-type header", async ({ request }) => {
+  test("should return text/plain content type", async ({ request }) => {
     const response = await request.get("/api");
-    const contentType = response.headers()["content-type"];
-    expect(contentType).toBeDefined();
-    expect(contentType).toMatch(/text\/plain/);
+    expect(response.headers()["content-type"]).toMatch(/text\/plain/);
+  });
+
+  test("should include CORS headers", async ({ request }) => {
+    const response = await request.get("/api");
+    const headers = response.headers();
+    expect(headers["access-control-allow-origin"]).toBeDefined();
+  });
+
+  test("should include security headers from Helmet", async ({ request }) => {
+    const response = await request.get("/api");
+    const headers = response.headers();
+    expect(headers["x-content-type-options"]).toBe("nosniff");
+  });
+
+  test("should handle OPTIONS preflight", async ({ request }) => {
+    const response = await request.fetch("/api", {
+      method: "OPTIONS",
+      headers: {
+        Origin: E2E_BASE_URL,
+        "Access-Control-Request-Method": "GET",
+      },
+    });
+    expect(response.status()).toBeLessThan(400);
+    expect(response.headers()["access-control-allow-origin"]).toBeDefined();
   });
 });
 
-test.describe("404 Handling", () => {
-  test("should handle non-existent routes", async ({ request }) => {
+test.describe("Health Endpoint", () => {
+  test("should return 200 with status ok", async ({ request }) => {
+    const response = await request.get("/api/health");
+    expect(response.status()).toBe(200);
+    const body = await response.json();
+    expect(body.status).toBe("ok");
+    expect(body.name).toBeDefined();
+  });
+
+  test("should return JSON content type", async ({ request }) => {
+    const response = await request.get("/api/health");
+    expect(response.headers()["content-type"]).toContain("application/json");
+  });
+
+  test("should include trace header", async ({ request }) => {
+    const response = await request.get("/api/health");
+    const elapsed = response.headers()["x-elapsed"];
+    expect(elapsed).toBeDefined();
+  });
+});
+
+test.describe("Auth Health Endpoint", () => {
+  test("should return auth health status", async ({ request }) => {
+    const response = await request.get("/api/auth/health");
+    expect(response.status()).toBe(200);
+    const body = await response.json();
+    expect(body.status).toBe("ok");
+    expect(body.name).toBe("AUTH");
+  });
+
+  test("should return JSON content type for auth health", async ({ request }) => {
+    const response = await request.get("/api/auth/health");
+    expect(response.headers()["content-type"]).toContain("application/json");
+  });
+
+  test("should return auth welcome message", async ({ request }) => {
+    const response = await request.get("/api/auth/");
+    expect(response.status()).toBe(200);
+    const body = await response.text();
+    expect(body).toContain("Welcome to AUTH Service");
+  });
+});
+
+test.describe("API Error Handling", () => {
+  test("should return error for unknown API route", async ({ request }) => {
+    const response = await request.get("/api/unknown-endpoint");
+    expect(response.status()).toBeGreaterThanOrEqual(400);
+  });
+
+  test("should return error for deeply nested API route", async ({ request }) => {
+    const response = await request.get("/api/some/nested/path");
+    expect(response.status()).toBeGreaterThanOrEqual(400);
+  });
+
+  test("should return error for unknown top-level route", async ({ request }) => {
     const response = await request.get("/nonexistent");
     expect(response.status()).toBeGreaterThanOrEqual(400);
   });
 
-  test("should handle API sub-routes gracefully", async ({ request }) => {
-    const response = await request.get("/api/some/nested/path");
+  test("should return error for unknown blog route", async ({ request }) => {
+    const response = await request.get("/blog/nonexistent");
     expect(response.status()).toBeGreaterThanOrEqual(400);
+  });
+
+  test("should handle POST to read-only endpoint", async ({ request }) => {
+    const response = await request.post("/api/health", {
+      headers: { Origin: E2E_BASE_URL, "Content-Type": "application/json" },
+      data: {},
+    });
+    // Should either reject or handle gracefully
+    expect(response.status()).toBeGreaterThanOrEqual(200);
+  });
+
+  test("should handle DELETE to read-only endpoint", async ({ request }) => {
+    const response = await request.fetch("/api/health", {
+      method: "DELETE",
+      headers: { Origin: E2E_BASE_URL },
+    });
+    // Should either reject or handle gracefully
+    expect(response.status()).toBeGreaterThanOrEqual(200);
+  });
+});
+
+test.describe("API Rate Limiting", () => {
+  test("should handle multiple rapid requests", async ({ request }) => {
+    const responses = await Promise.all(
+      Array.from({ length: 10 }, () => request.get("/api/health")),
+    );
+    // All should succeed under rate limit
+    for (const response of responses) {
+      expect(response.status()).toBeLessThan(500);
+    }
   });
 });

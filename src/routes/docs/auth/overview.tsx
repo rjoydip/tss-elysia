@@ -1,16 +1,15 @@
 /**
- * Authentication Documentation
+ * Authentication Overview Documentation
  * Overview of the auth system and its features
  */
 
-import { createFileRoute } from "@tanstack/react-router";
-import { Link } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 
-export const Route = createFileRoute("/docs/auth/")({
-  component: AuthDocsIndex,
+export const Route = createFileRoute("/docs/auth/overview")({
+  component: AuthDocsOverview,
 });
 
-function AuthDocsIndex() {
+function AuthDocsOverview() {
   return (
     <div className="space-y-6">
       <div>

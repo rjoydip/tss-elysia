@@ -32,7 +32,7 @@ export const docsConfig: DocSection[] = [
   {
     title: "Authentication",
     items: [
-      { name: "Overview", href: "/docs/auth" },
+      { name: "Overview", href: "/docs/auth/overview" },
       { name: "Login", href: "/docs/auth/login" },
       { name: "Register", href: "/docs/auth/register" },
       { name: "Token Management", href: "/docs/auth/token" },
@@ -41,15 +41,6 @@ export const docsConfig: DocSection[] = [
   },
   {
     title: "API Reference",
-    items: [
-      { name: "Overview", href: "/docs/api/reference" },
-      { name: "Health", href: "/docs/api/health" },
-      { name: "Users", href: "/docs/api/users" },
-      { name: "Auth", href: "/docs/api/auth" },
-    ],
+    items: [{ name: "Overview", href: "/docs/api/reference" }],
   },
 ];
-
-export function getDocsConfig(_pathname: string): DocSection[] {
-  return docsConfig;
-}

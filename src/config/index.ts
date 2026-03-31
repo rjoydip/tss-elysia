@@ -102,6 +102,18 @@ export const isProduction = isBun
 export const AUTH_ALLOWED_METHODS = ["GET", "POST", "PUT", "DELETE"];
 
 /**
+ * Navigation items for the header component.
+ * Defines the main sections of the site for easy access.
+ * Should be updated to reflect actual site structure and content.
+ */
+export const navItems = [
+  { name: "Documentation", href: "/docs" },
+  { name: "API", href: "/docs/api/reference" },
+  { name: "Blog", href: "/blog" },
+  { name: "Changelog", href: "/changelog" },
+];
+
+/**
  * Elysia server configuration.
  * Defines core server behavior including websocket and response handling.
  * @property normalize - Normalize paths (remove trailing slashes)

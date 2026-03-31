@@ -7,7 +7,7 @@
 
 A full-stack TypeScript application using TanStack Start, Elysia, React 19, and Bun.
 
-> **Project Roadmap**: See [PLAN.md](./PLAN.md) for detailed feature planning and progress tracking.
+> **Project Roadmap**: See [PLAN.md](./.artifacts/PLAN.md) for detailed feature planning and progress tracking.
 
 ## Quick Start
 
@@ -81,20 +81,19 @@ Options:
 
 Detailed documentation available in `docs/`:
 
-| Document                                               | Description                     |
-| ------------------------------------------------------ | ------------------------------- |
-| [Agent Skills](docs/agent-skills.md)                   | AI agent skills and usage guide |
-| [API Reference](docs/api/reference.md)                 | API endpoints and usage         |
-| [Architecture](docs/architecture.md)                   | System architecture overview    |
-| [Authentication](docs/auth/authentication.md)          | Auth setup and configuration    |
-| [CI/CD](docs/infra/ci-cd.md)                           | CI/CD pipelines and releases    |
-| [Development](docs/development.md)                     | Development guide               |
-| [Docker](docs/infra/docker.md)                         | Docker deployment guide         |
-| [Environment Variables](docs/environment-variables.md) | Environment configuration       |
-| [Middleware](docs/middleware.md)                       | Middleware documentation        |
-| [Project Overview](docs/project-overview.md)           | Project introduction            |
-| [Testing](docs/testing.md)                             | Testing guide                   |
-| [Troubleshooting](docs/troubleshooting.md)             | Common issues and solutions     |
+| Document                                               | Description                  |
+| ------------------------------------------------------ | ---------------------------- |
+| [API Reference](docs/api/reference.md)                 | API endpoints and usage      |
+| [Architecture](docs/architecture.md)                   | System architecture overview |
+| [Authentication](docs/auth/authentication.md)          | Auth setup and configuration |
+| [CI/CD](docs/infra/ci-cd.md)                           | CI/CD pipelines and releases |
+| [Development](docs/development.md)                     | Development guide            |
+| [Docker](docs/infra/docker.md)                         | Docker deployment guide      |
+| [Environment Variables](docs/environment-variables.md) | Environment configuration    |
+| [Middleware](docs/middleware.md)                       | Middleware documentation     |
+| [Project Overview](docs/project-overview.md)           | Project introduction         |
+| [Testing](docs/testing.md)                             | Testing guide                |
+| [Troubleshooting](docs/troubleshooting.md)             | Common issues and solutions  |
 
 ## Tech Stack
 
@@ -217,4 +216,4 @@ Common issues:
 
 For detailed agent coding guidelines, see [AGENTS.md](./AGENTS.md).
 
-For feature planning and progress tracking, see [PLAN.md](./PLAN.md).
+For feature planning and progress tracking, see [PLAN.md](./.artifacts/PLAN.md).

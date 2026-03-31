@@ -1,5 +1,6 @@
 import { faker } from "@faker-js/faker";
 import { Database } from "bun:sqlite";
+import { logger } from "./lib/logger";
 
 const dbName =
   process.env.DATABASE_PATH && process.env.DATABASE_NAME
@@ -51,7 +52,7 @@ const insertPlanStmt = db.prepare(
 
 function seedPlans() {
   const now = Date.now();
-  console.log("Seeding subscription plans...");
+  logger.success("Seeding subscription plans...");
 
   for (const plan of PLAN_DATA) {
     const existing = db.query("SELECT id FROM subscription_plan WHERE id = ?").get(plan.id);
@@ -71,9 +72,9 @@ function seedPlans() {
         now,
         "{}",
       );
-      console.log(`Inserted plan: ${plan.name}`);
+      logger.success(`Inserted plan: ${plan.name}`);
     } else {
-      console.log(`Plan already exists: ${plan.name}`);
+      logger.success(`Plan already exists: ${plan.name}`);
     }
   }
 }
@@ -84,7 +85,7 @@ const insertUserStmt = db.prepare(
 
 function seedUsers(count: number = 10) {
   const now = Date.now();
-  console.log(`Seeding ${count} users...`);
+  logger.success(`Seeding ${count} users...`);
 
   const tiers = ["free", "contributor", "enterprise"];
 
@@ -112,16 +113,16 @@ function seedUsers(count: number = 10) {
     );
   }
 
-  console.log(`Seeded ${count} users`);
+  logger.success(`Seeded ${count} users`);
 }
 
 function main() {
-  console.log(`Starting database seeding on ${dbName}...`);
+  logger.step(1, `Starting database seeding on ${dbName}...`);
 
   seedPlans();
   seedUsers(10);
 
-  console.log("Database seeding complete!");
+  logger.step(2, "Database seeding complete!");
 }
 
 main();

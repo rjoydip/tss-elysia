@@ -4,7 +4,7 @@ import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import * as React from "react";
 import appCss from "~/styles/app.css?url";
-import { ThemeProvider } from "~/components/theme-provider";
+import { ThemeProvider } from "~/components/theme/provider";
 
 const queryClient = new QueryClient();
 

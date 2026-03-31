@@ -152,7 +152,7 @@ const router = createRouter({
 
 ## Configuration
 
-### App Config (`src/config.ts`)
+### App Config (`src/config/index.ts`)
 
 Central configuration for the application:
 

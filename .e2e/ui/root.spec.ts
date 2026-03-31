@@ -1,30 +1,128 @@
+/**
+ * E2E tests for the root landing page
+ */
+
 import { test, expect } from "@playwright/test";
 
-test.describe("Root Page UI", () => {
+test.describe("Landing Page", () => {
   test.beforeEach(async ({ page }) => {
     await page.goto("/");
-  });
-
-  test("should display root page with title", async ({ page }) => {
-    await page.goto("/");
     await page.waitForLoadState("networkidle");
-    await expect(page.locator("h3")).toHaveText("Welcome Home!");
   });
 
-  test("should have navigation links", async ({ page }) => {
-    await expect(page.getByRole("link", { name: "Home" })).toBeVisible();
-    await expect(page.getByRole("link", { name: "404" })).toBeVisible();
+  test("should display hero heading", async ({ page }) => {
+    await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+  });
+
+  test("should display brand-colored text in hero", async ({ page }) => {
+    await expect(page.getByText("TypeScript", { exact: true })).toBeVisible();
+  });
+
+  test("should display version badge", async ({ page }) => {
+    await expect(page.getByText(/Released/)).toBeVisible();
+  });
+
+  test("should display Get Started button linking to docs", async ({ page }) => {
+    const getStarted = page.getByRole("link", { name: /Get Started/ });
+    await expect(getStarted).toBeVisible();
+    await expect(getStarted).toHaveAttribute("href", "/docs");
+  });
+
+  test("should display API Reference button", async ({ page }) => {
+    const apiRef = page.getByRole("link", { name: "API Reference" });
+    await expect(apiRef).toBeVisible();
+  });
+
+  test("should display features section", async ({ page }) => {
+    await expect(page.getByText("Everything you need")).toBeVisible();
+    await expect(page.getByText("Type-Safe API")).toBeVisible();
+    await expect(page.getByText("Modern Stack")).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Authentication" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Database" })).toBeVisible();
+  });
+
+  test("should display stats section", async ({ page }) => {
+    await expect(page.getByText("10x")).toBeVisible();
+    await expect(page.getByText("100%")).toBeVisible();
+    await expect(page.getByText("Faster Development")).toBeVisible();
+  });
+
+  test("should display CTA section", async ({ page }) => {
+    await expect(page.getByText("Ready to get started?")).toBeVisible();
+    await expect(page.getByRole("link", { name: "Read the Docs" })).toBeVisible();
+    await expect(page.getByRole("link", { name: /View on GitHub/ })).toBeVisible();
+  });
+
+  test("should display code preview", async ({ page }) => {
+    await expect(page.locator("pre code")).toBeVisible();
   });
 });
 
-test.describe("Navigation", () => {
-  test("should navigate to root", async ({ page }) => {
+test.describe("Landing Page Header", () => {
+  test.beforeEach(async ({ page }) => {
     await page.goto("/");
-    await expect(page.getByRole("heading", { name: "Welcome Home!" })).toBeVisible();
+    await page.waitForLoadState("networkidle");
   });
 
+  test("should render header", async ({ page }) => {
+    await expect(page.locator("header").first()).toBeVisible();
+  });
+
+  test("should have nav links in header", async ({ page }) => {
+    // Use CSS selectors targeting the header nav directly
+    await expect(page.locator("header nav a[href='/docs']")).toBeVisible();
+  });
+
+  test("should have GitHub link in header", async ({ page }) => {
+    await expect(page.locator("header a[href*='github.com']")).toBeVisible();
+  });
+
+  test("should have theme toggle button in header", async ({ page }) => {
+    await expect(
+      page
+        .locator("header")
+        .first()
+        .getByRole("button", { name: /Switch to/ }),
+    ).toBeVisible();
+  });
+});
+
+test.describe("Landing Page Footer", () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto("/");
+    await page.waitForLoadState("networkidle");
+  });
+
+  test("should render footer", async ({ page }) => {
+    await expect(page.locator("footer")).toBeVisible();
+  });
+
+  test("should have Documentation link", async ({ page }) => {
+    await expect(page.locator("footer a[href='/docs']")).toBeVisible();
+  });
+
+  test("should have Blog link", async ({ page }) => {
+    await expect(page.locator("footer a[href='/blog']")).toBeVisible();
+  });
+
+  test("should have Status link", async ({ page }) => {
+    await expect(page.locator("footer a[href='/status']")).toBeVisible();
+  });
+
+  test("should display copyright with current year", async ({ page }) => {
+    const year = new Date().getFullYear().toString();
+    await expect(page.locator("footer").getByText(year)).toBeVisible();
+  });
+});
+
+test.describe("404 Page", () => {
   test("should show 404 for unknown route", async ({ page }) => {
     await page.goto("/unknown-route");
+    await expect(page.getByText("404: Page Not Found")).toBeVisible();
+  });
+
+  test("should show 404 for deeply nested unknown route", async ({ page }) => {
+    await page.goto("/some/deeply/nested/route");
     await expect(page.getByText("404: Page Not Found")).toBeVisible();
   });
 });

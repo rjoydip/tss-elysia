@@ -12,7 +12,7 @@ import {
   rateLimitConfig,
   corsConfig,
   helmetConfig,
-} from "../src/config.ts";
+} from "../src/config/index.ts";
 import { logger } from "../src/logger.ts";
 
 describe("_config", () => {
