@@ -1,7 +1,7 @@
 import { describe, expect, it } from "bun:test";
 import {
   API_PREFIX,
-  API_NAME,
+  APP_NAME,
   HOST,
   PORT,
   isBrowser,
@@ -12,7 +12,7 @@ import {
   rateLimitConfig,
   corsConfig,
   helmetConfig,
-} from "../src/config.ts";
+} from "../src/config/index.ts";
 import { logger } from "../src/logger.ts";
 
 describe("_config", () => {
@@ -21,8 +21,8 @@ describe("_config", () => {
       expect(API_PREFIX).toBe("/api");
     });
 
-    it("should have default API_NAME", () => {
-      expect(API_NAME).toBe("TSS ELYSIA");
+    it("should have default APP_NAME", () => {
+      expect(APP_NAME).toBe("TSSE");
     });
 
     it("should have HOST as string", () => {

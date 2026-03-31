@@ -1,6 +1,6 @@
 # Middleware
 
-This project implements middleware based on the try-elysia architecture, providing security, performance, and functionality layers for the Elysia server.
+This project implements middleware for the Elysia server, providing security, performance, and functionality layers.
 
 ## Middleware Overview
 
@@ -29,7 +29,7 @@ export const cors = new Elysia({ name: "cors" }).onRequest(({ set }) => {
 });
 ```
 
-### CORS Configuration (`src/config.ts`)
+### CORS Configuration (`src/config/index.ts`)
 
 ```typescript
 export const corsConfig = {
@@ -66,7 +66,7 @@ export const helmet = new Elysia({ name: "helmet" }).onRequest(({ set }) => {
 - `Referrer-Policy`
 - `X-Permitted-Cross-Domain-Policies`
 
-### Helmet Configuration (`src/config.ts`)
+### Helmet Configuration (`src/config/index.ts`)
 
 ```typescript
 export const helmetConfig = {
@@ -99,7 +99,7 @@ export const rateLimitMiddleware = new Elysia({ name: "rate-limit" }).use(
 );
 ```
 
-### Configuration (`src/config.ts`)
+### Configuration (`src/config/index.ts`)
 
 ```typescript
 export const rateLimitConfig = {

@@ -9,8 +9,7 @@
  * What it does:
  * 1. Checks for Bun runtime
  * 2. Installs dependencies
- * 3. Installs OpenCode LSP (if not already installed)
- * 4. Copies .env.example to .env (if .env doesn't exist)
+ * 3. Copies .env.example to .env (if .env doesn't exist)
  * 5. Generates database schema
  * 6. Runs database migrations
  * 7. Seeds the database with initial data
@@ -57,48 +56,7 @@ if (installProcess.exitCode !== 0) {
 }
 logger.success("Dependencies installed");
 
-logger.step(3, "Setting up OpenCode LSP...");
-
-/**
- * Language servers and tools to install for enhanced IDE support.
- * These provide IntelliSense, formatting, and linting capabilities.
- */
-const LSP_PACKAGES = [
-  "opencode-ai", // AI-powered coding assistant
-  "typescript-language-server", // TypeScript/JavaScript language server
-  "vscode-langservers-extracted", // JSON, HTML, CSS, YAML language servers
-  "@tailwindcss/language-server", // Tailwind CSS IntelliSense
-  "yaml-language-server", // YAML validation and completion
-] as const;
-
-const opencodeDir = join(rootDir, ".opencode");
-const opencodePackageJson = join(opencodeDir, "package.json");
-
-if (existsSync(opencodePackageJson)) {
-  const packageJsonContent = await Bun.file(opencodePackageJson).text();
-  const packageJson = JSON.parse(packageJsonContent);
-
-  const missingPackages = LSP_PACKAGES.filter(
-    (pkg) => !packageJson.dependencies?.[pkg] && !packageJson.devDependencies?.[pkg],
-  );
-
-  if (missingPackages.length > 0) {
-    logger.info(`Installing LSP packages: ${missingPackages.join(", ")}...`);
-    const addProcess = Bun.spawn(["bun", "add", "-D", ...missingPackages], { cwd: opencodeDir });
-    await addProcess.exited;
-    if (addProcess.exitCode !== 0) {
-      logger.warn("Failed to install some LSP packages, continuing...");
-    } else {
-      logger.success("LSP packages installed");
-    }
-  } else {
-    logger.info("All LSP packages already installed");
-  }
-} else {
-  logger.info("OpenCode config not found, skipping LSP setup");
-}
-
-logger.step(4, "Setting up environment variables...");
+logger.step(3, "Setting up environment variables...");
 const envExamplePath = join(rootDir, ".env.example");
 const envPath = join(rootDir, ".env");
 
@@ -115,7 +73,7 @@ if (existsSync(envExamplePath)) {
 }
 
 if (!SKIP_DB) {
-  logger.step(5, "Setting up database...");
+  logger.step(4, "Setting up database...");
 
   logger.info("Generating database schema...");
   const generateProcess = Bun.spawn(["bun", "run", "db:generate"], {
@@ -153,7 +111,7 @@ if (!SKIP_DB) {
   logger.info("Skipping database setup (--skip-db)");
 }
 
-logger.step(6, "Setting up git hooks...");
+logger.step(5, "Setting up git hooks...");
 const prepareProcess = Bun.spawn(["bun", "run", "prepare"], {
   cwd: rootDir,
 });
@@ -164,7 +122,7 @@ if (prepareProcess.exitCode !== 0) {
   logger.success("Git hooks installed");
 }
 
-logger.step(7, "Running typecheck...");
+logger.step(6, "Running typecheck...");
 const typecheckProcess = Bun.spawn(["bun", "run", "typecheck"], {
   cwd: rootDir,
 });

@@ -16,7 +16,7 @@ import { openapi } from "@elysiajs/openapi";
 import { opentelemetry } from "@elysiajs/opentelemetry";
 import { BatchSpanProcessor } from "@opentelemetry/sdk-trace-node";
 import { OTLPTraceExporter } from "@opentelemetry/exporter-trace-otlp-proto";
-import { API_NAME } from "~/config";
+import { APP_NAME } from "~/config";
 import { cors, corsWithCredentials } from "./cors";
 import { helmet } from "./helmet";
 import { rateLimitMiddleware } from "./rate-limit";
@@ -25,7 +25,7 @@ import { rateLimitMiddleware } from "./rate-limit";
  * Options for composing middleware with custom configuration.
  */
 type ComposedMiddlewareOptions = {
-  openapi_name: string;
+  openAPP_NAME: string;
 };
 
 /**
@@ -36,12 +36,12 @@ type ComposedMiddlewareOptions = {
  *
  * @example
  * const app = new Elysia()
- *   .use(composedMiddleware({ openapi_name: "My API" }))
+ *   .use(composedMiddleware({ openAPP_NAME: "My API" }))
  *   .listen(3000)
  */
 export const composedMiddleware = (
-  { openapi_name }: ComposedMiddlewareOptions = {
-    openapi_name: API_NAME,
+  { openAPP_NAME }: ComposedMiddlewareOptions = {
+    openAPP_NAME: APP_NAME,
   },
 ) =>
   new Elysia({ name: "composed-middleware" })
@@ -54,9 +54,10 @@ export const composedMiddleware = (
     // OpenAPI documentation generation
     .use(
       openapi({
+        path: "reference",
         documentation: {
           info: {
-            title: `${openapi_name} API Documentation`,
+            title: `${openAPP_NAME} Documentation`,
             version: "v1",
           },
         },

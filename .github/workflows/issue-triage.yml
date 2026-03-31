@@ -1,0 +1,56 @@
+name: Issue Triage
+
+# Required GitHub Variables (set in repository settings -> Secrets and variables -> Actions):
+#   GH_USER_EMAIL  - Email for git config (fallback: github-actions[bot]@users.noreply.github.com)
+#   GH_USER_NAME   - Name for git config (fallback: github-actions[bot])
+#   OPENCODE_MODEL - Model for OpenCode (fallback: anthropic/claude-sonnet-4-20250514)
+
+on:
+  issues:
+    types: [opened]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  triage:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      issues: write
+    steps:
+      - name: Check account age
+        id: check
+        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8.0.0
+        with:
+          script: |
+            const user = await github.rest.users.getByUsername({
+              username: context.payload.issue.user.login
+            });
+            const created = new Date(user.data.created_at);
+            const days = (Date.now() - created) / (1000 * 60 * 60 * 24);
+            return days >= 30;
+          result-encoding: string
+
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        if: steps.check.outputs.result == 'true'
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          persist-credentials: true
+      - name: Configure Git
+        if: steps.check.outputs.result == 'true'
+        run: |
+          git config --global user.email "${{ vars.GH_USER_EMAIL || 'github-actions[bot]@users.noreply.github.com' }}"
+          git config --global user.name "${{ vars.GH_USER_NAME || 'github-actions[bot]' }}"
+          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
+      - uses: anomalyco/opencode/github@e7f94f9b9a3bd8742330e4a7ba8573ac21042c01 # v1.3.6
+        if: steps.check.outputs.result == 'true'
+        timeout-minutes: 10
+        with:
+          model: ${{ vars.OPENCODE_MODEL || 'anthropic/claude-sonnet-4-20250514' }}
+          prompt: |
+            Review this issue. If there's a clear fix or relevant docs:
+            - Provide documentation links
+            - Add error handling guidance for code examples
+            Otherwise, do not comment.

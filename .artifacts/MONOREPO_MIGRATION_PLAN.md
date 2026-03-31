@@ -75,7 +75,7 @@ tss-elysia-nitro/
 ├── turbo.json                  # Turborepo config
 ├── tsconfig/
 │   └── base.json              # Shared TypeScript config
-└── bun.lockb
+└── bun.lock
 ```
 
 ---
@@ -222,15 +222,15 @@ bun add turbo -D
 
 #### 2.1 Package: `packages/config`
 
-| Action | Description                                       |
-| ------ | ------------------------------------------------- |
-| Create | `packages/config/package.json`                    |
-| Create | `packages/config/tsconfig.json`                   |
-| Create | `packages/config/src/index.ts`                    |
-| Move   | `src/env.ts` → `packages/config/src/env.ts`       |
-| Move   | `src/config.ts` → `packages/config/src/config.ts` |
-| Move   | `src/logger.ts` → `packages/config/src/logger.ts` |
-| Move   | `src/utils.ts` → `packages/config/src/utils.ts`   |
+| Action | Description                                            |
+| ------ | ------------------------------------------------------ |
+| Create | `packages/config/package.json`                         |
+| Create | `packages/config/tsconfig.json`                        |
+| Create | `packages/config/src/index.ts`                         |
+| Move   | `src/env.ts` → `packages/config/src/env.ts`            |
+| Move   | `src/config/index.ts` → `packages/config/src/index.ts` |
+| Move   | `src/logger.ts` → `packages/config/src/logger.ts`      |
+| Move   | `src/utils.ts` → `packages/config/src/utils.ts`        |
 
 **`packages/config/package.json`**:
 
@@ -490,8 +490,7 @@ export * from "./api";
     "@tanstack/react-query": "^5.95.2",
     "@tanstack/react-router": "^1.168.4",
     "@tanstack/react-router-devtools": "^1.166.11",
-    "react": "^19.2.4",
-    "react-dom": "^19.2.4"
+    "react": "^19.2.4"
   }
 }
 ```

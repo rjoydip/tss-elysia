@@ -8,7 +8,7 @@ import { Elysia } from "elysia";
 import { treaty } from "@elysiajs/eden";
 import { createFileRoute } from "@tanstack/react-router";
 import { createIsomorphicFn } from "@tanstack/react-start";
-import { API_PREFIX, API_NAME, HOST, PORT, isBrowser } from "~/config";
+import { API_PREFIX, APP_NAME, HOST, PORT, isBrowser } from "~/config";
 import { composedMiddleware } from "~/middlewares";
 import { errorFn, traceFn } from "~/utils";
 
@@ -24,7 +24,7 @@ export const apiApp = new Elysia({
   // Apply composed middleware (CORS, Helmet, Rate Limit, OpenTelemetry)
   .use(
     composedMiddleware({
-      openapi_name: "API",
+      openAPP_NAME: "API",
     }),
   )
   // Request tracing for performance monitoring
@@ -32,7 +32,7 @@ export const apiApp = new Elysia({
   // Centralized error handling
   .onError(errorFn)
   // Store application name
-  .state("name", API_NAME)
+  .state("name", APP_NAME)
 
   /**
    * Health check endpoint for monitoring.
@@ -87,6 +87,7 @@ export const Route = createFileRoute(`/api/$`)({
     handlers: {
       GET: handle,
       POST: handle,
+      OPTIONS: handle,
     },
   },
 });

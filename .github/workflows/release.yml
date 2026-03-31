@@ -61,7 +61,7 @@ jobs:
         uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5.0.4
         with:
           path: ${{ env.BUN_INSTALL_CACHE_DIR }}
-          key: ${{ runner.os }}-bun-deps-${{ hashFiles('**/bun.lockb') }}
+          key: ${{ runner.os }}-bun-deps-${{ hashFiles('**/bun.lock') }}
           restore-keys: |
             ${{ runner.os }}-bun-deps-
 
@@ -118,7 +118,7 @@ jobs:
         uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5.0.4
         with:
           path: ${{ env.BUN_INSTALL_CACHE_DIR }}
-          key: ${{ runner.os }}-bun-deps-${{ hashFiles('**/bun.lockb') }}
+          key: ${{ runner.os }}-bun-deps-${{ hashFiles('**/bun.lock') }}
           restore-keys: |
             ${{ runner.os }}-bun-deps-
 
@@ -154,7 +154,7 @@ jobs:
         uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5.0.4
         with:
           path: ${{ env.BUN_INSTALL_CACHE_DIR }}
-          key: ${{ runner.os }}-bun-deps-${{ hashFiles('**/bun.lockb') }}
+          key: ${{ runner.os }}-bun-deps-${{ hashFiles('**/bun.lock') }}
           restore-keys: |
             ${{ runner.os }}-bun-deps-
 
@@ -184,7 +184,7 @@ jobs:
         uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5.0.4
         with:
           path: ${{ env.BUN_INSTALL_CACHE_DIR }}
-          key: ${{ runner.os }}-bun-deps-${{ hashFiles('**/bun.lockb') }}
+          key: ${{ runner.os }}-bun-deps-${{ hashFiles('**/bun.lock') }}
           restore-keys: |
             ${{ runner.os }}-bun-deps-
 
@@ -233,7 +233,7 @@ jobs:
         uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5.0.4
         with:
           path: ${{ env.BUN_INSTALL_CACHE_DIR }}
-          key: ${{ runner.os }}-bun-deps-${{ hashFiles('**/bun.lockb') }}
+          key: ${{ runner.os }}-bun-deps-${{ hashFiles('**/bun.lock') }}
           restore-keys: |
             ${{ runner.os }}-bun-deps-
 
@@ -269,7 +269,7 @@ jobs:
 
       # Create GitHub Release
       - name: Create GitHub Release
-        uses: actions/create-release@5d65a2c8e67e0cfc9a6bab5b5ed2d5a3e96dc0b # v1.0.1
+        uses: actions/create-release@0cb9c9b65d5d1901c1f53e5e66eaf4afd303e70e # v1.1.4
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
