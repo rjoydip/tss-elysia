@@ -102,7 +102,6 @@ Detailed documentation available in `docs/`:
 - **Runtime**: Bun
 - **UI**: React 19 + TypeScript
 - **Styling**: Tailwind CSS v4
-- **Validation**: Zod v4
 
 ## Project Structure
 

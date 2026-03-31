@@ -227,7 +227,8 @@ function Home() {
               </svg>
             </Link>
             <Link
-              to="/docs/api/reference"
+              to="/docs/$"
+              params={{ _splat: "api/reference" }}
               className={cn(buttonVariants({ variant: "outline", size: "lg" }))}
             >
               API Reference

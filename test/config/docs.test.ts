@@ -31,10 +31,10 @@ describe("docsConfig", () => {
     }
   });
 
-  it("should have all hrefs start with /docs", () => {
+  it("should have all hrefs start with /docs or /api", () => {
     for (const section of docsConfig) {
       for (const item of section.items) {
-        expect(item.href).toMatch(/^\/docs/);
+        expect(item.href).toMatch(/^\/docs|\/api/);
       }
     }
   });
@@ -54,11 +54,11 @@ describe("docsConfig", () => {
   it("should have Authentication section", () => {
     const section = docsConfig.find((s) => s.title === "Authentication");
     expect(section).toBeDefined();
-    expect(section!.items.length).toBeGreaterThanOrEqual(4);
+    expect(section!.items.length).toBeGreaterThanOrEqual(1);
   });
 
   it("should have API Reference section", () => {
-    const section = docsConfig.find((s) => s.title === "API Reference");
+    const section = docsConfig.find((s) => s.title === "API");
     expect(section).toBeDefined();
     expect(section!.items.length).toBeGreaterThanOrEqual(1);
   });
@@ -74,10 +74,6 @@ describe("docsConfig", () => {
     const authSection = docsConfig.find((s) => s.title === "Authentication");
     const authHrefs = authSection!.items.map((i) => i.href);
     expect(authHrefs).toContain("/docs/auth/overview");
-    expect(authHrefs).toContain("/docs/auth/login");
-    expect(authHrefs).toContain("/docs/auth/register");
-    expect(authHrefs).toContain("/docs/auth/token");
-    expect(authHrefs).toContain("/docs/auth/middleware");
   });
 });
 

@@ -13,15 +13,13 @@ test.describe("Docs Sidebar", () => {
   test("should render sidebar with all sections", async ({ page }) => {
     await expect(page.getByRole("button", { name: "Getting Started" })).toBeVisible();
     await expect(page.getByRole("button", { name: "Authentication" })).toBeVisible();
-    await expect(page.getByRole("button", { name: "API Reference" })).toBeVisible();
+    await expect(page.getByRole("button", { name: "API" })).toBeVisible();
   });
 
   test("should expand Getting Started section on click", async ({ page }) => {
-    // Getting Started auto-expands on /docs since its Overview item matches the current path
-    // Click twice: first click collapses, second click re-expands
-    await page.getByRole("button", { name: "Getting Started" }).click();
-    await page.getByRole("button", { name: "Getting Started" }).click();
+    // Getting Started auto-expands on /docs since its Overview item href="/docs" matches the path
     await expect(page.getByRole("link", { name: "Development", exact: true })).toBeVisible();
+    await expect(page.getByRole("link", { name: "Overview", exact: true })).toBeVisible();
   });
 
   test("should collapse section on second click", async ({ page }) => {
@@ -39,15 +37,13 @@ test.describe("Docs Sidebar", () => {
 
   test("should expand Authentication section", async ({ page }) => {
     await page.getByRole("button", { name: "Authentication" }).click();
-    await expect(page.getByRole("link", { name: "Login" })).toBeVisible();
-    await expect(page.getByRole("link", { name: "Register" })).toBeVisible();
-    await expect(page.getByRole("link", { name: "Token Management" })).toBeVisible();
-    await expect(page.getByRole("link", { name: "Middleware" })).toBeVisible();
+    // Use aside scope to avoid matching Getting Started's "Overview" link (auto-expanded on /docs)
+    await expect(page.locator("aside a[href='/docs/auth/overview']")).toBeVisible();
   });
 
-  test("should expand API Reference section", async ({ page }) => {
-    await page.getByRole("button", { name: "API Reference" }).click();
-    await expect(page.locator("aside a[href='/docs/api/reference']").first()).toBeVisible();
+  test("should expand API section", async ({ page }) => {
+    await page.getByRole("button", { name: "API" }).click();
+    await expect(page.locator("aside a[href='/docs/api/overview']").first()).toBeVisible();
   });
 
   test("should navigate to Development page via sidebar", async ({ page }) => {

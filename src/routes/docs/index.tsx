@@ -3,7 +3,7 @@
  * Getting Started overview with quick-start steps, features, and next steps
  */
 
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/docs/")({
   component: DocsLandingPage,
@@ -178,8 +178,8 @@ function DocsLandingPage() {
       <section>
         <h2 className="text-2xl font-semibold tracking-tight mb-6 text-foreground">Next Steps</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Link
-            to="/docs/development"
+          <a
+            href="/docs/development"
             className="block p-5 border rounded-lg hover:border-brand hover:bg-brand/5 transition-all group"
           >
             <h3 className="font-semibold mb-1 text-foreground group-hover:text-brand transition-colors">
@@ -188,16 +188,16 @@ function DocsLandingPage() {
             <p className="text-sm text-muted-foreground">
               Configure your local development environment
             </p>
-          </Link>
-          <Link
-            to="/docs/auth/overview"
+          </a>
+          <a
+            href="/docs/auth/overview"
             className="block p-5 border rounded-lg hover:border-brand hover:bg-brand/5 transition-all group"
           >
             <h3 className="font-semibold mb-1 text-foreground group-hover:text-brand transition-colors">
               Authentication
             </h3>
             <p className="text-sm text-muted-foreground">Learn about authentication and security</p>
-          </Link>
+          </a>
         </div>
       </section>
     </div>
