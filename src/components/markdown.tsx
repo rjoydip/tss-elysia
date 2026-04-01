@@ -5,12 +5,41 @@
  */
 
 import React, { useEffect, useState } from "react";
-import remarkFrontmatter from "remark-frontmatter";
 import remarkGfm from "remark-gfm";
 import Markdown from "react-markdown";
 import rehypeRaw from "rehype-raw";
 import rehypeSlug from "rehype-slug";
 import { getShikiHighlighter } from "~/lib/shiki";
+
+/**
+ * Parsed frontmatter metadata extracted from YAML frontmatter blocks.
+ * Contains optional title and description fields for use in <head> meta tags.
+ */
+export interface FrontmatterData {
+  title?: string;
+  description?: string;
+  [key: string]: string | undefined;
+}
+
+/**
+ * Parses YAML frontmatter from raw markdown content.
+ * Extracts key-value pairs from the --- delimited block at the start of the file.
+ * Returns null if no frontmatter is present.
+ */
+export function parseFrontmatter(content: string): FrontmatterData | null {
+  const match = content.match(/^---\r?\n([\s\S]*?)\r?\n---/);
+  if (!match?.[1]) return null;
+
+  const data: FrontmatterData = {};
+  for (const line of match[1].split("\n")) {
+    const colonIdx = line.indexOf(":");
+    if (colonIdx === -1) continue;
+    const key = line.slice(0, colonIdx).trim();
+    const value = line.slice(colonIdx + 1).trim();
+    if (key) data[key] = value || undefined;
+  }
+  return Object.keys(data).length > 0 ? data : null;
+}
 
 /**
  * Remark plugin that removes frontmatter nodes (yaml/toml) from the AST.
@@ -27,6 +56,8 @@ function remarkStripFrontmatter() {
 
 interface MarkdownRendererProps {
   content: string;
+  /** Callback invoked with parsed frontmatter metadata for use in <head> meta tags */
+  onFrontmatter?: (data: FrontmatterData) => void;
 }
 
 interface CodeBlockProps {
@@ -98,11 +129,18 @@ function CodeBlock({ children, className }: CodeBlockProps) {
   );
 }
 
-export function MarkdownRenderer({ content }: MarkdownRendererProps) {
+export function MarkdownRenderer({ content, onFrontmatter }: MarkdownRendererProps) {
+  // Extract frontmatter metadata and notify parent via callback for <head> meta tags
+  useEffect(() => {
+    if (!onFrontmatter) return;
+    const frontmatter = parseFrontmatter(content);
+    if (frontmatter) onFrontmatter(frontmatter);
+  }, [content, onFrontmatter]);
+
   return (
     <div className="prose prose-neutral dark:prose-invert max-w-none">
       <Markdown
-        remarkPlugins={[remarkGfm, [remarkFrontmatter, ["yaml", "toml"]], remarkStripFrontmatter]}
+        remarkPlugins={[remarkGfm, remarkStripFrontmatter]}
         rehypePlugins={[rehypeRaw, rehypeSlug]}
         components={{
           h1: ({ children }) => (

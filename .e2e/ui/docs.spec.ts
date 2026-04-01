@@ -11,9 +11,11 @@ test.describe("Docs Sidebar", () => {
   });
 
   test("should render sidebar with all sections", async ({ page }) => {
-    await expect(page.getByRole("button", { name: "Getting Started" })).toBeVisible();
-    await expect(page.getByRole("button", { name: "Authentication" })).toBeVisible();
-    await expect(page.getByRole("button", { name: "API" })).toBeVisible();
+    // Verify each expected section button exists without relying on DOM order
+    const expectedSections = ["Getting Started", "Authentication", "API"];
+    for (const section of expectedSections) {
+      await expect(page.getByRole("button", { name: section })).toBeVisible();
+    }
   });
 
   test("should expand Getting Started section on click", async ({ page }) => {
@@ -211,5 +213,16 @@ test.describe("Docs Theme Toggle", () => {
       .getByRole("button", { name: /Switch to/ })
       .getAttribute("aria-label");
     expect(labelAfterNav).toBe(labelAfterToggle);
+  });
+});
+
+test.describe("Docs 404 Handling", () => {
+  test("should show error boundary for non-existent doc page", async ({ page }) => {
+    // Navigate to a doc path that doesn't exist — the loader throws an Error
+    await page.goto("/docs/this-page-does-not-exist");
+    await page.waitForLoadState("networkidle");
+    // The root route's errorComponent renders "500: Internal Server Error"
+    // when the loader throws; verify the error is surfaced to the user
+    await expect(page.getByText("Internal Server Error")).toBeVisible();
   });
 });

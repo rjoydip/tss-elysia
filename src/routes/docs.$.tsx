@@ -5,7 +5,7 @@
  */
 
 import { createFileRoute } from "@tanstack/react-router";
-import { MarkdownRenderer } from "~/components/markdown";
+import { MarkdownRenderer, parseFrontmatter } from "~/components/markdown";
 import { Skeleton } from "~/components/ui/skeleton";
 import { useEffect, useState } from "react";
 
@@ -38,30 +38,49 @@ for (const [key, content] of Object.entries(markdownModules)) {
 }
 
 /**
+ * Safely extracts the splat path from route params.
+ * In TanStack Router catch-all routes, _splat may be undefined for /docs root.
+ */
+function getSplatPath(params: Record<string, unknown>): string {
+  const raw = params._splat;
+  return typeof raw === "string" ? raw : "";
+}
+
+/**
  * Route definition for the dynamic docs catch-all.
  * Uses splat parameter to capture nested doc paths.
  */
 export const Route = createFileRoute("/docs/$")({
   loader: async ({ params }) => {
+    // Use type-safe extraction to handle undefined _splat at runtime
+    const rawPath = getSplatPath(params as Record<string, unknown>);
     // Strip .md extension if present so /docs/guides/environment-variables.md
     // resolves the same as /docs/guides/environment-variables
-    const docPath = (params._splat ?? "").replace(/\.md$/, "");
+    const docPath = rawPath.replace(/\.md$/, "");
     const content = docMap.get(docPath);
 
     if (!content) {
       throw new Error(`Documentation page not found: ${docPath}`);
     }
 
-    return { content, docPath };
+    // Pre-extract frontmatter for use in <head> meta tags
+    const frontmatter = parseFrontmatter(content);
+    return { content, docPath, frontmatter };
   },
   component: DocsPage,
-  head: ({ loaderData }) => ({
-    meta: [
-      {
-        title: `${(loaderData?.docPath ?? "").replace(/\//g, " / ")} | Documentation`,
-      },
-    ],
-  }),
+  head: ({ loaderData }) => {
+    const fm = loaderData?.frontmatter;
+    const docPath = loaderData?.docPath ?? "";
+    // Use frontmatter title/description if available, fall back to doc path
+    const title = fm?.title ?? docPath.replace(/\//g, " / ");
+    const description = fm?.description;
+    return {
+      meta: [
+        { title: `${title} | Documentation` },
+        ...(description ? [{ name: "description", content: description }] : []),
+      ],
+    };
+  },
 });
 
 /**
