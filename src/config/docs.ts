@@ -24,7 +24,7 @@ export interface DocSection {
 /** Main navigation items for the header */
 export const navItems = [
   { name: "Docs", href: "/docs" },
-  { name: "API", href: "/docs/api/reference" },
+  { name: "API", href: "/docs/api/overview" },
   { name: "Blog", href: "/blog" },
   { name: "Changelog", href: "/changelog" },
 ];

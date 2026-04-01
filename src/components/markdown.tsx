@@ -4,13 +4,26 @@
  * Uses Shiki for beautiful code blocks with theme support
  */
 
-import React, { useMemo, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import remarkFrontmatter from "remark-frontmatter";
 import remarkGfm from "remark-gfm";
 import Markdown from "react-markdown";
 import rehypeRaw from "rehype-raw";
 import rehypeSlug from "rehype-slug";
 import { getShikiHighlighter } from "~/lib/shiki";
+
+/**
+ * Remark plugin that removes frontmatter nodes (yaml/toml) from the AST.
+ * remark-frontmatter parses frontmatter into AST nodes but doesn't remove them;
+ * this plugin strips them so they don't appear in rendered output.
+ */
+function remarkStripFrontmatter() {
+  return (tree: { children: Array<{ type: string }> }) => {
+    tree.children = tree.children.filter((node) => {
+      return node.type !== "yaml" && node.type !== "toml";
+    });
+  };
+}
 
 interface MarkdownRendererProps {
   content: string;
@@ -86,14 +99,10 @@ function CodeBlock({ children, className }: CodeBlockProps) {
 }
 
 export function MarkdownRenderer({ content }: MarkdownRendererProps) {
-  const processedContent = useMemo(() => {
-    return content;
-  }, [content]);
-
   return (
     <div className="prose prose-neutral dark:prose-invert max-w-none">
       <Markdown
-        remarkPlugins={[remarkGfm, [remarkFrontmatter, ["yaml", "toml"]]]}
+        remarkPlugins={[remarkGfm, [remarkFrontmatter, ["yaml", "toml"]], remarkStripFrontmatter]}
         rehypePlugins={[rehypeRaw, rehypeSlug]}
         components={{
           h1: ({ children }) => (
@@ -171,7 +180,7 @@ export function MarkdownRenderer({ content }: MarkdownRendererProps) {
           ),
         }}
       >
-        {processedContent}
+        {content}
       </Markdown>
     </div>
   );

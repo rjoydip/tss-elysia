@@ -164,10 +164,10 @@ describe("navItems", () => {
     expect(docs!.href).toBe("/docs");
   });
 
-  it("should contain API link pointing to flat route", () => {
+  it("should contain API link pointing to api overview", () => {
     const api = navItems.find((i) => i.name === "API");
     expect(api).toBeDefined();
-    expect(api!.href).toBe("/docs/api/reference");
+    expect(api!.href).toBe("/docs/api/overview");
   });
 
   it("should contain Blog link", () => {
