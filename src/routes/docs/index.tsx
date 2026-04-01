@@ -3,7 +3,7 @@
  * Getting Started overview with quick-start steps, features, and next steps
  */
 
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/docs/")({
   component: DocsLandingPage,
@@ -42,7 +42,7 @@ const features = [
         strokeWidth="2"
         strokeLinecap="round"
         strokeLinejoin="round"
-        className="text-brand"
+        className="text-primary"
       >
         <polyline points="16 18 22 12 16 6" />
         <polyline points="8 6 2 12 8 18" />
@@ -63,7 +63,7 @@ const features = [
         strokeWidth="2"
         strokeLinecap="round"
         strokeLinejoin="round"
-        className="text-brand"
+        className="text-primary"
       >
         <polygon points="12 2 2 7 12 12 22 7 12 2" />
         <polyline points="2 17 12 22 22 17" />
@@ -85,7 +85,7 @@ const features = [
         strokeWidth="2"
         strokeLinecap="round"
         strokeLinejoin="round"
-        className="text-brand"
+        className="text-primary"
       >
         <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
         <path d="M7 11V7a5 5 0 0 1 10 0v4" />
@@ -106,7 +106,7 @@ const features = [
         strokeWidth="2"
         strokeLinecap="round"
         strokeLinejoin="round"
-        className="text-brand"
+        className="text-primary"
       >
         <ellipse cx="12" cy="5" rx="9" ry="3" />
         <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3" />
@@ -132,10 +132,10 @@ function DocsLandingPage() {
           {quickStartSteps.map((step, index) => (
             <div
               key={index}
-              className="border rounded-lg p-5 hover:border-brand/50 hover:shadow-md hover:shadow-brand/5 transition-all duration-200"
+              className="border rounded-lg p-5 hover:border-primary/50 hover:shadow-md hover:shadow-primary/5 transition-all duration-200"
             >
               <div className="flex items-center gap-3 mb-2">
-                <span className="w-7 h-7 rounded-full bg-brand/10 text-brand text-sm font-semibold flex items-center justify-center">
+                <span className="w-7 h-7 rounded-full bg-primary text-primary text-sm font-semibold flex items-center justify-center">
                   {index + 1}
                 </span>
                 <h3 className="font-semibold text-foreground">{step.title}</h3>
@@ -143,7 +143,7 @@ function DocsLandingPage() {
               <p className="text-sm text-muted-foreground mb-3 ml-10">{step.description}</p>
               <div className="ml-10">
                 <pre className="bg-[#0a0a0a] px-4 py-2.5 rounded-md overflow-x-auto border">
-                  <code className="text-sm font-mono text-brand">{step.code}</code>
+                  <code className="text-sm font-mono text-primary">{step.code}</code>
                 </pre>
               </div>
             </div>
@@ -158,10 +158,10 @@ function DocsLandingPage() {
           {features.map((feature) => (
             <div
               key={feature.title}
-              className="border rounded-lg p-5 hover:border-brand/50 hover:shadow-md hover:shadow-brand/5 transition-all duration-200"
+              className="border rounded-lg p-5 hover:border-primary/50 hover:shadow-md hover:shadow-primary/5 transition-all duration-200"
             >
               <div className="flex items-start gap-3">
-                <div className="w-10 h-10 rounded-lg bg-brand/10 flex items-center justify-center flex-shrink-0">
+                <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
                   {feature.icon}
                 </div>
                 <div>
@@ -178,26 +178,26 @@ function DocsLandingPage() {
       <section>
         <h2 className="text-2xl font-semibold tracking-tight mb-6 text-foreground">Next Steps</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Link
-            to="/docs/development"
-            className="block p-5 border rounded-lg hover:border-brand hover:bg-brand/5 transition-all group"
+          <a
+            href="/docs/getting-started/development"
+            className="block p-5 border rounded-lg hover:border-primary hover:bg-primary/5 transition-all group"
           >
-            <h3 className="font-semibold mb-1 text-foreground group-hover:text-brand transition-colors">
+            <h3 className="font-semibold mb-1 text-foreground group-hover:text-primary transition-colors">
               Development Setup
             </h3>
             <p className="text-sm text-muted-foreground">
               Configure your local development environment
             </p>
-          </Link>
-          <Link
-            to="/docs/auth/overview"
-            className="block p-5 border rounded-lg hover:border-brand hover:bg-brand/5 transition-all group"
+          </a>
+          <a
+            href="/docs/auth/overview"
+            className="block p-5 border rounded-lg hover:border-primary hover:bg-primary/5 transition-all group"
           >
-            <h3 className="font-semibold mb-1 text-foreground group-hover:text-brand transition-colors">
+            <h3 className="font-semibold mb-1 text-foreground group-hover:text-primary transition-colors">
               Authentication
             </h3>
             <p className="text-sm text-muted-foreground">Learn about authentication and security</p>
-          </Link>
+          </a>
         </div>
       </section>
     </div>

@@ -158,5 +158,3 @@ src/
 - CORS configured for allowed origins
 - Helmet adds security headers
 - Rate limiting prevents abuse
-
-## Performance

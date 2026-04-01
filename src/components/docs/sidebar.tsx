@@ -88,7 +88,7 @@ export const DocsSidebar = memo(function DocsSidebar({
                           className={cn(
                             "block px-3 py-1.5 text-sm rounded-md transition-colors",
                             isActive
-                              ? "bg-brand/10 text-brand font-medium"
+                              ? "bg-primary text-primary font-medium"
                               : "text-muted-foreground hover:text-foreground hover:bg-accent/50",
                           )}
                         >

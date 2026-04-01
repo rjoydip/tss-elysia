@@ -4,15 +4,60 @@
  * Uses Shiki for beautiful code blocks with theme support
  */
 
-import React, { useMemo, useEffect, useState } from "react";
-import Markdown from "react-markdown";
+import React, { useEffect, useState } from "react";
 import remarkGfm from "remark-gfm";
+import Markdown from "react-markdown";
 import rehypeRaw from "rehype-raw";
 import rehypeSlug from "rehype-slug";
-import { codeToHtml } from "shiki";
+import { getShikiHighlighter } from "~/lib/shiki";
+
+/**
+ * Parsed frontmatter metadata extracted from YAML frontmatter blocks.
+ * Contains optional title and description fields for use in <head> meta tags.
+ */
+export interface FrontmatterData {
+  title?: string;
+  description?: string;
+  [key: string]: string | undefined;
+}
+
+/**
+ * Parses YAML frontmatter from raw markdown content.
+ * Extracts key-value pairs from the --- delimited block at the start of the file.
+ * Returns null if no frontmatter is present.
+ */
+export function parseFrontmatter(content: string): FrontmatterData | null {
+  const match = content.match(/^---\r?\n([\s\S]*?)\r?\n---/);
+  if (!match?.[1]) return null;
+
+  const data: FrontmatterData = {};
+  for (const line of match[1].split("\n")) {
+    const colonIdx = line.indexOf(":");
+    if (colonIdx === -1) continue;
+    const key = line.slice(0, colonIdx).trim();
+    const value = line.slice(colonIdx + 1).trim();
+    if (key) data[key] = value || undefined;
+  }
+  return Object.keys(data).length > 0 ? data : null;
+}
+
+/**
+ * Remark plugin that removes frontmatter nodes (yaml/toml) from the AST.
+ * remark-frontmatter parses frontmatter into AST nodes but doesn't remove them;
+ * this plugin strips them so they don't appear in rendered output.
+ */
+function remarkStripFrontmatter() {
+  return (tree: { children: Array<{ type: string }> }) => {
+    tree.children = tree.children.filter((node) => {
+      return node.type !== "yaml" && node.type !== "toml";
+    });
+  };
+}
 
 interface MarkdownRendererProps {
   content: string;
+  /** Callback invoked with parsed frontmatter metadata for use in <head> meta tags */
+  onFrontmatter?: (data: FrontmatterData) => void;
 }
 
 interface CodeBlockProps {
@@ -41,22 +86,29 @@ function CodeBlock({ children, className }: CodeBlockProps) {
   useEffect(() => {
     if (!code) return;
 
+    let cancelled = false;
+
     const highlight = async () => {
       try {
-        const html = await codeToHtml(code.trim(), {
+        const highlighter = await getShikiHighlighter();
+        if (cancelled) return;
+        const html = highlighter.codeToHtml(code.trim(), {
           lang: language,
           themes: {
             light: "github-light",
             dark: "github-dark",
           },
         });
-        setHighlightedCode(html);
+        if (!cancelled) setHighlightedCode(html);
       } catch {
-        setHighlightedCode(`<pre><code>${code}</code></pre>`);
+        if (!cancelled) setHighlightedCode(`<pre><code>${code}</code></pre>`);
       }
     };
 
     highlight();
+    return () => {
+      cancelled = true;
+    };
   }, [code, language]);
 
   if (!code) return null;
@@ -77,15 +129,18 @@ function CodeBlock({ children, className }: CodeBlockProps) {
   );
 }
 
-export function MarkdownRenderer({ content }: MarkdownRendererProps) {
-  const processedContent = useMemo(() => {
-    return content;
-  }, [content]);
+export function MarkdownRenderer({ content, onFrontmatter }: MarkdownRendererProps) {
+  // Extract frontmatter metadata and notify parent via callback for <head> meta tags
+  useEffect(() => {
+    if (!onFrontmatter) return;
+    const frontmatter = parseFrontmatter(content);
+    if (frontmatter) onFrontmatter(frontmatter);
+  }, [content, onFrontmatter]);
 
   return (
     <div className="prose prose-neutral dark:prose-invert max-w-none">
       <Markdown
-        remarkPlugins={[remarkGfm]}
+        remarkPlugins={[remarkGfm, remarkStripFrontmatter]}
         rehypePlugins={[rehypeRaw, rehypeSlug]}
         components={{
           h1: ({ children }) => (
@@ -129,7 +184,7 @@ export function MarkdownRenderer({ content }: MarkdownRendererProps) {
             return <>{children}</>;
           },
           blockquote: ({ children }) => (
-            <blockquote className="border-l-4 border-brand pl-4 my-4 italic text-muted-foreground bg-brand/5 py-2 rounded-r-md">
+            <blockquote className="border-l-4 border-primary pl-4 my-4 italic text-muted-foreground bg-primary/5 py-2 rounded-r-md">
               {children}
             </blockquote>
           ),
@@ -144,23 +199,26 @@ export function MarkdownRenderer({ content }: MarkdownRendererProps) {
             </th>
           ),
           td: ({ children }) => <td className="border border-border px-4 py-2">{children}</td>,
-          a: ({ children, href }) => (
-            <a
-              href={href}
-              className="text-brand hover:underline"
-              target={href?.startsWith("http") ? "_blank" : undefined}
-              rel={href?.startsWith("http") ? "noopener noreferrer" : undefined}
-            >
-              {children}
-            </a>
-          ),
+          a: ({ children, href }) => {
+            const _href = href?.replace(/\.md$/, "");
+            return (
+              <a
+                href={_href}
+                className="text-primary hover:underline"
+                target={_href?.startsWith("http") ? "_blank" : undefined}
+                rel={_href?.startsWith("http") ? "noopener noreferrer" : undefined}
+              >
+                {children}
+              </a>
+            );
+          },
           hr: () => <hr className="my-8 border-border" />,
           img: ({ src, alt }) => (
             <img src={src} alt={alt} className="max-w-full h-auto rounded-lg my-4" />
           ),
         }}
       >
-        {processedContent}
+        {content}
       </Markdown>
     </div>
   );

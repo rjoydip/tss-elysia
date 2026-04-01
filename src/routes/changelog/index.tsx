@@ -4,11 +4,16 @@
  */
 
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
-import { cn } from "~/lib/utils";
 import { changelogData, ChangelogEntry, ChangelogType } from "~/lib/changelog/data";
 import { Header } from "~/components/header";
 import { Footer } from "~/components/footer";
+import { Badge } from "~/components/ui/badge";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "~/components/ui/accordion";
 
 export const Route = createFileRoute("/changelog/")({
   component: ChangelogPage,
@@ -17,7 +22,7 @@ export const Route = createFileRoute("/changelog/")({
 const typeLabels: Record<ChangelogType, { label: string; className: string }> = {
   feature: {
     label: "New",
-    className: "bg-brand/10 text-brand border-brand/20",
+    className: "bg-primary/10 text-primary border-primary/20",
   },
   fix: { label: "Fix", className: "bg-blue-500/10 text-blue-500 border-blue-500/20" },
   breaking: { label: "Breaking", className: "bg-red-500/10 text-red-500 border-red-500/20" },
@@ -28,62 +33,39 @@ const typeLabels: Record<ChangelogType, { label: string; className: string }> = 
   docs: { label: "Docs", className: "bg-orange-500/10 text-orange-500 border-orange-500/20" },
 };
 
+const typeBadgeVariant: Record<ChangelogType, "default" | "secondary" | "destructive" | "outline"> =
+  {
+    feature: "default",
+    fix: "secondary",
+    breaking: "destructive",
+    improvement: "secondary",
+    docs: "outline",
+  };
+
 function ChangelogBadge({ type }: { type: ChangelogType }) {
-  const config = typeLabels[type];
   return (
-    <span className={cn("text-xs font-medium px-2 py-0.5 rounded-full border", config.className)}>
-      {config.label}
-    </span>
+    <Badge variant={typeBadgeVariant[type]} className="shrink-0">
+      {typeLabels[type].label}
+    </Badge>
   );
 }
 
-function ChangelogEntryComponent({
-  entry,
-  isLatest,
-}: {
-  entry: ChangelogEntry;
-  isLatest: boolean;
-}) {
-  const [expanded, setExpanded] = useState(isLatest);
-
+function ChangelogEntryComponent({ entry }: { entry: ChangelogEntry }) {
   return (
-    <div className="border rounded-xl overflow-hidden">
-      <button
-        onClick={() => setExpanded(!expanded)}
-        className="w-full flex items-center justify-between p-6 hover:bg-muted/50 transition-colors text-left"
-      >
-        <div className="flex items-center gap-4">
-          <div className="flex items-center gap-3">
-            <span className="text-2xl font-bold text-foreground">{entry.version}</span>
-            {isLatest && (
-              <span className="text-xs font-semibold px-2 py-1 rounded-full bg-brand text-black">
-                Latest
-              </span>
-            )}
+    <Accordion type="single" collapsible defaultValue={entry.version}>
+      <AccordionItem value={entry.version} className="border rounded-xl overflow-hidden">
+        <AccordionTrigger className="px-6 py-4 hover:no-underline hover:bg-muted/50">
+          <div className="flex items-center gap-4 text-left">
+            <div className="flex items-center gap-3">
+              <span className="text-2xl font-bold text-foreground">{entry.version}</span>
+            </div>
+            <div className="hidden sm:block">
+              <p className="font-medium text-foreground">{entry.title}</p>
+              <p className="text-sm text-muted-foreground">{entry.releasedAt}</p>
+            </div>
           </div>
-          <div className="hidden sm:block">
-            <p className="font-medium text-foreground">{entry.title}</p>
-            <p className="text-sm text-muted-foreground">{entry.releasedAt}</p>
-          </div>
-        </div>
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="20"
-          height="20"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          className={cn("transition-transform duration-200", expanded ? "rotate-180" : "")}
-        >
-          <path d="m6 9 6 6 6-6" />
-        </svg>
-      </button>
-
-      {expanded && (
-        <div className="border-t px-6 py-4 bg-muted/20">
+        </AccordionTrigger>
+        <AccordionContent className="px-6 pb-4">
           <div className="sm:hidden mb-4">
             <p className="font-medium text-foreground">{entry.title}</p>
             <p className="text-sm text-muted-foreground">{entry.releasedAt}</p>
@@ -96,9 +78,9 @@ function ChangelogEntryComponent({
               </li>
             ))}
           </ul>
-        </div>
-      )}
-    </div>
+        </AccordionContent>
+      </AccordionItem>
+    </Accordion>
   );
 }
 
@@ -121,12 +103,12 @@ function ChangelogPage() {
           </div>
 
           {/* Latest Version Banner */}
-          <div className="mb-8 p-6 rounded-xl bg-gradient-to-r from-brand/10 to-brand-hover/5 border border-brand/20">
+          <div className="mb-8 p-6 rounded-xl bg-gradient-to-r from-primary/10 to-primary/5 border border-primary/20">
             <div className="flex items-center gap-3 mb-2">
               <span className="text-3xl font-bold text-foreground">{latestVersion.version}</span>
-              <span className="text-sm font-semibold px-2 py-1 rounded-full bg-brand text-black">
+              <Badge className="bg-primary text-primary-foreground hover:bg-primary/90">
                 Latest
-              </span>
+              </Badge>
             </div>
             <p className="text-foreground mb-2">{latestVersion.title}</p>
             <p className="text-sm text-muted-foreground">{latestVersion.releasedAt}</p>
@@ -134,8 +116,8 @@ function ChangelogPage() {
 
           {/* Changelog Entries */}
           <div className="space-y-4">
-            {changelogData.map((entry, index) => (
-              <ChangelogEntryComponent key={entry.version} entry={entry} isLatest={index === 0} />
+            {changelogData.map((entry) => (
+              <ChangelogEntryComponent key={entry.version} entry={entry} />
             ))}
           </div>
         </div>

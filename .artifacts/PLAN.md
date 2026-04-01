@@ -294,4 +294,4 @@ Complete the authentication system with additional security features, set up use
 - [pgvector Documentation](https://github.com/pgvector/pgvector)
 - [Neo4j Graph Database](https://neo4j.com/docs/)
 - [AGENTS.md](./AGENTS.md)
-- [Environment Variables Docs](./docs/environment-variables.md)
+- [Environment Variables Docs](./docs/guides/environment-variables.md)

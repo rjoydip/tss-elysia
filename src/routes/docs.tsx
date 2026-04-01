@@ -12,7 +12,7 @@ import { docsConfig } from "~/config/docs";
 import { Header } from "~/components/header";
 import { Footer } from "~/components/footer";
 import { DocsSidebar } from "~/components/docs/sidebar";
-import { Breadcrumb } from "~/components/ui/breadcrumb";
+import { BreadcrumbNav } from "~/components/breadcrumb";
 
 export const Route = createFileRoute("/docs")({
   component: DocsLayout,
@@ -124,7 +124,7 @@ function DocsLayout() {
       >
         <div className="max-w-6xl mx-auto py-12">
           {/* Breadcrumb Navigation */}
-          {breadcrumbs.length > 0 && <Breadcrumb items={breadcrumbs} className="mb-6" />}
+          {breadcrumbs.length > 0 && <BreadcrumbNav items={breadcrumbs} className="mb-6" />}
           <Outlet />
         </div>
         <Footer />

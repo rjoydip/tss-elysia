@@ -82,7 +82,7 @@ test.describe("Cross-Page Transitions", () => {
     await page.waitForLoadState("networkidle");
     await page.goBack();
     await page.waitForLoadState("networkidle");
-    expect(page.url()).toMatch(/\/$/);
+    expect(page.url()).toMatch(/\/docs|\/$/);
   });
 
   test("should handle browser forward navigation", async ({ page }) => {

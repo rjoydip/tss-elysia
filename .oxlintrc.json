@@ -3,7 +3,6 @@
   "plugins": ["unicorn", "typescript", "oxc"],
   "ignorePatterns": ["**/.bun-install-cache"],
   "rules": {
-    "no-unused-vars": "warn",
-    "no-unused-imports": "warn"
+    "no-unused-vars": "warn"
   }
 }

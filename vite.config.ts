@@ -1,3 +1,4 @@
+import path from "node:path";
 import { defineConfig } from "vite";
 import { tanstackStart } from "@tanstack/react-start/plugin/vite";
 import viteReact from "@vitejs/plugin-react";
@@ -25,7 +26,7 @@ export default defineConfig(() => ({
   },
   resolve: {
     alias: {
-      "~": "/src",
+      "~": path.resolve(import.meta.dirname, "src"),
     },
   },
   server: {
@@ -36,38 +37,5 @@ export default defineConfig(() => ({
   preview: {
     host,
     port,
-  },
-  build: {
-    rollupOptions: {
-      output: {
-        manualChunks: (id) => {
-          if (id.includes("node_modules")) {
-            if (id.includes("better-auth")) {
-              return "vendor-auth";
-            }
-            if (id.includes("@tanstack")) {
-              return "vendor-router";
-            }
-            if (id.includes("react")) {
-              return "vendor-react";
-            }
-            if (id.includes("drizzle")) {
-              return "vendor-db";
-            }
-            if (id.includes("kysely")) {
-              return "vendor-kysely";
-            }
-            if (id.includes("@libsql") || id.includes("bun:sqlite")) {
-              return "vendor-sqlite";
-            }
-            return "vendor";
-          }
-        },
-        chunkFileNames: "chunks/[name]-[hash].js",
-        entryFileNames: "js/[name]-[hash].js",
-        assetFileNames: "assets/[name]-[hash][extname]",
-      },
-    },
-    chunkSizeWarningLimit: 1000,
   },
 }));

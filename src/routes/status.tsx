@@ -7,7 +7,17 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
 import { Badge } from "~/components/ui/badge";
+import { Card, CardContent } from "~/components/ui/card";
+import { Label } from "~/components/ui/label";
 import { Separator } from "~/components/ui/separator";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "~/components/ui/select";
+import { Switch } from "~/components/ui/switch";
 import { cn } from "~/lib/utils";
 import { Header } from "~/components/header";
 import { Footer } from "~/components/footer";
@@ -123,32 +133,25 @@ function HealthDashboard() {
             </div>
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-2">
-                <label className="text-sm text-muted-foreground">Auto-refresh:</label>
-                <button
-                  onClick={() => setAutoRefresh(!autoRefresh)}
-                  className={cn(
-                    "relative inline-flex h-6 w-11 items-center rounded-full transition-colors",
-                    autoRefresh ? "bg-brand" : "bg-muted",
-                  )}
-                >
-                  <span
-                    className={cn(
-                      "inline-block h-4 w-4 transform rounded-full bg-white transition-transform",
-                      autoRefresh ? "translate-x-6" : "translate-x-1",
-                    )}
-                  />
-                </button>
+                <Label htmlFor="auto-refresh" className="text-sm text-muted-foreground">
+                  Auto-refresh:
+                </Label>
+                <Switch id="auto-refresh" checked={autoRefresh} onCheckedChange={setAutoRefresh} />
               </div>
               {autoRefresh && (
-                <select
-                  value={refreshInterval}
-                  onChange={(e) => setRefreshInterval(Number(e.target.value))}
-                  className="bg-background border border-input rounded-md px-3 py-1.5 text-sm"
+                <Select
+                  value={String(refreshInterval)}
+                  onValueChange={(val) => setRefreshInterval(Number(val))}
                 >
-                  <option value={10}>10s</option>
-                  <option value={30}>30s</option>
-                  <option value={60}>60s</option>
-                </select>
+                  <SelectTrigger className="w-20">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="10">10s</SelectItem>
+                    <SelectItem value="30">30s</SelectItem>
+                    <SelectItem value="60">60s</SelectItem>
+                  </SelectContent>
+                </Select>
               )}
             </div>
           </div>
@@ -156,15 +159,15 @@ function HealthDashboard() {
 
         <div className="space-y-6">
           {/* Overall Status Card */}
-          <div className="border rounded-xl p-6">
-            <div className="flex items-center justify-between">
+          <Card>
+            <div className="flex items-center justify-between p-6">
               <div className="flex items-center gap-4">
                 <div
                   className={cn(
                     "w-4 h-4 rounded-full",
                     serviceStatuses.every((s) => s.status === "loading") &&
                       "bg-yellow-500 animate-pulse",
-                    allUp && "bg-brand",
+                    allUp && autoRefresh ? "bg-success" : "bg-primary",
                     someDown && "bg-red-500",
                   )}
                 />
@@ -177,7 +180,7 @@ function HealthDashboard() {
                 variant={allUp ? "default" : someDown ? "destructive" : "secondary"}
                 className={cn(
                   "text-sm px-3 py-1",
-                  allUp && "bg-brand text-black hover:bg-brand-hover",
+                  allUp && "bg-primary text-primary-foreground hover:bg-primary/90",
                 )}
               >
                 {serviceStatuses.every((s) => s.status === "loading")
@@ -189,43 +192,47 @@ function HealthDashboard() {
                       : "Unknown"}
               </Badge>
             </div>
-          </div>
+          </Card>
 
           {/* Service Status Cards */}
           <div className="grid gap-4 md:grid-cols-2">
             {serviceStatuses.map((service) => (
-              <div
-                key={service.name}
-                className="border rounded-xl p-5 hover:border-brand/30 transition-colors"
-              >
-                <div className="flex items-center justify-between mb-3">
-                  <div className="flex items-center gap-3">
-                    <div
-                      className={cn(
-                        "w-3 h-3 rounded-full",
-                        service.status === "loading" && "bg-yellow-500 animate-pulse",
-                        service.status === "up" && "bg-brand",
-                        service.status === "down" && "bg-red-500",
-                      )}
-                    />
-                    <h3 className="font-semibold text-foreground">{service.name}</h3>
+              <Card key={service.name} className="hover:border-primary/30 transition-colors">
+                <CardContent className="p-5">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-3">
+                      <div
+                        className={cn(
+                          "w-2 h-2 rounded-full",
+                          service.status === "loading" && "bg-yellow-500 animate-pulse",
+                          service.status === "up" && autoRefresh ? "bg-success" : "bg-primary",
+                          service.status === "down" && "bg-red-500",
+                        )}
+                      />
+                      <h3 className="font-semibold text-foreground">{service.name}</h3>
+                    </div>
+                    {service.status === "up" && service.responseTime && (
+                      <span className="text-sm font-mono text-primary">
+                        {service.responseTime}ms
+                      </span>
+                    )}
                   </div>
-                  {service.status === "up" && service.responseTime && (
-                    <span className="text-sm font-mono text-brand">{service.responseTime}ms</span>
-                  )}
-                </div>
-                <p className="text-sm text-muted-foreground mb-2">
-                  {services.find((s) => s.name === service.name)?.description}
-                </p>
-                {service.status === "down" && service.error && (
-                  <p className="text-sm text-red-500">{service.error}</p>
-                )}
-                {service.lastChecked && service.status !== "loading" && (
-                  <p className="text-xs text-muted-foreground">
-                    Last checked: {service.lastChecked.toLocaleTimeString()}
+                  <p className="text-sm text-muted-foreground mb-2">
+                    {services.find((s) => s.name === service.name)?.description}
                   </p>
-                )}
-              </div>
+                  {service.status === "down" && service.error && (
+                    <p className="text-sm text-red-500">{service.error}</p>
+                  )}
+                  {service.lastChecked && service.status !== "loading" && (
+                    <p className="text-xs text-muted-foreground">
+                      Last checked:{" "}
+                      <span className="text-primary font-bold">
+                        {service.lastChecked.toLocaleTimeString()}
+                      </span>
+                    </p>
+                  )}
+                </CardContent>
+              </Card>
             ))}
           </div>
 
@@ -244,7 +251,7 @@ function HealthDashboard() {
               </div>
             </div>
 
-            <div className="border rounded-xl overflow-hidden">
+            <Card>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-px bg-border">
                 {otherServices.map((service) => (
                   <div key={service.name} className="bg-background p-4">
@@ -253,10 +260,10 @@ function HealthDashboard() {
                       <span
                         className={cn(
                           "w-2 h-2 rounded-full",
-                          service.status === "operational" && "bg-brand",
+                          service.status === "operational" && "bg-primary",
                           service.status === "degraded" && "bg-yellow-500",
                           service.status === "outage" && "bg-red-500",
-                          service.status === "unknown" && "bg-muted",
+                          service.status === "unknown" && "bg-muted-foreground",
                         )}
                       />
                     </div>
@@ -264,7 +271,7 @@ function HealthDashboard() {
                   </div>
                 ))}
               </div>
-            </div>
+            </Card>
           </section>
         </div>
       </div>
