@@ -5,8 +5,9 @@
  */
 
 import React, { useMemo, useEffect, useState } from "react";
-import Markdown from "react-markdown";
+import remarkFrontmatter from "remark-frontmatter";
 import remarkGfm from "remark-gfm";
+import Markdown from "react-markdown";
 import rehypeRaw from "rehype-raw";
 import rehypeSlug from "rehype-slug";
 import { getShikiHighlighter } from "~/lib/shiki";
@@ -92,7 +93,7 @@ export function MarkdownRenderer({ content }: MarkdownRendererProps) {
   return (
     <div className="prose prose-neutral dark:prose-invert max-w-none">
       <Markdown
-        remarkPlugins={[remarkGfm]}
+        remarkPlugins={[remarkGfm, [remarkFrontmatter, ["yaml", "toml"]]]}
         rehypePlugins={[rehypeRaw, rehypeSlug]}
         components={{
           h1: ({ children }) => (
@@ -151,16 +152,19 @@ export function MarkdownRenderer({ content }: MarkdownRendererProps) {
             </th>
           ),
           td: ({ children }) => <td className="border border-border px-4 py-2">{children}</td>,
-          a: ({ children, href }) => (
-            <a
-              href={href}
-              className="text-primary hover:underline"
-              target={href?.startsWith("http") ? "_blank" : undefined}
-              rel={href?.startsWith("http") ? "noopener noreferrer" : undefined}
-            >
-              {children}
-            </a>
-          ),
+          a: ({ children, href }) => {
+            const _href = href?.replace(/\.md$/, "");
+            return (
+              <a
+                href={_href}
+                className="text-primary hover:underline"
+                target={_href?.startsWith("http") ? "_blank" : undefined}
+                rel={_href?.startsWith("http") ? "noopener noreferrer" : undefined}
+              >
+                {children}
+              </a>
+            );
+          },
           hr: () => <hr className="my-8 border-border" />,
           img: ({ src, alt }) => (
             <img src={src} alt={alt} className="max-w-full h-auto rounded-lg my-4" />

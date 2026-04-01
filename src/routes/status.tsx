@@ -167,7 +167,7 @@ function HealthDashboard() {
                     "w-4 h-4 rounded-full",
                     serviceStatuses.every((s) => s.status === "loading") &&
                       "bg-yellow-500 animate-pulse",
-                    allUp && "bg-primary",
+                    allUp && autoRefresh ? "bg-success" : "bg-primary",
                     someDown && "bg-red-500",
                   )}
                 />
@@ -203,9 +203,9 @@ function HealthDashboard() {
                     <div className="flex items-center gap-3">
                       <div
                         className={cn(
-                          "w-3 h-3 rounded-full",
+                          "w-2 h-2 rounded-full",
                           service.status === "loading" && "bg-yellow-500 animate-pulse",
-                          service.status === "up" && "bg-primary",
+                          service.status === "up" && autoRefresh ? "bg-success" : "bg-primary",
                           service.status === "down" && "bg-red-500",
                         )}
                       />
@@ -225,7 +225,10 @@ function HealthDashboard() {
                   )}
                   {service.lastChecked && service.status !== "loading" && (
                     <p className="text-xs text-muted-foreground">
-                      Last checked: {service.lastChecked.toLocaleTimeString()}
+                      Last checked:{" "}
+                      <span className="text-primary font-bold">
+                        {service.lastChecked.toLocaleTimeString()}
+                      </span>
                     </p>
                   )}
                 </CardContent>
@@ -260,7 +263,7 @@ function HealthDashboard() {
                           service.status === "operational" && "bg-primary",
                           service.status === "degraded" && "bg-yellow-500",
                           service.status === "outage" && "bg-red-500",
-                          service.status === "unknown" && "bg-muted",
+                          service.status === "unknown" && "bg-muted-foreground",
                         )}
                       />
                     </div>

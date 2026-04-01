@@ -42,7 +42,7 @@ function BlogCard({ post }: { post: BlogPost }) {
               {post.tags.slice(0, 2).map((tag) => (
                 <span
                   key={tag}
-                  className="text-xs font-medium px-2 py-1 rounded-full bg-primary/10 text-primary"
+                  className="text-xs font-medium px-2 py-1 rounded-full bg-primary text-primary"
                 >
                   {tag}
                 </span>

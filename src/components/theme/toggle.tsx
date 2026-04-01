@@ -71,7 +71,7 @@ export function ThemeToggle() {
       onClick={() => setTheme(nextTheme)}
       className={cn(
         "inline-flex items-center justify-center w-9 h-9 rounded-md",
-        "bg-transparent hover:bg-accent border-0 cursor-pointer",
+        "bg-transparent hover:bg-accent border-0 cursor-pointer text-primary",
         "transition-colors duration-200",
       )}
       aria-label={`Switch to ${nextTheme} theme`}

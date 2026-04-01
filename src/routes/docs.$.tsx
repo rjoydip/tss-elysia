@@ -43,7 +43,9 @@ for (const [key, content] of Object.entries(markdownModules)) {
  */
 export const Route = createFileRoute("/docs/$")({
   loader: async ({ params }) => {
-    const docPath = params._splat ?? "";
+    // Strip .md extension if present so /docs/guides/environment-variables.md
+    // resolves the same as /docs/guides/environment-variables
+    const docPath = (params._splat ?? "").replace(/\.md$/, "");
     const content = docMap.get(docPath);
 
     if (!content) {

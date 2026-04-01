@@ -60,12 +60,12 @@ test.describe("Docs Sidebar", () => {
     // Getting Started auto-expands on /docs, no need to click
     await page.locator("aside").getByRole("link", { name: "Development", exact: true }).click();
     await page.waitForLoadState("networkidle");
-    expect(page.url()).toContain("/docs/development");
+    expect(page.url()).toContain("/docs/getting-started/development");
     await expect(page.getByRole("heading", { name: "Development", exact: true })).toBeVisible();
   });
 
   test("should auto-expand section containing current page", async ({ page }) => {
-    await page.goto("/docs/development");
+    await page.goto("/docs/getting-started/development");
     await page.waitForLoadState("networkidle");
     await expect(
       page.locator("aside").getByRole("link", { name: "Development", exact: true }),
@@ -88,13 +88,13 @@ test.describe("Docs Sidebar", () => {
 
 test.describe("Docs Breadcrumbs", () => {
   test("should show breadcrumb nav on child pages", async ({ page }) => {
-    await page.goto("/docs/development");
+    await page.goto("/docs/getting-started/development");
     await page.waitForLoadState("networkidle");
     await expect(page.locator("nav[aria-label='breadcrumb']")).toBeVisible();
   });
 
   test("should show Docs label in breadcrumb", async ({ page }) => {
-    await page.goto("/docs/development");
+    await page.goto("/docs/getting-started/development");
     await page.waitForLoadState("networkidle");
     await expect(
       page.locator("nav[aria-label='breadcrumb']").getByText("Docs", { exact: true }),
@@ -155,7 +155,7 @@ test.describe("Docs Landing Page Content", () => {
     await expect(page.getByRole("heading", { name: "Next Steps" })).toBeVisible();
     const devLink = page.getByRole("link", { name: /Development Setup/ });
     await expect(devLink).toBeVisible();
-    await expect(devLink).toHaveAttribute("href", "/docs/development");
+    await expect(devLink).toHaveAttribute("href", "/docs/getting-started/development");
   });
 });
 

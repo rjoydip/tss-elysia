@@ -52,9 +52,15 @@ test.describe("Changelog Page", () => {
     await expect(page.getByText("Improved").first()).toBeVisible();
   });
 
-  test("should expand changelog entry on click", async ({ page }) => {
+  test("should have changelog entry expanded by default", async ({ page }) => {
+    // ChangelogEntryComponent uses defaultValue={entry.version}, so 1.1.0 is open on load
+    await expect(page.getByText("Added two-factor authentication (2FA) support")).toBeVisible();
+  });
+
+  test("should collapse changelog entry on click", async ({ page }) => {
+    // Click the 1.1.0 trigger to toggle the already-open accordion closed
     await page.getByRole("button", { name: /1\.1\.0/ }).click();
-    await expect(page.getByText("Added two-factor authentication")).toBeVisible();
+    await expect(page.getByText("Added two-factor authentication (2FA) support")).not.toBeVisible();
   });
 });
 

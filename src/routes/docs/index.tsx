@@ -179,7 +179,7 @@ function DocsLandingPage() {
         <h2 className="text-2xl font-semibold tracking-tight mb-6 text-foreground">Next Steps</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <a
-            href="/docs/development"
+            href="/docs/getting-started/development"
             className="block p-5 border rounded-lg hover:border-primary hover:bg-primary/5 transition-all group"
           >
             <h3 className="font-semibold mb-1 text-foreground group-hover:text-primary transition-colors">

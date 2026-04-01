@@ -50,25 +50,14 @@ function ChangelogBadge({ type }: { type: ChangelogType }) {
   );
 }
 
-function ChangelogEntryComponent({
-  entry,
-  isLatest,
-}: {
-  entry: ChangelogEntry;
-  isLatest: boolean;
-}) {
+function ChangelogEntryComponent({ entry }: { entry: ChangelogEntry }) {
   return (
-    <Accordion type="single" collapsible defaultValue={isLatest ? entry.version : undefined}>
+    <Accordion type="single" collapsible defaultValue={entry.version}>
       <AccordionItem value={entry.version} className="border rounded-xl overflow-hidden">
         <AccordionTrigger className="px-6 py-4 hover:no-underline hover:bg-muted/50">
           <div className="flex items-center gap-4 text-left">
             <div className="flex items-center gap-3">
               <span className="text-2xl font-bold text-foreground">{entry.version}</span>
-              {isLatest && (
-                <Badge className="bg-primary text-primary-foreground hover:bg-primary/90">
-                  Latest
-                </Badge>
-              )}
             </div>
             <div className="hidden sm:block">
               <p className="font-medium text-foreground">{entry.title}</p>
@@ -127,8 +116,8 @@ function ChangelogPage() {
 
           {/* Changelog Entries */}
           <div className="space-y-4">
-            {changelogData.map((entry, index) => (
-              <ChangelogEntryComponent key={entry.version} entry={entry} isLatest={index === 0} />
+            {changelogData.map((entry) => (
+              <ChangelogEntryComponent key={entry.version} entry={entry} />
             ))}
           </div>
         </div>

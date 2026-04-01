@@ -24,7 +24,7 @@ Use environment variables to customize:
 bun run --env-file=.env dev
 ```
 
-Or create a `.env` file (see [Environment Variables](environment-variables.md)).
+Or create a `.env` file (see [Environment Variables](/docs/guides/environment-variables.md)).
 
 ## Testing
 
@@ -159,4 +159,4 @@ PORT=3000
 VITE_API_URL=http://localhost:3000/api
 ```
 
-See [Environment Variables](environment-variables.md) for details.
+See [Environment Variables](/docs/guides/environment-variables.md) for details.
