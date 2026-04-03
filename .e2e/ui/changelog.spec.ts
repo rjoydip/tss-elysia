@@ -74,6 +74,6 @@ test.describe("Changelog Page Layout", () => {
   test("should render footer on changelog page", async ({ page }) => {
     await page.goto("/changelog");
     await page.waitForLoadState("networkidle");
-    await expect(page.locator("footer")).toBeVisible();
+    await expect(page.locator("footer").filter({ hasText: "TSS" }).first()).toBeVisible();
   });
 });

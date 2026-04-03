@@ -8,11 +8,11 @@ Complete the authentication system with additional security features, set up use
 
 - [ ] Implement OAuth providers (Google, GitHub) for social login
 - [ ] Add Two-Factor Authentication (TOTP) support
-- [ ] Set up user account management routes (profile, settings)
+- [x] Set up user account management routes (profile, settings)
 - [ ] Implement organization/team management for multi-tenant support
 - [x] Enhance security with rate limiting, CSRF protection, and audit logging
 - [ ] Complete E2E test coverage for auth flows
-- [ ] Integrate shadcn/ui component library
+- [x] Integrate shadcn/ui component library
 - [ ] Build admin and user dashboards with user management
 - [ ] Implement enterprise SASS product features
 - [ ] Add email notifications via Resend
@@ -71,11 +71,11 @@ Complete the authentication system with additional security features, set up use
 
 #### User Account Management
 
-- [ ] Create profile route `/profile`
-- [ ] Create settings route `/settings`
-- [ ] Add password change functionality
-- [ ] Add email change with verification
-- [ ] Implement session management (view/revoke sessions)
+- [x] Create profile route `/profile`
+- [x] Create settings route `/settings`
+- [x] Add password change functionality
+- [x] Add email change with verification
+- [x] Implement session management (view/revoke sessions)
 
 #### Organization Support
 
@@ -108,14 +108,14 @@ Complete the authentication system with additional security features, set up use
   - [x] Badge component (`src/components/ui/badge.tsx`)
   - [x] Separator component (`src/components/ui/separator.tsx`)
 - [ ] Add required shadcn components:
-  - [ ] Input component
-  - [ ] Label component
+  - [x] Input component
+  - [x] Label component (already existed)
   - [ ] Form components (Form, Field, etc.)
   - [ ] Dialog component
   - [ ] Dropdown Menu component
   - [ ] Avatar component
   - [ ] Table component
-  - [ ] Tabs component
+  - [x] Tabs component
   - [ ] Sheet component (sidebar)
 - [ ] Create reusable component library
 - [ ] Implement design tokens (colors, spacing, typography)
@@ -275,7 +275,51 @@ Complete the authentication system with additional security features, set up use
 
 - [x] Refactor logging to dedicated `src/logger.ts` file
 - [x] Rename `scriptLogger` to `logger` in scripts
-- [x] Update logger imports across codebase (src/env.ts, src/lib/auth.ts, src/utils.ts)
+- [x] Update logger imports across codebase (src/env.ts, src/lib/auth/index.ts, src/utils.ts)
+- [x] Create auth client utilities (`src/lib/auth/client.ts`)
+- [x] Create auth server instance (`src/lib/auth/index.ts`)
+- [x] Create auth guard component (`src/components/auth/auth-guard.tsx`)
+- [x] Create login page (`src/routes/auth/login.tsx`) and form (`src/components/auth/form/login.tsx`)
+- [x] Create register page (`src/routes/auth/register.tsx`) and form (`src/components/auth/form/register.tsx`)
+- [x] Create profile page (`src/routes/profile.tsx`) with profile components
+- [x] Create settings page (`src/routes/settings/index.tsx`) with settings components
+- [x] Add password change functionality (`src/components/settings/password-change-form.tsx`)
+- [x] Add email change with verification (`src/components/settings/email-change-form.tsx`, `src/routes/auth/verify-email.tsx`)
+- [x] Implement session management (`src/components/settings/session-settings.tsx`)
+- [x] Add Input component (`src/components/ui/input.tsx`)
+- [x] Add Tabs component (`src/components/ui/tabs.tsx`)
+- [x] Install dependencies: @radix-ui/react-tabs, @radix-ui/react-dialog, @radix-ui/react-avatar, @radix-ui/react-dropdown-menu, @radix-ui/react-toast, react-hook-form, @hookform/resolvers, zod, @tanstack/react-form
+- [x] Reorganize file structure:
+  - Moved `src/components/auth-guard.tsx` to `src/components/auth/auth-guard.tsx`
+  - Moved `src/lib/auth.ts` to `src/lib/auth/index.ts`
+  - Moved `src/lib/auth-client.ts` to `src/lib/auth/client.ts`
+  - Moved `src/routes/login.tsx` to `src/routes/auth/login.tsx`
+  - Moved `src/routes/register.tsx` to `src/routes/auth/register.tsx`
+  - Moved `src/routes/verify-email.tsx` to `src/routes/auth/verify-email.tsx`
+  - Moved `src/routes/profile.tsx` to `src/routes/profile/index.tsx`
+  - Moved `src/routes/settings.tsx` to `src/routes/settings/index.tsx`
+  - Moved `src/components/auth/login-form.tsx` to `src/components/auth/form/login.tsx`
+  - Moved `src/components/auth/register-form.tsx` to `src/components/auth/form/register.tsx`
+  - Created `src/components/branding.tsx` for reusable branding
+  - Created `src/components/footer.tsx` for common footer
+  - Updated all imports to reflect new structure
+- [x] Redesign login form with Supabase-style UI (`src/components/auth/form/login.tsx`)
+- [x] Redesign register form with Supabase-style UI (`src/components/auth/form/register.tsx`)
+- [x] Convert login/register forms to use TanStack Form (`src/components/auth/form/login.tsx`, `src/components/auth/form/register.tsx`)
+- [x] Install @tanstack/react-form package
+- [x] Make branding component customizable (`src/components/branding.tsx`)
+- [x] Improve footer component with configurable options (`src/components/footer.tsx`)
+- [x] Update README.md with new folder structure
+- [x] Create unit tests for UI components (`test/components/ui.test.tsx`)
+- [x] Create unit tests for additional UI components (`test/components/ui-additional.test.tsx`)
+  - Label, Switch, Skeleton, Input, Tabs, Accordion
+- [x] Create E2E tests for UI components (`.e2e/ui/components.spec.ts`)
+- [x] Update testing documentation (`docs/guides/testing.md`) with new test structure
+- [x] Add password requirements hidden until typing in register form
+- [x] Add Branding layout to forgot password page
+- [x] Remove OAuth buttons from forgot password page
+- [x] Add showSignIn prop to Header component
+- [x] Fix Branding component to hide on mobile properly
 
 ## References
 

@@ -58,6 +58,6 @@ test.describe("Status Page Layout", () => {
   test("should render footer on status page", async ({ page }) => {
     await page.goto("/status");
     await page.waitForLoadState("networkidle");
-    await expect(page.locator("footer")).toBeVisible();
+    await expect(page.locator("footer").filter({ hasText: "TSS" }).first()).toBeVisible();
   });
 });

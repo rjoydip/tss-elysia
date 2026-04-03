@@ -5,8 +5,6 @@
 import { test, expect, type APIRequestContext } from "@playwright/test";
 import { E2E_BASE_URL } from "./config";
 
-const BASE_ORIGIN = E2E_BASE_URL;
-
 function uniqueEmail(prefix = "test") {
   return `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2)}@example.com`;
 }
@@ -18,14 +16,14 @@ async function signUp(
   name = "Test User",
 ) {
   return request.post("/api/auth/sign-up/email", {
-    headers: { Origin: BASE_ORIGIN },
+    headers: { Origin: E2E_BASE_URL },
     data: { email, password, name },
   });
 }
 
 async function signIn(request: APIRequestContext, email: string, password = "TestPassword123!") {
   return request.post("/api/auth/sign-in/email", {
-    headers: { Origin: BASE_ORIGIN },
+    headers: { Origin: E2E_BASE_URL },
     data: { email, password },
   });
 }
@@ -143,14 +141,14 @@ test.describe("Sign In", () => {
 test.describe("Session Management", () => {
   test("should get session", async ({ request }) => {
     const response = await request.get("/api/auth/get-session", {
-      headers: { Origin: BASE_ORIGIN },
+      headers: { Origin: E2E_BASE_URL },
     });
     expect(response.status()).toBe(200);
   });
 
   test("should sign out", async ({ request }) => {
     const response = await request.post("/api/auth/sign-out", {
-      headers: { Origin: BASE_ORIGIN },
+      headers: { Origin: E2E_BASE_URL },
       data: {},
     });
     expect(response.status()).toBe(200);
@@ -160,11 +158,11 @@ test.describe("Session Management", () => {
     const email = uniqueEmail("session");
     await signUp(request, email);
     await request.post("/api/auth/sign-out", {
-      headers: { Origin: BASE_ORIGIN },
+      headers: { Origin: E2E_BASE_URL },
       data: {},
     });
     const response = await request.get("/api/auth/get-session", {
-      headers: { Origin: BASE_ORIGIN },
+      headers: { Origin: E2E_BASE_URL },
     });
     expect(response.status()).toBe(200);
     const text = await response.text();
@@ -173,7 +171,7 @@ test.describe("Session Management", () => {
 
   test("should list sessions", async ({ request }) => {
     const response = await request.get("/api/auth/list-sessions", {
-      headers: { Origin: BASE_ORIGIN },
+      headers: { Origin: E2E_BASE_URL },
     });
     expect(response.status()).toBeLessThan(500);
   });
@@ -183,7 +181,7 @@ test.describe("Auth Error Handling", () => {
   test("should reject PATCH method (405)", async ({ request }) => {
     const response = await request.fetch("/api/auth/sign-in/email", {
       method: "PATCH",
-      headers: { Origin: BASE_ORIGIN, "Content-Type": "application/json" },
+      headers: { Origin: E2E_BASE_URL, "Content-Type": "application/json" },
       data: JSON.stringify({ email: "test@test.com", password: "test" }),
     });
     expect(response.status()).toBe(405);
@@ -193,7 +191,7 @@ test.describe("Auth Error Handling", () => {
     const response = await request.fetch("/api/auth/sign-in/email", {
       method: "OPTIONS",
       headers: {
-        Origin: BASE_ORIGIN,
+        Origin: E2E_BASE_URL,
         "Access-Control-Request-Method": "POST",
       },
     });
@@ -204,7 +202,7 @@ test.describe("Auth Error Handling", () => {
   test("should handle malformed JSON body", async ({ request }) => {
     const response = await request.fetch("/api/auth/sign-up/email", {
       method: "POST",
-      headers: { Origin: BASE_ORIGIN, "Content-Type": "application/json" },
+      headers: { Origin: E2E_BASE_URL, "Content-Type": "application/json" },
       data: "not valid json{",
     });
     expect(response.status()).toBeGreaterThanOrEqual(400);
@@ -212,7 +210,7 @@ test.describe("Auth Error Handling", () => {
 
   test("should handle empty body", async ({ request }) => {
     const response = await request.post("/api/auth/sign-up/email", {
-      headers: { Origin: BASE_ORIGIN, "Content-Type": "application/json" },
+      headers: { Origin: E2E_BASE_URL, "Content-Type": "application/json" },
       data: "",
     });
     expect(response.status()).toBeGreaterThanOrEqual(400);

@@ -22,7 +22,7 @@ import { cn } from "~/lib/utils";
 import { Header } from "~/components/header";
 import { Footer } from "~/components/footer";
 
-export const Route = createFileRoute("/status")({
+export const Route = createFileRoute("/status/")({
   component: HealthDashboard,
 });
 
