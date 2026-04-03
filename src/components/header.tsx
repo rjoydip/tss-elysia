@@ -180,7 +180,7 @@ export function Header({ className, children, showSignIn = true }: HeaderProps) 
             </DropdownMenu.Root>
           ) : showSignIn ? (
             <div className="flex items-center gap-2 text-primary">
-              <Link to="/auth/login">
+              <Link to="/account/login">
                 <Button variant="ghost" size="sm">
                   Sign in
                 </Button>

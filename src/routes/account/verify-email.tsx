@@ -16,7 +16,7 @@ import { Footer } from "~/components/footer";
  * Route definition for the email verification page.
  * Uses TanStack Router's file-based routing system.
  */
-export const Route = createFileRoute("/auth/verify-email")({
+export const Route = createFileRoute("/account/verify-email")({
   component: VerifyEmail,
 });
 

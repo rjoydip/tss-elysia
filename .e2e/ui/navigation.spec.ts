@@ -71,7 +71,7 @@ test.describe("Cross-Page Transitions", () => {
     for (const path of paths) {
       await page.goto(path);
       await page.waitForLoadState("networkidle");
-      await expect(page.locator("footer")).toBeVisible();
+      await expect(page.locator("footer").filter({ hasText: "TSS" }).first()).toBeVisible();
     }
   });
 

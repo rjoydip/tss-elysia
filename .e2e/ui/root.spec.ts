@@ -100,7 +100,7 @@ test.describe("Landing Page Footer", () => {
   });
 
   test("should render footer", async ({ page }) => {
-    await expect(page.locator("footer")).toBeVisible();
+    await expect(page.locator("footer").filter({ hasText: "TSS" }).first()).toBeVisible();
   });
 
   test("should have Documentation link", async ({ page }) => {

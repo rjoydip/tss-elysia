@@ -35,7 +35,7 @@ interface AuthGuardProps {
  *   <ProtectedContent />
  * </AuthGuard>
  */
-export function AuthGuard({ children, fallback = "/auth/login" }: AuthGuardProps) {
+export function AuthGuard({ children, fallback = "/account/login" }: AuthGuardProps) {
   const { data: session, isPending, error } = useSession();
   const navigate = useNavigate();
 

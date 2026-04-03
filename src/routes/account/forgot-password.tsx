@@ -13,7 +13,7 @@ import { Header } from "~/components/header";
  * Route definition for the forgot password page.
  * Uses TanStack Router's file-based routing system.
  */
-export const Route = createFileRoute("/auth/forgot-password")({
+export const Route = createFileRoute("/account/forgot-password")({
   component: ForgotPassword,
 });
 

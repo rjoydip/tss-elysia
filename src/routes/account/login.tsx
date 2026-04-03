@@ -1,34 +1,34 @@
 /**
- * Register Page Route
- * Displays the registration form for new user accounts.
+ * Login Page Route
+ * Displays the login form for user authentication.
  * Uses TanStack Router for file-based routing.
  */
 
 import { createFileRoute } from "@tanstack/react-router";
-import { RegisterForm } from "~/components/auth/form/register";
+import { LoginForm } from "~/components/auth/form/login";
 import { Header } from "~/components/header";
 import { Footer } from "~/components/footer";
 
 /**
- * Route definition for the register page.
+ * Route definition for the login page.
  * Uses TanStack Router's file-based routing system.
  */
-export const Route = createFileRoute("/auth/register")({
-  component: Register,
+export const Route = createFileRoute("/account/login")({
+  component: Login,
 });
 
 /**
- * Register page component.
- * Renders the registration form with header and footer.
+ * Login page component.
+ * Renders the login form with header and footer.
  * Centered layout with responsive design.
  */
-function Register() {
+function Login() {
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <Header />
 
       <main className="flex-1 flex items-center justify-center px-4 pt-20 pb-12">
-        <RegisterForm />
+        <LoginForm />
       </main>
 
       <Footer />

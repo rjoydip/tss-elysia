@@ -10,7 +10,7 @@ const BASE_URL = "http://localhost:3000";
 test.describe("UI Components", () => {
   test.describe("Button Component", () => {
     test.beforeEach(async ({ page }) => {
-      await page.goto(`${BASE_URL}/auth/login`);
+      await page.goto(`${BASE_URL}/account/login`);
     });
 
     test("should render default button", async ({ page }) => {
@@ -39,7 +39,7 @@ test.describe("UI Components", () => {
 
   test.describe("Input Component", () => {
     test.beforeEach(async ({ page }) => {
-      await page.goto(`${BASE_URL}/auth/login`);
+      await page.goto(`${BASE_URL}/account/login`);
     });
 
     test("should render email input", async ({ page }) => {
@@ -96,7 +96,7 @@ test.describe("UI Components", () => {
 
   test.describe("Form Integration", () => {
     test("should render form with inputs and buttons", async ({ page }) => {
-      await page.goto(`${BASE_URL}/auth/login`);
+      await page.goto(`${BASE_URL}/account/login`);
 
       const emailInput = page.locator("main").getByPlaceholder("Email");
       const passwordInput = page.locator("main").getByPlaceholder("Password");
@@ -108,7 +108,7 @@ test.describe("UI Components", () => {
     });
 
     test("should show password requirements after typing", async ({ page }) => {
-      await page.goto(`${BASE_URL}/auth/register`);
+      await page.goto(`${BASE_URL}/account/register`);
 
       const passwordInput = page.locator("main").getByPlaceholder("Password");
       await passwordInput.fill("test");

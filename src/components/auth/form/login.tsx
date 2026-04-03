@@ -176,7 +176,7 @@ export function LoginForm() {
             </form.Field>
 
             <div className="flex items-center justify-end">
-              <a href="/auth/forgot-password" className="text-sm text-primary hover:underline">
+              <a href="/account/forgot-password" className="text-sm text-primary hover:underline">
                 Forgot password?
               </a>
             </div>
@@ -196,7 +196,7 @@ export function LoginForm() {
           {/* Sign up link */}
           <p className="text-center text-sm text-muted-foreground">
             Don&apos;t have an account?{" "}
-            <Link to="/auth/register" className="text-primary hover:underline font-medium">
+            <Link to="/account/register" className="text-primary hover:underline font-medium">
               Sign up
             </Link>
           </p>

@@ -18,11 +18,11 @@ import { Route as DocsIndexRouteImport } from './routes/docs/index'
 import { Route as ChangelogIndexRouteImport } from './routes/changelog/index'
 import { Route as BlogIndexRouteImport } from './routes/blog/index'
 import { Route as DocsSplatRouteImport } from './routes/docs.$'
-import { Route as AuthVerifyEmailRouteImport } from './routes/auth/verify-email'
-import { Route as AuthRegisterRouteImport } from './routes/auth/register'
-import { Route as AuthLoginRouteImport } from './routes/auth/login'
-import { Route as AuthForgotPasswordRouteImport } from './routes/auth/forgot-password'
 import { Route as ApiSplatRouteImport } from './routes/api/$'
+import { Route as AccountVerifyEmailRouteImport } from './routes/account/verify-email'
+import { Route as AccountRegisterRouteImport } from './routes/account/register'
+import { Route as AccountLoginRouteImport } from './routes/account/login'
+import { Route as AccountForgotPasswordRouteImport } from './routes/account/forgot-password'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 
 const DocsRoute = DocsRouteImport.update({
@@ -70,29 +70,29 @@ const DocsSplatRoute = DocsSplatRouteImport.update({
   path: '/$',
   getParentRoute: () => DocsRoute,
 } as any)
-const AuthVerifyEmailRoute = AuthVerifyEmailRouteImport.update({
-  id: '/auth/verify-email',
-  path: '/auth/verify-email',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AuthRegisterRoute = AuthRegisterRouteImport.update({
-  id: '/auth/register',
-  path: '/auth/register',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AuthLoginRoute = AuthLoginRouteImport.update({
-  id: '/auth/login',
-  path: '/auth/login',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AuthForgotPasswordRoute = AuthForgotPasswordRouteImport.update({
-  id: '/auth/forgot-password',
-  path: '/auth/forgot-password',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const ApiSplatRoute = ApiSplatRouteImport.update({
   id: '/api/$',
   path: '/api/$',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AccountVerifyEmailRoute = AccountVerifyEmailRouteImport.update({
+  id: '/account/verify-email',
+  path: '/account/verify-email',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AccountRegisterRoute = AccountRegisterRouteImport.update({
+  id: '/account/register',
+  path: '/account/register',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AccountLoginRoute = AccountLoginRouteImport.update({
+  id: '/account/login',
+  path: '/account/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AccountForgotPasswordRoute = AccountForgotPasswordRouteImport.update({
+  id: '/account/forgot-password',
+  path: '/account/forgot-password',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
@@ -104,11 +104,11 @@ const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/docs': typeof DocsRouteWithChildren
+  '/account/forgot-password': typeof AccountForgotPasswordRoute
+  '/account/login': typeof AccountLoginRoute
+  '/account/register': typeof AccountRegisterRoute
+  '/account/verify-email': typeof AccountVerifyEmailRoute
   '/api/$': typeof ApiSplatRoute
-  '/auth/forgot-password': typeof AuthForgotPasswordRoute
-  '/auth/login': typeof AuthLoginRoute
-  '/auth/register': typeof AuthRegisterRoute
-  '/auth/verify-email': typeof AuthVerifyEmailRoute
   '/docs/$': typeof DocsSplatRoute
   '/blog/': typeof BlogIndexRoute
   '/changelog/': typeof ChangelogIndexRoute
@@ -120,11 +120,11 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/account/forgot-password': typeof AccountForgotPasswordRoute
+  '/account/login': typeof AccountLoginRoute
+  '/account/register': typeof AccountRegisterRoute
+  '/account/verify-email': typeof AccountVerifyEmailRoute
   '/api/$': typeof ApiSplatRoute
-  '/auth/forgot-password': typeof AuthForgotPasswordRoute
-  '/auth/login': typeof AuthLoginRoute
-  '/auth/register': typeof AuthRegisterRoute
-  '/auth/verify-email': typeof AuthVerifyEmailRoute
   '/docs/$': typeof DocsSplatRoute
   '/blog': typeof BlogIndexRoute
   '/changelog': typeof ChangelogIndexRoute
@@ -138,11 +138,11 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/docs': typeof DocsRouteWithChildren
+  '/account/forgot-password': typeof AccountForgotPasswordRoute
+  '/account/login': typeof AccountLoginRoute
+  '/account/register': typeof AccountRegisterRoute
+  '/account/verify-email': typeof AccountVerifyEmailRoute
   '/api/$': typeof ApiSplatRoute
-  '/auth/forgot-password': typeof AuthForgotPasswordRoute
-  '/auth/login': typeof AuthLoginRoute
-  '/auth/register': typeof AuthRegisterRoute
-  '/auth/verify-email': typeof AuthVerifyEmailRoute
   '/docs/$': typeof DocsSplatRoute
   '/blog/': typeof BlogIndexRoute
   '/changelog/': typeof ChangelogIndexRoute
@@ -157,11 +157,11 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/docs'
+    | '/account/forgot-password'
+    | '/account/login'
+    | '/account/register'
+    | '/account/verify-email'
     | '/api/$'
-    | '/auth/forgot-password'
-    | '/auth/login'
-    | '/auth/register'
-    | '/auth/verify-email'
     | '/docs/$'
     | '/blog/'
     | '/changelog/'
@@ -173,11 +173,11 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/account/forgot-password'
+    | '/account/login'
+    | '/account/register'
+    | '/account/verify-email'
     | '/api/$'
-    | '/auth/forgot-password'
-    | '/auth/login'
-    | '/auth/register'
-    | '/auth/verify-email'
     | '/docs/$'
     | '/blog'
     | '/changelog'
@@ -190,11 +190,11 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/docs'
+    | '/account/forgot-password'
+    | '/account/login'
+    | '/account/register'
+    | '/account/verify-email'
     | '/api/$'
-    | '/auth/forgot-password'
-    | '/auth/login'
-    | '/auth/register'
-    | '/auth/verify-email'
     | '/docs/$'
     | '/blog/'
     | '/changelog/'
@@ -208,11 +208,11 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   DocsRoute: typeof DocsRouteWithChildren
+  AccountForgotPasswordRoute: typeof AccountForgotPasswordRoute
+  AccountLoginRoute: typeof AccountLoginRoute
+  AccountRegisterRoute: typeof AccountRegisterRoute
+  AccountVerifyEmailRoute: typeof AccountVerifyEmailRoute
   ApiSplatRoute: typeof ApiSplatRoute
-  AuthForgotPasswordRoute: typeof AuthForgotPasswordRoute
-  AuthLoginRoute: typeof AuthLoginRoute
-  AuthRegisterRoute: typeof AuthRegisterRoute
-  AuthVerifyEmailRoute: typeof AuthVerifyEmailRoute
   BlogIndexRoute: typeof BlogIndexRoute
   ChangelogIndexRoute: typeof ChangelogIndexRoute
   ProfileIndexRoute: typeof ProfileIndexRoute
@@ -286,39 +286,39 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DocsSplatRouteImport
       parentRoute: typeof DocsRoute
     }
-    '/auth/verify-email': {
-      id: '/auth/verify-email'
-      path: '/auth/verify-email'
-      fullPath: '/auth/verify-email'
-      preLoaderRoute: typeof AuthVerifyEmailRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/auth/register': {
-      id: '/auth/register'
-      path: '/auth/register'
-      fullPath: '/auth/register'
-      preLoaderRoute: typeof AuthRegisterRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/auth/login': {
-      id: '/auth/login'
-      path: '/auth/login'
-      fullPath: '/auth/login'
-      preLoaderRoute: typeof AuthLoginRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/auth/forgot-password': {
-      id: '/auth/forgot-password'
-      path: '/auth/forgot-password'
-      fullPath: '/auth/forgot-password'
-      preLoaderRoute: typeof AuthForgotPasswordRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/api/$': {
       id: '/api/$'
       path: '/api/$'
       fullPath: '/api/$'
       preLoaderRoute: typeof ApiSplatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/account/verify-email': {
+      id: '/account/verify-email'
+      path: '/account/verify-email'
+      fullPath: '/account/verify-email'
+      preLoaderRoute: typeof AccountVerifyEmailRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/account/register': {
+      id: '/account/register'
+      path: '/account/register'
+      fullPath: '/account/register'
+      preLoaderRoute: typeof AccountRegisterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/account/login': {
+      id: '/account/login'
+      path: '/account/login'
+      fullPath: '/account/login'
+      preLoaderRoute: typeof AccountLoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/account/forgot-password': {
+      id: '/account/forgot-password'
+      path: '/account/forgot-password'
+      fullPath: '/account/forgot-password'
+      preLoaderRoute: typeof AccountForgotPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/auth/$': {
@@ -346,11 +346,11 @@ const DocsRouteWithChildren = DocsRoute._addFileChildren(DocsRouteChildren)
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   DocsRoute: DocsRouteWithChildren,
+  AccountForgotPasswordRoute: AccountForgotPasswordRoute,
+  AccountLoginRoute: AccountLoginRoute,
+  AccountRegisterRoute: AccountRegisterRoute,
+  AccountVerifyEmailRoute: AccountVerifyEmailRoute,
   ApiSplatRoute: ApiSplatRoute,
-  AuthForgotPasswordRoute: AuthForgotPasswordRoute,
-  AuthLoginRoute: AuthLoginRoute,
-  AuthRegisterRoute: AuthRegisterRoute,
-  AuthVerifyEmailRoute: AuthVerifyEmailRoute,
   BlogIndexRoute: BlogIndexRoute,
   ChangelogIndexRoute: ChangelogIndexRoute,
   ProfileIndexRoute: ProfileIndexRoute,
