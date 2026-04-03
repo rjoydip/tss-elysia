@@ -97,32 +97,84 @@ bun run start    # Run production server
 
 ```bash
 src/
-├── config.ts         # Central config (API name, rate limits, CORS, helmet)
-├── env.ts            # Isomorphic env fetching with type-safe validation
-├── lib/              # Library code
-│   ├── auth.ts       # Better Auth instance
+├── config/            # Central config (API name, rate limits, CORS, helmet)
+│   └── index.ts
+├── env.ts              # Isomorphic env fetching with type-safe validation
+├── lib/                # Library code
+│   ├── auth/          # Better Auth
+│   │   ├── index.ts   # Server auth instance
+│   │   └── client.ts  # Client auth hooks and methods
 │   └── db/           # Database (Drizzle + SQLite)
-├── logger.ts         # Logger configuration
-├── middlewares/      # Middleware implementations
+│       ├── index.ts
+│       └── schema.ts
+├── logger.ts           # Logger configuration
+├── middlewares/        # Middleware implementations
 │   ├── cors.ts       # CORS headers
 │   ├── helmet.ts     # Security headers
 │   ├── rate-limit.ts # Rate limiting
 │   └── index.ts      # Export barrel
-├── router.tsx        # TanStack Router configuration
-├── routeTree.gen.ts # Auto-generated route tree
+├── router.tsx         # TanStack Router configuration
+├── routeTree.gen.ts  # Auto-generated route tree
 ├── routes/           # File-based routing
-│   ├── __root.tsx    # Root route
-│   ├── index.tsx     # Home route
-│   └── api/          # API routes
-│       ├── $.ts      # API catch-all
-│       └── auth/     # Auth routes
+│   ├── __root.tsx   # Root route
+│   ├── index.tsx    # Home route
+│   ├── auth/        # Auth routes
+│   ├── profile/     # Profile route
+│   ├── settings/    # Settings route
+│   ├── docs/        # Documentation routes
+│   ├── blog/        # Blog routes
+│   ├── changelog/   # Changelog routes
+│   ├── status/      # Status page routes
+│   └── api/         # API routes
+│       ├── $.ts     # API catch-all
+│       └── auth/    # Auth routes
 │           └── $.ts
 ├── server.ts         # TanStack Start server entry
 ├── types/            # TypeScript type definitions
 │   └── subscription.ts
 ├── utils.ts          # Utility functions
+├── components/       # React components
+│   ├── ui/          # shadcn/ui components
+│   ├── auth/        # Auth components
+│   ├── profile/     # Profile components
+│   ├── settings/    # Settings components
+│   ├── header.tsx   # Common header
+│   ├── footer.tsx   # Common footer
+│   ├── branding.tsx # Branding component
+│   └── theme/       # Theme components
 └── styles/
-    └── app.css       # Global styles
+    └── app.css      # Global styles
+```
+
+## Test Structure
+
+```bash
+test/                  # Unit tests (Bun)
+├── components/        # Component unit tests
+│   ├── ui.test.tsx       # Button, Badge, Card, Separator
+│   ├── ui-additional.test.tsx # Label, Switch, Skeleton, Input, Tabs, Accordion
+│   ├── header.test.tsx  # Header component
+│   ├── branding.test.tsx # Branding component
+│   └── footer.test.tsx  # Footer component
+├── routes/            # Route tests
+├── db.test.ts        # Database tests
+├── auth.test.ts      # Auth tests
+└── fixtures/         # Test fixtures
+    └── db.ts
+
+.e2e/                 # E2E tests (Playwright)
+├── ui/               # UI E2E tests
+│   ├── auth.spec.ts      # Authentication tests
+│   ├── components.spec.ts # UI component tests
+│   ├── navigation.spec.ts # Navigation tests
+│   ├── docs.spec.ts      # Documentation tests
+│   ├── root.spec.ts      # Landing page tests
+│   ├── status.spec.ts   # Status page tests
+│   ├── blog.spec.ts     # Blog tests
+│   └── changelog.spec.ts # Changelog tests
+├── api/              # API E2E tests
+│   └── endpoints.spec.ts # API endpoints
+└── config.ts         # E2E configuration
 ```
 
 ## Code Generation

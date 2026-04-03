@@ -2,6 +2,7 @@
  * Authentication configuration and factory using Better Auth.
  * Provides email/password auth with database adapter for Drizzle ORM.
  * Uses Argon2id for secure password hashing with Bun native API when available.
+ * This module should only be used on the server side.
  */
 
 import { hash, type Options, verify } from "@node-rs/argon2";
@@ -126,7 +127,7 @@ function getAuth() {
  * const session = await auth.api.getSession({ headers })
  */
 export const auth = new Proxy(
-  // eslint_disable-next-line @typescript-eslint/no-explicit-any
+  // eslint_disable_next-line @typescript-eslint/no-explicit-any
   {} as any,
   {
     get(_target, prop) {

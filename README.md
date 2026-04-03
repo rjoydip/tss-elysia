@@ -101,19 +101,66 @@ Detailed documentation available in `docs/`:
 - **Server**: Elysia
 - **Runtime**: Bun
 - **UI**: React 19 + TypeScript
+- **Form**: Tanstack Form
+- **State Management**: TanStack Store
+- **Function Execution Timing**: Tanstack Pacer
 - **Styling**: Tailwind CSS v4
 
 ## Project Structure
 
 ```bash
 src/
-├── config.ts          # Central configuration (logger, rate-limit, cors, helmet)
+├── config/             # Central configuration (logger, rate-limit, cors, helmet)
+│   └── index.ts
+├── components/         # React components
+│   ├── ui/            # shadcn/ui components
+│   │   ├── accordion.tsx
+│   │   ├── badge.tsx
+│   │   ├── breadcrumb.tsx
+│   │   ├── button.tsx
+│   │   ├── card.tsx
+│   │   ├── input.tsx
+│   │   ├── label.tsx
+│   │   ├── select.tsx
+│   │   ├── separator.tsx
+│   │   ├── skeleton.tsx
+│   │   ├── switch.tsx
+│   │   ├── table.tsx
+│   │   └── tabs.tsx
+│   ├── auth/          # Auth components
+│   │   ├── form/       # Auth form components
+│   │   │   ├── login.tsx
+│   │   │   ├── register.tsx
+│   │   │   └── forgot-password.tsx
+│   │   ├── auth-guard.tsx   # Route protection component
+│   │   ├── branding.tsx     # Branding component
+│   │   └── footer.tsx       # Common footer
+│   ├── profile/       # Profile components
+│   │   └── profile-page.tsx
+│   ├── settings/      # Settings components
+│   │   ├── account-settings.tsx
+│   │   ├── email-change-form.tsx
+│   │   ├── password-change-form.tsx
+│   │   ├── preferences-settings.tsx
+│   │   ├── session-settings.tsx
+│   │   └── settings-page.tsx
+│   ├── header.tsx     # Common header
+│   ├── footer.tsx     # Common footer
+│   ├── branding.tsx   # Branding component
+│   ├── code-highlight.tsx # Code highlighting component
+│   └── theme/         # Theme components
+│       ├── provider.tsx
+│       ├── toggle.tsx
+│       └── context.tsx
 ├── env.ts             # Isomorphic env fetching with type-safe validation
-├── lib/                # Library code
-│   ├── auth.ts        # Better Auth instance
-│   └── db/            # Database (Drizzle + SQLite)
-│       ├── index.ts
-│       └── schema.ts
+├── lib/               # Library code
+│   ├── auth/          # Authentication (Better Auth)
+│   │   ├── index.ts   # Server auth instance
+│   │   └── client.ts  # Client auth hooks and methods
+│   ├── db/            # Database (Drizzle + SQLite)
+│   │   ├── index.ts
+│   │   └── schema.ts
+│   └── utils.ts       # Utility functions (cn, etc.)
 ├── logger.ts          # Logger configuration
 ├── middlewares/       # Middleware implementations
 │   ├── cors.ts        # CORS headers
@@ -125,7 +172,20 @@ src/
 ├── routes/            # File-based routing (TanStack Start)
 │   ├── __root.tsx     # Root route
 │   ├── index.tsx      # Home route
-│   └── api/           # API routes
+│   ├── auth/          # Auth routes
+│   │   ├── login.tsx  # Login page (/auth/login)
+│   │   ├── register.tsx # Register page (/auth/register)
+│   │   ├── forgot-password.tsx # Forgot password page (/auth/forgot-password)
+│   │   └── verify-email.tsx # Email verification (/auth/verify-email)
+│   ├── profile/       # Profile routes
+│   │   └── index.tsx  # Profile page (/profile)
+│   ├── settings/      # Settings routes
+│   │   └── index.tsx  # Settings page (/settings)
+│   ├── docs/          # Documentation routes
+│   ├── blog/          # Blog routes
+│   ├── changelog/    # Changelog routes
+│   ├── status/       # Status page routes
+│   └── api/          # API routes
 │       ├── $.ts       # API catch-all route
 │       └── auth/      # Auth routes (Better Auth)
 │           └── $.ts
@@ -137,6 +197,37 @@ src/
     └── app.css        # Global styles
 vite.config.ts         # Vite configuration
 tsconfig.json          # TypeScript configuration
+```
+
+## Test Structure
+
+```bash
+test/                  # Unit tests (Bun)
+├── components/        # Component unit tests
+│   ├── ui.test.tsx       # UI components (Button, Badge, Card, Separator)
+│   ├── ui-additional.test.tsx # Additional UI (Label, Switch, Skeleton, Input, Tabs, Accordion)
+│   ├── header.test.tsx   # Header component tests
+│   ├── branding.test.tsx # Branding component tests
+│   └── footer.test.tsx   # Footer component tests
+├── routes/            # Route tests
+├── db.test.ts         # Database tests
+├── auth.test.ts      # Auth tests
+└── fixtures/          # Test fixtures
+    └── db.ts
+
+.e2e/                 # E2E tests (Playwright)
+├── ui/               # UI E2E tests
+│   ├── auth.spec.ts      # Authentication tests
+│   ├── components.spec.ts # UI component tests
+│   ├── navigation.spec.ts # Navigation tests
+│   ├── docs.spec.ts      # Documentation page tests
+│   ├── root.spec.ts      # Landing page tests
+│   ├── status.spec.ts   # Status page tests
+│   ├── blog.spec.ts      # Blog page tests
+│   └── changelog.spec.ts # Changelog page tests
+├── api/              # API E2E tests
+│   └── endpoints.spec.ts # API endpoint tests
+└── config.ts         # E2E configuration
 ```
 
 ## Code Style

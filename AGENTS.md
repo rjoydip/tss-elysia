@@ -4,7 +4,7 @@ This file contains guidelines for AI coding agents working in this repository.
 
 ## AI/LLM Coding Standards
 
-All AI-generated code must adhere to these standards:
+All AI-generated code must adhere to these standards.
 
 ### Code Commenting Requirements
 
@@ -75,6 +75,8 @@ All necessary information is in [README.md](./README.md), including:
 - Git workflow and pre-commit hooks
 - Common issues
 
+> Note: Find tech stack details here [Tech Stack](./README.md#tech-stack)
+
 ## Recommended Workflow
 
 1. For any task, first check [PLAN.md](./.artifacts/PLAN.md) to see if it's already planned
@@ -87,29 +89,6 @@ All necessary information is in [README.md](./README.md), including:
 8. Run `bun run test:e2e` to verify E2E test
 9. Once changes are complete, verify and update PLAN.md (mark completed tasks/goals)
 10. Commit changes (hooks will verify)
-
-## Skills & Agents
-
-This project uses a skill-based architecture. Skills are located in `.agents/skills/`.
-
-### Available Skills
-
-| Skill              | Description                    | Usage                        |
-| ------------------ | ------------------------------ | ---------------------------- |
-| `expect`           | Adversarial browser testing    | Test changes in real browser |
-| `land-pr`          | Land a PR with proper workflow | Merge PRs to main            |
-| `code-review`      | Code quality review            | Review PRs and code          |
-| `docs-writer`      | Documentation creation         | Write/update docs            |
-| `security-auditor` | Security audit                 | Find vulnerabilities         |
-
-### Loading Skills
-
-Use the `skill` tool to load a skill when a task matches its description:
-
-```bash
-Load skill "expect" for browser testing
-Load skill "land-pr" for PR merging
-```
 
 ## Environment Configuration
 

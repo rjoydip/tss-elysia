@@ -22,6 +22,12 @@ test/
   auth.test.ts        # Auth unit tests (Better Auth)
   env.test.ts         # Environment variable tests
   setup.ts            # Test setup (JSDOM)
+  components/         # Component unit tests
+    ui.test.tsx       # UI components (Button, Badge, Card, Separator)
+    ui-additional.test.tsx # Additional UI (Label, Switch, Skeleton, Input, Tabs, Accordion)
+    header.test.tsx   # Header component
+    branding.test.tsx # Branding component
+    footer.test.tsx   # Footer component
   fixtures/           # Shared test fixtures
     db.ts             # In-memory DB, seed helpers
   load-tests/         # k6 load tests
@@ -100,9 +106,17 @@ E2E tests are in `.e2e/`:
 ```bash
 .e2e/
   config.ts       # Shared E2E configuration (host, port, base URL)
-  ui.test.ts      # UI tests (home page, navigation)
-  api.$.test.ts   # API endpoint tests
-  auth.test.ts    # Authentication E2E tests
+  ui/
+    auth.spec.ts      # Authentication UI tests (login, register, forgot password)
+    components.spec.ts # UI component tests (Button, Input, Card, Badge, Tabs)
+    navigation.spec.ts # Navigation tests
+    docs.spec.ts      # Documentation page tests
+    root.spec.ts      # Landing page tests
+    status.spec.ts    # Status page tests
+    blog.spec.ts      # Blog page tests
+    changelog.spec.ts # Changelog page tests
+  api/               # API endpoint tests
+    endpoints.spec.ts # API endpoints
 ```
 
 E2E configuration is centralized in `.e2e/config.ts` and shared by both `playwright.config.ts` and test files:

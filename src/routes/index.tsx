@@ -11,6 +11,7 @@ import { Footer } from "~/components/footer";
 import { CodeHighlight } from "~/components/code-highlight";
 import { cn } from "~/lib/utils";
 import { APP_VERSION, GITHUB_REPO_URL } from "~/config";
+import { BrandDescription, BrandTitle } from "~/components/branding";
 
 export const Route = createFileRoute("/")({
   component: Home,
@@ -194,13 +195,8 @@ function Home() {
               v{APP_VERSION} Released
             </span>
           </Badge>
-          <h1 className="text-5xl md:text-7xl font-bold tracking-tight mb-6 text-foreground">
-            Build faster with <span className="text-primary">TypeScript</span>
-          </h1>
-          <p className="text-xl md:text-2xl text-muted-foreground max-w-2xl mx-auto mb-10 leading-relaxed">
-            A modern full-stack application built with ElysiaJS, React 19, and Better Auth.
-            Type-safe, fast, and ready for production.
-          </p>
+          <BrandTitle size="5xl" />
+          <BrandDescription size="xl" />
           <div className="flex flex-wrap justify-center gap-4">
             <Link
               to="/docs"

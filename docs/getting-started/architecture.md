@@ -115,34 +115,81 @@ src/routes/api/$.ts (API routes)
 
 ```bash
 src/
-├── config.ts         # Central configuration (AUTH_ALLOWED_METHODS, rate limits, CORS, helmet)
-├── env.ts            # Type-safe environment variables
-├── lib/              # Library code
-│   ├── auth.ts       # Better Auth instance
+├── config/             # Central configuration
+│   └── index.ts        # (APP_NAME, rate limits, CORS, helmet)
+├── components/         # React components
+│   ├── ui/            # shadcn/ui components
+│   │   ├── accordion.tsx
+│   │   ├── badge.tsx
+│   │   ├── breadcrumb.tsx
+│   │   ├── button.tsx
+│   │   ├── card.tsx
+│   │   ├── input.tsx
+│   │   ├── label.tsx
+│   │   ├── select.tsx
+│   │   ├── separator.tsx
+│   │   ├── skeleton.tsx
+│   │   ├── switch.tsx
+│   │   ├── table.tsx
+│   │   └── tabs.tsx
+│   ├── auth/          # Auth components
+│   │   ├── form/       # Auth form components
+│   │   │   ├── login.tsx
+│   │   │   ├── register.tsx
+│   │   │   └── forgot-password.tsx
+│   │   ├── auth-guard.tsx
+│   │   ├── branding.tsx
+│   │   └── footer.tsx
+│   ├── profile/       # Profile components
+│   ├── settings/      # Settings components
+│   ├── header.tsx     # Common header
+│   ├── footer.tsx     # Common footer
+│   ├── branding.tsx   # Branding component
+│   ├── code-highlight.tsx
+│   └── theme/         # Theme components
+│       ├── provider.tsx
+│       ├── toggle.tsx
+│       └── context.tsx
+├── env.ts              # Type-safe environment variables
+├── lib/                # Library code
+│   ├── auth/          # Better Auth
+│   │   ├── index.ts   # Server auth instance
+│   │   └── client.ts  # Client auth hooks
 │   └── db/           # Database (Drizzle + SQLite)
 │       ├── index.ts
 │       └── schema.ts
-├── logger.ts        # Logger configuration
-├── middlewares/     # Middleware implementations
+├── logger.ts           # Logger configuration
+├── middlewares/       # Middleware implementations
 │   ├── cors.ts
 │   ├── helmet.ts
 │   ├── rate-limit.ts
 │   └── index.ts
-├── router.tsx        # TanStack Router
-├── routeTree.gen.ts # Auto-generated route tree
+├── router.tsx         # TanStack Router
+├── routeTree.gen.ts  # Auto-generated routes
 ├── routes/           # TanStack Start routes
 │   ├── __root.tsx
-│   ├── index.tsx
-│   ├── api/
-│   │   ├── $.ts     # API catch-all route
-│   │   └── auth/
-│   │       └── $.ts # Auth routes (Better Auth)
-├── server.ts         # Server entry point (auth method gate)
-├── types/            # TypeScript type definitions
+│   ├── index.tsx     # Home route
+│   ├── auth/         # Auth routes
+│   │   ├── login.tsx
+│   │   ├── register.tsx
+│   │   ├── forgot-password.tsx
+│   │   └── verify-email.tsx
+│   ├── profile/      # Profile route
+│   ├── settings/     # Settings route
+│   ├── docs/         # Documentation routes
+│   ├── blog/         # Blog routes
+│   ├── changelog/    # Changelog routes
+│   ├── status/       # Status page routes
+│   └── api/          # API routes
+│       ├── $.ts
+│       └── auth/
+│           └── $.ts
+├── server.ts         # Server entry point
+├── types/            # TypeScript types
 │   └── subscription.ts
 ├── utils.ts          # Utility functions
 └── styles/
-    └── app.css
+    └── app.css       # Global styles
 ```
 
 ## SSR/CSR Strategy

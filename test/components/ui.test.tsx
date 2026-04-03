@@ -17,6 +17,17 @@ import {
   CardFooter,
 } from "../../src/components/ui/card";
 import { Separator } from "../../src/components/ui/separator";
+import { Label } from "../../src/components/ui/label";
+import { Switch } from "../../src/components/ui/switch";
+import { Skeleton } from "../../src/components/ui/skeleton";
+import { Input } from "../../src/components/ui/input";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "../../src/components/ui/tabs";
+import {
+  Accordion,
+  AccordionItem,
+  AccordionTrigger,
+  AccordionContent,
+} from "../../src/components/ui/accordion";
 
 // --- Badge Tests ---
 
@@ -256,5 +267,263 @@ describe("Separator", () => {
   it("should render as a div element", () => {
     const html = renderToString(<Separator />);
     expect(html).toContain("<div");
+  });
+});
+
+describe("Label", () => {
+  it("should render label with correct classes", () => {
+    const html = renderToString(<Label>Label</Label>);
+    expect(html).toContain("Label");
+    expect(html).toContain("text-sm");
+    expect(html).toContain("font-medium");
+  });
+
+  it("should render with custom className", () => {
+    const html = renderToString(<Label className="custom-label">Custom</Label>);
+    expect(html).toContain("custom-label");
+  });
+
+  it("should render with htmlFor attribute", () => {
+    const html = renderToString(<Label htmlFor="test-input">Label</Label>);
+    expect(html).toContain('for="test-input"');
+  });
+
+  it("should render as label element", () => {
+    const html = renderToString(<Label>Test</Label>);
+    expect(html).toContain("<label");
+  });
+});
+
+// --- Switch Tests ---
+
+describe("Switch", () => {
+  it("should render switch with default classes", () => {
+    const html = renderToString(<Switch />);
+    expect(html).toContain("h-6");
+    expect(html).toContain("w-11");
+  });
+
+  it("should render with checked state classes", () => {
+    const html = renderToString(<Switch checked />);
+    expect(html).toContain("data-[state=checked]:bg-primary");
+  });
+
+  it("should render with unchecked state classes", () => {
+    const html = renderToString(<Switch />);
+    expect(html).toContain("data-[state=unchecked]:bg-input");
+  });
+
+  it("should render with custom className", () => {
+    const html = renderToString(<Switch className="my-switch" />);
+    expect(html).toContain("my-switch");
+  });
+
+  it("should render with thumb element", () => {
+    const html = renderToString(<Switch />);
+    expect(html).toContain("rounded-full");
+    expect(html).toContain("h-5");
+    expect(html).toContain("w-5");
+  });
+
+  it("should be disabled when disabled prop is true", () => {
+    const html = renderToString(<Switch disabled />);
+    expect(html).toContain("disabled");
+    expect(html).toContain("disabled:opacity-50");
+  });
+});
+
+// --- Skeleton Tests ---
+
+describe("Skeleton", () => {
+  it("should render skeleton with default classes", () => {
+    const html = renderToString(<Skeleton />);
+    expect(html).toContain("animate-pulse");
+    expect(html).toContain("rounded-md");
+    expect(html).toContain("bg-muted");
+  });
+
+  it("should render with custom className", () => {
+    const html = renderToString(<Skeleton className="my-skeleton" />);
+    expect(html).toContain("my-skeleton");
+  });
+
+  it("should render as a div element", () => {
+    const html = renderToString(<Skeleton />);
+    expect(html).toContain("<div");
+  });
+
+  it("should render with custom dimensions via className", () => {
+    const html = renderToString(<Skeleton className="h-4 w-full" />);
+    expect(html).toContain("h-4");
+    expect(html).toContain("w-full");
+  });
+});
+
+// --- Input Tests ---
+
+describe("Input", () => {
+  it("should render input with default classes", () => {
+    const html = renderToString(<Input />);
+    expect(html).toContain("<input");
+    expect(html).toContain("h-10");
+    expect(html).toContain("w-full");
+    expect(html).toContain("border");
+  });
+
+  it("should render with placeholder text", () => {
+    const html = renderToString(<Input placeholder="Enter text" />);
+    expect(html).toContain('placeholder="Enter text"');
+  });
+
+  it("should render with custom className", () => {
+    const html = renderToString(<Input className="my-input" />);
+    expect(html).toContain("my-input");
+  });
+
+  it("should render with type password", () => {
+    const html = renderToString(<Input type="password" />);
+    expect(html).toContain('type="password"');
+  });
+
+  it("should render with type email", () => {
+    const html = renderToString(<Input type="email" />);
+    expect(html).toContain('type="email"');
+  });
+
+  it("should be disabled when disabled prop is true", () => {
+    const html = renderToString(<Input disabled />);
+    expect(html).toContain("disabled");
+    expect(html).toContain("disabled:opacity-50");
+  });
+
+  it("should accept custom type", () => {
+    const html = renderToString(<Input type="number" />);
+    expect(html).toContain('type="number"');
+  });
+});
+
+// --- Tabs Tests ---
+
+describe("Tabs", () => {
+  it("should render Tabs root component with children", () => {
+    const html = renderToString(
+      <Tabs defaultValue="tab1">
+        <TabsList>
+          <TabsTrigger value="tab1">Tab 1</TabsTrigger>
+        </TabsList>
+        <TabsContent value="tab1">Content 1</TabsContent>
+      </Tabs>,
+    );
+    expect(html).toContain("Tab 1");
+    expect(html).toContain("Content 1");
+  });
+
+  it("should render TabsList within Tabs with correct classes", () => {
+    const html = renderToString(
+      <Tabs defaultValue="tab">
+        <TabsList>
+          <TabsTrigger value="tab">Tab</TabsTrigger>
+        </TabsList>
+      </Tabs>,
+    );
+    expect(html).toContain("inline-flex");
+    expect(html).toContain("h-10");
+    expect(html).toContain("bg-muted");
+  });
+
+  it("should render TabsTrigger within Tabs with correct classes", () => {
+    const html = renderToString(
+      <Tabs defaultValue="tab">
+        <TabsList>
+          <TabsTrigger value="tab">Tab</TabsTrigger>
+        </TabsList>
+      </Tabs>,
+    );
+    expect(html).toContain("Tab");
+    expect(html).toContain("inline-flex");
+  });
+
+  it("should render TabsContent within Tabs with correct classes", () => {
+    const html = renderToString(
+      <Tabs defaultValue="tab">
+        <TabsContent value="tab">Content</TabsContent>
+      </Tabs>,
+    );
+    expect(html).toContain("Content");
+    expect(html).toContain("mt-2");
+  });
+
+  it("should render TabsList with custom className", () => {
+    const html = renderToString(
+      <Tabs defaultValue="tab">
+        <TabsList className="my-tabs">
+          <TabsTrigger value="tab">Tab</TabsTrigger>
+        </TabsList>
+      </Tabs>,
+    );
+    expect(html).toContain("my-tabs");
+  });
+});
+
+// --- Accordion Tests ---
+
+describe("Accordion", () => {
+  it("should render Accordion with all components", () => {
+    const html = renderToString(
+      <Accordion type="single" collapsible>
+        <AccordionItem value="item-1">
+          <AccordionTrigger>Trigger</AccordionTrigger>
+          <AccordionContent>Content</AccordionContent>
+        </AccordionItem>
+      </Accordion>,
+    );
+    expect(html).toContain("Trigger");
+    expect(html).toContain("data-state");
+  });
+
+  it("should render AccordionItem with border", () => {
+    const html = renderToString(
+      <Accordion type="single">
+        <AccordionItem value="item-1">
+          <AccordionTrigger>Trigger</AccordionTrigger>
+        </AccordionItem>
+      </Accordion>,
+    );
+    expect(html).toContain("border-b");
+  });
+
+  it("should render AccordionTrigger within Accordion", () => {
+    const html = renderToString(
+      <Accordion type="single">
+        <AccordionItem value="item">
+          <AccordionTrigger>Trigger</AccordionTrigger>
+        </AccordionItem>
+      </Accordion>,
+    );
+    expect(html).toContain("Trigger");
+    expect(html).toContain("flex-1");
+  });
+
+  it("should render AccordionContent within Accordion", () => {
+    const html = renderToString(
+      <Accordion type="single">
+        <AccordionItem value="item">
+          <AccordionContent>Content</AccordionContent>
+        </AccordionItem>
+      </Accordion>,
+    );
+    expect(html).toContain("overflow-hidden");
+    expect(html).toContain("text-sm");
+  });
+
+  it("should render AccordionItem with custom className", () => {
+    const html = renderToString(
+      <Accordion type="single">
+        <AccordionItem value="item" className="my-accordion">
+          <AccordionTrigger>Trigger</AccordionTrigger>
+        </AccordionItem>
+      </Accordion>,
+    );
+    expect(html).toContain("my-accordion");
   });
 });

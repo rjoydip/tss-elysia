@@ -1,6 +1,6 @@
 /**
  * Unit tests for src/components/footer.tsx
- * Tests: Footer rendering, links, dynamic year
+ * Tests: Footer rendering, links, dynamic year, options
  */
 
 import { describe, expect, it } from "bun:test";
@@ -49,9 +49,9 @@ describe("Footer", () => {
     expect(html).toContain(currentYear);
   });
 
-  it("should render TSS Elysia in copyright", () => {
+  it("should render app name in copyright", () => {
     const html = renderToString(<Footer />);
-    expect(html).toContain("TSS Elysia");
+    expect(html).toContain("TSSE");
   });
 
   it("should apply custom className", () => {
@@ -68,5 +68,27 @@ describe("Footer", () => {
     const html = renderToString(<Footer />);
     const linkCount = (html.match(/<a /g) || []).length;
     expect(linkCount).toBeGreaterThanOrEqual(5);
+  });
+
+  it("should show terms when showTerms is true", () => {
+    const html = renderToString(<Footer showTerms={true} />);
+    expect(html).toContain("Terms of Service");
+    expect(html).toContain("Privacy Policy");
+  });
+
+  it("should hide terms when showTerms is false", () => {
+    const html = renderToString(<Footer showTerms={false} />);
+    expect(html).not.toContain("Terms of Service");
+  });
+
+  it("should show logo when showLogo is true (default)", () => {
+    const html = renderToString(<Footer showLogo={true} />);
+    expect(html).toContain("TSSE");
+  });
+
+  it("should hide logo when showLogo is false", () => {
+    const html = renderToString(<Footer showLogo={false} />);
+    // Logo section should be empty - app name should not appear in logo area
+    expect(html).not.toContain("TSSE</span>");
   });
 });
