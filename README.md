@@ -83,15 +83,15 @@ Detailed documentation available in `docs/`:
 
 | Document                                                      | Description                  |
 | ------------------------------------------------------------- | ---------------------------- |
-| [API Reference](docs/api/reference.md)                        | API endpoints and usage      |
+| [API Reference](docs/api/overview.md)                         | API endpoints and usage      |
 | [Architecture](docs/getting-started/architecture.md)          | System architecture overview |
-| [Authentication](docs/auth/authentication.md)                 | Auth setup and configuration |
+| [Authentication](docs/auth/overview.md)                       | Auth setup and configuration |
 | [CI/CD](docs/infra/ci-cd.md)                                  | CI/CD pipelines and releases |
 | [Development](docs/getting-started/development.md)            | Development guide            |
 | [Docker](docs/infra/docker.md)                                | Docker deployment guide      |
 | [Environment Variables](docs/guides/environment-variables.md) | Environment configuration    |
 | [Middleware](docs/guides/middleware.md)                       | Middleware documentation     |
-| [Project Overview](docs/project-overview.md)                  | Project introduction         |
+| [Overview](docs/guides/overview.md)                           | Project introduction         |
 | [Testing](docs/guides/testing.md)                             | Testing guide                |
 | [Troubleshooting](docs/guides/troubleshooting.md)             | Common issues and solutions  |
 
@@ -172,11 +172,11 @@ src/
 ├── routes/            # File-based routing (TanStack Start)
 │   ├── __root.tsx     # Root route
 │   ├── index.tsx      # Home route
-│   ├── auth/          # Auth routes
-│   │   ├── login.tsx  # Login page (/auth/login)
-│   │   ├── register.tsx # Register page (/auth/register)
-│   │   ├── forgot-password.tsx # Forgot password page (/auth/forgot-password)
-│   │   └── verify-email.tsx # Email verification (/auth/verify-email)
+│   ├── account/       # Account routes
+│   │   ├── login.tsx  # Login page (/account/login)
+│   │   ├── register.tsx # Register page (/account/register)
+│   │   ├── forgot-password.tsx # Forgot password page (/account/forgot-password)
+│   │   └── verify-email.tsx # Email verification (/account/verify-email)
 │   ├── profile/       # Profile routes
 │   │   └── index.tsx  # Profile page (/profile)
 │   ├── settings/      # Settings routes
