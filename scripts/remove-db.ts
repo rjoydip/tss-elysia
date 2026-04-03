@@ -1,5 +1,6 @@
 import { existsSync, unlinkSync } from "node:fs";
 import { resolve } from "node:path";
+import { isCI } from "std-env";
 import { logger } from "./lib/logger";
 
 const dbPath =
@@ -7,7 +8,9 @@ const dbPath =
     ? `${process.env.DATABASE_PATH}/${process.env.DATABASE_NAME}`
     : process.env.DATABASE_NAME && !process.env.DATABASE_PATH
       ? `.artifacts/${process.env.DATABASE_NAME}`
-      : ".artifacts/tss-elysia.db";
+      : isCI
+        ? ".artifacts/tss-elysia-test.db"
+        : ".artifacts/tss-elysia.db";
 
 const fullPath = resolve(dbPath);
 

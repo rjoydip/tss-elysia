@@ -4,12 +4,11 @@
  */
 
 import { test, expect } from "@playwright/test";
-
-const BASE_URL = "http://localhost:3000";
+import { E2E_BASE_URL } from "../config";
 
 test.describe("Login Page", () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto(`${BASE_URL}/account/login`);
+    await page.goto(`${E2E_BASE_URL}/account/login`);
   });
 
   test("should load login page without crashing", async ({ page }) => {
@@ -59,7 +58,7 @@ test.describe("Login Page", () => {
 
 test.describe("Register Page", () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto(`${BASE_URL}/account/register`);
+    await page.goto(`${E2E_BASE_URL}/account/register`);
   });
 
   test("should load register page without crashing", async ({ page }) => {
@@ -110,26 +109,26 @@ test.describe("Register Page", () => {
 test.describe("Branding Component (Desktop)", () => {
   test("should display branding on login page (lg screen)", async ({ page }) => {
     await page.setViewportSize({ width: 1280, height: 720 });
-    await page.goto(`${BASE_URL}/account/login`);
+    await page.goto(`${E2E_BASE_URL}/account/login`);
     await expect(page.getByText(/build faster/i)).toBeVisible();
   });
 
   test("should display branding on register page (lg screen)", async ({ page }) => {
     await page.setViewportSize({ width: 1280, height: 720 });
-    await page.goto(`${BASE_URL}/account/register`);
+    await page.goto(`${E2E_BASE_URL}/account/register`);
     await expect(page.getByText(/build faster/i)).toBeVisible();
   });
 
   test("should hide branding on mobile", async ({ page }) => {
     await page.setViewportSize({ width: 375, height: 667 });
-    await page.goto(`${BASE_URL}/account/login`);
+    await page.goto(`${E2E_BASE_URL}/account/login`);
     await expect(page.getByText(/build faster/i)).not.toBeVisible();
   });
 });
 
 test.describe("Form Validation", () => {
   test("should show error for empty name on submit", async ({ page }) => {
-    await page.goto(`${BASE_URL}/account/register`);
+    await page.goto(`${E2E_BASE_URL}/account/register`);
     // Skip name field
     await page.locator("main").getByPlaceholder("Email").fill("test@example.com");
     await page.locator("main").getByPlaceholder("Password").fill("Password123!");
@@ -153,7 +152,7 @@ test.describe("Form Validation", () => {
 
 test.describe("Forgot Password Page", () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto(`${BASE_URL}/account/forgot-password`);
+    await page.goto(`${E2E_BASE_URL}/account/forgot-password`);
   });
 
   test("should load forgot password page without crashing", async ({ page }) => {
@@ -199,17 +198,17 @@ test.describe("Forgot Password Page", () => {
 
 test.describe("Email Verification Page", () => {
   test("should display loading state initially", async ({ page }) => {
-    await page.goto(`${BASE_URL}/account/verify-email`);
+    await page.goto(`${E2E_BASE_URL}/account/verify-email`);
     await expect(page.locator("main").getByText(/verifying your email/i)).toBeVisible();
   });
 
   test("should display header", async ({ page }) => {
-    await page.goto(`${BASE_URL}/account/verify-email`);
+    await page.goto(`${E2E_BASE_URL}/account/verify-email`);
     await expect(page.locator("header")).toBeVisible();
   });
 
   test("should display footer", async ({ page }) => {
-    await page.goto(`${BASE_URL}/account/verify-email`);
+    await page.goto(`${E2E_BASE_URL}/account/verify-email`);
     await expect(page.locator("footer")).toBeVisible();
   });
 });

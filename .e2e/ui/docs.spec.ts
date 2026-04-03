@@ -88,23 +88,6 @@ test.describe("Docs Sidebar", () => {
   });
 });
 
-test.describe("Docs .md Extension Handling", () => {
-  test.skip("should resolve /docs/x.md the same as /docs/x", async ({ page }) => {
-    await page.goto("/docs/guides/environment-variables.md");
-    await page.waitForLoadState("networkidle");
-    await expect(
-      page.getByRole("heading", { name: "Environment Variables", exact: true }),
-    ).toBeVisible();
-  });
-
-  test.skip("should render markdown content when .md is in the URL", async ({ page }) => {
-    await page.goto("/docs/getting-started/architecture.md");
-    await page.waitForLoadState("networkidle");
-    await page.waitForSelector("nav[aria-label='breadcrumb']");
-    await expect(page.getByRole("heading", { name: "Architecture", exact: true })).toBeVisible();
-  });
-});
-
 test.describe("Docs Breadcrumbs", () => {
   test("should show breadcrumb nav on child pages", async ({ page }) => {
     await page.goto("/docs/getting-started/development");
