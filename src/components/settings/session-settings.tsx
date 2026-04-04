@@ -5,6 +5,7 @@
  */
 
 import { useState, useEffect } from "react";
+import { toast } from "sonner";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";
 import { Button } from "~/components/ui/button";
 import { listSessions, revokeSession, revokeOtherSessions, useSession } from "~/lib/auth/client";
@@ -35,7 +36,6 @@ export function SessionSettings() {
   const { data: currentSession } = useSession();
   const [sessions, setSessions] = useState<SessionData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [revokingId, setRevokingId] = useState<string | null>(null);
   const [isRevokingAll, setIsRevokingAll] = useState(false);
 
@@ -51,21 +51,21 @@ export function SessionSettings() {
    */
   const fetchSessions = async () => {
     setIsLoading(true);
-    setError(null);
 
     try {
       const { data, error: fetchError } = await listSessions();
 
       if (fetchError) {
-        setError(fetchError.message || "Failed to fetch sessions");
+        toast.error(fetchError.message || "Failed to fetch sessions");
         setIsLoading(false);
         return;
       }
 
       setSessions(data || []);
       setIsLoading(false);
+      // oxlint-disable-next-line no-unused-vars
     } catch (_err) {
-      setError("An unexpected error occurred");
+      toast.error("An unexpected error occurred");
       setIsLoading(false);
     }
   };
@@ -76,13 +76,12 @@ export function SessionSettings() {
    */
   const handleRevokeSession = async (token: string) => {
     setRevokingId(token);
-    setError(null);
 
     try {
       const { error: revokeError } = await revokeSession(token);
 
       if (revokeError) {
-        setError(revokeError.message || "Failed to revoke session");
+        toast.error(revokeError.message || "Failed to revoke session");
         setRevokingId(null);
         return;
       }
@@ -90,8 +89,10 @@ export function SessionSettings() {
       // Remove revoked session from list
       setSessions((prev) => prev.filter((s) => s.token !== token));
       setRevokingId(null);
+      toast.success("Session revoked successfully");
+      // oxlint-disable-next-line no-unused-vars
     } catch (_err) {
-      setError("An unexpected error occurred");
+      toast.error("An unexpected error occurred");
       setRevokingId(null);
     }
   };
@@ -102,13 +103,12 @@ export function SessionSettings() {
    */
   const handleRevokeAllOther = async () => {
     setIsRevokingAll(true);
-    setError(null);
 
     try {
       const { error: revokeError } = await revokeOtherSessions();
 
       if (revokeError) {
-        setError(revokeError.message || "Failed to revoke sessions");
+        toast.error(revokeError.message || "Failed to revoke sessions");
         setIsRevokingAll(false);
         return;
       }
@@ -116,8 +116,10 @@ export function SessionSettings() {
       // Refresh session list
       await fetchSessions();
       setIsRevokingAll(false);
+      toast.success("All other sessions revoked successfully");
+      // oxlint-disable-next-line no-unused-vars
     } catch (_err) {
-      setError("An unexpected error occurred");
+      toast.error("An unexpected error occurred");
       setIsRevokingAll(false);
     }
   };
@@ -170,13 +172,6 @@ export function SessionSettings() {
           </div>
         </CardHeader>
         <CardContent>
-          {/* Error message */}
-          {error && (
-            <div className="p-3 mb-4 text-sm text-destructive bg-destructive/10 rounded-md border border-destructive/20">
-              {error}
-            </div>
-          )}
-
           {/* Loading state */}
           {isLoading ? (
             <div className="flex items-center justify-center py-8">

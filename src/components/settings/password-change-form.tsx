@@ -8,6 +8,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { toast } from "sonner";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
@@ -46,8 +47,6 @@ type PasswordFormData = z.infer<typeof passwordSchema>;
  * <PasswordChangeForm />
  */
 export function PasswordChangeForm() {
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
   const {
@@ -64,45 +63,30 @@ export function PasswordChangeForm() {
    * Validates passwords and attempts to change password.
    */
   const onSubmit = async (data: PasswordFormData) => {
-    setError(null);
-    setSuccess(false);
     setIsLoading(true);
 
     try {
       const { error: changeError } = await changePassword(data.currentPassword, data.newPassword);
 
       if (changeError) {
-        setError(changeError.message || "Failed to change password");
+        toast.error(changeError.message || "Failed to change password");
         setIsLoading(false);
         return;
       }
 
       // Clear form and show success
       reset();
-      setSuccess(true);
       setIsLoading(false);
+      toast.success("Password changed successfully!");
+      // oxlint-disable-next-line no-unused-vars
     } catch (_err) {
-      setError("An unexpected error occurred");
+      toast.error("An unexpected error occurred");
       setIsLoading(false);
     }
   };
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-      {/* Success message */}
-      {success && (
-        <div className="p-3 text-sm text-green-700 bg-green-50 rounded-md border border-green-200">
-          Password changed successfully!
-        </div>
-      )}
-
-      {/* Error message */}
-      {error && (
-        <div className="p-3 text-sm text-destructive bg-destructive/10 rounded-md border border-destructive/20">
-          {error}
-        </div>
-      )}
-
       {/* Current password */}
       <div className="space-y-2">
         <Label htmlFor="currentPassword">Current Password</Label>

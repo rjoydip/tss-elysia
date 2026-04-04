@@ -6,6 +6,7 @@
 
 import { useState } from "react";
 import { Link } from "@tanstack/react-router";
+import { toast } from "sonner";
 import { AuthGuard } from "~/components/auth/auth-guard";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
@@ -32,24 +33,22 @@ export function ProfilePage() {
  * Profile content component.
  * Renders user profile information and edit form.
  * Handles profile updates with loading and error states.
+ * @returns JSX.Element The profile content component
  */
 function ProfileContent() {
   const { data: session, refetch } = useSession();
   const [isEditing, setIsEditing] = useState(false);
   const [name, setName] = useState(session?.user?.name || "");
   const [image, setImage] = useState(session?.user?.image || "");
-  const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [success, setSuccess] = useState(false);
 
-  /**
-   * Handle profile update submission.
-   * Updates user profile and refreshes session.
-   */
-  const handleUpdate = async (e: React.FormEvent) => {
+   /**
+    * Handle profile update submission.
+    * Updates user profile and refreshes session.
+    * @param e - The form submit event
+    */
+   const handleUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError(null);
-    setSuccess(false);
     setIsLoading(true);
 
     try {
@@ -59,30 +58,31 @@ function ProfileContent() {
       });
 
       if (updateError) {
-        setError(updateError.message || "Failed to update profile");
+        toast.error(updateError.message || "Failed to update profile");
         setIsLoading(false);
         return;
       }
 
       // Refresh session to get updated data
       await refetch();
-      setSuccess(true);
       setIsEditing(false);
       setIsLoading(false);
+      toast.success("Profile updated successfully!");
+      // oxlint-disable-next-line no-unused-vars
     } catch (_err) {
-      setError("An unexpected error occurred");
+      toast.error("An unexpected error occurred");
       setIsLoading(false);
     }
   };
 
-  /**
-   * Cancel editing and reset form to current values.
-   */
-  const handleCancel = () => {
+   /**
+    * Cancel editing and reset form to current values.
+    * Resets the form fields to their original values from the session.
+    */
+   const handleCancel = () => {
     setName(session?.user?.name || "");
     setImage(session?.user?.image || "");
     setIsEditing(false);
-    setError(null);
   };
 
   return (
@@ -114,20 +114,6 @@ function ProfileContent() {
           </Button>
         </Link>
       </div>
-
-      {/* Success message */}
-      {success && (
-        <div className="p-3 text-sm text-green-700 bg-green-50 rounded-md border border-green-200">
-          Profile updated successfully!
-        </div>
-      )}
-
-      {/* Error message */}
-      {error && (
-        <div className="p-3 text-sm text-destructive bg-destructive/10 rounded-md border border-destructive/20">
-          {error}
-        </div>
-      )}
 
       {/* Profile card */}
       <Card>

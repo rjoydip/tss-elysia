@@ -8,6 +8,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { toast } from "sonner";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
@@ -36,8 +37,6 @@ type EmailFormData = z.infer<typeof emailSchema>;
  */
 export function EmailChangeForm() {
   const { data: session } = useSession();
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
   const {
@@ -49,17 +48,15 @@ export function EmailChangeForm() {
     resolver: zodResolver(emailSchema),
   });
 
-  /**
-   * Handle form submission.
-   * Validates email and sends verification email.
-   */
-  const onSubmit = async (data: EmailFormData) => {
-    setError(null);
-    setSuccess(false);
-
+   /**
+    * Handle form submission.
+    * Validates email and sends verification email.
+    * @param data - The form data containing the new email address
+    */
+   const onSubmit = async (data: EmailFormData) => {
     // Check if new email is same as current
     if (data.newEmail === session?.user?.email) {
-      setError("New email must be different from current email");
+      toast.error("New email must be different from current email");
       return;
     }
 
@@ -72,37 +69,24 @@ export function EmailChangeForm() {
       );
 
       if (changeError) {
-        setError(changeError.message || "Failed to change email");
+        toast.error(changeError.message || "Failed to change email");
         setIsLoading(false);
         return;
       }
 
       // Clear form and show success
       reset();
-      setSuccess(true);
       setIsLoading(false);
+      toast.success("Verification email sent! Please check your new email address.");
+      // oxlint-disable-next-line no-unused-vars
     } catch (_err) {
-      setError("An unexpected error occurred");
+      toast.error("An unexpected error occurred");
       setIsLoading(false);
     }
   };
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-      {/* Success message */}
-      {success && (
-        <div className="p-3 text-sm text-green-700 bg-green-50 rounded-md border border-green-200">
-          Verification email sent! Please check your new email address.
-        </div>
-      )}
-
-      {/* Error message */}
-      {error && (
-        <div className="p-3 text-sm text-destructive bg-destructive/10 rounded-md border border-destructive/20">
-          {error}
-        </div>
-      )}
-
       {/* Current email (read-only) */}
       <div className="space-y-2">
         <Label htmlFor="currentEmail">Current Email</Label>

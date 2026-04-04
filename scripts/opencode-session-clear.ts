@@ -44,7 +44,7 @@ async function main() {
   // 🔥 Run all deletions in parallel
   await Promise.all(sessions.map((session) => deleteSession(session)));
 
-  logger.success("\nAll done.");
+  logger.success("All done.");
 }
 
 main();
