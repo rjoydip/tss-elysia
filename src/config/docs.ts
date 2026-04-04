@@ -33,6 +33,10 @@ const SECTION_TITLE_MAP: Record<string, string> = {
   infra: "Infrastructure",
 };
 
+const FILE_NAME_MAP: Record<string, string> = {
+  "ci-cd": "CI/CD",
+};
+
 /**
  * Formats a file or folder name into a readable display name.
  * Converts kebab-case to Title Case (e.g., "environment-variables" → "Environment Variables").
@@ -104,7 +108,7 @@ for (const key of Object.keys(docModules)) {
   const href = relPath === "getting-started/overview" ? "/docs" : `/docs/${relPath}`;
 
   // Overview pages always display as "Overview", other files use formatted file name
-  const name = fileName === "overview" ? "Overview" : formatName(fileName);
+  const name = fileName === "overview" ? "Overview" : FILE_NAME_MAP[formatName(fileName)] ?? formatName(fileName);
 
   if (!groups.has(folder)) {
     groups.set(folder, []);

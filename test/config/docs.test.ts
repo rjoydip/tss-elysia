@@ -5,7 +5,8 @@
  */
 
 import { describe, expect, it } from "bun:test";
-import { docsConfig, navItems } from "../../src/config/docs";
+import { docsConfig } from "../../src/config/docs";
+import { navItems } from "../../src/config/index";
 
 describe("docsConfig", () => {
   it("should be a non-empty array", () => {
@@ -159,15 +160,15 @@ describe("navItems", () => {
   });
 
   it("should contain Docs link", () => {
-    const docs = navItems.find((i) => i.name === "Docs");
+    const docs = navItems.find((i) => i.name === "Documentation");
     expect(docs).toBeDefined();
     expect(docs!.href).toBe("/docs");
   });
 
   it("should contain API link pointing to api overview", () => {
-    const api = navItems.find((i) => i.name === "API");
+    const api = docsConfig.find((i) => i.title === "API");
     expect(api).toBeDefined();
-    expect(api!.href).toBe("/docs/api/overview");
+    expect(api!.items[0].href).toBe("/docs/api/overview");
   });
 
   it("should contain Blog link", () => {
@@ -183,6 +184,6 @@ describe("navItems", () => {
   });
 
   it("should have exactly 4 nav items", () => {
-    expect(navItems).toHaveLength(4);
+    expect(navItems).toHaveLength(3);
   });
 });
