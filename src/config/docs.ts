@@ -21,14 +21,6 @@ export interface DocSection {
   items: DocItem[];
 }
 
-/** Main navigation items for the header */
-export const navItems = [
-  { name: "Docs", href: "/docs" },
-  { name: "API", href: "/docs/api/overview" },
-  { name: "Blog", href: "/blog" },
-  { name: "Changelog", href: "/changelog" },
-];
-
 /** Defines the display order for sidebar sections */
 const SECTION_ORDER = ["getting-started", "auth", "api", "infra", "guides"] as const;
 
