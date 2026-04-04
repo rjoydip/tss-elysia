@@ -1,4 +1,9 @@
-# API Reference
+---
+title: API Reference
+description: API endpoints and server routes reference
+---
+
+## API Reference
 
 ## Server Routes
 

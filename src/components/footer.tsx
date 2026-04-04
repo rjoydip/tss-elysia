@@ -16,14 +16,14 @@ interface FooterProps {
   showLogo?: boolean;
 }
 
-export function Footer({ className, showTerms = true, showLogo = true }: FooterProps) {
+export function Footer({ className, showTerms = true, showLogo = false }: FooterProps) {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className={cn(`py-8 px-6 bg-muted/10`, className)}>
-      <div className="max-w-6xl mx-auto">
+    <footer className={cn(`py-4 px-4 bg-muted/10`, className)}>
+      <div className="mx-auto">
         {/* Main footer content */}
-        <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+        <div className="flex flex-col md:flex-row items-center justify-between">
           {/* Logo and copyright */}
           <div className="flex items-center gap-3">{showLogo && <BrandLogo size="xs" />}</div>
 
@@ -56,10 +56,10 @@ export function Footer({ className, showTerms = true, showLogo = true }: FooterP
         </div>
 
         {/* Divider */}
-        <div className="mt-8 pt-8 border-t border-border/50">
+        <div className="mt-4 pt-4 border-t border-border/50">
           {/* Terms (optional - for auth pages) */}
           {showTerms && (
-            <p className="text-center text-xs text-muted-foreground mb-4">
+            <p className="text-center text-xs text-muted-foreground mb-2">
               By continuing, you agree to our{" "}
               <a href="/terms" className="text-primary hover:underline">
                 Terms of Service

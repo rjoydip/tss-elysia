@@ -109,9 +109,5 @@ function DocsPage() {
     );
   }
 
-  return (
-    <div className="max-w-4xl">
-      <MarkdownRenderer content={content} />
-    </div>
-  );
+  return <MarkdownRenderer content={content} />;
 }

@@ -191,7 +191,7 @@ function Home() {
             className="mb-8 px-4 py-1.5 border-primary bg-primary text-primary text-sm font-medium"
           >
             <span className="flex items-center gap-2">
-              <span className="w-4 h-4 rounded-full bg-background dark:bg-ring animate-pulse self-center" />
+              <span className="w-3 h-3 rounded-full bg-background dark:bg-ring animate-pulse self-center" />
               v{APP_VERSION} Released
             </span>
           </Badge>

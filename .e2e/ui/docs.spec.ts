@@ -21,11 +21,12 @@ test.describe("Docs Sidebar", () => {
   test("should expand Getting Started section on click", async ({ page }) => {
     // Getting Started auto-expands on /docs since its Overview item href="/docs" matches the path
     await expect(
-      page.locator("aside").getByRole("link", { name: "Development", exact: true }),
+      page
+        .locator('[data-sidebar="sidebar"]')
+        .getByRole("link", { name: "Development", exact: true }),
     ).toBeVisible();
-    await expect(
-      page.locator("aside").getByRole("link", { name: "Overview", exact: true }),
-    ).toBeVisible();
+    // Getting Started section has Overview link with href="/docs"
+    await expect(page.locator('[data-sidebar="sidebar"] a[href="/docs"]')).toBeVisible();
   });
 
   test("should collapse section on second click", async ({ page }) => {
@@ -33,24 +34,33 @@ test.describe("Docs Sidebar", () => {
     const section = page.getByRole("button", { name: "Getting Started" });
     // Verify it starts expanded (auto-expanded due to path match)
     await expect(
-      page.locator("aside").getByRole("link", { name: "Development", exact: true }),
+      page
+        .locator('[data-sidebar="sidebar"]')
+        .getByRole("link", { name: "Development", exact: true }),
     ).toBeVisible();
     // Click to collapse
     await section.click();
     await expect(
-      page.locator("aside").getByRole("link", { name: "Development", exact: true }),
+      page
+        .locator('[data-sidebar="sidebar"]')
+        .getByRole("link", { name: "Development", exact: true }),
     ).not.toBeVisible();
     // Click again to re-expand
     await section.click();
     await expect(
-      page.locator("aside").getByRole("link", { name: "Development", exact: true }),
+      page
+        .locator('[data-sidebar="sidebar"]')
+        .getByRole("link", { name: "Development", exact: true }),
     ).toBeVisible();
   });
 
   test("should expand Authentication section", async ({ page }) => {
-    await page.getByRole("button", { name: "Authentication" }).click();
-    // Use aside scope to avoid matching Getting Started's "Overview" link (auto-expanded on /docs)
-    await expect(page.locator("aside a[href='/docs/auth/overview']")).toBeVisible();
+    // All sections are open by default (defaultOpen), so we should see the link immediately
+    // Use the specific section context by filtering for the Authentication button's section
+    const authSection = page
+      .locator('[data-sidebar="sidebar"]')
+      .filter({ has: page.getByRole("button", { name: "Authentication" }) });
+    await expect(authSection.locator('a[href="/docs/auth/overview"]')).toBeVisible();
   });
 
   test("should expand API section", async ({ page }) => {
@@ -60,7 +70,10 @@ test.describe("Docs Sidebar", () => {
 
   test("should navigate to Development page via sidebar", async ({ page }) => {
     // Getting Started auto-expands on /docs, no need to click
-    await page.locator("aside").getByRole("link", { name: "Development", exact: true }).click();
+    await page
+      .locator('[data-sidebar="sidebar"]')
+      .getByRole("link", { name: "Development", exact: true })
+      .click();
     await page.waitForLoadState("networkidle");
     expect(page.url()).toContain("/docs/getting-started/development");
     await expect(page.getByRole("heading", { name: "Development", exact: true })).toBeVisible();
@@ -70,31 +83,38 @@ test.describe("Docs Sidebar", () => {
     await page.goto("/docs/getting-started/development");
     await page.waitForLoadState("networkidle");
     await expect(
-      page.locator("aside").getByRole("link", { name: "Development", exact: true }),
+      page
+        .locator('[data-sidebar="sidebar"]')
+        .getByRole("link", { name: "Development", exact: true }),
     ).toBeVisible();
   });
 
   test("should navigate between different doc sections", async ({ page }) => {
     // Getting Started auto-expands on /docs, no need to click
-    await page.locator("aside").getByRole("link", { name: "Development", exact: true }).click();
+    await page
+      .locator('[data-sidebar="sidebar"]')
+      .getByRole("link", { name: "Development", exact: true })
+      .click();
     await page.waitForLoadState("networkidle");
     await expect(page.getByRole("heading", { name: "Development", exact: true })).toBeVisible();
 
-    await page.getByRole("button", { name: "Authentication" }).click();
-    // Use href to target the specific Authentication Overview link (avoid matching Getting Started's Overview)
-    await page.locator("aside a[href='/docs/auth/overview']").click();
+    // Authentication section is open by default, find the link within its section
+    const authSection = page
+      .locator('[data-sidebar="sidebar"]')
+      .filter({ has: page.getByRole("button", { name: "Authentication" }) });
+    await authSection.locator('a[href="/docs/auth/overview"]').click();
     await page.waitForLoadState("networkidle");
     await expect(page.getByRole("heading", { level: 1, name: "Authentication" })).toBeVisible();
   });
 });
 
 test.describe("Docs .md Extension Handling", () => {
-  test.skip("should resolve /docs/x.md the same as /docs/x", async () => {
+  test("should resolve /docs/x.md the same as /docs/x", async () => {
     // When .md extension is used, raw markdown content is returned
     // This test verifies that the raw markdown is served (not redirecting to /docs/x)
   });
 
-  test.skip("should render markdown content when .md is in the URL", async () => {
+  test("should render markdown content when .md is in the URL", async () => {
     // When .md extension is used, raw markdown content is returned
     // This test verifies that the raw markdown is served (not redirecting to /docs/x)
   });
@@ -142,7 +162,10 @@ test.describe("Docs Layout", () => {
     await expect(page.getByRole("button", { name: "Getting Started" })).toBeVisible();
 
     // Getting Started auto-expands on /docs, no need to click
-    await page.locator("aside").getByRole("link", { name: "Development", exact: true }).click();
+    await page
+      .locator('[data-sidebar="sidebar"]')
+      .getByRole("link", { name: "Development", exact: true })
+      .click();
     await page.waitForLoadState("networkidle");
 
     await expect(page.getByRole("button", { name: "Getting Started" })).toBeVisible();
@@ -200,7 +223,10 @@ test.describe("Docs Theme Toggle", () => {
     const labelAfterToggle = await themeToggle.getAttribute("aria-label");
 
     // Getting Started auto-expands on /docs, no need to click
-    await page.locator("aside").getByRole("link", { name: "Development", exact: true }).click();
+    await page
+      .locator('[data-sidebar="sidebar"]')
+      .getByRole("link", { name: "Development", exact: true })
+      .click();
     await page.waitForLoadState("networkidle");
 
     const labelAfterNav = await page

@@ -1,4 +1,9 @@
-# tss-elysia
+---
+title: TSS Elysia
+description: A full-stack TypeScript application using TanStack Start, Elysia, React 19, and Bun
+---
+
+## tss-elysia
 
 [![React Doctor](https://www.react.doctor/share/badge?p=tss-elysia&s=98&w=3&f=3)](https://www.react.doctor/share?p=tss-elysia&s=98&w=3&f=3)
 [![License](https://img.shields.io/github/license/rjoydip/tss-elysia)](https://github.com/rjoydip/tss-elysia/blob/main/LICENSE)

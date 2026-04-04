@@ -1,4 +1,9 @@
-# Guides
+---
+title: Guides
+description: Practical guides for working with the tss-elysia stack
+---
+
+## Guides
 
 Practical guides for working with the tss-elysia stack.
 

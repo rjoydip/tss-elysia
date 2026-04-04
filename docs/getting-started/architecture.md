@@ -1,4 +1,9 @@
-# Architecture
+---
+title: Architecture
+description: System architecture and design patterns
+---
+
+## Architecture
 
 This document describes the system architecture of the tss-elysia project.
 

@@ -1,4 +1,9 @@
-# Environment Variables
+---
+title: Environment Variables
+description: Type-safe environment configuration
+---
+
+## Environment Variables
 
 This project uses type-safe environment variables with isomorphic fetching, supporting both client and server environments.
 

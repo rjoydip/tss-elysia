@@ -181,12 +181,36 @@ Complete the authentication system with additional security features, set up use
 
 ### Phase 8: Real-time Features
 
+#### Security & Authentication
+
+- [ ] Use authenticated WebSocket/SSE connections (require valid session token)
+- [ ] Implement connection authentication middleware
+- [ ] Add connection upgrade request validation (CSRF tokens)
+- [ ] Set up rate limiting per WebSocket connection
+- [ ] Implement connection expiration and re-authentication flow
+- [ ] Add secure WebSocket handshake with origin validation
+- [ ] Encrypt real-time message payloads
+- [ ] Add audit logging for connection events
+
+#### Implementation
+
 - [ ] Install and configure WebSocket library (Elysia WS or SSE)
 - [ ] Implement real-time notifications
 - [ ] Add live user presence indicators
 - [ ] Create real-time dashboard updates
 - [ ] Implement chat/messaging infrastructure
 - [ ] Add connection status handling
+
+#### Connection Security Checklist
+
+- [ ] Validate session on connection handshake
+- [ ] Use secure WebSocket (wss://) in production
+- [ ] Implement heartbeat/ping-pong for connection health
+- [ ] Add connection timeout limits
+- [ ] Rate limit message frequency per user
+- [ ] Sanitize real-time message data
+- [ ] Implement graceful disconnect handling
+- [ ] Add reconnection logic with exponential backoff
 
 ---
 

@@ -30,7 +30,7 @@ export function Header({ className, children, showSignIn = true }: HeaderProps) 
         className,
       )}
     >
-      <div className="flex items-center justify-between h-full px-6 max-w-7xl mx-auto">
+      <div className="flex items-center justify-between h-full px-6 mx-auto">
         <div className="flex items-center gap-8">
           <Link to="/" className="flex items-center gap-1 mt-1 font-bold text-xl">
             <BrandLogo size="sm" />

@@ -1,4 +1,9 @@
-# Infrastructure
+---
+title: Infrastructure
+description: Deployment and infrastructure documentation
+---
+
+## Infrastructure
 
 Deployment and infrastructure documentation for the tss-elysia stack.
 

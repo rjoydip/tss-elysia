@@ -1,4 +1,9 @@
-# Middleware
+---
+title: Middleware
+description: CORS, Helmet, and Rate Limit setup
+---
+
+## Middleware
 
 This project implements middleware for the Elysia server, providing security, performance, and functionality layers.
 
