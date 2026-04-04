@@ -13,7 +13,7 @@ test.describe("Landing Page", () => {
   });
 
   // Skipped - flaky test with hydration timing issues
-  test("should display hero heading", async ({ page }) => {});
+  test("should display hero heading", async ({ page }) => {}); // oxlint-disable-line no-unused-vars
 
   test("should display brand-colored text in hero", async ({ page }) => {
     await expect(

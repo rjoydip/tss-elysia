@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { A11yer } from "a11yer";
 import * as React from "react";
 import { ThemeProvider } from "~/components/theme/provider";
+import { Toaster } from "~/components/ui/sonner";
 import appCss from "~/app.css?url";
 
 const queryClient = new QueryClient();
@@ -37,6 +38,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
             </head>
             <body>
               {children}
+              <Toaster />
               {import.meta.env.DEV && <TanStackRouterDevtools position="bottom-right" />}
               <Scripts />
             </body>

@@ -1,4 +1,9 @@
-# Testing
+---
+title: Testing
+description: Unit, E2E, and load testing guide
+---
+
+## Testing
 
 This project uses two testing approaches: unit tests with Bun and E2E tests with Playwright.
 
@@ -28,6 +33,10 @@ test/
     header.test.tsx   # Header component
     branding.test.tsx # Branding component
     footer.test.tsx   # Footer component
+    profile/          # Profile components
+      profile-page.test.tsx # Profile page component
+    settings/         # Settings components
+      email-change-form.test.tsx # Email change form component
   fixtures/           # Shared test fixtures
     db.ts             # In-memory DB, seed helpers
   load-tests/         # k6 load tests
@@ -111,6 +120,7 @@ E2E tests are in `.e2e/`:
     components.spec.ts # UI component tests (Button, Input, Card, Badge, Tabs)
     navigation.spec.ts # Navigation tests
     docs.spec.ts      # Documentation page tests
+    profile.spec.ts   # Profile page tests
     root.spec.ts      # Landing page tests
     status.spec.ts    # Status page tests
     blog.spec.ts      # Blog page tests

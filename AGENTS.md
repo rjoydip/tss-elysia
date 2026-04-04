@@ -1,4 +1,9 @@
-# AGENTS.md
+---
+title: AGENTS.md
+description: Guidelines for AI coding agents working in this repository
+---
+
+## AGENTS.md
 
 This file contains guidelines for AI coding agents working in this repository.
 
@@ -9,6 +14,7 @@ All AI-generated code must adhere to these standards.
 ### Code Commenting Requirements
 
 - **Always add meaningful comments** to all new or modified code
+- For JavaScript/TypeScript files (.js, .ts, .jsx, .tsx, .mjs, .cjs), use **JSDoc comments** for functions, classes, and complex logic
 - Explain **why** (intent/purpose), not just **what** (mechanics)
 - Add function-level comments describing:
   - Purpose of the function
@@ -32,6 +38,8 @@ All AI-generated code must adhere to these standards.
 - **Reuse utilities**: Use existing helpers/utilities instead of duplicating code
 - **Formatting**: Always run `bun run fmt` before completing any task
 - **Linting**: Run `bun run lint:fix` to auto-fix issues
+  - For markdown files, ensure proper markdown linting (`markdownlint`) is followed
+  - Add new line at EOF
 - **Type Checking**: Ensure `bun run typecheck` passes
 - **Dead Code Prevention**: Run lint and typecheck to detect unused code before committing
 
@@ -87,7 +95,7 @@ All necessary information is in [README.md](./README.md), including:
 6. Run `bun run typecheck` to verify types
 7. Run `bun test` to verify unit test
 8. Run `bun run test:e2e` to verify E2E test
-9. Once changes are complete, verify and update PLAN.md (mark completed tasks/goals)
+9. Once changes are complete, verify and update `PLAN.md` (mark completed tasks/goals)
 10. Commit changes (hooks will verify)
 
 ## Environment Configuration
@@ -116,12 +124,10 @@ GITHUB_TOKEN=ghp_xxx  # For GitHub MCP integration
 
 This project includes MCP (Model Context Protocol) servers for enhanced capabilities:
 
-| Tool              | Purpose                         | Requirement         |
-| ----------------- | ------------------------------- | ------------------- |
-| `chrome-devtools` | Browser automation & testing    | Auto-configured     |
-| `github`          | GitHub issues, PRs, repos       | `GITHUB_TOKEN` env  |
-| `filesystem`      | Enhanced file operations in src | Auto-configured     |
-| `sqlite`          | Database queries                | Database must exist |
+| Tool         | Purpose                         | Requirement         |
+| ------------ | ------------------------------- | ------------------- |
+| `filesystem` | Enhanced file operations in src | Auto-configured     |
+| `sqlite`     | Database queries                | Database must exist |
 
 ---
 

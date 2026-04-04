@@ -21,14 +21,6 @@ export interface DocSection {
   items: DocItem[];
 }
 
-/** Main navigation items for the header */
-export const navItems = [
-  { name: "Docs", href: "/docs" },
-  { name: "API", href: "/docs/api/overview" },
-  { name: "Blog", href: "/blog" },
-  { name: "Changelog", href: "/changelog" },
-];
-
 /** Defines the display order for sidebar sections */
 const SECTION_ORDER = ["getting-started", "auth", "api", "infra", "guides"] as const;
 
@@ -39,6 +31,10 @@ const SECTION_TITLE_MAP: Record<string, string> = {
   auth: "Authentication",
   api: "API",
   infra: "Infrastructure",
+};
+
+const FILE_NAME_MAP: Record<string, string> = {
+  "ci-cd": "CI/CD",
 };
 
 /**
@@ -112,7 +108,7 @@ for (const key of Object.keys(docModules)) {
   const href = relPath === "getting-started/overview" ? "/docs" : `/docs/${relPath}`;
 
   // Overview pages always display as "Overview", other files use formatted file name
-  const name = fileName === "overview" ? "Overview" : formatName(fileName);
+  const name = fileName === "overview" ? "Overview" : FILE_NAME_MAP[formatName(fileName)] ?? formatName(fileName);
 
   if (!groups.has(folder)) {
     groups.set(folder, []);

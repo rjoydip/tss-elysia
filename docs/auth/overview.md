@@ -1,4 +1,9 @@
-# Authentication
+---
+title: Authentication
+description: Authentication and authorization with Better Auth
+---
+
+## Authentication
 
 This project uses [Better Auth](https://better-auth.com) for authentication and authorization, integrated with Drizzle ORM for database storage.
 

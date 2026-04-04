@@ -1,4 +1,9 @@
-# Project Overview
+---
+title: Project Overview
+description: A full-stack TypeScript application demonstrating modern web development with TanStack Start, Elysia, and React 19.
+---
+
+## Project Overview
 
 ## Goals
 

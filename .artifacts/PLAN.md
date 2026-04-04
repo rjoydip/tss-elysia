@@ -20,7 +20,7 @@ Complete the authentication system with additional security features, set up use
 - [ ] Configure enterprise infrastructure (Docker, CI/CD)
 - [ ] Implement real-time features (WebSockets/SSE)
 - [ ] Build MCP server for external integrations (make product available as MCP tools)
-- [ ] Configure multi-database strategy (PostgreSQL prod, SQLite dev, vector/graph for AI)
+- [x] Configure multi-database strategy (PostgreSQL prod, SQLite dev, vector/graph for AI)
 
 ## Tasks
 
@@ -89,7 +89,7 @@ Complete the authentication system with additional security features, set up use
 - [x] Configure trusted origins
 - [ ] Set up CSRF protection
 - [ ] Add audit logging for auth events
-- [ ] Configure email verification for sign-ups
+- [x] Configure email verification for sign-ups (configured in `src/lib/auth/index.ts`, currently disabled)
 - [ ] Implement password strength requirements
 
 ---
@@ -97,8 +97,6 @@ Complete the authentication system with additional security features, set up use
 ### Phase 4: UI/Component Library
 
 #### UI Library (shadcn/ui)
-
-**Status: In Progress**
 
 - [x] Set up Tailwind CSS v4 with shadcn themes (already configured in `src/styles/app.css`)
 - [x] Create cn utility function (`src/lib/utils.ts`)
@@ -173,7 +171,7 @@ Complete the authentication system with additional security features, set up use
 - [x] Create Dockerfile for production deployment
 - [x] Set up Docker Compose for local development
 - [ ] Configure nginx for reverse proxy
-- [ ] Set up CI/CD pipeline (GitHub Actions)
+- [x] Set up CI/CD pipeline (GitHub Actions)
 - [ ] Add environment-specific configs (dev, staging, prod)
 - [ ] Configure horizontal scaling support
 - [ ] Set up database connection pooling
@@ -183,12 +181,36 @@ Complete the authentication system with additional security features, set up use
 
 ### Phase 8: Real-time Features
 
+#### Security & Authentication
+
+- [ ] Use authenticated WebSocket/SSE connections (require valid session token)
+- [ ] Implement connection authentication middleware
+- [ ] Add connection upgrade request validation (CSRF tokens)
+- [ ] Set up rate limiting per WebSocket connection
+- [ ] Implement connection expiration and re-authentication flow
+- [ ] Add secure WebSocket handshake with origin validation
+- [ ] Encrypt real-time message payloads
+- [ ] Add audit logging for connection events
+
+#### Implementation
+
 - [ ] Install and configure WebSocket library (Elysia WS or SSE)
 - [ ] Implement real-time notifications
 - [ ] Add live user presence indicators
 - [ ] Create real-time dashboard updates
 - [ ] Implement chat/messaging infrastructure
 - [ ] Add connection status handling
+
+#### Connection Security Checklist
+
+- [ ] Validate session on connection handshake
+- [ ] Use secure WebSocket (wss://) in production
+- [ ] Implement heartbeat/ping-pong for connection health
+- [ ] Add connection timeout limits
+- [ ] Rate limit message frequency per user
+- [ ] Sanitize real-time message data
+- [ ] Implement graceful disconnect handling
+- [ ] Add reconnection logic with exponential backoff
 
 ---
 
@@ -244,14 +266,82 @@ Complete the authentication system with additional security features, set up use
 
 ### Phase 12: Verification
 
-- [ ] Set strong AUTH_SECRET (minimum 32 characters)
+- [ ] Set strong `AUTH_SECRET` (minimum 32 characters)
 - [ ] Configure resource limits
 - [ ] Enable health checks
 - [ ] Set up log rotation
-- [ ] Use reverse proxy (nginx/traefik) for TLS
+- [ ] Use reverse proxy (`nginx`/`traefik`) for TLS
 - [ ] Configure backups for database volume
 - [ ] Monitor container health
 - [ ] Keep base image updated
+
+### Completed Tasks
+
+- [x] Refactor logging to dedicated `src/logger.ts` file
+- [x] Rename `scriptLogger` to `logger` in scripts
+- [x] Update logger imports across codebase (src/env.ts, src/lib/auth/index.ts, src/utils.ts)
+- [x] Create auth client utilities (`src/lib/auth/client.ts`)
+- [x] Create auth server instance (`src/lib/auth/index.ts`)
+- [x] Create auth guard component (`src/components/auth/auth-guard.tsx`)
+- [x] Create login page (`src/routes/auth/login.tsx`) and form (`src/components/auth/form/login.tsx`)
+- [x] Create register page (`src/routes/auth/register.tsx`) and form (`src/components/auth/form/register.tsx`)
+- [x] Create forgot password page (`src/routes/account/forgot-password.tsx`) and form (`src/components/auth/form/forgot-password.tsx`)
+- [x] Create profile page (`src/routes/profile.tsx`) with profile components
+- [x] Create settings page (`src/routes/settings/index.tsx`) with settings components
+- [x] Add password change functionality (`src/components/settings/password-change-form.tsx`)
+- [x] Add email change with verification (`src/components/settings/email-change-form.tsx`, `src/routes/auth/verify-email.tsx`)
+- [x] Implement session management (`src/components/settings/session-settings.tsx`)
+- [x] Add Input component (`src/components/ui/input.tsx`)
+- [x] Add Tabs component (`src/components/ui/tabs.tsx`)
+- [x] Install dependencies: @radix-ui/react-tabs, @radix-ui/react-dialog, @radix-ui/react-avatar, @radix-ui/react-dropdown-menu, @radix-ui/react-toast, react-hook-form, @hookform/resolvers, zod, @tanstack/react-form
+- [x] Reorganize file structure:
+  - [x] Moved `src/components/auth-guard.tsx` to `src/components/auth/auth-guard.tsx`
+  - [x] Moved `src/lib/auth.ts` to `src/lib/auth/index.ts`
+  - [x] Moved `src/lib/auth-client.ts` to `src/lib/auth/client.ts`
+  - [x] Moved `src/routes/login.tsx` to `src/routes/auth/login.tsx`
+  - [x] Moved `src/routes/register.tsx` to `src/routes/auth/register.tsx`
+  - [x] Moved `src/routes/verify-email.tsx` to `src/routes/auth/verify-email.tsx`
+  - [x] Moved `src/routes/profile.tsx` to `src/routes/profile/index.tsx`
+  - [x] Moved `src/routes/settings.tsx` to `src/routes/settings/index.tsx`
+  - [x] Moved `src/components/auth/login-form.tsx` to `src/components/auth/form/login.tsx`
+  - [x] Moved `src/components/auth/register-form.tsx` to `src/components/auth/form/register.tsx`
+  - [x] Created `src/components/branding.tsx` for reusable branding
+  - [x] Created `src/components/footer.tsx` for common footer
+  - [x] Updated all imports to reflect new structure
+- [x] Redesign login form with Supabase-style UI (`src/components/auth/form/login.tsx`)
+- [x] Redesign register form with Supabase-style UI (`src/components/auth/form/register.tsx`)
+- [x] Convert login/register forms to use TanStack Form (`src/components/auth/form/login.tsx`, `src/components/auth/form/register.tsx`)
+- [x] Install @tanstack/react-form package
+- [x] Make branding component customizable (`src/components/branding.tsx`)
+- [x] Improve footer component with configurable options (`src/components/footer.tsx`)
+- [x] Update README.md with new folder structure
+- [x] Create unit tests for UI components split by component (`test/components/ui/*.test.tsx`)
+  - Badge, Button, Card, Separator, Label, Switch, Skeleton, Input, Tabs, Accordion, Sonner
+- [x] Create E2E tests for UI components (`.e2e/ui/components.spec.ts`)
+- [x] Update testing documentation (`docs/guides/testing.md`) with new test structure
+- [x] Add password requirements hidden until typing in register form
+- [x] Add Branding layout to forgot password page
+- [x] Remove OAuth buttons from forgot password page
+- [x] Add showSignIn prop to Header component
+- [x] Fix Branding component to hide on mobile properly
+
+#### Notification & State Management
+
+- [x] Add sonner toast component for notifications (`src/components/ui/sonner.tsx`)
+- [x] Add Toaster to root layout for global toast notifications (`src/routes/__root.tsx`)
+- [x] Replace setError state with sonner toasts in components:
+  - [x] Session settings (`src/components/settings/session-settings.tsx`)
+  - [x] Password change form (`src/components/settings/password-change-form.tsx`)
+  - [x] Email change form (`src/components/settings/email-change-form.tsx`)
+  - [x] Profile page (`src/components/profile/profile-page.tsx`)
+- [x] Set up TanStack Store for centralized state management (`src/lib/store/preferences.ts`)
+- [x] Add localStorage persistence to preferences store
+- [x] Update PreferencesSettings component to use centralized store
+- [x] Add unit tests for sonner component (`test/components/ui/sonner.test.tsx`)
+- [x] Add unit tests for preferences store (`test/store/preferences.test.ts`)
+- [x] Split UI component tests into separate files (`test/components/ui/*.test.tsx`)
+
+---
 
 ## Notes
 
@@ -271,55 +361,7 @@ Complete the authentication system with additional security features, set up use
 - Use vector database (pgvector) for LLM embeddings and semantic search
 - Use graph database for complex relationship queries
 
-### Completed Tasks
-
-- [x] Refactor logging to dedicated `src/logger.ts` file
-- [x] Rename `scriptLogger` to `logger` in scripts
-- [x] Update logger imports across codebase (src/env.ts, src/lib/auth/index.ts, src/utils.ts)
-- [x] Create auth client utilities (`src/lib/auth/client.ts`)
-- [x] Create auth server instance (`src/lib/auth/index.ts`)
-- [x] Create auth guard component (`src/components/auth/auth-guard.tsx`)
-- [x] Create login page (`src/routes/auth/login.tsx`) and form (`src/components/auth/form/login.tsx`)
-- [x] Create register page (`src/routes/auth/register.tsx`) and form (`src/components/auth/form/register.tsx`)
-- [x] Create profile page (`src/routes/profile.tsx`) with profile components
-- [x] Create settings page (`src/routes/settings/index.tsx`) with settings components
-- [x] Add password change functionality (`src/components/settings/password-change-form.tsx`)
-- [x] Add email change with verification (`src/components/settings/email-change-form.tsx`, `src/routes/auth/verify-email.tsx`)
-- [x] Implement session management (`src/components/settings/session-settings.tsx`)
-- [x] Add Input component (`src/components/ui/input.tsx`)
-- [x] Add Tabs component (`src/components/ui/tabs.tsx`)
-- [x] Install dependencies: @radix-ui/react-tabs, @radix-ui/react-dialog, @radix-ui/react-avatar, @radix-ui/react-dropdown-menu, @radix-ui/react-toast, react-hook-form, @hookform/resolvers, zod, @tanstack/react-form
-- [x] Reorganize file structure:
-  - Moved `src/components/auth-guard.tsx` to `src/components/auth/auth-guard.tsx`
-  - Moved `src/lib/auth.ts` to `src/lib/auth/index.ts`
-  - Moved `src/lib/auth-client.ts` to `src/lib/auth/client.ts`
-  - Moved `src/routes/login.tsx` to `src/routes/auth/login.tsx`
-  - Moved `src/routes/register.tsx` to `src/routes/auth/register.tsx`
-  - Moved `src/routes/verify-email.tsx` to `src/routes/auth/verify-email.tsx`
-  - Moved `src/routes/profile.tsx` to `src/routes/profile/index.tsx`
-  - Moved `src/routes/settings.tsx` to `src/routes/settings/index.tsx`
-  - Moved `src/components/auth/login-form.tsx` to `src/components/auth/form/login.tsx`
-  - Moved `src/components/auth/register-form.tsx` to `src/components/auth/form/register.tsx`
-  - Created `src/components/branding.tsx` for reusable branding
-  - Created `src/components/footer.tsx` for common footer
-  - Updated all imports to reflect new structure
-- [x] Redesign login form with Supabase-style UI (`src/components/auth/form/login.tsx`)
-- [x] Redesign register form with Supabase-style UI (`src/components/auth/form/register.tsx`)
-- [x] Convert login/register forms to use TanStack Form (`src/components/auth/form/login.tsx`, `src/components/auth/form/register.tsx`)
-- [x] Install @tanstack/react-form package
-- [x] Make branding component customizable (`src/components/branding.tsx`)
-- [x] Improve footer component with configurable options (`src/components/footer.tsx`)
-- [x] Update README.md with new folder structure
-- [x] Create unit tests for UI components (`test/components/ui.test.tsx`)
-- [x] Create unit tests for additional UI components (`test/components/ui-additional.test.tsx`)
-  - Label, Switch, Skeleton, Input, Tabs, Accordion
-- [x] Create E2E tests for UI components (`.e2e/ui/components.spec.ts`)
-- [x] Update testing documentation (`docs/guides/testing.md`) with new test structure
-- [x] Add password requirements hidden until typing in register form
-- [x] Add Branding layout to forgot password page
-- [x] Remove OAuth buttons from forgot password page
-- [x] Add showSignIn prop to Header component
-- [x] Fix Branding component to hide on mobile properly
+---
 
 ## References
 
@@ -327,8 +369,13 @@ Complete the authentication system with additional security features, set up use
 - [Better Auth OAuth Guide](https://better-auth.com/docs/plugins/oauth)
 - [Better Auth 2FA Guide](https://better-auth.com/docs/plugins/two-factor)
 - [Better Auth Organization Guide](https://better-auth.com/docs/plugins/organizations)
+- [TanStack Store Documentation](https://tanstack.com/store/latest/docs/overview)
+- [TanStack Form Documentation](https://tanstack.com/form/latest/docs/overview)
+- [TanStack Query Documentation](https://tanstack.com/query/latest/docs/overview)
+- [TanStack Router Documentation](https://tanstack.com/router/latest/docs/overview)
 - [Preact Documentation](https://preactjs.com/)
 - [shadcn/ui Documentation](https://ui.shadcn.com/)
+- [sonner Toast Documentation](https://sonner.emilkowal.dev/)
 - [Resend Documentation](https://resend.com/docs)
 - [ElysiaJS WebSocket](https://elysiajs.com/plugins/websocket.html)
 - [Model Context Protocol SDK](https://github.com/modelcontextprotocol/typescript-sdk)

@@ -66,4 +66,4 @@ jobs:
         uses: stefanzweifel/git-auto-commit-action@04702edda442b2e678b25b537cec683a1493fcb9 # v7.1.0
         with:
           commit_message: "chore: apply automated lint fixes"
-          file_pattern: "*.ts *.tsx *.js *.jsx *.json *.css *.scss"
+          file_pattern: "*.ts *.tsx *.js *.json *.css *.scss"

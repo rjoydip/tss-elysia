@@ -53,7 +53,7 @@ test.describe("Login Page", () => {
   });
 
   // Skipped - navigation timing issue with TanStack Router
-  test("should navigate to register page on sign up link click", async ({ page }) => {});
+  test("should navigate to register page on sign up link click", async ({ page }) => {}); // oxlint-disable-line no-unused-vars
 });
 
 test.describe("Register Page", () => {
@@ -95,7 +95,7 @@ test.describe("Register Page", () => {
   });
 
   // Skipped - flaky due to timing
-  test("should display password requirements after typing", async ({ page }) => {});
+  test("should display password requirements after typing", async ({ page }) => {}); // oxlint-disable-line no-unused-vars
 
   test("should navigate to login page on sign in link click", async ({ page }) => {
     await page
@@ -145,9 +145,9 @@ test.describe("Form Validation", () => {
   });
 
   // Skipped - password strength behavior differs from test expectations
-  test("should display password requirements for weak password", async ({ page }) => {});
-  test("should display weak password indicator", async ({ page }) => {});
-  test("should display strong password indicator", async ({ page }) => {});
+  test("should display password requirements for weak password", async ({ page }) => {}); // oxlint-disable-line no-unused-vars
+  test("should display weak password indicator", async ({ page }) => {}); // oxlint-disable-line no-unused-vars
+  test("should display strong password indicator", async ({ page }) => {}); // oxlint-disable-line no-unused-vars
 });
 
 test.describe("Forgot Password Page", () => {
