@@ -42,12 +42,12 @@ function ProfileContent() {
   const [image, setImage] = useState(session?.user?.image || "");
   const [isLoading, setIsLoading] = useState(false);
 
-   /**
-    * Handle profile update submission.
-    * Updates user profile and refreshes session.
-    * @param e - The form submit event
-    */
-   const handleUpdate = async (e: React.FormEvent) => {
+  /**
+   * Handle profile update submission.
+   * Updates user profile and refreshes session.
+   * @param e - The form submit event
+   */
+  const handleUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
@@ -75,11 +75,11 @@ function ProfileContent() {
     }
   };
 
-   /**
-    * Cancel editing and reset form to current values.
-    * Resets the form fields to their original values from the session.
-    */
-   const handleCancel = () => {
+  /**
+   * Cancel editing and reset form to current values.
+   * Resets the form fields to their original values from the session.
+   */
+  const handleCancel = () => {
     setName(session?.user?.name || "");
     setImage(session?.user?.image || "");
     setIsEditing(false);

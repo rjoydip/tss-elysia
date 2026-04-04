@@ -48,12 +48,12 @@ export function EmailChangeForm() {
     resolver: zodResolver(emailSchema),
   });
 
-   /**
-    * Handle form submission.
-    * Validates email and sends verification email.
-    * @param data - The form data containing the new email address
-    */
-   const onSubmit = async (data: EmailFormData) => {
+  /**
+   * Handle form submission.
+   * Validates email and sends verification email.
+   * @param data - The form data containing the new email address
+   */
+  const onSubmit = async (data: EmailFormData) => {
     // Check if new email is same as current
     if (data.newEmail === session?.user?.email) {
       toast.error("New email must be different from current email");

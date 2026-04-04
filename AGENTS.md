@@ -9,6 +9,7 @@ All AI-generated code must adhere to these standards.
 ### Code Commenting Requirements
 
 - **Always add meaningful comments** to all new or modified code
+- For JavaScript/TypeScript files (.js, .ts, .jsx, .tsx, .mjs, .cjs), use **JSDoc comments** for functions, classes, and complex logic
 - Explain **why** (intent/purpose), not just **what** (mechanics)
 - Add function-level comments describing:
   - Purpose of the function
@@ -32,6 +33,7 @@ All AI-generated code must adhere to these standards.
 - **Reuse utilities**: Use existing helpers/utilities instead of duplicating code
 - **Formatting**: Always run `bun run fmt` before completing any task
 - **Linting**: Run `bun run lint:fix` to auto-fix issues
+  - For markdown files, ensure proper markdown linting (`markdownlint`) is followed
 - **Type Checking**: Ensure `bun run typecheck` passes
 - **Dead Code Prevention**: Run lint and typecheck to detect unused code before committing
 
