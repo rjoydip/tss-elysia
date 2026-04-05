@@ -50,7 +50,7 @@ const authService = new Elysia().all(
  * Includes health check and root endpoint.
  */
 const authApp = new Elysia({
-  name: "api.auth",
+  name: "auth",
   prefix: "/api/auth",
 })
   // Request tracing for performance monitoring

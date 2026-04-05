@@ -12,7 +12,7 @@ description: A full-stack TypeScript application using TanStack Start, Elysia, R
 
 A full-stack TypeScript application using TanStack Start, Elysia, React 19, and Bun.
 
-> **Project Roadmap**: See [PLAN.md](./.artifacts/plans/PLAN.md) for detailed feature planning and progress tracking.
+> **Project Roadmap**: See [PLAN.md](./.artifacts/PLAN.md) for detailed feature planning and progress tracking.
 
 ## Quick Start
 
@@ -175,19 +175,6 @@ src/
 │   ├── db/            # Database (Drizzle + SQLite)
 │   │   ├── index.ts
 │   │   └── schema.ts
-│   ├── realtime/      # Real-time features (WebSocket)
-│   │   ├── index.ts           # Main exports
-│   │   ├── auth.ts            # Connection authentication
-│   │   ├── authorization.ts   # RBAC for messages
-│   │   ├── chat-service.ts    # Chat/messaging
-│   │   ├── connection-store.ts # Connection management
-│   │   ├── csrf.ts            # CSRF validation
-│   │   ├── dashboard-service.ts # Real-time dashboard
-│   │   ├── notification-service.ts # Notifications
-│   │   ├── presence-service.ts # User presence
-│   │   ├── rate-limit.ts      # Per-connection rate limiting
-│   │   ├── sanitizer.ts       # Content sanitization
-│   │   └── schemas.ts         # Message validation (Zod)
 │   └── utils.ts       # Utility functions (cn, etc.)
 ├── logger.ts          # Logger configuration
 ├── middlewares/       # Middleware implementations
@@ -195,8 +182,6 @@ src/
 │   ├── helmet.ts      # Security headers
 │   ├── index.ts       # Export barrel
 │   └── rate-limit.ts  # Rate limiting
-├── plugins/          # Elysia plugins
-│   └── websocket.ts   # WebSocket real-time plugin
 ├── router.tsx         # TanStack Router configuration
 ├── routeTree.gen.ts   # Auto-generated route tree
 ├── routes/            # File-based routing (TanStack Start)
@@ -245,11 +230,8 @@ test/                  # Unit tests (Bun)
 │   ├── settings.test.ts
 │   ├── blog.test.ts
 │   └── changelog.test.ts
-├── lib/              # Library tests
-│   ├── realtime/     # Real-time tests
-│   │   └── connection-store.test.ts # Connection store tests
-│   └── ...
 ├── hooks/            # Hook tests
+├── lib/              # Library tests
 ├── store/            # Store tests
 ├── components/       # Component tests
 │   └── ui/          # UI component tests
@@ -281,8 +263,6 @@ test/                  # Unit tests (Bun)
 │   ├── profile.spec.ts
 │   ├── settings.spec.ts
 │   └── status.spec.ts
-├── realtime/         # Real-time E2E tests
-│   └── websocket.spec.ts # WebSocket tests
 ├── auth.spec.ts       # Auth flow tests
 ├── landing.spec.ts   # Landing page tests
 ├── navigation.spec.ts # Navigation tests
@@ -365,4 +345,4 @@ Common issues:
 
 For detailed agent coding guidelines, see [AGENTS.md](./AGENTS.md).
 
-For feature planning and progress tracking, see [PLAN.md](./.artifacts/plans/PLAN.md).
+For feature planning and progress tracking, see [PLAN.md](./.artifacts/PLAN.md).

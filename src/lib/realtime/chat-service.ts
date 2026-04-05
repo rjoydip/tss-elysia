@@ -136,6 +136,7 @@ class ChatServiceImpl {
 
     for (const message of this.messages.values()) {
       if (message.channelId === channelId && !message.deletedAt) {
+        // oxlint-disable-next-line no-non-null-asserted-optional-chain
         if (before && message.createdAt >= this.messages.get(before)?.createdAt!) {
           continue;
         }
