@@ -5,7 +5,7 @@
  * @module logger
  */
 
-import { isProduction } from "./config";
+import { isProduction, isTest } from "../config";
 
 /**
  * Log levels in priority order (lowest to highest).
@@ -101,7 +101,7 @@ export function createLogger(options: LoggerOptions = {}) {
    * Core logging function.
    */
   const log = (level: LogLevel, message: string, data?: Record<string, unknown> | Error) => {
-    if (!shouldLog(level)) return;
+    if (!shouldLog(level) || isTest) return;
 
     let context: Record<string, unknown> | undefined;
     let error: Error | undefined;

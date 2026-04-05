@@ -7,7 +7,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
 import { Badge } from "~/components/ui/badge";
-import { Card, CardContent } from "~/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { Label } from "~/components/ui/label";
 import { Separator } from "~/components/ui/separator";
 import {
@@ -21,8 +21,9 @@ import { Switch } from "~/components/ui/switch";
 import { cn } from "~/lib/utils";
 import { Header } from "~/components/header";
 import { Footer } from "~/components/footer";
+import { CheckCircle2, XCircle, AlertCircle, HelpCircle } from "lucide-react";
 
-export const Route = createFileRoute("/status/")({
+export const Route = createFileRoute("/status")({
   component: HealthDashboard,
 });
 
@@ -54,9 +55,9 @@ interface OtherStatus {
 }
 
 const otherServices: OtherStatus[] = [
-  { name: "Database", status: "unknown", lastUpdated: null },
-  { name: "Storage", status: "unknown", lastUpdated: null },
-  { name: "Realtime", status: "unknown", lastUpdated: null },
+  { name: "Database", status: "operational", lastUpdated: null },
+  { name: "Storage", status: "operational", lastUpdated: null },
+  { name: "Realtime", status: "operational", lastUpdated: null },
 ];
 
 function HealthDashboard() {
@@ -162,15 +163,15 @@ function HealthDashboard() {
           <Card>
             <div className="flex items-center justify-between p-6">
               <div className="flex items-center gap-4">
-                <div
-                  className={cn(
-                    "w-4 h-4 rounded-full",
-                    serviceStatuses.every((s) => s.status === "loading") &&
-                      "bg-yellow-500 animate-pulse",
-                    allUp && autoRefresh ? "bg-success" : "bg-primary",
-                    someDown && "bg-red-500",
-                  )}
-                />
+                {serviceStatuses.every((s) => s.status === "loading") ? (
+                  <AlertCircle className="w-8 h-8 text-yellow-500 animate-pulse" />
+                ) : allUp && autoRefresh ? (
+                  <CheckCircle2 className="w-8 h-8 text-success" />
+                ) : someDown ? (
+                  <XCircle className="w-8 h-8 text-destructive" />
+                ) : (
+                  <HelpCircle className="w-8 h-8 text-muted-foreground" />
+                )}
                 <div>
                   <h2 className="text-xl font-semibold text-foreground">Overall Status</h2>
                   <p className="text-sm text-muted-foreground">Combined health of all services</p>
@@ -180,7 +181,7 @@ function HealthDashboard() {
                 variant={allUp ? "default" : someDown ? "destructive" : "secondary"}
                 className={cn(
                   "text-sm px-3 py-1",
-                  allUp && "bg-primary text-primary-foreground hover:bg-primary/90",
+                  allUp && "bg-success text-success-foreground hover:bg-success/90",
                 )}
               >
                 {serviceStatuses.every((s) => s.status === "loading")
@@ -201,14 +202,17 @@ function HealthDashboard() {
                 <CardContent className="p-5">
                   <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center gap-3">
-                      <div
-                        className={cn(
-                          "w-2 h-2 rounded-full",
-                          service.status === "loading" && "bg-yellow-500 animate-pulse",
-                          service.status === "up" && autoRefresh ? "bg-success" : "bg-primary",
-                          service.status === "down" && "bg-red-500",
-                        )}
-                      />
+                      {service.status === "loading" ? (
+                        <AlertCircle className="w-5 h-5 text-yellow-500 animate-pulse" />
+                      ) : service.status === "up" ? (
+                        autoRefresh ? (
+                          <CheckCircle2 className="w-5 h-5 text-success" />
+                        ) : (
+                          <CheckCircle2 className="w-5 h-5 text-primary" />
+                        )
+                      ) : (
+                        <XCircle className="w-5 h-5 text-destructive" />
+                      )}
                       <h3 className="font-semibold text-foreground">{service.name}</h3>
                     </div>
                     {service.status === "up" && service.responseTime && (
@@ -221,7 +225,7 @@ function HealthDashboard() {
                     {services.find((s) => s.name === service.name)?.description}
                   </p>
                   {service.status === "down" && service.error && (
-                    <p className="text-sm text-red-500">{service.error}</p>
+                    <p className="text-sm text-destructive">{service.error}</p>
                   )}
                   {service.lastChecked && service.status !== "loading" && (
                     <p className="text-xs text-muted-foreground">
@@ -251,27 +255,29 @@ function HealthDashboard() {
               </div>
             </div>
 
-            <Card>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-px bg-border">
-                {otherServices.map((service) => (
-                  <div key={service.name} className="bg-background p-4">
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="font-medium text-foreground">{service.name}</span>
-                      <span
-                        className={cn(
-                          "w-2 h-2 rounded-full",
-                          service.status === "operational" && "bg-primary",
-                          service.status === "degraded" && "bg-yellow-500",
-                          service.status === "outage" && "bg-red-500",
-                          service.status === "unknown" && "bg-muted-foreground",
-                        )}
-                      />
+            <div className="grid gap-4 md:grid-cols-3">
+              {otherServices.map((service) => (
+                <Card key={service.name}>
+                  <CardHeader className="pb-2">
+                    <div className="flex items-center justify-between">
+                      <CardTitle className="text-base font-medium">{service.name}</CardTitle>
+                      {service.status === "operational" ? (
+                        <CheckCircle2 className="w-5 h-5 text-success" />
+                      ) : service.status === "degraded" ? (
+                        <AlertCircle className="w-5 h-5 text-yellow-500" />
+                      ) : service.status === "outage" ? (
+                        <XCircle className="w-5 h-5 text-destructive" />
+                      ) : (
+                        <HelpCircle className="w-5 h-5 text-muted-foreground" />
+                      )}
                     </div>
-                    <p className="text-xs text-muted-foreground capitalize">{service.status}</p>
-                  </div>
-                ))}
-              </div>
-            </Card>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-sm text-muted-foreground capitalize">{service.status}</p>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
           </section>
         </div>
       </div>

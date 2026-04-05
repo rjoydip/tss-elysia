@@ -12,8 +12,8 @@
  */
 
 import { t, getSchemaValidator, type TSchema } from "elysia";
-import { isBun, isNode, isProduction, PORT } from "./config";
-import { logger } from "./logger";
+import { isBun, isNode, isProduction, PORT } from ".";
+import { logger } from "../lib/logger";
 
 /**
  * Configuration options for environment validation.

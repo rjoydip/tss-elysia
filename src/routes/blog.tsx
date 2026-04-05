@@ -8,7 +8,7 @@ import { blogPosts, getFeaturedPost, BlogPost } from "~/lib/blog/data";
 import { Header } from "~/components/header";
 import { Footer } from "~/components/footer";
 
-export const Route = createFileRoute("/blog/")({
+export const Route = createFileRoute("/blog")({
   component: BlogPage,
 });
 

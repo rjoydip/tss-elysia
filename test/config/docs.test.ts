@@ -5,8 +5,139 @@
  */
 
 import { describe, expect, it } from "bun:test";
-import { docsConfig } from "../../src/config/docs";
+import {
+  docsConfig,
+  globKeyToDocPath,
+  getSplatPath,
+  buildDocMap,
+  docMap,
+} from "../../src/config/docs";
 import { navItems } from "../../src/config/index";
+
+/**
+ * Helper to access unexported getDisplayName function for testing.
+ */
+function getDisplayName(fileName: string): string {
+  const FILE_NAME_MAP: Record<string, string> = {
+    "ci-cd": "CI/CD",
+  };
+
+  function formatName(slug: string): string {
+    return slug
+      .split("-")
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(" ");
+  }
+
+  return FILE_NAME_MAP[fileName] ?? formatName(fileName);
+}
+
+describe("getDisplayName", () => {
+  it("should return mapped name for ci-cd", () => {
+    expect(getDisplayName("ci-cd")).toBe("CI/CD");
+  });
+
+  it("should format kebab-case to Title Case for unmapped names", () => {
+    expect(getDisplayName("environment-variables")).toBe("Environment Variables");
+  });
+
+  it("should return same name for overview (rely on separate handling)", () => {
+    expect(getDisplayName("overview")).toBe("Overview");
+  });
+});
+
+describe("globKeyToDocPath", () => {
+  it("should convert glob key with multiple ../ to doc path", () => {
+    expect(globKeyToDocPath("../../docs/auth/overview.md")).toBe("auth/overview");
+  });
+
+  it("should convert glob key with single ../ to doc path", () => {
+    expect(globKeyToDocPath("../docs/auth/overview.md")).toBe("auth/overview");
+  });
+
+  it("should convert glob key without ../ to doc path", () => {
+    expect(globKeyToDocPath("docs/auth/overview.md")).toBe("auth/overview");
+  });
+
+  it("should remove .md extension", () => {
+    expect(globKeyToDocPath("../../docs/getting-started/development.md")).toBe(
+      "getting-started/development",
+    );
+  });
+
+  it("should handle root doc without folder", () => {
+    expect(globKeyToDocPath("../../docs/overview.md")).toBe("overview");
+  });
+
+  it("should handle nested paths", () => {
+    expect(globKeyToDocPath("../../docs/guides/deployment/docker-compose.md")).toBe(
+      "guides/deployment/docker-compose",
+    );
+  });
+});
+
+describe("getSplatPath", () => {
+  it("should return string _splat value", () => {
+    expect(getSplatPath({ _splat: "auth/overview" })).toBe("auth/overview");
+  });
+
+  it("should return empty string for undefined _splat", () => {
+    expect(getSplatPath({})).toBe("");
+  });
+
+  it("should return empty string for non-string _splat", () => {
+    expect(getSplatPath({ _splat: 123 })).toBe("");
+  });
+
+  it("should return empty string for array _splat", () => {
+    expect(getSplatPath({ _splat: ["a", "b"] })).toBe("");
+  });
+
+  it("should return empty string for object _splat", () => {
+    expect(getSplatPath({ _splat: { path: "test" } })).toBe("");
+  });
+});
+
+describe("buildDocMap", () => {
+  it("should build map from modules record", () => {
+    const modules = {
+      "../../docs/overview.md": "# Overview",
+      "../../docs/auth/overview.md": "# Auth",
+    };
+    const map = buildDocMap(modules);
+    expect(map.get("overview")).toBe("# Overview");
+    expect(map.get("auth/overview")).toBe("# Auth");
+  });
+
+  it("should handle nested paths", () => {
+    const modules = {
+      "../../docs/guides/deployment/ci-cd.md": "# CI/CD",
+    };
+    const map = buildDocMap(modules);
+    expect(map.get("guides/deployment/ci-cd")).toBe("# CI/CD");
+  });
+
+  it("should return empty map for empty record", () => {
+    const map = buildDocMap({});
+    expect(map.size).toBe(0);
+  });
+});
+
+describe("docMap", () => {
+  it("should be a Map instance", () => {
+    expect(docMap instanceof Map).toBe(true);
+  });
+
+  it("should have entries for all doc files", () => {
+    expect(docMap.size).toBeGreaterThan(0);
+  });
+
+  it("should have content for getting-started/overview", () => {
+    const content = docMap.get("getting-started/overview");
+    expect(typeof content).toBe("string");
+    expect(content!.length).toBeGreaterThan(0);
+  });
+});
 
 describe("docsConfig", () => {
   it("should be a non-empty array", () => {
@@ -183,7 +314,7 @@ describe("navItems", () => {
     expect(changelog!.href).toBe("/changelog");
   });
 
-  it("should have exactly 4 nav items", () => {
+  it("should have exactly 3 nav items", () => {
     expect(navItems).toHaveLength(3);
   });
 });

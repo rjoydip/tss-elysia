@@ -60,6 +60,69 @@ bun run typecheck  # TypeScript unused detection
 bun run lint:fix  # Auto-fix safe unused items
 ```
 
+### Testing Requirements
+
+This project uses two testing frameworks:
+
+- **Unit Tests**: Bun (`bun test`) - Located in `test/`
+- **E2E Tests**: Playwright (`bun run test:e2e`) - Located in `.e2e/`
+
+#### Unit Tests Structure
+
+```bash
+test/
+├── config/           # Configuration tests
+│   ├── docs.test.ts  # Docs config (globKeyToDocPath, getSplatPath, buildDocMap, getDisplayName)
+│   └── index.test.ts
+├── middlewares/      # Middleware tests
+│   ├── cors.test.ts
+│   ├── helmet.test.ts
+│   └── index.test.ts # traceFn, errorFn, composedMiddleware
+├── routes/           # Route tests
+│   └── status.test.ts
+├── store/            # Store tests
+├── components/       # Component tests
+│   └── ui/          # UI component tests
+├── lib/              # Library tests
+└── ...
+```
+
+#### E2E Tests Structure
+
+```bash
+.e2e/
+├── ui/               # UI tests (split by component/page)
+│   ├── button.spec.ts
+│   ├── input.spec.ts
+│   ├── sidebar.spec.ts
+│   └── ...
+├── api/              # API tests
+│   ├── endpoints.spec.ts
+│   └── middlewares.spec.ts
+├── middlewares/      # Middleware-specific tests
+│   └── rate-limit.spec.ts
+└── auth.spec.ts
+```
+
+#### Running Tests
+
+```bash
+# Run all unit tests
+bun test
+
+# Run specific test file
+bun test test/config/docs.test.ts
+
+# Run all E2E tests
+bun run test:e2e
+
+# Run specific E2E test file
+bun run test:e2e -- .e2e/api/middlewares.spec.ts
+
+# Run UI E2E tests only
+bun run test:e2e -- .e2e/ui/
+```
+
 ### Agent Behavior
 
 When generating or modifying code, the AI agent must:

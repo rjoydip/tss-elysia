@@ -1,7 +1,7 @@
 import { describe, expect, it, beforeEach } from "bun:test";
 import { Database } from "bun:sqlite";
 import { faker } from "@faker-js/faker";
-import { CREATE_TABLES_SQL } from "./fixtures/db";
+import { CREATE_TABLES_SQL } from "../fixtures/db";
 
 function createTestDatabase(): Database {
   const sqlite = new Database(":memory:");

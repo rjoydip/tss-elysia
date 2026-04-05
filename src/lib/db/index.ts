@@ -9,7 +9,7 @@
 import { drizzle } from "drizzle-orm/bun-sqlite";
 import { Database } from "bun:sqlite";
 import * as schema from "./schema";
-import { env } from "~/env";
+import { env } from "~/config/env";
 
 // SQLite database instance - Bun's native SQLite driver
 let sqlite: Database | undefined;

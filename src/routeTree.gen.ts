@@ -9,14 +9,14 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as StatusRouteImport } from './routes/status'
+import { Route as SettingsRouteImport } from './routes/settings'
+import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as DocsRouteImport } from './routes/docs'
+import { Route as ChangelogRouteImport } from './routes/changelog'
+import { Route as BlogRouteImport } from './routes/blog'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as StatusIndexRouteImport } from './routes/status/index'
-import { Route as SettingsIndexRouteImport } from './routes/settings/index'
-import { Route as ProfileIndexRouteImport } from './routes/profile/index'
 import { Route as DocsIndexRouteImport } from './routes/docs/index'
-import { Route as ChangelogIndexRouteImport } from './routes/changelog/index'
-import { Route as BlogIndexRouteImport } from './routes/blog/index'
 import { Route as DocsSplatRouteImport } from './routes/docs.$'
 import { Route as ApiSplatRouteImport } from './routes/api/$'
 import { Route as AccountVerifyEmailRouteImport } from './routes/account/verify-email'
@@ -25,9 +25,34 @@ import { Route as AccountLoginRouteImport } from './routes/account/login'
 import { Route as AccountForgotPasswordRouteImport } from './routes/account/forgot-password'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 
+const StatusRoute = StatusRouteImport.update({
+  id: '/status',
+  path: '/status',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SettingsRoute = SettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProfileRoute = ProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DocsRoute = DocsRouteImport.update({
   id: '/docs',
   path: '/docs',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ChangelogRoute = ChangelogRouteImport.update({
+  id: '/changelog',
+  path: '/changelog',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BlogRoute = BlogRouteImport.update({
+  id: '/blog',
+  path: '/blog',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -35,35 +60,10 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const StatusIndexRoute = StatusIndexRouteImport.update({
-  id: '/status/',
-  path: '/status/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SettingsIndexRoute = SettingsIndexRouteImport.update({
-  id: '/settings/',
-  path: '/settings/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ProfileIndexRoute = ProfileIndexRouteImport.update({
-  id: '/profile/',
-  path: '/profile/',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const DocsIndexRoute = DocsIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => DocsRoute,
-} as any)
-const ChangelogIndexRoute = ChangelogIndexRouteImport.update({
-  id: '/changelog/',
-  path: '/changelog/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const BlogIndexRoute = BlogIndexRouteImport.update({
-  id: '/blog/',
-  path: '/blog/',
-  getParentRoute: () => rootRouteImport,
 } as any)
 const DocsSplatRoute = DocsSplatRouteImport.update({
   id: '/$',
@@ -103,131 +103,166 @@ const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/blog': typeof BlogRoute
+  '/changelog': typeof ChangelogRoute
   '/docs': typeof DocsRouteWithChildren
+  '/profile': typeof ProfileRoute
+  '/settings': typeof SettingsRoute
+  '/status': typeof StatusRoute
   '/account/forgot-password': typeof AccountForgotPasswordRoute
   '/account/login': typeof AccountLoginRoute
   '/account/register': typeof AccountRegisterRoute
   '/account/verify-email': typeof AccountVerifyEmailRoute
   '/api/$': typeof ApiSplatRoute
   '/docs/$': typeof DocsSplatRoute
-  '/blog/': typeof BlogIndexRoute
-  '/changelog/': typeof ChangelogIndexRoute
   '/docs/': typeof DocsIndexRoute
-  '/profile/': typeof ProfileIndexRoute
-  '/settings/': typeof SettingsIndexRoute
-  '/status/': typeof StatusIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/blog': typeof BlogRoute
+  '/changelog': typeof ChangelogRoute
+  '/profile': typeof ProfileRoute
+  '/settings': typeof SettingsRoute
+  '/status': typeof StatusRoute
   '/account/forgot-password': typeof AccountForgotPasswordRoute
   '/account/login': typeof AccountLoginRoute
   '/account/register': typeof AccountRegisterRoute
   '/account/verify-email': typeof AccountVerifyEmailRoute
   '/api/$': typeof ApiSplatRoute
   '/docs/$': typeof DocsSplatRoute
-  '/blog': typeof BlogIndexRoute
-  '/changelog': typeof ChangelogIndexRoute
   '/docs': typeof DocsIndexRoute
-  '/profile': typeof ProfileIndexRoute
-  '/settings': typeof SettingsIndexRoute
-  '/status': typeof StatusIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/blog': typeof BlogRoute
+  '/changelog': typeof ChangelogRoute
   '/docs': typeof DocsRouteWithChildren
+  '/profile': typeof ProfileRoute
+  '/settings': typeof SettingsRoute
+  '/status': typeof StatusRoute
   '/account/forgot-password': typeof AccountForgotPasswordRoute
   '/account/login': typeof AccountLoginRoute
   '/account/register': typeof AccountRegisterRoute
   '/account/verify-email': typeof AccountVerifyEmailRoute
   '/api/$': typeof ApiSplatRoute
   '/docs/$': typeof DocsSplatRoute
-  '/blog/': typeof BlogIndexRoute
-  '/changelog/': typeof ChangelogIndexRoute
   '/docs/': typeof DocsIndexRoute
-  '/profile/': typeof ProfileIndexRoute
-  '/settings/': typeof SettingsIndexRoute
-  '/status/': typeof StatusIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/docs'
-    | '/account/forgot-password'
-    | '/account/login'
-    | '/account/register'
-    | '/account/verify-email'
-    | '/api/$'
-    | '/docs/$'
-    | '/blog/'
-    | '/changelog/'
-    | '/docs/'
-    | '/profile/'
-    | '/settings/'
-    | '/status/'
-    | '/api/auth/$'
-  fileRoutesByTo: FileRoutesByTo
-  to:
-    | '/'
-    | '/account/forgot-password'
-    | '/account/login'
-    | '/account/register'
-    | '/account/verify-email'
-    | '/api/$'
-    | '/docs/$'
     | '/blog'
     | '/changelog'
     | '/docs'
     | '/profile'
     | '/settings'
     | '/status'
-    | '/api/auth/$'
-  id:
-    | '__root__'
-    | '/'
-    | '/docs'
     | '/account/forgot-password'
     | '/account/login'
     | '/account/register'
     | '/account/verify-email'
     | '/api/$'
     | '/docs/$'
-    | '/blog/'
-    | '/changelog/'
     | '/docs/'
-    | '/profile/'
-    | '/settings/'
-    | '/status/'
+    | '/api/auth/$'
+  fileRoutesByTo: FileRoutesByTo
+  to:
+    | '/'
+    | '/blog'
+    | '/changelog'
+    | '/profile'
+    | '/settings'
+    | '/status'
+    | '/account/forgot-password'
+    | '/account/login'
+    | '/account/register'
+    | '/account/verify-email'
+    | '/api/$'
+    | '/docs/$'
+    | '/docs'
+    | '/api/auth/$'
+  id:
+    | '__root__'
+    | '/'
+    | '/blog'
+    | '/changelog'
+    | '/docs'
+    | '/profile'
+    | '/settings'
+    | '/status'
+    | '/account/forgot-password'
+    | '/account/login'
+    | '/account/register'
+    | '/account/verify-email'
+    | '/api/$'
+    | '/docs/$'
+    | '/docs/'
     | '/api/auth/$'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  BlogRoute: typeof BlogRoute
+  ChangelogRoute: typeof ChangelogRoute
   DocsRoute: typeof DocsRouteWithChildren
+  ProfileRoute: typeof ProfileRoute
+  SettingsRoute: typeof SettingsRoute
+  StatusRoute: typeof StatusRoute
   AccountForgotPasswordRoute: typeof AccountForgotPasswordRoute
   AccountLoginRoute: typeof AccountLoginRoute
   AccountRegisterRoute: typeof AccountRegisterRoute
   AccountVerifyEmailRoute: typeof AccountVerifyEmailRoute
   ApiSplatRoute: typeof ApiSplatRoute
-  BlogIndexRoute: typeof BlogIndexRoute
-  ChangelogIndexRoute: typeof ChangelogIndexRoute
-  ProfileIndexRoute: typeof ProfileIndexRoute
-  SettingsIndexRoute: typeof SettingsIndexRoute
-  StatusIndexRoute: typeof StatusIndexRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/status': {
+      id: '/status'
+      path: '/status'
+      fullPath: '/status'
+      preLoaderRoute: typeof StatusRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/settings': {
+      id: '/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof SettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/profile': {
+      id: '/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof ProfileRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/docs': {
       id: '/docs'
       path: '/docs'
       fullPath: '/docs'
       preLoaderRoute: typeof DocsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/changelog': {
+      id: '/changelog'
+      path: '/changelog'
+      fullPath: '/changelog'
+      preLoaderRoute: typeof ChangelogRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/blog': {
+      id: '/blog'
+      path: '/blog'
+      fullPath: '/blog'
+      preLoaderRoute: typeof BlogRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -237,47 +272,12 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/status/': {
-      id: '/status/'
-      path: '/status'
-      fullPath: '/status/'
-      preLoaderRoute: typeof StatusIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/settings/': {
-      id: '/settings/'
-      path: '/settings'
-      fullPath: '/settings/'
-      preLoaderRoute: typeof SettingsIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/profile/': {
-      id: '/profile/'
-      path: '/profile'
-      fullPath: '/profile/'
-      preLoaderRoute: typeof ProfileIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/docs/': {
       id: '/docs/'
       path: '/'
       fullPath: '/docs/'
       preLoaderRoute: typeof DocsIndexRouteImport
       parentRoute: typeof DocsRoute
-    }
-    '/changelog/': {
-      id: '/changelog/'
-      path: '/changelog'
-      fullPath: '/changelog/'
-      preLoaderRoute: typeof ChangelogIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/blog/': {
-      id: '/blog/'
-      path: '/blog'
-      fullPath: '/blog/'
-      preLoaderRoute: typeof BlogIndexRouteImport
-      parentRoute: typeof rootRouteImport
     }
     '/docs/$': {
       id: '/docs/$'
@@ -345,17 +345,17 @@ const DocsRouteWithChildren = DocsRoute._addFileChildren(DocsRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  BlogRoute: BlogRoute,
+  ChangelogRoute: ChangelogRoute,
   DocsRoute: DocsRouteWithChildren,
+  ProfileRoute: ProfileRoute,
+  SettingsRoute: SettingsRoute,
+  StatusRoute: StatusRoute,
   AccountForgotPasswordRoute: AccountForgotPasswordRoute,
   AccountLoginRoute: AccountLoginRoute,
   AccountRegisterRoute: AccountRegisterRoute,
   AccountVerifyEmailRoute: AccountVerifyEmailRoute,
   ApiSplatRoute: ApiSplatRoute,
-  BlogIndexRoute: BlogIndexRoute,
-  ChangelogIndexRoute: ChangelogIndexRoute,
-  ProfileIndexRoute: ProfileIndexRoute,
-  SettingsIndexRoute: SettingsIndexRoute,
-  StatusIndexRoute: StatusIndexRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
 }
 export const routeTree = rootRouteImport

@@ -10,10 +10,10 @@ import { betterAuth } from "better-auth";
 import { openAPI } from "better-auth/plugins";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { db, schema } from "~/lib/db";
-import { env } from "~/env";
+import { env } from "~/config/env";
 import type { SubscriptionTier } from "~/types/subscription";
 import { isBun } from "~/config";
-import { logger } from "~/logger";
+import { logger } from "~/lib/logger";
 
 /**
  * Creates and configures the Better Auth instance.

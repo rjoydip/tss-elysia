@@ -36,23 +36,23 @@ Or create a `.env` file (see [Environment Variables](/docs/guides/environment-va
 ### Unit Tests (Bun)
 
 ```bash
-bun run test:unit              # Run all tests
-bun run test:watch      # Watch mode
-bun run test:coverage   # With coverage
+bun test              # Run all tests
+bun test --watch      # Watch mode
+bun test --coverage   # With coverage
+bun test test/config/docs.test.ts  # Run specific test file
 ```
 
-Test files: `test/*.test.ts`
+Test files: `test/**/*.test.ts`
 
 ### E2E Tests (Playwright)
 
 ```bash
-bun run test:e2e        # Run E2E tests
-bun run test:e2e:ui     # Run with interactive UI
-bun run test:e2e:headed # Run headed (visible browser)
-bun run test:e2e:report # View HTML report
+bun run test:e2e              # Run all E2E tests
+bun run test:e2e -- .e2e/ui/  # Run UI tests only
+bun run test:e2e -- .e2e/api/ # Run API tests only
 ```
 
-Test files: `.e2e/*.test.ts`
+Test files: `.e2e/**/*.spec.ts`
 
 ### Load Tests (k6)
 
@@ -123,13 +123,18 @@ src/
 ├── routes/           # File-based routing
 │   ├── __root.tsx   # Root route
 │   ├── index.tsx    # Home route
-│   ├── auth/        # Auth routes
-│   ├── profile/     # Profile route
-│   ├── settings/    # Settings route
-│   ├── docs/        # Documentation routes
-│   ├── blog/        # Blog routes
-│   ├── changelog/   # Changelog routes
-│   ├── status/      # Status page routes
+│   ├── account/     # Account routes
+│   │   ├── login.tsx
+│   │   ├── register.tsx
+│   │   ├── forgot-password.tsx
+│   │   └── verify-email.tsx
+│   ├── profile.tsx  # Profile page
+│   ├── settings.tsx # Settings page
+│   ├── docs.tsx     # Documentation layout
+│   ├── docs.$.tsx   # Documentation catch-all
+│   ├── blog.tsx     # Blog routes
+│   ├── changelog.tsx # Changelog routes
+│   ├── status.tsx   # Health monitoring dashboard
 │   └── api/         # API routes
 │       ├── $.ts     # API catch-all
 │       └── auth/    # Auth routes
@@ -155,30 +160,41 @@ src/
 
 ```bash
 test/                  # Unit tests (Bun)
-├── components/        # Component unit tests
-│   ├── ui.test.tsx       # Button, Badge, Card, Separator
-│   ├── ui-additional.test.tsx # Label, Switch, Skeleton, Input, Tabs, Accordion
-│   ├── header.test.tsx  # Header component
-│   ├── branding.test.tsx # Branding component
-│   └── footer.test.tsx  # Footer component
-├── routes/            # Route tests
+├── config/           # Configuration tests
+│   ├── docs.test.ts  # Docs config tests
+│   └── index.test.ts # App config tests
+├── middlewares/      # Middleware tests
+│   ├── cors.test.ts  # CORS tests
+│   ├── helmet.test.ts # Helmet tests
+│   └── index.test.ts # Middleware index tests
+├── hooks/            # Hook tests
+├── lib/              # Library tests
+├── routes/           # Route tests
+│   └── status.test.ts # Status page tests
+├── store/            # Store tests
+├── components/       # Component tests
+│   └── ui/          # UI component tests
 ├── db.test.ts        # Database tests
 ├── auth.test.ts      # Auth tests
 └── fixtures/         # Test fixtures
     └── db.ts
 
 .e2e/                 # E2E tests (Playwright)
-├── ui/               # UI E2E tests
+├── ui/               # UI E2E tests (split by component)
 │   ├── auth.spec.ts      # Authentication tests
-│   ├── components.spec.ts # UI component tests
+│   ├── button.spec.ts   # Button tests
+│   ├── input.spec.ts    # Input tests
 │   ├── navigation.spec.ts # Navigation tests
 │   ├── docs.spec.ts      # Documentation tests
 │   ├── root.spec.ts      # Landing page tests
 │   ├── status.spec.ts   # Status page tests
 │   ├── blog.spec.ts     # Blog tests
-│   └── changelog.spec.ts # Changelog tests
+│   └── ...
 ├── api/              # API E2E tests
-│   └── endpoints.spec.ts # API endpoints
+│   ├── endpoints.spec.ts # API endpoints
+│   └── middlewares.spec.ts # Middleware tests
+├── middlewares/       # Middleware-specific tests
+│   └── rate-limit.spec.ts # Rate limit tests
 └── config.ts         # E2E configuration
 ```
 

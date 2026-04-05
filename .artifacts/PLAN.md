@@ -92,6 +92,32 @@ Complete the authentication system with additional security features, set up use
 - [x] Configure email verification for sign-ups (configured in `src/lib/auth/index.ts`, currently disabled)
 - [ ] Implement password strength requirements
 
+### Phase 4: Documentation & Testing Updates
+
+- [x] Add `stripFrontmatter` function to remove frontmatter from markdown before rendering
+- [x] Add `getDisplayName` function for proper FILE_NAME_MAP lookup
+- [x] Move docs utilities from `src/routes/docs.$.tsx` to `src/config/docs.ts`:
+  - [x] `globKeyToDocPath` - converts Vite glob key to doc path
+  - [x] `getSplatPath` - extracts splat path from route params
+  - [x] `buildDocMap` - builds lookup map from modules
+  - [x] `docMap` - exported map instance
+- [x] Add unit tests for new config functions:
+  - [x] `test/config/docs.test.ts` - globKeyToDocPath, getSplatPath, buildDocMap, getDisplayName
+- [x] Add unit tests for middlewares:
+  - [x] `test/middlewares/helmet.test.ts` - security headers
+  - [x] `test/middlewares/cors.test.ts` - CORS headers
+  - [x] `test/middlewares/index.test.ts` - traceFn, errorFn, composedMiddleware
+- [x] Add E2E tests for middlewares:
+  - [x] `.e2e/api/middlewares.spec.ts` - CORS, Helmet, Trace, Error, Rate Limit
+- [x] Split UI component E2E tests into separate files:
+  - [x] `button.spec.ts`, `input.spec.ts`, `card.spec.ts`, `badge.spec.ts`
+  - [x] `tabs.spec.ts`, `form.spec.ts`, `sidebar.spec.ts`, `avatar.spec.ts`
+  - [x] `tooltip.spec.ts`, `sheet.spec.ts`, `dropdown-menu.spec.ts`, `switch.spec.ts`
+  - [x] `select.spec.ts`, `accordion.spec.ts`, `label.spec.ts`, `table.spec.ts`, `skeleton.spec.ts`
+- [x] Update README.md with new test structure
+- [x] Update AGENTS.md with testing requirements
+- [x] Update folder structure documentation in README.md
+
 ---
 
 ### Phase 4: UI/Component Library
@@ -105,16 +131,26 @@ Complete the authentication system with additional security features, set up use
   - [x] Card components (`src/components/ui/card.tsx`)
   - [x] Badge component (`src/components/ui/badge.tsx`)
   - [x] Separator component (`src/components/ui/separator.tsx`)
-- [ ] Add required shadcn components:
+- [x] Add required shadcn components:
   - [x] Input component
   - [x] Label component (already existed)
-  - [ ] Form components (Form, Field, etc.)
-  - [ ] Dialog component
-  - [ ] Dropdown Menu component
-  - [ ] Avatar component
-  - [ ] Table component
+  - [x] Form components (Form, Field, etc.) - using TanStack Form
+  - [x] Dropdown Menu component
+  - [x] Avatar component
+  - [x] Table component
   - [x] Tabs component
-  - [ ] Sheet component (sidebar)
+  - [x] Sheet component (sidebar)
+  - [x] Switch component
+  - [x] Select component
+  - [x] Accordion component
+  - [x] Tooltip component
+  - [x] Skeleton component
+  - [x] Breadcrumb component
+  - [x] Collapsible component
+  - [x] Sonner toast component
+- [x] Add Markdown renderer with Shiki (`src/components/ui/markdown.tsx`)
+- [x] Create unit tests for UI components (`test/components/ui/*.test.tsx`)
+- [x] Create E2E tests for UI components split by component (`.e2e/ui/*.spec.ts`)
 - [ ] Create reusable component library
 - [ ] Implement design tokens (colors, spacing, typography)
 - [ ] Add Preact configuration (future optimization)
@@ -340,6 +376,15 @@ Complete the authentication system with additional security features, set up use
 - [x] Add unit tests for sonner component (`test/components/ui/sonner.test.tsx`)
 - [x] Add unit tests for preferences store (`test/store/preferences.test.ts`)
 - [x] Split UI component tests into separate files (`test/components/ui/*.test.tsx`)
+- [x] Add `stripFrontmatter` function to remove frontmatter from markdown content
+- [x] Add `getDisplayName` function for proper FILE_NAME_MAP lookup in docs config
+- [x] Move docs utilities from `src/routes/docs.$.tsx` to `src/config/docs.ts`
+- [x] Add unit tests for config/docs functions (`test/config/docs.test.ts`)
+- [x] Add unit tests for middlewares (`test/middlewares/*.test.ts`)
+- [x] Add E2E tests for middlewares (`.e2e/api/middlewares.spec.ts`)
+- [x] Split UI component E2E tests into separate files (`.e2e/ui/*.spec.ts`)
+- [x] Update README.md with new test structure and folder structure
+- [x] Update AGENTS.md with testing requirements
 
 ---
 

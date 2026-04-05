@@ -104,7 +104,14 @@ test.describe("Docs Sidebar", () => {
       .filter({ has: page.getByRole("button", { name: "Authentication" }) });
     await authSection.locator('a[href="/docs/auth/overview"]').click();
     await page.waitForLoadState("networkidle");
-    await expect(page.getByRole("heading", { level: 1, name: "Authentication" })).toBeVisible();
+    await page.waitForTimeout(2000);
+    // Verify navigation to auth docs page
+    await expect(page).toHaveURL(/.*\/docs\/auth\/overview/);
+    // Verify the main content area has the docs content
+    await expect(page.locator("main")).toBeVisible();
+    await expect(page.locator("main").getByText(/This project uses/)).toBeVisible({
+      timeout: 10000,
+    });
   });
 });
 

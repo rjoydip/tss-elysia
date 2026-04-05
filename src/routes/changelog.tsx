@@ -15,7 +15,7 @@ import {
   AccordionTrigger,
 } from "~/components/ui/accordion";
 
-export const Route = createFileRoute("/changelog/")({
+export const Route = createFileRoute("/changelog")({
   component: ChangelogPage,
 });
 

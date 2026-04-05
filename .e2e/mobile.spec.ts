@@ -3,7 +3,7 @@
  */
 
 import { test, expect } from "@playwright/test";
-import { E2E_BASE_URL } from "../config";
+import { E2E_BASE_URL } from "./_config";
 
 test.describe("Mobile Behavior", () => {
   test.describe("Sidebar Mobile", () => {

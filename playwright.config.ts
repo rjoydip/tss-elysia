@@ -1,6 +1,6 @@
 import { defineConfig, devices } from "@playwright/test";
 import { isCI } from "std-env";
-import { E2E_BASE_URL, E2E_HOST, E2E_PORT } from "./.e2e/config";
+import { E2E_BASE_URL, E2E_HOST, E2E_PORT } from "./.e2e/_config";
 
 export default defineConfig({
   testDir: "./.e2e",
