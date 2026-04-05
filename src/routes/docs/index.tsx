@@ -118,7 +118,7 @@ const features = [
 
 function DocsLandingPage() {
   return (
-    <div className="max-w-4xl">
+    <>
       {/* Title */}
       <h1 className="text-4xl font-bold tracking-tight mb-4 text-foreground">Getting Started</h1>
       <p className="text-xl text-muted-foreground mb-8 leading-relaxed">
@@ -200,6 +200,6 @@ function DocsLandingPage() {
           </a>
         </div>
       </section>
-    </div>
+    </>
   );
 }

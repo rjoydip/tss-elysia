@@ -1,4 +1,9 @@
-# API Reference
+---
+title: API Reference
+description: API endpoints and server routes reference
+---
+
+## API Reference
 
 ## Server Routes
 
@@ -6,12 +11,19 @@ This project uses TanStack Start with file-based routing. Routes are defined in 
 
 ### Current Routes
 
-| Method | Path          | Description       |
-| ------ | ------------- | ----------------- |
-| GET    | `/`           | Home page (SSR)   |
-| GET    | `/api`        | API root endpoint |
-| GET    | `/api/*`      | API catch-all     |
-| GET    | `/api/health` | Health check      |
+| Method | Path           | Description       |
+| ------ | -------------- | ----------------- |
+| GET    | `/`            | Home page (SSR)   |
+| GET    | `/account/*`   | Account routes    |
+| GET    | `/api`         | API root endpoint |
+| GET    | `/api/*`       | API catch-all     |
+| GET    | `/api/health`  | Health check      |
+| GET    | `/blog/*`      | Blog routes       |
+| GET    | `/changelog/*` | Changelog routes  |
+| GET    | `/docs/*`      | Docs routes       |
+| GET    | `/profile`     | Profile page      |
+| GET    | `/settings/*`  | Settings routes   |
+| GET    | `/status`      | Health monitor    |
 
 ### Route File Structure
 
@@ -19,10 +31,22 @@ This project uses TanStack Start with file-based routing. Routes are defined in 
 src/routes/
   __root.tsx        # Root route (layout)
   index.tsx         # Home page (/)
+  account/          # Account routes
+    login.tsx
+    register.tsx
+    forgot-password.tsx
+    verify-email.tsx
   api/
     $.ts           # API catch-all route (/api/*)
     auth/
       $.ts         # Auth route (/api/auth/*)
+  blog.tsx          # Blog routes
+  changelog.tsx     # Changelog routes
+  docs.tsx          # Documentation layout
+  docs.$.tsx        # Docs catch-all (/docs/*)
+  profile.tsx        # Profile page
+  settings.tsx       # Settings page
+  status.tsx        # Health monitoring dashboard
 ```
 
 ### API Route Implementation

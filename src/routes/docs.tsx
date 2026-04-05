@@ -6,16 +6,25 @@
  */
 
 import { createFileRoute, Outlet, useLocation } from "@tanstack/react-router";
-import { useState, useEffect, useCallback } from "react";
-import { cn } from "~/lib/utils";
+import React, { useEffect, useState } from "react";
 import { docsConfig } from "~/config/docs";
 import { Header } from "~/components/header";
-import { Footer } from "~/components/footer";
+import { SidebarInset, SidebarProvider, SidebarTrigger, useSidebar } from "~/components/ui/sidebar";
+import { Separator } from "~/components/ui/separator";
+import { Skeleton } from "~/components/ui/skeleton";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "~/components/ui/breadcrumb";
 import { DocsSidebar } from "~/components/docs/sidebar";
-import { BreadcrumbNav } from "~/components/breadcrumb";
+import { Footer } from "~/components/footer";
 
 export const Route = createFileRoute("/docs")({
-  component: DocsLayout,
+  component: DocsLayoutWrapper,
 });
 
 /**
@@ -24,111 +33,108 @@ export const Route = createFileRoute("/docs")({
  */
 function useBreadcrumbs(pathname: string) {
   const [breadcrumbs, setBreadcrumbs] = useState<{ label: string; href?: string }[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    setIsLoading(true);
+
     const items: { label: string; href?: string }[] = [];
     const segments = pathname.split("/").filter(Boolean);
 
-    // Only show breadcrumbs for non-root docs pages
     if (segments.length === 0 || segments[0] !== "docs") {
       setBreadcrumbs([]);
+      setIsLoading(false);
       return;
     }
 
     items.push({ label: "Docs", href: "/docs" });
 
-    // Find matching doc item for current path
-    // Prefer exact matches over prefix matches to avoid "/docs" matching "/docs/development"
     for (const section of docsConfig) {
       const matchingItem =
         section.items.find((item) => item.href === pathname) ??
         section.items.find((item) => item.href !== "/docs" && pathname.startsWith(item.href));
 
       if (matchingItem) {
-        items.push({ label: section.title });
-        items.push({ label: matchingItem.name });
+        items.push({ label: section.title, href: undefined });
+        items.push({ label: matchingItem.name, href: matchingItem.href });
         break;
       }
     }
 
     setBreadcrumbs(items);
+    setIsLoading(false);
   }, [pathname]);
 
-  return breadcrumbs;
+  return { breadcrumbs, isLoading };
 }
 
 function DocsLayout() {
-  const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({});
   const currentPath = useLocation({ select: (location) => location.pathname });
-  const breadcrumbs = useBreadcrumbs(currentPath);
+  const { breadcrumbs, isLoading } = useBreadcrumbs(currentPath);
+  const { state } = useSidebar();
+  const isExpanded = state === "expanded";
 
-  // Sync expanded sections when navigating to a new path
-  useEffect(() => {
-    const initialExpanded: Record<string, boolean> = {};
-    docsConfig.forEach((section) => {
-      initialExpanded[section.title] = section.items.some(
-        (item) => item.href === currentPath || currentPath.startsWith(item.href),
-      );
-    });
-    setExpandedSections(initialExpanded);
-  }, [currentPath]);
-
-  const toggleSection = useCallback((title: string) => {
-    setExpandedSections((prev) => ({
-      ...prev,
-      [title]: !prev[title],
-    }));
-  }, []);
-
-  const toggleSidebar = useCallback(() => {
-    setSidebarOpen((prev) => !prev);
-  }, []);
+  const headerMargin = isExpanded
+    ? "mx-[var(--sidebar-width)]"
+    : "mx-[calc(var(--sidebar-width-icon)+2rem)]";
+  const contentMargin = isExpanded
+    ? "mx-[var(--sidebar-width)]"
+    : "mx-[calc(var(--sidebar-width-icon)+2rem)]";
 
   return (
-    <div className="min-h-screen bg-background">
-      <Header>
-        {/* Mobile sidebar toggle */}
-        <button
-          onClick={toggleSidebar}
-          className="p-2 hover:bg-accent rounded-md transition-colors lg:hidden"
-          aria-label="Toggle sidebar"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="20"
-            height="20"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <line x1="3" x2="21" y1="6" y2="6" />
-            <line x1="3" x2="21" y1="12" y2="12" />
-            <line x1="3" x2="21" y1="18" y2="18" />
-          </svg>
-        </button>
-      </Header>
-
-      <DocsSidebar
-        sidebarOpen={sidebarOpen}
-        expandedSections={expandedSections}
-        onToggleSection={toggleSection}
-      />
-
-      {/* Main Content */}
-      <main
-        className={cn("pt-12 transition-all duration-300", sidebarOpen ? "lg:ml-72" : "lg:ml-0")}
-      >
-        <div className="max-w-6xl mx-auto py-12">
-          {/* Breadcrumb Navigation */}
-          {breadcrumbs.length > 0 && <BreadcrumbNav items={breadcrumbs} className="mb-6" />}
-          <Outlet />
-        </div>
-        <Footer />
-      </main>
+    <div className="flex flex-col">
+      <Header />
+      <>
+        <DocsSidebar className={isExpanded ? "" : "pt-12"} />
+        <SidebarInset className="flex pt-12">
+          <header className={`flex h-16 shrink-0 items-center gap-2 ${headerMargin}`}>
+            <SidebarTrigger />
+            <Separator orientation="vertical" className="mr-2 h-4" />
+            {isLoading ? (
+              <div className="flex items-center gap-2">
+                <Skeleton className="h-4 w-16" />
+                <Skeleton className="h-4 w-4" />
+                <Skeleton className="h-4 w-24" />
+              </div>
+            ) : breadcrumbs.length > 0 ? (
+              <Breadcrumb>
+                <BreadcrumbList>
+                  {breadcrumbs.map((item, index) => (
+                    <React.Fragment key={item.label}>
+                      <BreadcrumbItem
+                        className={
+                          index === breadcrumbs.length - 1 ? "hidden md:block" : "hidden md:block"
+                        }
+                      >
+                        {item.href && index < breadcrumbs.length - 1 ? (
+                          <BreadcrumbLink href={item.href}>{item.label}</BreadcrumbLink>
+                        ) : (
+                          <BreadcrumbPage>{item.label}</BreadcrumbPage>
+                        )}
+                      </BreadcrumbItem>
+                      {index < breadcrumbs.length - 1 && (
+                        <BreadcrumbSeparator className="hidden md:block" />
+                      )}
+                    </React.Fragment>
+                  ))}
+                </BreadcrumbList>
+              </Breadcrumb>
+            ) : null}
+          </header>
+          <div className={`flex flex-col p-4 pt-0 transition-all duration-200 ${contentMargin}`}>
+            <Outlet />
+            <Footer showLogo={true} />
+          </div>
+        </SidebarInset>
+      </>
     </div>
+  );
+}
+
+function DocsLayoutWrapper() {
+  return (
+    <SidebarProvider defaultOpen>
+      <DocsLayout />
+    </SidebarProvider>
   );
 }

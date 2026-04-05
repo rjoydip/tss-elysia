@@ -1,4 +1,9 @@
-# Contributing to TSS Elysia
+---
+title: Contributing
+description: Guidelines for contributing to TSS Elysia
+---
+
+## Contributing to TSS Elysia
 
 Thank you for your interest in contributing! This project uses [Changesets](https://github.com/changesets/changesets) for managing versioning and changelogs.
 

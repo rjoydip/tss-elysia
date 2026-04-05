@@ -1,4 +1,9 @@
-# CI/CD
+---
+title: CI/CD
+description: Continuous integration and deployment pipelines
+---
+
+## CI/CD
 
 This document covers the continuous integration and deployment pipelines for this project.
 
@@ -58,7 +63,7 @@ Releases are **automatically** created when:
 
 ### Release Workflow Steps
 
-```
+```bash
 ┌─────────────────────────────────────────────────────────────────┐
 │                    RELEASE WORKFLOW                              │
 └─────────────────────────────────────────────────────────────────┘

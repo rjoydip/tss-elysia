@@ -1,4 +1,9 @@
-# Architecture
+---
+title: Architecture
+description: System architecture and design patterns
+---
+
+## Architecture
 
 This document describes the system architecture of the tss-elysia project.
 
@@ -169,17 +174,18 @@ src/
 ├── routes/           # TanStack Start routes
 │   ├── __root.tsx
 │   ├── index.tsx     # Home route
-│   ├── auth/         # Auth routes
+│   ├── account/      # Account routes
 │   │   ├── login.tsx
 │   │   ├── register.tsx
 │   │   ├── forgot-password.tsx
 │   │   └── verify-email.tsx
-│   ├── profile/      # Profile route
-│   ├── settings/     # Settings route
-│   ├── docs/         # Documentation routes
-│   ├── blog/         # Blog routes
-│   ├── changelog/    # Changelog routes
-│   ├── status/       # Status page routes
+│   ├── profile.tsx   # Profile page
+│   ├── settings.tsx  # Settings page
+│   ├── docs.tsx      # Documentation layout
+│   ├── docs.$.tsx    # Documentation catch-all
+│   ├── blog.tsx      # Blog routes
+│   ├── changelog.tsx # Changelog routes
+│   ├── status.tsx     # Health monitoring dashboard
 │   └── api/          # API routes
 │       ├── $.ts
 │       └── auth/
@@ -189,7 +195,7 @@ src/
 │   └── subscription.ts
 ├── utils.ts          # Utility functions
 └── styles/
-    └── app.css       # Global styles
+    └── app.css       # Global styles (Tailwind CSS + shadcn theme)
 ```
 
 ## SSR/CSR Strategy

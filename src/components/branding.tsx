@@ -189,10 +189,11 @@ export function BrandLogo({
   size = "lg",
   showName = true,
 }: {
-  size?: "sm" | "md" | "lg" | "xl";
+  size?: "xs" | "sm" | "md" | "lg" | "xl";
   showName?: boolean;
 }) {
   const sizeClasses = {
+    xs: "w-6 h-6 text-lg",
     sm: "w-8 h-8 text-xl",
     md: "w-10 h-10 text-2xl",
     lg: "w-12 h-12 text-3xl",
@@ -200,13 +201,12 @@ export function BrandLogo({
   };
 
   return (
-    <div className="inline-flex items-center gap-2">
+    <>
       <div
         className={`
-                    bg-gradient-to-br from-primary/80 to-primary 
-                    rounded-lg flex items-center justify-center 
-                    ${sizeClasses[size]}
-                `}
+          rounded-lg flex items-center justify-center 
+          ${sizeClasses[size]}
+        `}
       >
         <svg xmlns="http://www.w3.org/2000/svg" width={24} height={24} viewBox="0 0 24 24">
           <path
@@ -218,6 +218,6 @@ export function BrandLogo({
       {showName && (
         <span className={`font-bold ${sizeClasses[size].split(" ")[1]}`}>{APP_NAME}</span>
       )}
-    </div>
+    </>
   );
 }

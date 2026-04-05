@@ -1,4 +1,9 @@
-# Troubleshooting
+---
+title: Troubleshooting
+description: Common issues and solutions
+---
+
+## Troubleshooting
 
 This document covers common issues and their solutions.
 

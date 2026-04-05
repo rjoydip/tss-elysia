@@ -6,45 +6,9 @@
 
 import { createFileRoute } from "@tanstack/react-router";
 import { MarkdownRenderer, parseFrontmatter } from "~/components/markdown";
+import { docMap, getSplatPath } from "~/config/docs";
 import { Skeleton } from "~/components/ui/skeleton";
 import { useEffect, useState } from "react";
-
-/**
- * Eagerly import all markdown files from the project /docs directory.
- * Vite bundles these at build time so nested paths resolve correctly.
- * Keys are relative paths like "../../docs/auth/overview.md".
- */
-const markdownModules = import.meta.glob("../../docs/**/*.md", {
-  query: "?raw",
-  import: "default",
-  eager: true,
-}) as Record<string, string>;
-
-/**
- * Converts a Vite glob key (e.g., "../../docs/auth/overview.md")
- * into a doc path (e.g., "auth/overview") for route matching.
- */
-function globKeyToDocPath(key: string): string {
-  return key.replace(/^(\.\.\/)*docs\//, "").replace(/\.md$/, "");
-}
-
-/**
- * Builds a lookup map from doc path to raw markdown content.
- * Example: { "auth/overview": "# Auth Overview\n...", "architecture": "# Architecture\n..." }
- */
-const docMap = new Map<string, string>();
-for (const [key, content] of Object.entries(markdownModules)) {
-  docMap.set(globKeyToDocPath(key), content);
-}
-
-/**
- * Safely extracts the splat path from route params.
- * In TanStack Router catch-all routes, _splat may be undefined for /docs root.
- */
-function getSplatPath(params: Record<string, unknown>): string {
-  const raw = params._splat;
-  return typeof raw === "string" ? raw : "";
-}
 
 /**
  * Route definition for the dynamic docs catch-all.
@@ -100,18 +64,14 @@ function DocsPage() {
 
   if (!mounted) {
     return (
-      <div className="max-w-4xl space-y-4">
-        <Skeleton className="h-8 w-3/4" />
+      <div className="max-w-7xl space-y-4 w-full">
+        <Skeleton className="h-8 w-full" />
         <Skeleton className="h-4 w-full" />
-        <Skeleton className="h-4 w-5/6" />
-        <Skeleton className="h-32 w-full" />
+        <Skeleton className="h-4 w-full" />
+        <Skeleton className="h-64 w-full" />
       </div>
     );
   }
 
-  return (
-    <div className="max-w-4xl">
-      <MarkdownRenderer content={content} />
-    </div>
-  );
+  return <MarkdownRenderer content={content} />;
 }

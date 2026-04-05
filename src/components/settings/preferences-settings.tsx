@@ -2,9 +2,10 @@
  * Preferences Settings Component
  * Handles user preference settings like theme and notifications.
  * Provides toggles for various user preferences.
+ * Uses centralized TanStack store for state management.
  */
 
-import { useState } from "react";
+import { usePreferences, setPreferences } from "~/lib/store/preferences";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";
 import { Label } from "~/components/ui/label";
 import { Switch } from "~/components/ui/switch";
@@ -12,14 +13,13 @@ import { Switch } from "~/components/ui/switch";
 /**
  * PreferencesSettings component for user preferences.
  * Displays theme and notification settings.
+ * Reads from and writes to centralized preferences store.
  *
  * @example
  * <PreferencesSettings />
  */
 export function PreferencesSettings() {
-  const [emailNotifications, setEmailNotifications] = useState(true);
-  const [marketingEmails, setMarketingEmails] = useState(false);
-  const [sessionAlerts, setSessionAlerts] = useState(true);
+  const preferences = usePreferences();
 
   return (
     <div className="space-y-6">
@@ -42,8 +42,8 @@ export function PreferencesSettings() {
             </div>
             <Switch
               id="emailNotifications"
-              checked={emailNotifications}
-              onCheckedChange={setEmailNotifications}
+              checked={preferences.emailNotifications}
+              onCheckedChange={(checked) => setPreferences({ emailNotifications: checked })}
             />
           </div>
 
@@ -59,8 +59,8 @@ export function PreferencesSettings() {
             </div>
             <Switch
               id="marketingEmails"
-              checked={marketingEmails}
-              onCheckedChange={setMarketingEmails}
+              checked={preferences.marketingEmails}
+              onCheckedChange={(checked) => setPreferences({ marketingEmails: checked })}
             />
           </div>
 
@@ -74,7 +74,11 @@ export function PreferencesSettings() {
                 Get notified when a new session is created on your account
               </p>
             </div>
-            <Switch id="sessionAlerts" checked={sessionAlerts} onCheckedChange={setSessionAlerts} />
+            <Switch
+              id="sessionAlerts"
+              checked={preferences.sessionAlerts}
+              onCheckedChange={(checked) => setPreferences({ sessionAlerts: checked })}
+            />
           </div>
         </CardContent>
       </Card>
@@ -107,7 +111,10 @@ export function PreferencesSettings() {
                 Make your profile visible to other users
               </p>
             </div>
-            <Switch defaultChecked />
+            <Switch
+              checked={preferences.profileVisibility}
+              onCheckedChange={(checked) => setPreferences({ profileVisibility: checked })}
+            />
           </div>
 
           {/* Activity status */}
@@ -118,7 +125,10 @@ export function PreferencesSettings() {
                 Show when you are online to other users
               </p>
             </div>
-            <Switch defaultChecked />
+            <Switch
+              checked={preferences.activityStatus}
+              onCheckedChange={(checked) => setPreferences({ activityStatus: checked })}
+            />
           </div>
         </CardContent>
       </Card>

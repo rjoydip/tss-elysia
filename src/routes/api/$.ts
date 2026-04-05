@@ -9,16 +9,16 @@ import { treaty } from "@elysiajs/eden";
 import { createFileRoute } from "@tanstack/react-router";
 import { createIsomorphicFn } from "@tanstack/react-start";
 import { API_PREFIX, APP_NAME, HOST, PORT, isBrowser } from "~/config";
-import { composedMiddleware } from "~/middlewares";
-import { errorFn, traceFn } from "~/utils";
+import { composedMiddleware, errorFn, traceFn } from "~/middlewares";
 
 /**
  * Main API application instance.
  * Prefix: /api (configurable via API_PREFIX)
  * Includes all security middleware, tracing, and error handling.
+ * Note: WebSocket support is added separately in createWsApiApp for production.
  */
 export const apiApp = new Elysia({
-  name: "api-app",
+  name: "api",
   prefix: API_PREFIX,
 })
   // Apply composed middleware (CORS, Helmet, Rate Limit, OpenTelemetry)
