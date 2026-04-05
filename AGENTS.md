@@ -60,6 +60,73 @@ bun run typecheck  # TypeScript unused detection
 bun run lint:fix  # Auto-fix safe unused items
 ```
 
+### Testing Requirements
+
+This project uses two testing frameworks:
+
+- **Unit Tests**: Bun (`bun test`) - Located in `test/`
+- **E2E Tests**: Playwright (`bun run test:e2e`) - Located in `.e2e/`
+
+#### Unit Tests Structure
+
+```bash
+test/
+├── config/           # Configuration tests
+│   ├── docs.test.ts  # Docs config (globKeyToDocPath, getSplatPath, buildDocMap, getDisplayName)
+│   └── index.test.ts
+├── middlewares/      # Middleware tests
+│   ├── cors.test.ts
+│   ├── helmet.test.ts
+│   └── index.test.ts # traceFn, errorFn, composedMiddleware
+├── routes/           # Route tests
+│   └── status.test.ts
+├── store/            # Store tests
+├── components/       # Component tests
+│   └── ui/          # UI component tests
+├── lib/              # Library tests
+│   └── realtime/   # Real-time tests
+│       └── connection-store.test.ts
+└── ...
+```
+
+#### E2E Tests Structure
+
+```bash
+.e2e/
+├── ui/               # UI tests (split by component/page)
+│   ├── button.spec.ts
+│   ├── input.spec.ts
+│   ├── sidebar.spec.ts
+│   └── ...
+├── api/              # API tests
+│   ├── endpoints.spec.ts
+│   └── middlewares.spec.ts
+├── middlewares/      # Middleware-specific tests
+│   └── rate-limit.spec.ts
+├── realtime/         # Real-time tests
+│   └── websocket.spec.ts
+└── auth.spec.ts
+```
+
+#### Running Tests
+
+```bash
+# Run all unit tests
+bun test
+
+# Run specific test file
+bun test test/config/docs.test.ts
+
+# Run all E2E tests
+bun run test:e2e
+
+# Run specific E2E test file
+bun run test:e2e -- .e2e/api/middlewares.spec.ts
+
+# Run UI E2E tests only
+bun run test:e2e -- .e2e/ui/
+```
+
 ### Agent Behavior
 
 When generating or modifying code, the AI agent must:
@@ -87,7 +154,7 @@ All necessary information is in [README.md](./README.md), including:
 
 ## Recommended Workflow
 
-1. For any task, first check [PLAN.md](./.artifacts/PLAN.md) to see if it's already planned
+1. For any task, first check [PLAN.md](./.artifacts/plans/PLAN.md) to see if it's already planned
 2. For non-trivial tasks, create a plan using PLAN.md template
 3. Create/edit code
 4. Run `bun run fmt` to ensure formatting

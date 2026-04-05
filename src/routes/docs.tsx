@@ -11,6 +11,7 @@ import { docsConfig } from "~/config/docs";
 import { Header } from "~/components/header";
 import { SidebarInset, SidebarProvider, SidebarTrigger, useSidebar } from "~/components/ui/sidebar";
 import { Separator } from "~/components/ui/separator";
+import { Skeleton } from "~/components/ui/skeleton";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -32,13 +33,17 @@ export const Route = createFileRoute("/docs")({
  */
 function useBreadcrumbs(pathname: string) {
   const [breadcrumbs, setBreadcrumbs] = useState<{ label: string; href?: string }[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    setIsLoading(true);
+
     const items: { label: string; href?: string }[] = [];
     const segments = pathname.split("/").filter(Boolean);
 
     if (segments.length === 0 || segments[0] !== "docs") {
       setBreadcrumbs([]);
+      setIsLoading(false);
       return;
     }
 
@@ -57,14 +62,15 @@ function useBreadcrumbs(pathname: string) {
     }
 
     setBreadcrumbs(items);
+    setIsLoading(false);
   }, [pathname]);
 
-  return breadcrumbs;
+  return { breadcrumbs, isLoading };
 }
 
 function DocsLayout() {
   const currentPath = useLocation({ select: (location) => location.pathname });
-  const breadcrumbs = useBreadcrumbs(currentPath);
+  const { breadcrumbs, isLoading } = useBreadcrumbs(currentPath);
   const { state } = useSidebar();
   const isExpanded = state === "expanded";
 
@@ -84,7 +90,13 @@ function DocsLayout() {
           <header className={`flex h-16 shrink-0 items-center gap-2 ${headerMargin}`}>
             <SidebarTrigger />
             <Separator orientation="vertical" className="mr-2 h-4" />
-            {breadcrumbs.length > 0 && (
+            {isLoading ? (
+              <div className="flex items-center gap-2">
+                <Skeleton className="h-4 w-16" />
+                <Skeleton className="h-4 w-4" />
+                <Skeleton className="h-4 w-24" />
+              </div>
+            ) : breadcrumbs.length > 0 ? (
               <Breadcrumb>
                 <BreadcrumbList>
                   {breadcrumbs.map((item, index) => (
@@ -107,9 +119,9 @@ function DocsLayout() {
                   ))}
                 </BreadcrumbList>
               </Breadcrumb>
-            )}
+            ) : null}
           </header>
-          <div className={`flex flex-col gap-4 p-4 transition-all duration-200 ${contentMargin}`}>
+          <div className={`flex flex-col p-4 pt-0 transition-all duration-200 ${contentMargin}`}>
             <Outlet />
             <Footer showLogo={true} />
           </div>

@@ -20,7 +20,7 @@ export function Footer({ className, showTerms = true, showLogo = false }: Footer
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className={cn(`py-4 px-4 bg-muted/10`, className)}>
+    <footer className={cn(`py-4 px-4`, className)}>
       <div className="mx-auto">
         {/* Main footer content */}
         <div className="flex flex-col md:flex-row items-center justify-between">

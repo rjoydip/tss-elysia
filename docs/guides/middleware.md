@@ -11,11 +11,14 @@ This project implements middleware for the Elysia server, providing security, pe
 
 Located in `src/middlewares/`:
 
-| Middleware | File            | Purpose                               |
-| ---------- | --------------- | ------------------------------------- |
-| CORS       | `cors.ts`       | Cross-Origin Resource Sharing headers |
-| Helmet     | `helmet.ts`     | Security HTTP headers                 |
-| Rate Limit | `rate-limit.ts` | Request rate limiting                 |
+| Middleware | File            | Purpose                                |
+| ---------- | --------------- | -------------------------------------- |
+| CORS       | `cors.ts`       | Cross-Origin Resource Sharing headers  |
+| Helmet     | `helmet.ts`     | Security HTTP headers                  |
+| Rate Limit | `rate-limit.ts` | Request rate limiting                  |
+| Trace      | `index.ts`      | Request timing and performance tracing |
+| Error      | `index.ts`      | Centralized error handling             |
+| Composed   | `index.ts`      | Combined middleware bundle             |
 
 ## CORS Middleware
 
@@ -122,6 +125,67 @@ All middlewares are exported from `src/middlewares/index.ts`:
 export { cors, corsWithCredentials } from "./cors";
 export { helmet } from "./helmet";
 export { rateLimitMiddleware } from "./rate-limit";
+export { traceFn, errorFn, composedMiddleware } from "./index";
+```
+
+## Trace Middleware
+
+Request tracing for performance monitoring:
+
+```typescript
+// src/middlewares/index.ts
+export const traceFn: TraceHandler = async ({
+  onBeforeHandle,
+  onAfterHandle,
+  onError,
+  onHandle,
+  set,
+}) => {
+  // Track time in each pipeline stage
+  onHandle(({ onStop }) => {
+    onStop(({ elapsed }) => {
+      set.headers["X-Elapsed"] = String(elapsed);
+    });
+  });
+};
+```
+
+## Error Handling Middleware
+
+Centralized error handling with JSON responses:
+
+```typescript
+// src/middlewares/index.ts
+export const errorFn: ErrorHandler = ({ code, error }) => {
+  const isProduction = process.env.NODE_ENV === "production";
+  const errorMessage = isProduction
+    ? "An unexpected error occurred"
+    : error instanceof Error
+      ? error.message
+      : String(error);
+
+  return new Response(JSON.stringify({ error: errorMessage }), {
+    status: code === "NOT_FOUND" ? 404 : 500,
+  });
+};
+```
+
+## Composed Middleware
+
+All middleware combined for easy integration:
+
+```typescript
+// src/middlewares/index.ts
+export const composedMiddleware = (
+  { openAPP_NAME }: ComposedMiddlewareOptions = { openAPP_NAME: APP_NAME },
+) =>
+  new Elysia({ name: "composed-middleware" })
+    .use(cors)
+    .use(corsWithCredentials)
+    .use(helmet)
+    .use(openapi({ ... }))
+    .use(rateLimitMiddleware)
+    .use(opentelemetry({ ... }));
 ```
 
 ## App Factory

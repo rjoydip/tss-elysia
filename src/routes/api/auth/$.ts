@@ -7,9 +7,9 @@
 import { Elysia } from "elysia";
 import type { Context } from "elysia";
 import { createFileRoute } from "@tanstack/react-router";
-import { errorFn, traceFn } from "~/utils";
 import { auth } from "~/lib/auth";
 import { AUTH_ALLOWED_METHODS } from "~/config";
+import { errorFn, traceFn } from "~/middlewares";
 
 /**
  * Auth service handler that delegates to Better Auth.
@@ -50,7 +50,7 @@ const authService = new Elysia().all(
  * Includes health check and root endpoint.
  */
 const authApp = new Elysia({
-  name: "auth-app",
+  name: "api.auth",
   prefix: "/api/auth",
 })
   // Request tracing for performance monitoring

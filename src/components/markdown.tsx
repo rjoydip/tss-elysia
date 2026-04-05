@@ -42,6 +42,17 @@ export function parseFrontmatter(content: string): FrontmatterData | null {
 }
 
 /**
+ * Strips YAML frontmatter from markdown content.
+ * Returns the content with frontmatter removed.
+ */
+export function stripFrontmatter(content: string): string {
+  return content
+    .replace(/^---\r?\n[\s\S]*?\r?\n---/, "")
+    .replace(/^---\n[\s\S]*?\n---/, "")
+    .replace(/^\s+/, "");
+}
+
+/**
  * Remark plugin that removes frontmatter nodes (yaml/toml) from the AST.
  * remark-frontmatter parses frontmatter into AST nodes but doesn't remove them;
  * this plugin strips them so they don't appear in rendered output.
@@ -137,6 +148,9 @@ export function MarkdownRenderer({ content, onFrontmatter }: MarkdownRendererPro
     if (frontmatter) onFrontmatter(frontmatter);
   }, [content, onFrontmatter]);
 
+  // Remove frontmatter before rendering to prevent it appearing in output
+  const cleanContent = stripFrontmatter(content);
+
   return (
     <div className="prose prose-neutral dark:prose-invert max-w-none">
       <Markdown
@@ -167,7 +181,7 @@ export function MarkdownRenderer({ content, onFrontmatter }: MarkdownRendererPro
             const isInline = !className;
             if (isInline) {
               return (
-                <code className="bg-muted px-1.5 py-0.5 rounded text-sm font-mono text-[#E11D48] dark:text-[#FB7185]">
+                <code className="bg-muted px-1.5 py-0.5 rounded text-sm font-mono text-primary">
                   {children}
                 </code>
               );
@@ -218,7 +232,7 @@ export function MarkdownRenderer({ content, onFrontmatter }: MarkdownRendererPro
           ),
         }}
       >
-        {content}
+        {cleanContent}
       </Markdown>
     </div>
   );

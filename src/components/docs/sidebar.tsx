@@ -6,10 +6,8 @@
 
 import { useMemo, memo } from "react";
 import { useLocation } from "@tanstack/react-router";
-import { docsConfig } from "~/config/docs";
-
 import { ChevronRight } from "lucide-react";
-
+import { docsConfig } from "~/config/docs";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "~/components/ui/collapsible";
 import {
   Sidebar,
@@ -47,7 +45,7 @@ export const DocsSidebar = memo(function ({ ...props }: React.HTMLAttributes<HTM
   }, [currentPath]);
 
   return (
-    <Sidebar collapsible="icon" variant="floating" {...props}>
+    <Sidebar {...props}>
       <SidebarHeader></SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
@@ -60,7 +58,10 @@ export const DocsSidebar = memo(function ({ ...props }: React.HTMLAttributes<HTM
                 <Collapsible key={section.title} asChild defaultOpen className="group/collapsible">
                   <SidebarMenuItem>
                     <CollapsibleTrigger asChild>
-                      <SidebarMenuButton tooltip={section.title}>
+                      <SidebarMenuButton
+                        tooltip={section.title}
+                        className="data-[active=true]:bg-primary data-[active=true]:text-primary-foreground"
+                      >
                         {section.title}
                         <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
                       </SidebarMenuButton>
@@ -71,7 +72,11 @@ export const DocsSidebar = memo(function ({ ...props }: React.HTMLAttributes<HTM
                           const isActive = activeHref === item.href;
                           return (
                             <SidebarMenuSubItem key={item.href}>
-                              <SidebarMenuSubButton asChild isActive={isActive}>
+                              <SidebarMenuSubButton
+                                asChild
+                                isActive={isActive}
+                                className="data-[active=true]:bg-primary data-[active=true]:text-primary-foreground"
+                              >
                                 <a href={item.href}>
                                   <span>{item.name}</span>
                                 </a>

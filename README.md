@@ -12,7 +12,7 @@ description: A full-stack TypeScript application using TanStack Start, Elysia, R
 
 A full-stack TypeScript application using TanStack Start, Elysia, React 19, and Bun.
 
-> **Project Roadmap**: See [PLAN.md](./.artifacts/PLAN.md) for detailed feature planning and progress tracking.
+> **Project Roadmap**: See [PLAN.md](./.artifacts/plans/PLAN.md) for detailed feature planning and progress tracking.
 
 ## Quick Start
 
@@ -116,22 +116,30 @@ Detailed documentation available in `docs/`:
 ```bash
 src/
 ├── config/             # Central configuration (logger, rate-limit, cors, helmet)
-│   └── index.ts
+│   ├── index.ts       # Main config exports
+│   └── docs.ts        # Documentation config (docMap, globKeyToDocPath, getSplatPath, buildDocMap)
 ├── components/         # React components
 │   ├── ui/            # shadcn/ui components
 │   │   ├── accordion.tsx
+│   │   ├── avatar.tsx
 │   │   ├── badge.tsx
 │   │   ├── breadcrumb.tsx
 │   │   ├── button.tsx
 │   │   ├── card.tsx
+│   │   ├── collapsible.tsx
+│   │   ├── dropdown-menu.tsx
 │   │   ├── input.tsx
 │   │   ├── label.tsx
 │   │   ├── select.tsx
 │   │   ├── separator.tsx
+│   │   ├── sheet.tsx
 │   │   ├── skeleton.tsx
+│   │   ├── sonner.tsx
 │   │   ├── switch.tsx
 │   │   ├── table.tsx
-│   │   └── tabs.tsx
+│   │   ├── tabs.tsx
+│   │   ├── tooltip.tsx
+│   │   └── markdown.tsx # Markdown renderer with Shiki
 │   ├── auth/          # Auth components
 │   │   ├── form/       # Auth form components
 │   │   │   ├── login.tsx
@@ -140,7 +148,9 @@ src/
 │   │   ├── auth-guard.tsx   # Route protection component
 │   │   ├── branding.tsx     # Branding component
 │   │   └── footer.tsx       # Common footer
-│   ├── profile/       # Profile components
+│   ├── docs/           # Documentation components
+│   │   └── sidebar.tsx  # Docs sidebar
+│   ├── profile/        # Profile components
 │   │   └── profile-page.tsx
 │   ├── settings/      # Settings components
 │   │   ├── account-settings.tsx
@@ -165,6 +175,19 @@ src/
 │   ├── db/            # Database (Drizzle + SQLite)
 │   │   ├── index.ts
 │   │   └── schema.ts
+│   ├── realtime/      # Real-time features (WebSocket)
+│   │   ├── index.ts           # Main exports
+│   │   ├── auth.ts            # Connection authentication
+│   │   ├── authorization.ts   # RBAC for messages
+│   │   ├── chat-service.ts    # Chat/messaging
+│   │   ├── connection-store.ts # Connection management
+│   │   ├── csrf.ts            # CSRF validation
+│   │   ├── dashboard-service.ts # Real-time dashboard
+│   │   ├── notification-service.ts # Notifications
+│   │   ├── presence-service.ts # User presence
+│   │   ├── rate-limit.ts      # Per-connection rate limiting
+│   │   ├── sanitizer.ts       # Content sanitization
+│   │   └── schemas.ts         # Message validation (Zod)
 │   └── utils.ts       # Utility functions (cn, etc.)
 ├── logger.ts          # Logger configuration
 ├── middlewares/       # Middleware implementations
@@ -172,6 +195,8 @@ src/
 │   ├── helmet.ts      # Security headers
 │   ├── index.ts       # Export barrel
 │   └── rate-limit.ts  # Rate limiting
+├── plugins/          # Elysia plugins
+│   └── websocket.ts   # WebSocket real-time plugin
 ├── router.tsx         # TanStack Router configuration
 ├── routeTree.gen.ts   # Auto-generated route tree
 ├── routes/            # File-based routing (TanStack Start)
@@ -182,15 +207,14 @@ src/
 │   │   ├── register.tsx # Register page (/account/register)
 │   │   ├── forgot-password.tsx # Forgot password page (/account/forgot-password)
 │   │   └── verify-email.tsx # Email verification (/account/verify-email)
-│   ├── profile/       # Profile routes
-│   │   └── index.tsx  # Profile page (/profile)
-│   ├── settings/      # Settings routes
-│   │   └── index.tsx  # Settings page (/settings)
-│   ├── docs/          # Documentation routes
-│   ├── blog/          # Blog routes
-│   ├── changelog/    # Changelog routes
-│   ├── status/       # Status page routes
-│   └── api/          # API routes
+│   ├── profile.tsx     # Profile page (/profile)
+│   ├── settings.tsx    # Settings page (/settings)
+│   ├── docs.tsx        # Documentation layout with sidebar
+│   ├── docs.$.tsx      # Documentation catch-all route
+│   ├── blog.tsx        # Blog routes
+│   ├── changelog.tsx   # Changelog routes
+│   ├── status.tsx      # Health monitoring dashboard
+│   └── api/            # API routes
 │       ├── $.ts       # API catch-all route
 │       └── auth/      # Auth routes (Better Auth)
 │           └── $.ts
@@ -208,30 +232,60 @@ tsconfig.json          # TypeScript configuration
 
 ```bash
 test/                  # Unit tests (Bun)
-├── components/        # Component unit tests
-│   ├── ui.test.tsx       # UI components (Button, Badge, Card, Separator)
-│   ├── ui-additional.test.tsx # Additional UI (Label, Switch, Skeleton, Input, Tabs, Accordion)
-│   ├── header.test.tsx   # Header component tests
-│   ├── branding.test.tsx # Branding component tests
-│   └── footer.test.tsx   # Footer component tests
-├── routes/            # Route tests
-├── db.test.ts         # Database tests
+├── config/           # Configuration tests
+│   ├── docs.test.ts  # Docs config tests (globKeyToDocPath, getSplatPath, buildDocMap)
+│   └── index.test.ts # App config tests
+├── middlewares/      # Middleware tests
+│   ├── cors.test.ts  # CORS tests
+│   ├── helmet.test.ts # Helmet tests
+│   └── index.test.ts # traceFn, errorFn, composedMiddleware
+├── routes/           # Route tests
+│   ├── status.test.ts # Status page tests
+│   ├── profile.test.ts
+│   ├── settings.test.ts
+│   ├── blog.test.ts
+│   └── changelog.test.ts
+├── lib/              # Library tests
+│   ├── realtime/     # Real-time tests
+│   │   └── connection-store.test.ts # Connection store tests
+│   └── ...
+├── hooks/            # Hook tests
+├── store/            # Store tests
+├── components/       # Component tests
+│   └── ui/          # UI component tests
+├── db.test.ts        # Database tests
 ├── auth.test.ts      # Auth tests
-└── fixtures/          # Test fixtures
+└── fixtures/         # Test fixtures
     └── db.ts
 
 .e2e/                 # E2E tests (Playwright)
-├── ui/               # UI E2E tests
-│   ├── auth.spec.ts      # Authentication tests
-│   ├── components.spec.ts # UI component tests
-│   ├── navigation.spec.ts # Navigation tests
-│   ├── docs.spec.ts      # Documentation page tests
-│   ├── root.spec.ts      # Landing page tests
-│   ├── status.spec.ts   # Status page tests
-│   ├── blog.spec.ts      # Blog page tests
-│   └── changelog.spec.ts # Changelog page tests
+├── ui/               # UI E2E tests (split by component)
+│   ├── button.spec.ts
+│   ├── input.spec.ts
+│   ├── sidebar.spec.ts
+│   └── ...
 ├── api/              # API E2E tests
-│   └── endpoints.spec.ts # API endpoint tests
+│   ├── endpoints.spec.ts
+│   └── middlewares.spec.ts
+├── middlewares/      # Middleware-specific E2E tests
+│   ├── cors.spec.ts
+│   ├── helmet.spec.ts
+│   ├── trace.spec.ts
+│   ├── error-handling.spec.ts
+│   └── rate-limit.spec.ts
+├── routes/           # Route E2E tests
+│   ├── auth.spec.ts
+│   ├── blog.spec.ts
+│   ├── changelog.spec.ts
+│   ├── docs.spec.ts
+│   ├── profile.spec.ts
+│   ├── settings.spec.ts
+│   └── status.spec.ts
+├── realtime/         # Real-time E2E tests
+│   └── websocket.spec.ts # WebSocket tests
+├── auth.spec.ts       # Auth flow tests
+├── landing.spec.ts   # Landing page tests
+├── navigation.spec.ts # Navigation tests
 └── config.ts         # E2E configuration
 ```
 
@@ -311,4 +365,4 @@ Common issues:
 
 For detailed agent coding guidelines, see [AGENTS.md](./AGENTS.md).
 
-For feature planning and progress tracking, see [PLAN.md](./.artifacts/PLAN.md).
+For feature planning and progress tracking, see [PLAN.md](./.artifacts/plans/PLAN.md).

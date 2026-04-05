@@ -23,7 +23,7 @@ This project uses TanStack Start with file-based routing. Routes are defined in 
 | GET    | `/docs/*`      | Docs routes       |
 | GET    | `/profile`     | Profile page      |
 | GET    | `/settings/*`  | Settings routes   |
-| GET    | `/status/*`    | Status routes     |
+| GET    | `/status`      | Health monitor    |
 
 ### Route File Structure
 
@@ -40,14 +40,13 @@ src/routes/
     $.ts           # API catch-all route (/api/*)
     auth/
       $.ts         # Auth route (/api/auth/*)
-  blog/             # Blog routes
-  changelog/        # Changelog routes
-  docs/
-    $.tsx          # Docs catch-all (/.md files)
-    tsx            # Docs layout
-  profile/          # Profile routes
-  settings/         # Settings routes
-  status/           # Status routes
+  blog.tsx          # Blog routes
+  changelog.tsx     # Changelog routes
+  docs.tsx          # Documentation layout
+  docs.$.tsx        # Docs catch-all (/docs/*)
+  profile.tsx        # Profile page
+  settings.tsx       # Settings page
+  status.tsx        # Health monitoring dashboard
 ```
 
 ### API Route Implementation

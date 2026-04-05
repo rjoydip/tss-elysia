@@ -38,6 +38,43 @@ const FILE_NAME_MAP: Record<string, string> = {
 };
 
 /**
+ * Converts a file name to its display name.
+ * Checks FILE_NAME_MAP first for custom mappings, then formats kebab-case to Title Case.
+ */
+function getDisplayName(fileName: string): string {
+  return FILE_NAME_MAP[fileName] ?? formatName(fileName);
+}
+
+/**
+ * Converts a Vite glob key (e.g., "../../docs/auth/overview.md")
+ * into a doc path (e.g., "auth/overview") for route matching.
+ */
+export function globKeyToDocPath(key: string): string {
+  return key.replace(/^(\.\.\/)*docs\//, "").replace(/\.md$/, "");
+}
+
+/**
+ * Safely extracts the splat path from route params.
+ * In TanStack Router catch-all routes, _splat may be undefined for /docs root.
+ */
+export function getSplatPath(params: Record<string, unknown>): string {
+  const raw = params._splat;
+  return typeof raw === "string" ? raw : "";
+}
+
+/**
+ * Builds a lookup map from doc path to raw markdown content.
+ * Example: { "auth/overview": "# Auth Overview\n...", "architecture": "# Architecture\n..." }
+ */
+export function buildDocMap(modules: Record<string, string>): Map<string, string> {
+  const docMap = new Map<string, string>();
+  for (const [key, content] of Object.entries(modules)) {
+    docMap.set(globKeyToDocPath(key), content);
+  }
+  return docMap;
+}
+
+/**
  * Formats a file or folder name into a readable display name.
  * Converts kebab-case to Title Case (e.g., "environment-variables" → "Environment Variables").
  */
@@ -95,6 +132,12 @@ function scanDocModules(): Record<string, string> {
 
 const docModules = scanDocModules();
 
+/**
+ * Lookup map from doc path to raw markdown content.
+ * Built from scanned doc modules using buildDocMap.
+ */
+export const docMap = buildDocMap(docModules);
+
 /** Group doc paths by their top-level folder (or root) */
 const groups = new Map<string, { name: string; href: string }[]>();
 
@@ -108,7 +151,7 @@ for (const key of Object.keys(docModules)) {
   const href = relPath === "getting-started/overview" ? "/docs" : `/docs/${relPath}`;
 
   // Overview pages always display as "Overview", other files use formatted file name
-  const name = fileName === "overview" ? "Overview" : FILE_NAME_MAP[formatName(fileName)] ?? formatName(fileName);
+  const name = fileName === "overview" ? "Overview" : getDisplayName(fileName);
 
   if (!groups.has(folder)) {
     groups.set(folder, []);

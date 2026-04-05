@@ -12,8 +12,8 @@ describe("API Flows", () => {
     const response = await apiApp.handle(new Request("http://localhost/unknown-route"));
 
     expect(response.status).toBe(404);
-    const body = await response.json();
-    expect(body.error).toBe("Endpoint not found");
+    const text = await response.text();
+    expect(text).toBe('{"error":"Endpoint not found"}');
   });
 
   it("should include CORS headers", async () => {
@@ -34,8 +34,8 @@ describe("API Flows", () => {
     const response = await apiApp.handle(new Request("http://localhost/api/nonexistent"));
 
     expect(response.status).toBe(404);
-    const body = await response.json();
-    expect(body).toHaveProperty("error");
+    const text = await response.text();
+    expect(text).toBe('{"error":"Endpoint not found"}');
   });
 
   it("should include trace headers in response", async () => {
