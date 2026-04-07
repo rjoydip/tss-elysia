@@ -70,11 +70,17 @@ export const traceFn: TraceHandler = async ({
   });
 
   // Track total request handling time
-  onHandle(({ onStop }) => {
+  onHandle((traceContext) => {
+    const request = (traceContext as { request?: Request }).request;
+    const endpoint = request
+      ? `${request.method} ${new URL(request.url).pathname}`
+      : "UNKNOWN /unknown";
+
+    const { onStop } = traceContext;
     onStop(({ elapsed }) => {
       const elapsedTime = typeof elapsed === "number" ? elapsed.toFixed(4) : "0.00";
       set.headers["X-Elapsed"] = elapsedTime;
-      logger.debug(`Request took: ${elapsedTime} ms`);
+      logger.debug(`Trace ${endpoint} took ${elapsedTime} ms`);
     });
   });
 };

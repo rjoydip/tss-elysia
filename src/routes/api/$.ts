@@ -11,8 +11,9 @@ import { createIsomorphicFn } from "@tanstack/react-start";
 import { API_PREFIX, APP_NAME, HOST, PORT, isBrowser } from "~/config";
 import { composedMiddleware, errorFn, traceFn } from "~/middlewares";
 import { websocketPlugin } from "~/plugins/websocket";
-import { connectionStore } from "~/lib/realtime";
-import { getDatabaseHeartbeat } from "~/lib/db/heartbeat";
+import { coreApiRoutes } from "./modules/-core";
+import { realtimeApiRoutes } from "./modules/-realtime";
+import { databaseApiRoutes } from "./modules/-database";
 
 /**
  * Main API application instance.
@@ -38,134 +39,12 @@ export const apiRoutes = new Elysia({
   .onError(errorFn)
   // Store application name
   .state("name", APP_NAME)
-
   /**
-   * Root endpoint for service information.
-   * Returns welcome message identifying the API service.
+   * Compose modular route groups so endpoint ownership is explicit and maintainable.
    */
-  .get(
-    "/",
-    ({ store: { name }, set }) => {
-      set.headers["Content-Type"] = "text/plain; charset=utf-8";
-      return `Welcome to ${name} Service`;
-    },
-    {
-      detail: {
-        summary: "Get API root",
-        description: "Get API root",
-        tags: ["api"],
-        responses: {
-          200: { description: "Success" },
-        },
-      },
-    },
-  )
-
-  /**
-   * Health check endpoint for monitoring.
-   * Used by load balancers and orchestration systems (Kubernetes, etc.)
-   * Returns simple JSON with service status.
-   */
-  .get(
-    "/health",
-    async ({ store: { name } }) => {
-      return new Response(
-        JSON.stringify({
-          name,
-          status: "healthy",
-          timestamp: new Date().toISOString(),
-        }),
-        {
-          headers: { "Content-Type": "application/json" },
-        },
-      );
-    },
-    {
-      detail: {
-        summary: "Get API health",
-        description: "Get API health",
-        tags: ["api-health"],
-        responses: {
-          200: { description: "Success" },
-        },
-      },
-    },
-  )
-  /**
-   * Realtime discovery endpoint.
-   * Provides the public websocket endpoint that clients should connect to.
-   */
-  .get(
-    "/realtime",
-    () =>
-      new Response(
-        JSON.stringify({
-          websocketEndpoint: `${API_PREFIX}/ws`,
-          healthEndpoint: `${API_PREFIX}/realtime/health`,
-          requiresAuth: true,
-        }),
-        {
-          headers: { "Content-Type": "application/json" },
-        },
-      ),
-    {
-      detail: {
-        summary: "Get realtime endpoint metadata",
-        description: "Returns websocket endpoint information for realtime clients",
-        tags: ["api-realtime"],
-      },
-    },
-  )
-  /**
-   * Realtime health endpoint.
-   * Exposes connection counters for validation and operational monitoring.
-   */
-  .get(
-    "/realtime/health",
-    () =>
-      new Response(
-        JSON.stringify({
-          status: "healthy",
-          websocketPath: `${API_PREFIX}/ws`,
-          totalConnections: connectionStore.getCount(),
-          authenticatedConnections: connectionStore.getAuthenticatedCount(),
-          timestamp: new Date().toISOString(),
-        }),
-        {
-          headers: { "Content-Type": "application/json" },
-        },
-      ),
-    {
-      detail: {
-        summary: "Get realtime health",
-        description: "Returns websocket readiness and connection statistics",
-        tags: ["api-realtime"],
-      },
-    },
-  )
-  /**
-   * Database heartbeat endpoint.
-   * Executes a lightweight query to verify database liveness and response latency.
-   */
-  .get(
-    "/database/heartbeat",
-    () => {
-      const heartbeat = getDatabaseHeartbeat();
-      const statusCode = heartbeat.status === "healthy" ? 200 : 503;
-
-      return new Response(JSON.stringify(heartbeat), {
-        status: statusCode,
-        headers: { "Content-Type": "application/json" },
-      });
-    },
-    {
-      detail: {
-        summary: "Get database heartbeat",
-        description: "Runs a lightweight database liveness probe for status monitoring",
-        tags: ["api-health", "api-database"],
-      },
-    },
-  );
+  .use(coreApiRoutes)
+  .use(realtimeApiRoutes)
+  .use(databaseApiRoutes);
 
 /**
  * Request handler wrapper for TanStack Start integration.
