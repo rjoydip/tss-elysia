@@ -113,4 +113,30 @@ describe("Eden Treaty - API Endpoints", () => {
       expect(response.headers.get("content-type")).toContain("application/json");
     });
   });
+
+  describe("GET /api/realtime", () => {
+    it("should return websocket discovery metadata", async () => {
+      const { data, error, status } = await api.api.realtime.get();
+
+      expect(error).toBeNull();
+      expect(status).toBe(200);
+      expect(data).toHaveProperty("websocketEndpoint", "/api/ws");
+      expect(data).toHaveProperty("healthEndpoint", "/api/realtime/health");
+      expect(data).toHaveProperty("requiresAuth", true);
+    });
+  });
+
+  describe("GET /api/realtime/health", () => {
+    it("should return realtime health payload", async () => {
+      const { data, error, status } = await api.api.realtime.health.get();
+
+      expect(error).toBeNull();
+      expect(status).toBe(200);
+      expect(data).toHaveProperty("status", "healthy");
+      expect(data).toHaveProperty("websocketPath", "/api/ws");
+      expect(data).toHaveProperty("totalConnections");
+      expect(data).toHaveProperty("authenticatedConnections");
+      expect(data).toHaveProperty("timestamp");
+    });
+  });
 });

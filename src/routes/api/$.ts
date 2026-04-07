@@ -10,17 +10,21 @@ import { createFileRoute } from "@tanstack/react-router";
 import { createIsomorphicFn } from "@tanstack/react-start";
 import { API_PREFIX, APP_NAME, HOST, PORT, isBrowser } from "~/config";
 import { composedMiddleware, errorFn, traceFn } from "~/middlewares";
+import { websocketPlugin } from "~/plugins/websocket";
+import { connectionStore } from "~/lib/realtime";
 
-/**./mcp/$
+/**
  * Main API application instance.
  * Prefix: /api (configurable via API_PREFIX)
  * Includes all security middleware, tracing, and error handling.
- * Note: WebSocket support is added separately in createWsApiApp for production.
+ * Includes WebSocket endpoint registration for real-time features.
  */
 export const apiRoutes = new Elysia({
   name: "root.api",
   prefix: API_PREFIX,
 })
+  // Mount realtime websocket plugin so /api/ws and /api/ws/health are reachable.
+  .use(websocketPlugin)
   // Apply composed middleware (CORS, Helmet, Rate Limit, OpenTelemetry)
   .use(
     composedMiddleware({
@@ -83,6 +87,58 @@ export const apiRoutes = new Elysia({
         responses: {
           200: { description: "Success" },
         },
+      },
+    },
+  )
+  /**
+   * Realtime discovery endpoint.
+   * Provides the public websocket endpoint that clients should connect to.
+   */
+  .get(
+    "/realtime",
+    () =>
+      new Response(
+        JSON.stringify({
+          websocketEndpoint: `${API_PREFIX}/ws`,
+          healthEndpoint: `${API_PREFIX}/realtime/health`,
+          requiresAuth: true,
+        }),
+        {
+          headers: { "Content-Type": "application/json" },
+        },
+      ),
+    {
+      detail: {
+        summary: "Get realtime endpoint metadata",
+        description: "Returns websocket endpoint information for realtime clients",
+        tags: ["api-realtime"],
+      },
+    },
+  )
+  /**
+   * Realtime health endpoint.
+   * Exposes connection counters for validation and operational monitoring.
+   */
+  .get(
+    "/realtime/health",
+    () =>
+      new Response(
+        JSON.stringify({
+          status: "healthy",
+          websocketPath: `${API_PREFIX}/ws`,
+          totalConnections: connectionStore.getCount(),
+          authenticatedConnections: connectionStore.getAuthenticatedCount(),
+          timestamp: new Date().toISOString(),
+        }),
+        {
+          headers: { "Content-Type": "application/json" },
+        },
+      ),
+    {
+      detail: {
+        summary: "Get realtime health",
+        description: "Returns websocket readiness and connection statistics",
+        tags: ["api-realtime"],
       },
     },
   );

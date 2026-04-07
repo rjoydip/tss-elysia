@@ -344,7 +344,7 @@ Complete the authentication system with additional security features, set up use
 - [x] Implement session management (`src/components/settings/session-settings.tsx`)
 - [x] Add Input component (`src/components/ui/input.tsx`)
 - [x] Add Tabs component (`src/components/ui/tabs.tsx`)
-- [x] Install dependencies: @radix-ui/react-tabs, @radix-ui/react-dialog, @radix-ui/react-avatar, @radix-ui/react-dropdown-menu, @radix-ui/react-toast, react-hook-form, @hookform/resolvers, zod, @tanstack/react-form
+- [x] Install dependencies: @radix-ui/react-tabs, @radix-ui/react-dialog, @radix-ui/react-avatar, @radix-ui/react-dropdown-menu, react-hook-form, @hookform/resolvers, zod, @tanstack/react-form
 - [x] Reorganize file structure:
   - [x] Moved `src/components/auth-guard.tsx` to `src/components/auth/auth-guard.tsx`
   - [x] Moved `src/lib/auth.ts` to `src/lib/auth/index.ts`
