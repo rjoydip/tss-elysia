@@ -64,7 +64,7 @@ describe("Breadcrumb", () => {
     const html = renderToString(<BreadcrumbPage>Current</BreadcrumbPage>);
     expect(html).toContain("<span");
     expect(html).toContain("Current");
-    expect(html).toContain('role="link"');
+    expect(html).toContain('aria-label="breadcrumb page"');
     expect(html).toContain('aria-disabled="true"');
     expect(html).toContain('aria-current="page"');
     expect(html).toContain("text-foreground");

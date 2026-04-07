@@ -1,8 +1,15 @@
 /**
- * MCP API key management routes.
- * Provides endpoints for creating, listing, updating, and revoking API keys.
+ * MCP API key management routes plugin.
+ *
+ * Intent:
+ * - Keep key endpoints modular so they can be mounted by both:
+ *   - the standalone MCP router (`mcpApiRoutes`, prefix `/api/mcp`) used by tests
+ *   - the mountable API module (`mcpApiModuleRoutes`) used by the root `/api` router
+ *
+ * Prefixing rule:
+ * - This plugin does not set a prefix; callers decide the final URL prefix.
+ * - Endpoints are defined relative to the caller (e.g. `/keys`, `/keys/:id`).
  */
-
 import { Elysia, t } from "elysia";
 import {
   createApiKey,
@@ -15,10 +22,12 @@ import { logger } from "~/lib/logger";
 
 /**
  * MCP API key routes.
- * All routes require authentication via MCP API key.
- * Includes rate limiting per API key.
+ *
+ * @remarks
+ * - These endpoints require an MCP API key (`Authorization: Bearer ...`).
+ * - The parent router is responsible for adding the `/api/mcp` or `/api/...` prefix.
  */
-export const mcpKeysRoutes = new Elysia({ name: "mcp.keys.api" })
+export const mcpKeysRoutes = new Elysia({ name: "api.routes.mcp.keys", prefix: "/keys" })
   .derive(async (context) => {
     const authHeader: string | null = context.headers.authorization ?? null;
 
@@ -45,7 +54,7 @@ export const mcpKeysRoutes = new Elysia({ name: "mcp.keys.api" })
     }
   })
   .get(
-    "/keys",
+    "/",
     async ({ apiKey, rateLimitInfo }) => {
       if (!apiKey) {
         return new Response(JSON.stringify({ error: "Unauthorized" }), {
@@ -76,7 +85,7 @@ export const mcpKeysRoutes = new Elysia({ name: "mcp.keys.api" })
     },
   )
   .post(
-    "/keys",
+    "/",
     async ({ apiKey, body, rateLimitInfo }) => {
       if (!apiKey) {
         return new Response(JSON.stringify({ error: "Unauthorized" }), {
@@ -152,7 +161,7 @@ export const mcpKeysRoutes = new Elysia({ name: "mcp.keys.api" })
     },
   )
   .delete(
-    "/keys/:id",
+    "/:id",
     async ({ apiKey, params }) => {
       if (!apiKey) {
         return new Response(JSON.stringify({ error: "Unauthorized" }), {
@@ -191,7 +200,7 @@ export const mcpKeysRoutes = new Elysia({ name: "mcp.keys.api" })
     },
   )
   .put(
-    "/keys/:id",
+    "/:id",
     async ({ apiKey, params, body }) => {
       if (!apiKey) {
         return new Response(JSON.stringify({ error: "Unauthorized" }), {

@@ -11,9 +11,9 @@ import { connectionStore } from "~/lib/realtime";
  * Realtime API route group.
  * Mounted under `/api` by the root API application.
  */
-export const realtimeApiRoutes = new Elysia({ name: "api.routes.realtime" })
+export const realtimeRoutes = new Elysia({ name: "api.routes.realtime", prefix: "/realtime" })
   .get(
-    "/realtime",
+    "/",
     () =>
       new Response(
         JSON.stringify({
@@ -34,7 +34,7 @@ export const realtimeApiRoutes = new Elysia({ name: "api.routes.realtime" })
     },
   )
   .get(
-    "/realtime/health",
+    "/health",
     () =>
       new Response(
         JSON.stringify({

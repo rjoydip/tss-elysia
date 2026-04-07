@@ -11,9 +11,9 @@ import { createIsomorphicFn } from "@tanstack/react-start";
 import { API_PREFIX, APP_NAME, HOST, PORT, isBrowser } from "~/config";
 import { composedMiddleware, errorFn, traceFn } from "~/middlewares";
 import { websocketPlugin } from "~/plugins/websocket";
-import { coreApiRoutes } from "./modules/-core";
-import { realtimeApiRoutes } from "./modules/-realtime";
-import { databaseApiRoutes } from "./modules/-database";
+import { coreRoutes } from "./modules/-core";
+import { mcpCoreRoutes } from "./mcp/modules/-core";
+import { authCoreRoutes } from "./auth/modules/-core";
 
 /**
  * Main API application instance.
@@ -25,8 +25,6 @@ export const apiRoutes = new Elysia({
   name: "root.api",
   prefix: API_PREFIX,
 })
-  // Mount realtime websocket plugin so /api/ws and /api/ws/health are reachable.
-  .use(websocketPlugin)
   // Apply composed middleware (CORS, Helmet, Rate Limit, OpenTelemetry)
   .use(
     composedMiddleware({
@@ -37,12 +35,14 @@ export const apiRoutes = new Elysia({
   .trace(traceFn)
   // Centralized error handling
   .onError(errorFn)
+  // Mount realtime websocket plugin so /api/ws and /api/ws/health are reachable.
+  .use(websocketPlugin)
   /**
    * Compose modular route groups so endpoint ownership is explicit and maintainable.
    */
-  .use(coreApiRoutes)
-  .use(realtimeApiRoutes)
-  .use(databaseApiRoutes);
+  .use(coreRoutes)
+  .use(authCoreRoutes)
+  .use(mcpCoreRoutes);
 
 /**
  * Request handler wrapper for TanStack Start integration.
@@ -58,6 +58,11 @@ export const Route = createFileRoute(`/api/$`)({
   server: {
     handlers: {
       GET: handle,
+      POST: handle,
+      PUT: handle,
+      PATCH: handle,
+      DELETE: handle,
+      OPTIONS: handle,
     },
   },
 });

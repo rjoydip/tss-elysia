@@ -6,13 +6,14 @@
 import { describe, expect, it } from "bun:test";
 import { Elysia } from "elysia";
 import { APP_NAME } from "../../../src/config";
-import { coreApiRoutes } from "../../../src/routes/api/modules/-core";
-import { realtimeApiRoutes } from "../../../src/routes/api/modules/-realtime";
-import { databaseApiRoutes } from "../../../src/routes/api/modules/-database";
+import { coreRoutes } from "../../../src/routes/api/modules/-core";
+import { realtimeRoutes } from "../../../src/routes/api/modules/-realtime";
+import { databaseRoutes } from "../../../src/routes/api/modules/-database";
 
 describe("Core API module", () => {
+  const app = new Elysia({ prefix: "/api" }).use(coreRoutes);
+
   it("should return root welcome message", async () => {
-    const app = new Elysia({ prefix: "/api" }).use(coreApiRoutes);
     const response = await app.handle(new Request("http://localhost/api"));
 
     expect(response.status).toBe(200);
@@ -21,7 +22,6 @@ describe("Core API module", () => {
   });
 
   it("should return healthy status payload", async () => {
-    const app = new Elysia({ prefix: "/api" }).use(coreApiRoutes);
     const response = await app.handle(new Request("http://localhost/api/health"));
 
     expect(response.status).toBe(200);
@@ -32,8 +32,9 @@ describe("Core API module", () => {
 });
 
 describe("Realtime API module", () => {
+  const app = new Elysia({ prefix: "/api" }).use(realtimeRoutes);
+
   it("should return realtime discovery metadata", async () => {
-    const app = new Elysia({ prefix: "/api" }).use(realtimeApiRoutes);
     const response = await app.handle(new Request("http://localhost/api/realtime"));
 
     expect(response.status).toBe(200);
@@ -43,7 +44,6 @@ describe("Realtime API module", () => {
   });
 
   it("should return realtime health payload", async () => {
-    const app = new Elysia({ prefix: "/api" }).use(realtimeApiRoutes);
     const response = await app.handle(new Request("http://localhost/api/realtime/health"));
 
     expect(response.status).toBe(200);
@@ -54,8 +54,9 @@ describe("Realtime API module", () => {
 });
 
 describe("Database API module", () => {
+  const app = new Elysia({ prefix: "/api" }).use(databaseRoutes);
+
   it("should return database heartbeat payload", async () => {
-    const app = new Elysia({ prefix: "/api" }).use(databaseApiRoutes);
     const response = await app.handle(new Request("http://localhost/api/database/heartbeat"));
 
     expect([200, 503]).toContain(response.status);

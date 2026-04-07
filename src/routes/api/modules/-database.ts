@@ -10,8 +10,8 @@ import { getDatabaseHeartbeat } from "~/lib/db/heartbeat";
  * Database API route group.
  * Mounted under `/api` by the root API application.
  */
-export const databaseApiRoutes = new Elysia({ name: "api.routes.database" }).get(
-  "/database/heartbeat",
+export const databaseRoutes = new Elysia({ name: "api.routes.database", prefix: "/database" }).get(
+  "/heartbeat",
   () => {
     const heartbeat = getDatabaseHeartbeat();
     const statusCode = heartbeat.status === "healthy" ? 200 : 503;
@@ -25,7 +25,7 @@ export const databaseApiRoutes = new Elysia({ name: "api.routes.database" }).get
     detail: {
       summary: "Get database heartbeat",
       description: "Runs a lightweight database liveness probe for status monitoring",
-      tags: ["api-health", "api-database"],
+      tags: ["api-database"],
     },
   },
 );

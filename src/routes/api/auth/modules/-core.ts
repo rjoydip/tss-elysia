@@ -5,11 +5,13 @@
 
 import { Elysia } from "elysia";
 import { AUTH_SERVICE_NAME } from "~/config";
+import { authServiceRoutes } from "./-service";
 
 /**
  * Core auth route group mounted under `/api/auth`.
  */
-export const authCoreRoutes = new Elysia({ name: "auth.routes.core" })
+export const authCoreRoutes = new Elysia({ name: "auth.routes.core", prefix: "/auth" })
+  .use(authServiceRoutes)
   .get(
     "/",
     ({ set }) => {
@@ -18,8 +20,8 @@ export const authCoreRoutes = new Elysia({ name: "auth.routes.core" })
     },
     {
       detail: {
-        summary: "Get AUTH root",
-        description: "Get AUTH root",
+        summary: `Get ${AUTH_SERVICE_NAME} root`,
+        description: `Get ${AUTH_SERVICE_NAME} root`,
         tags: ["auth"],
         responses: {
           200: { description: "Success" },

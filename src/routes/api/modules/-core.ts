@@ -5,19 +5,21 @@
 
 import { Elysia } from "elysia";
 import { APP_NAME } from "~/config";
+import { realtimeRoutes } from "./-realtime";
+import { databaseRoutes } from "./-database";
 
 /**
  * Core API route group.
  * Mounted under `/api` by the root API application.
  */
-export const coreApiRoutes = new Elysia({ name: "api.routes.core" })
-  // Store application name
-  .state("name", APP_NAME)
+export const coreRoutes = new Elysia({ name: "api.routes.core" })
+  .use(realtimeRoutes)
+  .use(databaseRoutes)
   .get(
     "/",
-    ({ set, store: { name } }) => {
+    ({ set }) => {
       set.headers["Content-Type"] = "text/plain; charset=utf-8";
-      return `Welcome to ${name} Service`;
+      return `Welcome to ${APP_NAME} Service`;
     },
     {
       detail: {
@@ -32,10 +34,10 @@ export const coreApiRoutes = new Elysia({ name: "api.routes.core" })
   )
   .get(
     "/health",
-    async ({ store: { name } }) =>
+    async () =>
       new Response(
         JSON.stringify({
-          name,
+          name: APP_NAME,
           status: "healthy",
           timestamp: new Date().toISOString(),
         }),
