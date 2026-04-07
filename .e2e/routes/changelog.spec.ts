@@ -58,9 +58,11 @@ test.describe("Changelog Page", () => {
   });
 
   test("should collapse changelog entry on click", async ({ page }) => {
-    // Click the 1.1.0 trigger to toggle the already-open accordion closed
-    await page.getByRole("button", { name: /1\.1\.0/ }).click();
-    await expect(page.getByText("Added two-factor authentication (2FA) support")).not.toBeVisible();
+    // Changelog accordion should close when toggled.
+    const trigger = page.getByRole("button", { name: /1\.1\.0/ });
+    await expect(trigger).toHaveAttribute("aria-expanded", "true");
+    await trigger.click();
+    await expect(trigger).toHaveAttribute("aria-expanded", "false");
   });
 });
 

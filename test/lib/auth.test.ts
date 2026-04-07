@@ -4,8 +4,8 @@ import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { drizzle } from "drizzle-orm/bun-sqlite";
 import { Database } from "bun:sqlite";
 import { faker } from "@faker-js/faker";
-import * as schema from "../../../src/lib/db/schema";
-import { CREATE_TABLES_SQL } from "../../fixtures/db";
+import * as schema from "../../src/lib/db/schema";
+import { CREATE_TABLES_SQL } from "../fixtures/db";
 
 function createTestDatabase(): ReturnType<typeof drizzle> {
   const sqlite = new Database(":memory:");

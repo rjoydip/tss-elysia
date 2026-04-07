@@ -8,23 +8,25 @@
 
 import { describe, expect, it } from "bun:test";
 
+const HEADER_PATH = "../../src/components/header";
+
 describe("Header", () => {
   it("should export Header component", async () => {
-    const { Header } = await import("../../src/components/header");
+    const { Header } = await import(HEADER_PATH);
     expect(typeof Header).toBe("function");
   });
 
   it("should have correct display behavior", async () => {
     // Header uses Link from TanStack Router which requires router context.
     // Verify the component exists and can be imported without errors.
-    const { Header } = await import("../../src/components/header");
+    const { Header } = await import(HEADER_PATH);
     expect(Header.name).toBe("Header");
   });
 
-  it("should accept showSignIn prop", async () => {
+  it("should accept show SignIn prop", async () => {
     // Verify the prop is accepted by checking the component can be imported
     // The actual behavior is tested in E2E tests
-    const { Header } = await import("../../src/components/header");
+    const { Header } = await import(HEADER_PATH);
     // Function should exist
     expect(Header.name).toBe("Header");
     // Check that the source includes the showSignIn prop

@@ -1,6 +1,6 @@
 import { describe, it, expect } from "bun:test";
 import { treaty } from "@elysiajs/eden";
-import { apiApp } from "../../../src/routes/api/$.ts";
+import { apiRoutes } from "../../../src/routes/api/$.ts";
 
 const getHealthData = () => ({
   name: "TSS ELYSIA",
@@ -9,7 +9,7 @@ const getHealthData = () => ({
 
 describe("API Flows", () => {
   it("should return 404 for unknown routes", async () => {
-    const response = await apiApp.handle(new Request("http://localhost/unknown-route"));
+    const response = await apiRoutes.handle(new Request("http://localhost/unknown-route"));
 
     expect(response.status).toBe(404);
     const text = await response.text();
@@ -17,7 +17,7 @@ describe("API Flows", () => {
   });
 
   it("should include CORS headers", async () => {
-    const response = await apiApp.handle(
+    const response = await apiRoutes.handle(
       new Request("http://localhost/api/health", {
         method: "OPTIONS",
         headers: {
@@ -31,7 +31,7 @@ describe("API Flows", () => {
   });
 
   it("should handle error response format", async () => {
-    const response = await apiApp.handle(new Request("http://localhost/api/nonexistent"));
+    const response = await apiRoutes.handle(new Request("http://localhost/api/nonexistent"));
 
     expect(response.status).toBe(404);
     const text = await response.text();
@@ -39,7 +39,7 @@ describe("API Flows", () => {
   });
 
   it("should include trace headers in response", async () => {
-    const response = await apiApp.handle(new Request("http://localhost/api/health"));
+    const response = await apiRoutes.handle(new Request("http://localhost/api/health"));
 
     expect(response.headers.get("X-Elapsed")).toBeDefined();
   });
@@ -71,7 +71,7 @@ describe("API Root", () => {
   });
 });
 
-const api = treaty(apiApp);
+const api = treaty(apiRoutes);
 
 describe("Eden Treaty - API Endpoints", () => {
   describe("GET /api", () => {
@@ -96,7 +96,7 @@ describe("Eden Treaty - API Endpoints", () => {
 
       expect(error).toBeNull();
       expect(status).toBe(200);
-      expect(data).toHaveProperty("status", "ok");
+      expect(data).toHaveProperty("status", "healthy");
     });
 
     it("should return name in health response", async () => {

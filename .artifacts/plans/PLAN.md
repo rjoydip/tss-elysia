@@ -259,20 +259,28 @@ Complete the authentication system with additional security features, set up use
 
 ### Phase 9: MCP Server (External Integration)
 
-- [ ] Implement MCP protocol server using @modelcontextprotocol/server
-- [ ] Design tool schema for available actions (auth, users, organizations)
-- [ ] Create authentication layer for MCP clients
-- [ ] Implement organization-scoped tool access
-- [ ] Add rate limiting per MCP client/token
-- [ ] Create API key management UI for MCP access
-- [ ] Implement tool execution sandboxing
-- [ ] Add MCP connection health monitoring
-- [ ] Create MCP client SDK/documentation
-- [ ] Implement tool discovery endpoint
-- [ ] Add WebSocket support for MCP stdio fallback
-- [ ] Set up MCP server load balancing for scalability
-- [ ] Add MCP request/response caching
-- [ ] Implement MCP telemetry and usage tracking
+> **Detailed Plan**: See [phase-9-mcp-server-plan.md](./phase-9-mcp-server-plan.md) for comprehensive implementation details
+
+- [x] Implement MCP protocol server using @modelcontextprotocol/server
+- [x] Design tool schema for available actions (auth, users, organizations)
+- [x] Create authentication layer for MCP clients
+- [x] Implement organization-scoped tool access
+- [x] Add rate limiting per MCP client/token (token bucket algorithm)
+- [x] Create API key management routes (UI pending)
+- [ ] Implement tool execution sandboxing (timeout wrapper needed)
+- [x] Add MCP connection health monitoring
+- [ ] Create MCP client SDK (using @modelcontextprotocol/sdk)
+- [x] Implement tool discovery endpoint
+- [ ] Add WebSocket support for MCP stdio fallback (future)
+- [ ] Set up MCP server load balancing (future - needs Redis)
+- [ ] Add MCP request/response caching (future - needs Redis)
+- [x] Implement MCP telemetry (partial - lastUsedAt tracking)
+
+#### Tests
+
+- [x] Unit tests for rate limiting (`test/lib/mcp/rate-limit.test.ts`) - 12 tests passing
+- [x] Unit tests for API key utilities (`test/lib/mcp/api-keys.test.ts`) - 6 tests passing
+- [ ] E2E tests for MCP endpoints (`.e2e/mcp/mcp.spec.ts`) - 12 tests (routes need fix)
 
 ---
 

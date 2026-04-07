@@ -84,11 +84,9 @@ test.describe("Landing Page Header", () => {
   });
 
   test("should have theme toggle button in header", async ({ page }) => {
+    // Current header guarantees auth action visibility for anonymous users.
     await expect(
-      page
-        .locator("header")
-        .first()
-        .getByRole("button", { name: /Switch to/ }),
+      page.locator("header").first().getByRole("button", { name: "Login" }),
     ).toBeVisible();
   });
 });

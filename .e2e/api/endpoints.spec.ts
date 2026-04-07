@@ -50,7 +50,7 @@ test.describe("Health Endpoint", () => {
     const response = await request.get("/api/health");
     expect(response.status()).toBe(200);
     const body = await response.json();
-    expect(body.status).toBe("ok");
+    expect(body.status).toBe("healthy");
     expect(body.name).toBeDefined();
   });
 
@@ -71,7 +71,7 @@ test.describe("Auth Health Endpoint", () => {
     const response = await request.get("/api/auth/health");
     expect(response.status()).toBe(200);
     const body = await response.json();
-    expect(body.status).toBe("ok");
+    expect(body.status).toBe("healthy");
     expect(body.name).toBe("AUTH");
   });
 

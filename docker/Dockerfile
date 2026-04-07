@@ -12,7 +12,7 @@ COPY package.json bun.lock* ./
 
 # Install production dependencies only
 # --production=false includes devDependencies needed for build
-RUN bun install --frozen-lockfile --production=false
+RUN bun install --frozen-lockfile --production=false --ignore-scripts
 
 # =============================================================================
 # Stage 2: Builder - Build the application

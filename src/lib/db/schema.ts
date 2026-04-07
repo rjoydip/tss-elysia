@@ -170,6 +170,7 @@ export type Account = typeof accounts.$inferSelect;
 export type Verification = typeof verifications.$inferSelect;
 export type SubscriptionPlan = typeof subscriptionPlans.$inferSelect;
 export type Subscription = typeof subscriptions.$inferSelect;
+export type McpApiKey = typeof mcpApiKeys.$inferSelect;
 
 // Union type for all table types
 export type DBType =
@@ -178,4 +179,38 @@ export type DBType =
   | typeof accounts
   | typeof verifications
   | typeof subscriptionPlans
-  | typeof subscriptions;
+  | typeof subscriptions
+  | typeof mcpApiKeys;
+
+/**
+ * MCP API Keys table - stores API keys for MCP client authentication.
+ * Allows external AI agents to access the application via MCP protocol.
+ * Keys are hashed before storage for security.
+ */
+export const mcpApiKeys = sqliteTable("mcp_api_key", {
+  id: text("id").primaryKey(),
+  name: text("name").notNull(),
+  keyHash: text("keyHash").notNull().unique(),
+  userId: text("userId")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  organizationId: text("organizationId"),
+  permissions: text("permissions"), // JSON string for tool permissions
+  rateLimit: integer("rateLimit").notNull().default(100),
+  rateLimitDuration: integer("rateLimitDuration").notNull().default(60_000),
+  lastUsedAt: integer("lastUsedAt", { mode: "timestamp" }),
+  expiresAt: integer("expiresAt", { mode: "timestamp" }),
+  createdAt: integer("createdAt", { mode: "timestamp" }).notNull(),
+  updatedAt: integer("updatedAt", { mode: "timestamp" }).notNull(),
+});
+
+/**
+ * MCP API Key relations - defines many-to-one relationship to users.
+ * Each API key belongs to exactly one user.
+ */
+export const mcpApiKeysRelations = relations(mcpApiKeys, ({ one }) => ({
+  user: one(users, {
+    fields: [mcpApiKeys.userId],
+    references: [users.id],
+  }),
+}));
