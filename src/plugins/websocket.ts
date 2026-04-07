@@ -3,7 +3,6 @@
  * Sets up WebSocket handling with authentication, heartbeat, and message routing.
  */
 
-import { websocket } from "@elysiajs/websocket";
 import { Elysia } from "elysia";
 import {
   connectionStore,
@@ -66,11 +65,6 @@ export function createWebSocketPlugin(config: Partial<WebSocketConfig> = {}) {
   return new Elysia({
     name: "realtime.websocket",
   })
-    .use(
-      websocket({
-        maxPayload: finalConfig.maxMessageSize,
-      }),
-    )
     .ws("/ws", {
       async open(ws: any) {
         // Validate origin

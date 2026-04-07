@@ -186,7 +186,7 @@ bun run db:reset
 
 ### Container Won't Start
 
-1. Check AUTH_SECRET is set:
+1. Check BETTER_AUTH_SECRET is set:
 
    ```bash
    docker logs tss-elysia
@@ -201,7 +201,7 @@ bun run db:reset
 3. Check volume permissions:
 
    ```bash
-   docker exec tss-elysia ls -la /app/data
+   docker exec tss-elysia ls -la /app/.artifacts
    ```
 
 ---
@@ -213,7 +213,7 @@ Ensure persistent volume:
 ```yaml
 # docker-compose.yml
 volumes:
-  - db-data:/app/data
+  - db-data:/app/.artifacts
 
 volumes:
   db-data:

@@ -11,19 +11,23 @@ This project uses TanStack Start with file-based routing. Routes are defined in 
 
 ### Current Routes
 
-| Method | Path           | Description       |
-| ------ | -------------- | ----------------- |
-| GET    | `/`            | Home page (SSR)   |
-| GET    | `/account/*`   | Account routes    |
-| GET    | `/api`         | API root endpoint |
-| GET    | `/api/*`       | API catch-all     |
-| GET    | `/api/health`  | Health check      |
-| GET    | `/blog/*`      | Blog routes       |
-| GET    | `/changelog/*` | Changelog routes  |
-| GET    | `/docs/*`      | Docs routes       |
-| GET    | `/profile`     | Profile page      |
-| GET    | `/settings/*`  | Settings routes   |
-| GET    | `/status`      | Health monitor    |
+| Method | Path              | Description                      |
+| ------ | ----------------- | -------------------------------- |
+| GET    | `/`               | Home page (SSR)                  |
+| GET    | `/account/*`      | Account routes                   |
+| GET    | `/api`            | API root endpoint                |
+| GET    | `/api/*`          | API catch-all                    |
+| GET    | `/api/health`     | Health check                     |
+| GET    | `/api/auth/*`     | Better Auth API                  |
+| GET    | `/api/mcp/*`      | MCP API endpoints                |
+| GET    | `/api/mcp/tools`  | MCP tool discovery               |
+| GET    | `/api/mcp/health` | MCP health and connection status |
+| GET    | `/blog/*`         | Blog routes                      |
+| GET    | `/changelog/*`    | Changelog routes                 |
+| GET    | `/docs/*`         | Docs routes                      |
+| GET    | `/profile`        | Profile page                     |
+| GET    | `/settings/*`     | Settings routes                  |
+| GET    | `/status`         | Health monitor                   |
 
 ### Route File Structure
 
@@ -40,6 +44,9 @@ src/routes/
     $.ts           # API catch-all route (/api/*)
     auth/
       $.ts         # Auth route (/api/auth/*)
+    mcp/
+      $.ts         # MCP route (/api/mcp/*)
+      -keys.ts     # MCP API key management routes
   blog.tsx          # Blog routes
   changelog.tsx     # Changelog routes
   docs.tsx          # Documentation layout
@@ -55,27 +62,32 @@ The API uses Elysia with the following structure:
 
 ```typescript
 // src/routes/api/$.ts
+import { Elysia } from "elysia";
 import { createFileRoute } from "@tanstack/react-router";
-import { createApp } from "~/server";
 import { API_PREFIX, APP_NAME } from "~/config";
+import { composedMiddleware, errorFn, traceFn } from "~/middlewares";
 
-export const app = createApp({
-  prefix: API_PREFIX,
-})
+export const apiRoutes = new Elysia({ name: "root.api", prefix: API_PREFIX })
+  .use(composedMiddleware({ openAPP_NAME: "API" }))
+  .trace(traceFn)
+  .onError(errorFn)
   .state("name", APP_NAME)
-  .get("/health", async ({ store: { name } }) => ({ name, status: "ok" }))
   .get("/", ({ store: { name }, set }) => {
     set.headers["Content-Type"] = "text/plain; charset=utf-8";
-    return `Welcome to ${name}`;
-  });
+    return `Welcome to ${name} Service`;
+  })
+  .get("/health", async ({ store: { name } }) => ({
+    name,
+    status: "healthy",
+    timestamp: new Date().toISOString(),
+  }));
 
-const handle = ({ request }: { request: Request }) => app.fetch(request);
+const handle = ({ request }: { request: Request }) => apiRoutes.fetch(request);
 
 export const Route = createFileRoute("/api/$")({
   server: {
     handlers: {
       GET: handle,
-      POST: handle,
     },
   },
 });
@@ -215,14 +227,14 @@ export const env = await _createEnv({
   client: { VITE_API_URL: t.String() },
   server: {
     API_URL: t.String(),
-    AUTH_SECRET: t.String(),
+    BETTER_AUTH_SECRET: t.String(),
     DATABASE_URL: t.String(),
     PORT: t.Number(),
   },
   runtimeEnv: () => ({
     VITE_API_URL: _getEnv("VITE_API_URL", ""),
     API_URL: _getEnv("API_URL", "http://localhost:3000/api"),
-    AUTH_SECRET: _getAuthSecret(),
+    BETTER_AUTH_SECRET: _getAuthSecret(),
     DATABASE_URL: _getEnv("DATABASE_URL", ""),
     PORT: parseInt(_getEnv("PORT", "3000"), 10),
   }),

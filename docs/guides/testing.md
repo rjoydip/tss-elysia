@@ -64,9 +64,9 @@ Use Eden Treaty for end-to-end type-safe API testing:
 ```typescript
 import { describe, expect, it } from "bun:test";
 import { treaty } from "@elysiajs/eden";
-import { app } from "../src/routes/api/$.ts";
+import { apiRoutes } from "../src/routes/api/$.ts";
 
-const api = treaty(app);
+const api = treaty(apiRoutes);
 
 describe("API Endpoints", () => {
   it("should return welcome message", async () => {
@@ -143,6 +143,9 @@ E2E tests are in `.e2e/`:
 ├── api/              # API E2E tests
 │   ├── endpoints.spec.ts # API endpoint tests
 │   └── middlewares.spec.ts # Middleware tests (CORS, Helmet, Trace, Rate Limit, Error)
+├── mcp/              # MCP E2E tests
+│   ├── mcp.spec.ts
+│   └── mcp-keys.spec.ts
 ├── middlewares/       # Middleware-specific tests
 │   └── rate-limit.spec.ts # Rate limiting tests
 ├── auth.spec.ts      # Auth E2E tests
@@ -165,7 +168,7 @@ export const E2E_PORT = port;
 
 Some API endpoint tests are skipped in CI environments because the preview server may not be accessible from Playwright's browser. Tests that require actual HTTP requests to the server will automatically skip when `isCI` is detected. Tests that don't require server access (like 404 handling) still run.
 
-### UI Tests (`.e2e/ui.test.ts`)
+### UI Tests (`.e2e/ui/*.spec.ts`)
 
 ```typescript
 import { test, expect } from "@playwright/test";
@@ -176,7 +179,7 @@ test("should display home page", async ({ page }) => {
 });
 ```
 
-### API Tests (`.e2e/api.test.ts`)
+### API Tests (`.e2e/api/*.spec.ts`)
 
 ```typescript
 import { test, expect } from "@playwright/test";

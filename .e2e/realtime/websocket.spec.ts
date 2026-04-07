@@ -5,12 +5,21 @@
  */
 
 import { test, expect } from "@playwright/test";
-import { E2E_BASE_URL } from "../_config";
 
 test.describe("WebSocket API Integration", () => {
-  test("should have WebSocket routes available", async ({ request }) => {
-    // Test that the API is running
-    const response = await request.get(`${E2E_BASE_URL}/api/health`);
+  test("should expose realtime discovery endpoint", async ({ request }) => {
+    const response = await request.get("/api/realtime");
     expect(response.ok()).toBeTruthy();
+    const payload = await response.json();
+    expect(payload.websocketEndpoint).toBe("/api/ws");
+    expect(payload.healthEndpoint).toBe("/api/realtime/health");
+  });
+
+  test("should expose realtime health endpoint", async ({ request }) => {
+    const response = await request.get("/api/realtime/health");
+    expect(response.ok()).toBeTruthy();
+    const payload = await response.json();
+    expect(payload.status).toBe("healthy");
+    expect(payload.websocketPath).toBe("/api/ws");
   });
 });

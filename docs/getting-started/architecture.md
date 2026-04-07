@@ -59,6 +59,7 @@ The application follows a server-side rendering (SSR) architecture using TanStac
 | App Factory  | `src/server.ts`            | Elysia app with middlewares                |
 | API Routes   | `src/routes/api/$.ts`      | API endpoints                              |
 | Auth Routes  | `src/routes/api/auth/$.ts` | Auth endpoints (Better Auth)               |
+| MCP Routes   | `src/routes/api/mcp/$.ts`  | MCP service routes and tool discovery      |
 
 ### 3. Configuration Layer
 
@@ -114,6 +115,8 @@ src/server.ts (createApp with middleware)
     │
     ▼
 src/routes/api/$.ts (API routes)
+    │
+    └── src/routes/api/mcp/$.ts (MCP routes)
 ```
 
 ## File Structure
@@ -160,10 +163,17 @@ src/
 │   ├── auth/          # Better Auth
 │   │   ├── index.ts   # Server auth instance
 │   │   └── client.ts  # Client auth hooks
+│   ├── mcp/           # MCP server runtime, auth, transport, tools
+│   │   ├── server.ts
+│   │   ├── auth.ts
+│   │   ├── api-keys.ts
+│   │   ├── rate-limit.ts
+│   │   ├── transport.ts
+│   │   └── tools/
 │   └── db/           # Database (Drizzle + SQLite)
 │       ├── index.ts
 │       └── schema.ts
-├── logger.ts           # Logger configuration
+├── lib/logger.ts       # Logger configuration
 ├── middlewares/       # Middleware implementations
 │   ├── cors.ts
 │   ├── helmet.ts
@@ -190,6 +200,9 @@ src/
 │       ├── $.ts
 │       └── auth/
 │           └── $.ts
+│       └── mcp/
+│           ├── $.ts
+│           └── -keys.ts
 ├── server.ts         # Server entry point
 ├── types/            # TypeScript types
 │   └── subscription.ts

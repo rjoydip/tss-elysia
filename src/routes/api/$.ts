@@ -10,17 +10,21 @@ import { createFileRoute } from "@tanstack/react-router";
 import { createIsomorphicFn } from "@tanstack/react-start";
 import { API_PREFIX, APP_NAME, HOST, PORT, isBrowser } from "~/config";
 import { composedMiddleware, errorFn, traceFn } from "~/middlewares";
+import { websocketPlugin } from "~/plugins/websocket";
+import { connectionStore } from "~/lib/realtime";
 
 /**
  * Main API application instance.
  * Prefix: /api (configurable via API_PREFIX)
  * Includes all security middleware, tracing, and error handling.
- * Note: WebSocket support is added separately in createWsApiApp for production.
+ * Includes WebSocket endpoint registration for real-time features.
  */
-export const apiApp = new Elysia({
-  name: "api",
+export const apiRoutes = new Elysia({
+  name: "root.api",
   prefix: API_PREFIX,
 })
+  // Mount realtime websocket plugin so /api/ws and /api/ws/health are reachable.
+  .use(websocketPlugin)
   // Apply composed middleware (CORS, Helmet, Rate Limit, OpenTelemetry)
   .use(
     composedMiddleware({
@@ -33,22 +37,6 @@ export const apiApp = new Elysia({
   .onError(errorFn)
   // Store application name
   .state("name", APP_NAME)
-
-  /**
-   * Health check endpoint for monitoring.
-   * Used by load balancers and orchestration systems (Kubernetes, etc.)
-   * Returns simple JSON with service status.
-   */
-  .get("/health", async ({ store: { name } }) => ({ name, status: "ok" }), {
-    detail: {
-      summary: "Get API health",
-      description: "Get API health",
-      tags: ["api-health"],
-      responses: {
-        200: { description: "Success" },
-      },
-    },
-  })
 
   /**
    * Root endpoint for service information.
@@ -70,13 +58,96 @@ export const apiApp = new Elysia({
         },
       },
     },
+  )
+
+  /**
+   * Health check endpoint for monitoring.
+   * Used by load balancers and orchestration systems (Kubernetes, etc.)
+   * Returns simple JSON with service status.
+   */
+  .get(
+    "/health",
+    async ({ store: { name } }) => {
+      return new Response(
+        JSON.stringify({
+          name,
+          status: "healthy",
+          timestamp: new Date().toISOString(),
+        }),
+        {
+          headers: { "Content-Type": "application/json" },
+        },
+      );
+    },
+    {
+      detail: {
+        summary: "Get API health",
+        description: "Get API health",
+        tags: ["api-health"],
+        responses: {
+          200: { description: "Success" },
+        },
+      },
+    },
+  )
+  /**
+   * Realtime discovery endpoint.
+   * Provides the public websocket endpoint that clients should connect to.
+   */
+  .get(
+    "/realtime",
+    () =>
+      new Response(
+        JSON.stringify({
+          websocketEndpoint: `${API_PREFIX}/ws`,
+          healthEndpoint: `${API_PREFIX}/realtime/health`,
+          requiresAuth: true,
+        }),
+        {
+          headers: { "Content-Type": "application/json" },
+        },
+      ),
+    {
+      detail: {
+        summary: "Get realtime endpoint metadata",
+        description: "Returns websocket endpoint information for realtime clients",
+        tags: ["api-realtime"],
+      },
+    },
+  )
+  /**
+   * Realtime health endpoint.
+   * Exposes connection counters for validation and operational monitoring.
+   */
+  .get(
+    "/realtime/health",
+    () =>
+      new Response(
+        JSON.stringify({
+          status: "healthy",
+          websocketPath: `${API_PREFIX}/ws`,
+          totalConnections: connectionStore.getCount(),
+          authenticatedConnections: connectionStore.getAuthenticatedCount(),
+          timestamp: new Date().toISOString(),
+        }),
+        {
+          headers: { "Content-Type": "application/json" },
+        },
+      ),
+    {
+      detail: {
+        summary: "Get realtime health",
+        description: "Returns websocket readiness and connection statistics",
+        tags: ["api-realtime"],
+      },
+    },
   );
 
 /**
  * Request handler wrapper for TanStack Start integration.
  * Adapts Elysia handler to TanStack Start's server handler interface.
  */
-const handle = ({ request }: { request: Request }) => apiApp.fetch(request);
+const handle = ({ request }: { request: Request }) => apiRoutes.fetch(request);
 
 /**
  * TanStack Start route definition.
@@ -86,8 +157,6 @@ export const Route = createFileRoute(`/api/$`)({
   server: {
     handlers: {
       GET: handle,
-      POST: handle,
-      OPTIONS: handle,
     },
   },
 });
@@ -108,11 +177,11 @@ export const Route = createFileRoute(`/api/$`)({
  */
 export const getAPI = createIsomorphicFn()
   // Server: Use in-process Elysia handler (no HTTP overhead)
-  .server(() => treaty(apiApp).api)
+  .server(() => treaty(apiRoutes).api)
   // Client: Make HTTP requests to server
   .client(() => {
     const url =
       import.meta.env.VITE_API_URL ||
       (isBrowser ? window.location.origin : `http://${HOST}:${PORT}`);
-    return treaty<typeof apiApp>(url).api;
+    return treaty<typeof apiRoutes>(url).api;
   });

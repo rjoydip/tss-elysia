@@ -49,8 +49,8 @@ const authService = new Elysia().all(
  * Prefix: /api/auth
  * Includes health check and root endpoint.
  */
-const authApp = new Elysia({
-  name: "auth",
+export const authRoutes = new Elysia({
+  name: "auth.api",
   prefix: "/api/auth",
 })
   // Request tracing for performance monitoring
@@ -63,23 +63,12 @@ const authApp = new Elysia({
   .state("name", "AUTH")
 
   /**
-   * Health check endpoint for monitoring.
-   * Returns service status for load balancers/health checks.
-   */
-  .get("/health", async ({ store: { name } }) => ({ name, status: "ok" }), {
-    detail: {
-      summary: "Get AUTH health",
-      description: "Get AUTH health",
-      tags: ["auth-health"],
-      responses: {
-        200: { description: "Success" },
-      },
-    },
-  })
-
-  /**
-   * Root endpoint for service information.
+   * Root endpoint for Auth service information.
    * Returns welcome message identifying the auth service.
+   * This is separate from the main API root to allow for different service information if needed.
+   *
+   * Note: This is not the same as the main API root at /api, which identifies the overall API service.
+   * This endpoint specifically identifies the auth service for clarity in monitoring and documentation.
    */
   .get(
     "/",
@@ -97,13 +86,43 @@ const authApp = new Elysia({
         },
       },
     },
+  )
+
+  /**
+   * Health check endpoint for monitoring.
+   * Returns service status for load balancers/health checks.
+   */
+  .get(
+    "/health",
+    async ({ store: { name } }) => {
+      return new Response(
+        JSON.stringify({
+          name,
+          status: "healthy",
+          timestamp: new Date().toISOString(),
+        }),
+        {
+          headers: { "Content-Type": "application/json" },
+        },
+      );
+    },
+    {
+      detail: {
+        summary: "Get AUTH health",
+        description: "Get AUTH health",
+        tags: ["auth-health"],
+        responses: {
+          200: { description: "Success" },
+        },
+      },
+    },
   );
 
 /**
  * Request handler wrapper for TanStack Start integration.
  * Adapts Elysia handler to TanStack Start's server handler interface.
  */
-const handle = ({ request }: { request: Request }) => authApp.fetch(request);
+const handle = ({ request }: { request: Request }) => authRoutes.fetch(request);
 
 /**
  * TanStack Start route definition.

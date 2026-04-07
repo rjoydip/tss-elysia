@@ -175,7 +175,7 @@ export function Header({ className, children, showSignIn = true }: HeaderProps) 
             <div className="flex items-center gap-2 text-primary">
               <Link to="/account/login">
                 <Button variant="ghost" size="sm">
-                  Sign in
+                  Login
                 </Button>
               </Link>
             </div>

@@ -9,15 +9,20 @@ This project uses type-safe environment variables with isomorphic fetching, supp
 
 ## Server Configuration
 
-| Variable        | Default         | Description                              |
-| --------------- | --------------- | ---------------------------------------- |
-| `HOST`          | `localhost`     | Server host                              |
-| `PORT`          | `3000`          | Server port                              |
-| `VITE_API_URL`  | Dynamic         | Client API URL for Eden Treaty           |
-| `DATABASE_PATH` | `.artifacts`    | SQLite database file path                |
-| `DATABASE_NAME` | `tss-elysia.db` | SQLite database file name                |
-| `DATABASE_URL`  | -               | Database connection URL (future use)     |
-| `AUTH_SECRET`   | Auto-generated  | Authentication secret for session tokens |
+| Variable                 | Default         | Description                              |
+| ------------------------ | --------------- | ---------------------------------------- |
+| `HOST`                   | `localhost`     | Server host                              |
+| `PORT`                   | `3000`          | Server port                              |
+| `VITE_API_URL`           | Dynamic         | Client API URL for Eden Treaty           |
+| `DATABASE_PATH`          | `.artifacts`    | SQLite database file path                |
+| `DATABASE_NAME`          | `tss-elysia.db` | SQLite database file name                |
+| `DATABASE_URL`           | -               | Database connection URL (future use)     |
+| `BETTER_AUTH_SECRET`     | Auto-generated  | Authentication secret for session tokens |
+| `WS_ENABLED`             | -               | Enables/disables websocket transport     |
+| `WS_HEARTBEAT_INTERVAL`  | -               | Websocket heartbeat interval             |
+| `WS_MAX_MESSAGE_SIZE`    | -               | Max websocket message size               |
+| `WS_RATE_LIMIT_MESSAGES` | -               | Websocket messages allowed per window    |
+| `WS_RATE_LIMIT_WINDOW`   | -               | Websocket rate-limit window (ms)         |
 
 ## Database Configuration
 
@@ -138,7 +143,7 @@ Client-side variables must be prefixed with `VITE_`:
 import { env } from "~/_env";
 
 console.log(env.VITE_API_URL); // Available in browser
-// env.AUTH_SECRET would throw - server-only
+// env.BETTER_AUTH_SECRET would throw - server-only
 ```
 
 #### Eden Treaty Dynamic URL
@@ -176,7 +181,7 @@ Server-only variables are protected from client access:
 import { env } from "~/_env";
 
 console.log(env.API_URL); // Available on server
-console.log(env.AUTH_SECRET); // Available on server
+console.log(env.BETTER_AUTH_SECRET); // Available on server
 ```
 
 ## Runtime Detection
@@ -263,6 +268,6 @@ Environment variables are validated at runtime using Elysia's type system:
 
 ## Security
 
-- Server-only variables (`AUTH_SECRET`, `DATABASE_URL`) are protected from client access
+- Server-only variables (`BETTER_AUTH_SECRET`, `DATABASE_URL`) are protected from client access
 - Accessing server variables from the browser throws an error
 - The env module uses a Proxy to enforce these boundaries
