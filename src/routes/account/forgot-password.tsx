@@ -8,6 +8,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { ForgotPasswordForm } from "~/components/auth/form/forgot-password";
 import { Footer } from "~/components/footer";
 import { Header } from "~/components/header";
+import { AnimatedPageBackground } from "~/components/background/animated-page-background";
 
 /**
  * Route definition for the forgot password page.
@@ -23,7 +24,8 @@ export const Route = createFileRoute("/account/forgot-password")({
  */
 function ForgotPassword() {
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="relative isolate min-h-screen bg-background flex flex-col">
+      <AnimatedPageBackground />
       <Header />
 
       <main className="flex-1 flex items-center justify-center px-4 pt-20 pb-12">

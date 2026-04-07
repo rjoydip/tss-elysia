@@ -7,6 +7,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { blogPosts, getFeaturedPost, BlogPost } from "~/lib/blog/data";
 import { Header } from "~/components/header";
 import { Footer } from "~/components/footer";
+import { AnimatedPageBackground } from "~/components/background/animated-page-background";
 
 export const Route = createFileRoute("/blog")({
   component: BlogPage,
@@ -140,7 +141,8 @@ function BlogPage() {
   const recentPosts = blogPosts.filter((p) => !p.featured);
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="relative isolate min-h-screen bg-background">
+      <AnimatedPageBackground />
       <Header />
 
       {/* Main Content */}

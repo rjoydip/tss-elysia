@@ -12,6 +12,7 @@ import { API_PREFIX, APP_NAME, HOST, PORT, isBrowser } from "~/config";
 import { composedMiddleware, errorFn, traceFn } from "~/middlewares";
 import { websocketPlugin } from "~/plugins/websocket";
 import { connectionStore } from "~/lib/realtime";
+import { getDatabaseHeartbeat } from "~/lib/db/heartbeat";
 
 /**
  * Main API application instance.
@@ -139,6 +140,29 @@ export const apiRoutes = new Elysia({
         summary: "Get realtime health",
         description: "Returns websocket readiness and connection statistics",
         tags: ["api-realtime"],
+      },
+    },
+  )
+  /**
+   * Database heartbeat endpoint.
+   * Executes a lightweight query to verify database liveness and response latency.
+   */
+  .get(
+    "/database/heartbeat",
+    () => {
+      const heartbeat = getDatabaseHeartbeat();
+      const statusCode = heartbeat.status === "healthy" ? 200 : 503;
+
+      return new Response(JSON.stringify(heartbeat), {
+        status: statusCode,
+        headers: { "Content-Type": "application/json" },
+      });
+    },
+    {
+      detail: {
+        summary: "Get database heartbeat",
+        description: "Runs a lightweight database liveness probe for status monitoring",
+        tags: ["api-health", "api-database"],
       },
     },
   );

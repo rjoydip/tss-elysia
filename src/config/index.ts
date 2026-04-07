@@ -115,6 +115,13 @@ export const navItems = [
 ];
 
 /**
+ * Status page configuration.
+ */
+export const statusPageConfig = {
+  manualRefreshCooldownMs: 10000, // 10 seconds
+};
+
+/**
  * Elysia server configuration.
  * Defines core server behavior including websocket and response handling.
  * @property normalize - Normalize paths (remove trailing slashes)

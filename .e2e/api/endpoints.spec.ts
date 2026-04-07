@@ -64,6 +64,15 @@ test.describe("Health Endpoint", () => {
     const elapsed = response.headers()["x-elapsed"];
     expect(elapsed).toBeDefined();
   });
+
+  test("should return database heartbeat payload", async ({ request }) => {
+    const response = await request.get("/api/database/heartbeat");
+    expect([200, 503]).toContain(response.status());
+    const body = await response.json();
+    expect(["healthy", "unhealthy"]).toContain(body.status);
+    expect(body.timestamp).toBeDefined();
+    expect(body.detail).toBeDefined();
+  });
 });
 
 test.describe("Auth Health Endpoint", () => {

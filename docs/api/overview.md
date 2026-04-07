@@ -11,23 +11,24 @@ This project uses TanStack Start with file-based routing. Routes are defined in 
 
 ### Current Routes
 
-| Method | Path              | Description                      |
-| ------ | ----------------- | -------------------------------- |
-| GET    | `/`               | Home page (SSR)                  |
-| GET    | `/account/*`      | Account routes                   |
-| GET    | `/api`            | API root endpoint                |
-| GET    | `/api/*`          | API catch-all                    |
-| GET    | `/api/health`     | Health check                     |
-| GET    | `/api/auth/*`     | Better Auth API                  |
-| GET    | `/api/mcp/*`      | MCP API endpoints                |
-| GET    | `/api/mcp/tools`  | MCP tool discovery               |
-| GET    | `/api/mcp/health` | MCP health and connection status |
-| GET    | `/blog/*`         | Blog routes                      |
-| GET    | `/changelog/*`    | Changelog routes                 |
-| GET    | `/docs/*`         | Docs routes                      |
-| GET    | `/profile`        | Profile page                     |
-| GET    | `/settings/*`     | Settings routes                  |
-| GET    | `/status`         | Health monitor                   |
+| Method | Path                      | Description                       |
+| ------ | ------------------------- | --------------------------------- |
+| GET    | `/`                       | Home page (SSR)                   |
+| GET    | `/account/*`              | Account routes                    |
+| GET    | `/api`                    | API root endpoint                 |
+| GET    | `/api/*`                  | API catch-all                     |
+| GET    | `/api/health`             | Health check                      |
+| GET    | `/api/auth/*`             | Better Auth API                   |
+| GET    | `/api/mcp/*`              | MCP API endpoints                 |
+| GET    | `/api/mcp/tools`          | MCP tool discovery                |
+| GET    | `/api/mcp/health`         | MCP health and connection status  |
+| GET    | `/api/database/heartbeat` | Database heartbeat liveness check |
+| GET    | `/blog/*`                 | Blog routes                       |
+| GET    | `/changelog/*`            | Changelog routes                  |
+| GET    | `/docs/*`                 | Docs routes                       |
+| GET    | `/profile`                | Profile page                      |
+| GET    | `/settings/*`             | Settings routes                   |
+| GET    | `/status`                 | Health monitor                    |
 
 ### Route File Structure
 
@@ -80,7 +81,14 @@ export const apiRoutes = new Elysia({ name: "root.api", prefix: API_PREFIX })
     name,
     status: "healthy",
     timestamp: new Date().toISOString(),
-  }));
+  }))
+  .get("/database/heartbeat", () => {
+    const heartbeat = getDatabaseHeartbeat();
+    return new Response(JSON.stringify(heartbeat), {
+      status: heartbeat.status === "healthy" ? 200 : 503,
+      headers: { "Content-Type": "application/json" },
+    });
+  });
 
 const handle = ({ request }: { request: Request }) => apiRoutes.fetch(request);
 
@@ -195,6 +203,9 @@ Central configuration for the application:
 ```typescript
 export const API_PREFIX = `/api`;
 export const APP_NAME = "TSS ELYSIA";
+export const statusPageConfig = {
+  manualRefreshCooldownMs: 10000, // Prevents refresh-button spam on /status
+};
 
 export const appConfig: ElysiaConfig<any> = {
   normalize: true,

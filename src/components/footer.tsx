@@ -20,7 +20,7 @@ export function Footer({ className, showTerms = true, showLogo = false }: Footer
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className={cn(`py-4 px-4`, className)}>
+    <footer className={cn("py-4 px-4", className)}>
       <div className="mx-auto">
         {/* Main footer content */}
         <div className="flex flex-col md:flex-row items-center justify-between">
@@ -50,13 +50,29 @@ export function Footer({ className, showTerms = true, showLogo = false }: Footer
               rel="noopener noreferrer"
               className="hover:text-foreground transition-colors"
             >
-              GitHub
+              <span className="inline-flex items-center gap-1">
+                GitHub
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="12"
+                  height="12"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden="true"
+                >
+                  <path d="M7 17L17 7" />
+                  <path d="M7 7h10v10" />
+                </svg>
+              </span>
             </a>
           </div>
         </div>
 
-        {/* Divider */}
-        <div className="mt-4 pt-4 border-t border-border/50">
+        <div className="mt-4 pt-4">
           {/* Terms (optional - for auth pages) */}
           {showTerms && (
             <p className="text-center text-xs text-muted-foreground mb-2">

@@ -4,6 +4,7 @@
  */
 
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useEffect } from "react";
 import { buttonVariants } from "~/components/ui/button";
 import { Badge } from "~/components/ui/badge";
 import { Header } from "~/components/header";
@@ -12,6 +13,8 @@ import { CodeHighlight } from "~/components/code-highlight";
 import { cn } from "~/lib/utils";
 import { APP_VERSION, GITHUB_REPO_URL } from "~/config";
 import { BrandDescription, BrandTitle } from "~/components/branding";
+import { getShikiHighlighter } from "~/lib/shiki";
+import { AnimatedPageBackground } from "~/components/background/animated-page-background";
 
 export const Route = createFileRoute("/")({
   component: Home,
@@ -179,8 +182,17 @@ const features = [
 ];
 
 function Home() {
+  /**
+   * Preloads the shared Shiki highlighter once the landing page mounts.
+   * This reduces perceived delay before the first highlighted code block appears.
+   */
+  useEffect(() => {
+    void getShikiHighlighter();
+  }, []);
+
   return (
-    <div className="min-h-screen bg-background">
+    <div className="relative isolate min-h-screen bg-background">
+      <AnimatedPageBackground />
       <Header />
 
       {/* Hero Section */}

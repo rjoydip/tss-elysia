@@ -6,6 +6,7 @@
 
 import { useEffect, useState } from "react";
 import { getShikiHighlighter } from "~/lib/shiki";
+import { useTheme } from "~/components/theme/provider";
 
 interface CodeHighlightProps {
   /** Code string to highlight */
@@ -25,6 +26,20 @@ export function CodeHighlight({
   className = "",
 }: CodeHighlightProps) {
   const [highlightedCode, setHighlightedCode] = useState<string>("");
+  const { theme } = useTheme();
+
+  /**
+   * Resolves runtime theme for highlighting.
+   * When using system mode, we read the active media query to keep output aligned with UI mode.
+   */
+  const resolvedTheme =
+    theme === "system"
+      ? typeof window !== "undefined" &&
+        window.matchMedia &&
+        window.matchMedia("(prefers-color-scheme: dark)").matches
+        ? "dark"
+        : "light"
+      : theme;
 
   useEffect(() => {
     if (!code) return;
@@ -34,22 +49,26 @@ export function CodeHighlight({
         const highlighter = await getShikiHighlighter();
         const html = highlighter.codeToHtml(code.trim(), {
           lang: language,
-          themes: {
-            light: "github-light",
-            dark: "github-dark",
-          },
+          theme: resolvedTheme === "dark" ? "github-dark" : "github-light",
         });
-        setHighlightedCode(html);
+        /**
+         * Shiki adds inline background styles to `<pre>`. We remove those so
+         * the app theme tokens define the surface consistently across themes.
+         */
+        const normalizedHtml = html
+          .replace(/background-color:[^;"]*;?/g, "")
+          .replace(/background:[^;"]*;?/g, "");
+        setHighlightedCode(normalizedHtml);
       } catch {
         // Fallback to plain code block on error
         setHighlightedCode(
-          `<pre style="background:#0a0a0a;padding:1.5rem;overflow-x:auto"><code>${code}</code></pre>`,
+          `<pre style="padding:1.5rem;overflow-x:auto"><code>${code}</code></pre>`,
         );
       }
     };
 
     highlight();
-  }, [code, language]);
+  }, [code, language, resolvedTheme]);
 
   if (highlightedCode) {
     return (
@@ -65,7 +84,7 @@ export function CodeHighlight({
           </div>
         )}
         <div
-          className="p-4 overflow-x-auto"
+          className="p-4 overflow-x-auto bg-muted/40 [&_pre]:!bg-transparent"
           dangerouslySetInnerHTML={{ __html: highlightedCode }}
         />
       </div>
@@ -85,7 +104,8 @@ export function CodeHighlight({
           <span className="text-xs text-muted-foreground ml-2 font-mono">{filename}</span>
         </div>
       )}
-      <pre className="p-6 text-sm overflow-x-auto bg-[#0a0a0a]">
+      <pre className="p-6 text-sm overflow-x-auto bg-muted/40 text-foreground">
+        {/* Uses theme tokens so loading state tracks light/dark mode immediately. */}
         <code className="font-mono">{code}</code>
       </pre>
     </div>

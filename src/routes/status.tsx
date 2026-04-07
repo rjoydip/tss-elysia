@@ -1,127 +1,117 @@
 /**
  * Health Monitoring Dashboard
- * Shows service health status for all API endpoints
- * Following Supabase-style UI design
+ * Shows service health status for all API endpoints.
  */
 
 import { createFileRoute } from "@tanstack/react-router";
-import { useState, useEffect } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Badge } from "~/components/ui/badge";
+import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
-import { Label } from "~/components/ui/label";
-import { Separator } from "~/components/ui/separator";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "~/components/ui/select";
-import { Switch } from "~/components/ui/switch";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "~/components/ui/tooltip";
 import { cn } from "~/lib/utils";
 import { Header } from "~/components/header";
 import { Footer } from "~/components/footer";
-import { CheckCircle2, XCircle, AlertCircle, HelpCircle } from "lucide-react";
+import { CheckCircle2, XCircle, AlertCircle, HelpCircle, RefreshCw } from "lucide-react";
+import { AnimatedPageBackground } from "~/components/background/animated-page-background";
+import {
+  canTriggerManualRefresh,
+  checkStatusHealth,
+  getManualRefreshCooldownRemainingMs,
+  refreshStatusHealth,
+  statusServices,
+  useStatusState,
+} from "~/lib/store/status";
 
 export const Route = createFileRoute("/status")({
   component: HealthDashboard,
 });
 
-interface HealthStatus {
-  name: string;
-  status: "loading" | "up" | "down";
-  responseTime: number | null;
-  lastChecked: Date | null;
-  error?: string;
-}
-
-const services = [
-  {
-    name: "Core API",
-    url: "/api/health",
-    description: "Main API health check",
-  },
-  {
-    name: "Auth API",
-    url: "/api/auth/health",
-    description: "Authentication service health",
-  },
-];
-
 interface OtherStatus {
   name: string;
   status: "operational" | "degraded" | "outage" | "unknown";
   lastUpdated: string | null;
+  tooltip: string;
 }
 
-const otherServices: OtherStatus[] = [
-  { name: "Database", status: "operational", lastUpdated: null },
-  { name: "Storage", status: "operational", lastUpdated: null },
-  { name: "Realtime", status: "operational", lastUpdated: null },
-];
-
 function HealthDashboard() {
-  const [serviceStatuses, setServiceStatuses] = useState<HealthStatus[]>(
-    services.map((s) => ({
-      name: s.name,
-      status: "loading",
-      responseTime: null,
-      lastChecked: null,
-    })),
-  );
-  const [autoRefresh, setAutoRefresh] = useState(false);
-  const [refreshInterval, setRefreshInterval] = useState(30);
-
-  const checkHealth = async () => {
-    const results = await Promise.all(
-      services.map(async (service) => {
-        const startTime = Date.now();
-        try {
-          const response = await fetch(service.url, {
-            method: "GET",
-            headers: { Origin: window.location.origin },
-          });
-          const responseTime = Date.now() - startTime;
-          return {
-            name: service.name,
-            status: response.ok ? ("up" as const) : ("down" as const),
-            responseTime,
-            lastChecked: new Date(),
-            error: response.ok ? undefined : `HTTP ${response.status}`,
-          };
-        } catch {
-          return {
-            name: service.name,
-            status: "down" as const,
-            responseTime: null,
-            lastChecked: new Date(),
-            error: "Connection failed",
-          };
-        }
-      }),
-    );
-    setServiceStatuses(results);
-  };
+  /**
+   * Status dashboard state is centrally managed via TanStack Store.
+   */
+  const { serviceStatuses, otherServiceStatuses, isRefreshing, lastRefreshSuccessful } =
+    useStatusState();
+  const [refreshUiTick, setRefreshUiTick] = useState(0);
 
   useEffect(() => {
-    checkHealth();
+    void checkStatusHealth();
   }, []);
 
   useEffect(() => {
-    if (!autoRefresh) return;
+    const timer = setInterval(() => {
+      setRefreshUiTick((prev) => prev + 1);
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
 
-    const interval = setInterval(() => {
-      checkHealth();
-    }, refreshInterval * 1000);
+  const allLoading = useMemo(
+    () => serviceStatuses.every((service) => service.status === "loading"),
+    [serviceStatuses],
+  );
+  const allUp = useMemo(
+    () => serviceStatuses.length > 0 && serviceStatuses.every((service) => service.status === "up"),
+    [serviceStatuses],
+  );
+  const someDown = useMemo(
+    () => serviceStatuses.some((service) => service.status === "down"),
+    [serviceStatuses],
+  );
+  const cooldownRemainingMs = useMemo(() => {
+    void refreshUiTick;
+    return getManualRefreshCooldownRemainingMs();
+  }, [refreshUiTick, isRefreshing]);
+  const canRefreshNow = useMemo(() => {
+    void refreshUiTick;
+    return canTriggerManualRefresh();
+  }, [refreshUiTick, isRefreshing]);
+  const refreshButtonLabel = useMemo(() => {
+    if (isRefreshing) return "Refreshing now";
+    if (cooldownRemainingMs > 0) {
+      return `Wait ${Math.ceil(cooldownRemainingMs / 1000)}s`;
+    }
+    return "Refresh now";
+  }, [isRefreshing, cooldownRemainingMs]);
 
-    return () => clearInterval(interval);
-  }, [autoRefresh, refreshInterval]);
+  /**
+   * Triggers a manual refresh using centralized status store action.
+   */
+  const handleRefreshControlClick = useCallback(() => {
+    const triggered = refreshStatusHealth();
+    if (!triggered) {
+      setRefreshUiTick((prev) => prev + 1);
+    }
+  }, []);
 
-  const allUp = serviceStatuses.every((s) => s.status === "up");
-  const someDown = serviceStatuses.some((s) => s.status === "down");
+  const refreshIndicatorClass = useMemo(() => {
+    if (isRefreshing) return "text-primary animate-spin";
+    if (lastRefreshSuccessful === true) return "text-success animate-pulse";
+    if (lastRefreshSuccessful === false) return "text-destructive animate-pulse";
+    return "text-yellow-500 animate-pulse";
+  }, [isRefreshing, lastRefreshSuccessful]);
+
+  /**
+   * Builds human-friendly overall status copy for the top-level badge.
+   * Adds a meaningful sentence for healthy state to improve readability.
+   */
+  const overallStatusLabel = useMemo(() => {
+    if (allLoading) return "Checking service health...";
+    if (allUp) return "Systems Healthy";
+    if (someDown) return "Some services are degraded and need attention";
+    return "Service health is currently unknown";
+  }, [allLoading, allUp, someDown]);
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="relative isolate min-h-screen bg-background">
+      <AnimatedPageBackground />
       <Header />
       <div className="max-w-4xl mx-auto pt-24 pb-10 px-6">
         <header className="mb-8">
@@ -133,27 +123,25 @@ function HealthDashboard() {
               </p>
             </div>
             <div className="flex items-center gap-4">
-              <div className="flex items-center gap-2">
-                <Label htmlFor="auto-refresh" className="text-sm text-muted-foreground">
-                  Auto-refresh:
-                </Label>
-                <Switch id="auto-refresh" checked={autoRefresh} onCheckedChange={setAutoRefresh} />
-              </div>
-              {autoRefresh && (
-                <Select
-                  value={String(refreshInterval)}
-                  onValueChange={(val) => setRefreshInterval(Number(val))}
-                >
-                  <SelectTrigger className="w-20">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="10">10s</SelectItem>
-                    <SelectItem value="30">30s</SelectItem>
-                    <SelectItem value="60">60s</SelectItem>
-                  </SelectContent>
-                </Select>
-              )}
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={handleRefreshControlClick}
+                disabled={!canRefreshNow}
+                title={refreshButtonLabel}
+                aria-label={refreshButtonLabel}
+                className="relative border-none transition-transform duration-300 hover:scale-110 hover:bg-transparent focus-visible:ring-0"
+              >
+                <RefreshCw className={cn("w-4 h-4 transition-colors", refreshIndicatorClass)} />
+              </Button>
+              <span
+                className={cn(
+                  "text-xs text-muted-foreground transition-all duration-300 animate-pulse",
+                  isRefreshing && "animate-pulse text-primary",
+                )}
+              >
+                {refreshButtonLabel}
+              </span>
             </div>
           </div>
         </header>
@@ -163,9 +151,9 @@ function HealthDashboard() {
           <Card>
             <div className="flex items-center justify-between p-6">
               <div className="flex items-center gap-4">
-                {serviceStatuses.every((s) => s.status === "loading") ? (
+                {allLoading ? (
                   <AlertCircle className="w-8 h-8 text-yellow-500 animate-pulse" />
-                ) : allUp && autoRefresh ? (
+                ) : allUp ? (
                   <CheckCircle2 className="w-8 h-8 text-success" />
                 ) : someDown ? (
                   <XCircle className="w-8 h-8 text-destructive" />
@@ -181,16 +169,10 @@ function HealthDashboard() {
                 variant={allUp ? "default" : someDown ? "destructive" : "secondary"}
                 className={cn(
                   "text-sm px-3 py-1",
-                  allUp && "bg-success text-success-foreground hover:bg-success/90",
+                  allUp && "bg-success text-success-foreground hover:bg-success/90 animate-pulse",
                 )}
               >
-                {serviceStatuses.every((s) => s.status === "loading")
-                  ? "Checking..."
-                  : allUp
-                    ? "All Systems Operational"
-                    : someDown
-                      ? "Degraded"
-                      : "Unknown"}
+                {overallStatusLabel}
               </Badge>
             </div>
           </Card>
@@ -202,27 +184,23 @@ function HealthDashboard() {
                 <CardContent className="p-5">
                   <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center gap-3">
-                      {service.status === "loading" ? (
+                      {service.status === "loading" || isRefreshing ? (
                         <AlertCircle className="w-5 h-5 text-yellow-500 animate-pulse" />
                       ) : service.status === "up" ? (
-                        autoRefresh ? (
-                          <CheckCircle2 className="w-5 h-5 text-success" />
-                        ) : (
-                          <CheckCircle2 className="w-5 h-5 text-primary" />
-                        )
+                        <CheckCircle2 className="w-5 h-5 text-success" />
                       ) : (
                         <XCircle className="w-5 h-5 text-destructive" />
                       )}
                       <h3 className="font-semibold text-foreground">{service.name}</h3>
                     </div>
-                    {service.status === "up" && service.responseTime && (
+                    {service.status === "up" && service.responseTime !== null && (
                       <span className="text-sm font-mono text-primary">
                         {service.responseTime}ms
                       </span>
                     )}
                   </div>
                   <p className="text-sm text-muted-foreground mb-2">
-                    {services.find((s) => s.name === service.name)?.description}
+                    {statusServices.find((s) => s.name === service.name)?.description}
                   </p>
                   {service.status === "down" && service.error && (
                     <p className="text-sm text-destructive">{service.error}</p>
@@ -240,8 +218,6 @@ function HealthDashboard() {
             ))}
           </div>
 
-          <Separator className="my-8" />
-
           {/* External Services Section */}
           <section>
             <div className="flex items-center justify-between mb-6">
@@ -256,24 +232,43 @@ function HealthDashboard() {
             </div>
 
             <div className="grid gap-4 md:grid-cols-3">
-              {otherServices.map((service) => (
+              {otherServiceStatuses.map((service: OtherStatus) => (
                 <Card key={service.name}>
                   <CardHeader className="pb-2">
                     <div className="flex items-center justify-between">
                       <CardTitle className="text-base font-medium">{service.name}</CardTitle>
-                      {service.status === "operational" ? (
-                        <CheckCircle2 className="w-5 h-5 text-success" />
-                      ) : service.status === "degraded" ? (
-                        <AlertCircle className="w-5 h-5 text-yellow-500" />
-                      ) : service.status === "outage" ? (
-                        <XCircle className="w-5 h-5 text-destructive" />
-                      ) : (
-                        <HelpCircle className="w-5 h-5 text-muted-foreground" />
-                      )}
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <button type="button" aria-label={`${service.name} status info`}>
+                              {service.status === "operational" ? (
+                                <CheckCircle2 className="w-5 h-5 text-success" />
+                              ) : service.status === "degraded" ? (
+                                <AlertCircle className="w-5 h-5 text-yellow-500" />
+                              ) : service.status === "outage" ? (
+                                <XCircle className="w-5 h-5 text-destructive" />
+                              ) : (
+                                <HelpCircle className="w-5 h-5 text-yellow-500" />
+                              )}
+                            </button>
+                          </TooltipTrigger>
+                          <TooltipContent>{service.tooltip}</TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
                     </div>
                   </CardHeader>
                   <CardContent>
-                    <p className="text-sm text-muted-foreground capitalize">{service.status}</p>
+                    <p className="text-sm text-muted-foreground capitalize">
+                      {service.status === "unknown" ? "upcoming" : service.status}
+                    </p>
+                    {service.lastUpdated && (
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Last checked:{" "}
+                        <span className="text-primary font-bold">
+                          {new Date(service.lastUpdated).toLocaleTimeString()}
+                        </span>
+                      </p>
+                    )}
                   </CardContent>
                 </Card>
               ))}

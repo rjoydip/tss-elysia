@@ -8,6 +8,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { RegisterForm } from "~/components/auth/form/register";
 import { Header } from "~/components/header";
 import { Footer } from "~/components/footer";
+import { AnimatedPageBackground } from "~/components/background/animated-page-background";
 
 /**
  * Route definition for the register page.
@@ -24,7 +25,8 @@ export const Route = createFileRoute("/account/register")({
  */
 function Register() {
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="relative isolate min-h-screen bg-background flex flex-col">
+      <AnimatedPageBackground />
       <Header />
 
       <main className="flex-1 flex items-center justify-center px-4 pt-20 pb-12">
