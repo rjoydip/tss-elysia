@@ -36,16 +36,6 @@ export function getRateLimitResult(): RateLimitResult | undefined {
 }
 
 /**
- * Sets the current API key in the request context.
- * Should be called at the start of each MCP request.
- *
- * @param _apiKey - The validated API key record (used in runWithApiKey)
- */
-export function setCurrentApiKey(_apiKey: McpApiKey): void {
-  // This is documentation only - actual setting happens via runWithApiKey
-}
-
-/**
  * Runs a function with the API key in its context.
  * Used to wrap MCP tool execution with authenticated context.
  *
@@ -115,7 +105,7 @@ export async function validateMcpAuth(
   }
 
   // Check rate limit
-  const rateLimit = checkRateLimit(apiKey);
+  const rateLimit = await checkRateLimit(apiKey);
 
   if (!rateLimit.allowed) {
     return null;

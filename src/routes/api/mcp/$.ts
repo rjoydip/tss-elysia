@@ -9,6 +9,7 @@ import { getMcpServer } from "~/lib/mcp/server";
 import { createFileRoute } from "@tanstack/react-router";
 import { composedMiddleware, errorFn, traceFn } from "~/middlewares";
 import { mcpKeysRoutes } from "./-keys";
+import { MCP_TOOL_CATALOG } from "~/lib/mcp/tools/catalog";
 
 /**
  * MCP health routes.
@@ -91,56 +92,7 @@ export const mcpRoutes = new Elysia({ name: "mcp.api", prefix: "/api/mcp" })
     async () => {
       return new Response(
         JSON.stringify({
-          tools: [
-            {
-              name: "get-current-user",
-              title: "Get Current User",
-              description: "Get the authenticated user's profile information",
-              category: "auth",
-            },
-            {
-              name: "list-sessions",
-              title: "List Sessions",
-              description: "List all active sessions for the current user",
-              category: "auth",
-            },
-            {
-              name: "revoke-session",
-              title: "Revoke Session",
-              description: "Revoke a specific session",
-              category: "auth",
-            },
-            {
-              name: "get-user",
-              title: "Get User",
-              description: "Get user details by user ID",
-              category: "users",
-            },
-            {
-              name: "list-users",
-              title: "List Users",
-              description: "List users in the system",
-              category: "users",
-            },
-            {
-              name: "update-user",
-              title: "Update User",
-              description: "Update the current user's profile",
-              category: "users",
-            },
-            {
-              name: "get-organization",
-              title: "Get Organization",
-              description: "Get details of the current organization",
-              category: "organization",
-            },
-            {
-              name: "list-members",
-              title: "List Organization Members",
-              description: "List all members of the current organization",
-              category: "organization",
-            },
-          ],
+          tools: MCP_TOOL_CATALOG,
         }),
         { headers: { "Content-Type": "application/json" } },
       );

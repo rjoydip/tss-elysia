@@ -9,6 +9,7 @@ import { mcpApiKeys, type McpApiKey } from "~/lib/db/schema";
 import { eq, and, desc } from "drizzle-orm";
 import { logger } from "~/lib/logger";
 import { sql } from "drizzle-orm";
+import { resetRateLimit } from "./rate-limit";
 
 /**
  * Length of the API key (excluding prefix).
@@ -116,7 +117,16 @@ export async function createApiKey(options: {
  * @returns True if revoked, false if not found or not authorized
  */
 export async function revokeApiKey(keyId: string, userId: string): Promise<boolean> {
-  await db.delete(mcpApiKeys).where(and(eq(mcpApiKeys.id, keyId), eq(mcpApiKeys.userId, userId)));
+  const deleted = await db
+    .delete(mcpApiKeys)
+    .where(and(eq(mcpApiKeys.id, keyId), eq(mcpApiKeys.userId, userId)))
+    .returning({ id: mcpApiKeys.id });
+
+  if (deleted.length === 0) {
+    return false;
+  }
+
+  await resetRateLimit(keyId);
 
   logger.info(`Revoked MCP API key: ${keyId} by user: ${userId}`);
   return true;

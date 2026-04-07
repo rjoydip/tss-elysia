@@ -137,7 +137,7 @@ export function registerUserTools(server: McpServer): void {
         }),
       ),
     },
-    async (args: Record<string, unknown>): Promise<CallToolResult> => {
+    async (_args: Record<string, unknown>): Promise<CallToolResult> => {
       try {
         const apiKey = getCurrentApiKey();
         if (!apiKey) {
@@ -146,9 +146,6 @@ export function registerUserTools(server: McpServer): void {
             isError: true,
           };
         }
-
-        const limit = (args.limit as number) || 50;
-        const offset = (args.offset as number) || 0;
 
         let userList: Array<{
           id: string;
@@ -160,12 +157,16 @@ export function registerUserTools(server: McpServer): void {
         }> = [];
 
         if (apiKey.organizationId) {
-          // For org-scoped, list all users (would need org member table in future)
-          const found = await db.query.users.findMany({
-            limit,
-            offset,
-          });
-          userList = found as typeof userList;
+          // Until organization membership joins are implemented, do not allow broad user listing.
+          return {
+            content: [
+              {
+                type: "text",
+                text: "Organization-scoped user listing is temporarily unavailable until organization membership filtering is implemented.",
+              },
+            ],
+            isError: true,
+          };
         } else {
           // For user-scoped, return only self
           const user = await db.query.users.findFirst({

@@ -6,6 +6,7 @@
 import { Elysia, t } from "elysia";
 import { createApiKey, listApiKeys, revokeApiKey, updateApiKey } from "~/lib/mcp/api-keys";
 import { validateMcpAuth } from "~/lib/mcp/auth";
+import { logger } from "~/lib/logger";
 
 /**
  * MCP API key routes.
@@ -15,16 +16,13 @@ import { validateMcpAuth } from "~/lib/mcp/auth";
 export const mcpKeysRoutes = new Elysia({ name: "mcp.keys.api" })
   .derive(async (context) => {
     const authHeader: string | null = context.headers.authorization ?? null;
-    console.log("[MCP keys] derive called, authHeader:", authHeader);
 
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
-      console.log("[MCP keys] No valid Bearer prefix");
       return { apiKey: null, rateLimitInfo: null };
     }
 
     try {
       const authResult = await validateMcpAuth(authHeader);
-      console.log("[MCP keys] authResult:", authResult);
 
       if (!authResult) {
         return { apiKey: null, rateLimitInfo: null };
@@ -35,7 +33,9 @@ export const mcpKeysRoutes = new Elysia({ name: "mcp.keys.api" })
         rateLimitInfo: authResult.rateLimit,
       };
     } catch (error) {
-      console.error("[MCP keys] derive error:", error);
+      logger.error(
+        `[MCP keys] auth derive failure: ${error instanceof Error ? error.message : "unknown error"}`,
+      );
       return { apiKey: null, rateLimitInfo: null };
     }
   })
@@ -157,7 +157,14 @@ export const mcpKeysRoutes = new Elysia({ name: "mcp.keys.api" })
       }
 
       const { id } = params;
-      await revokeApiKey(id, apiKey.userId);
+      const revoked = await revokeApiKey(id, apiKey.userId);
+
+      if (!revoked) {
+        return new Response(JSON.stringify({ error: "Key not found" }), {
+          status: 404,
+          headers: { "Content-Type": "application/json" },
+        });
+      }
 
       return new Response(JSON.stringify({ success: true }), {
         headers: { "Content-Type": "application/json" },

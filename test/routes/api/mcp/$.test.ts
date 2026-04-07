@@ -1,5 +1,6 @@
 import { describe, it, expect } from "bun:test";
 import { mcpRoutes } from "../../../../src/routes/api/mcp/$.ts";
+import { MCP_TOOL_CATALOG } from "../../../../src/lib/mcp/tools/catalog";
 
 describe("MCP API Flows", () => {
   it("should return 404 for unknown routes", async () => {
@@ -84,6 +85,17 @@ describe("MCP API Tools", () => {
 
     const authTools = json.tools.filter((tool: { category: string }) => tool.category === "auth");
     expect(authTools.length).toBeGreaterThan(0);
+  });
+
+  it("should match the shared MCP tool catalog names", async () => {
+    // Shared catalog is the source of truth for tool discovery payload.
+    const response = await mcpRoutes.handle(new Request("http://localhost/api/mcp/tools"));
+    const json = await response.json();
+
+    const responseNames = json.tools.map((tool: { name: string }) => tool.name).sort();
+    const catalogNames = MCP_TOOL_CATALOG.map((tool) => tool.name).sort();
+
+    expect(responseNames).toEqual(catalogNames);
   });
 
   it("should include user-related tools", async () => {

@@ -22,6 +22,26 @@ export type RateLimitResult = {
  */
 class RateLimitStore {
   private requests: Map<string, { count: number; resetAt: number }> = new Map();
+  private lock: Promise<void> = Promise.resolve();
+  private lastCleanupAt = 0;
+
+  /**
+   * Serializes store mutations to avoid interleaving under concurrent async request handling.
+   */
+  private async withLock<T>(operation: () => T): Promise<T> {
+    let release: (() => void) | undefined;
+    const nextLock = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    const previousLock = this.lock;
+    this.lock = previousLock.then(() => nextLock);
+    await previousLock;
+    try {
+      return operation();
+    } finally {
+      release?.();
+    }
+  }
 
   /**
    * Check if request is allowed and update counter.
@@ -31,69 +51,85 @@ class RateLimitStore {
    * @param duration - Window duration in ms
    * @returns { allowed: boolean, remaining: number, resetAt: number }
    */
-  check(
+  async check(
     keyId: string,
     limit: number,
     duration: number,
-  ): {
+  ): Promise<{
     allowed: boolean;
     remaining: number;
     resetAt: number;
-  } {
-    const now = Date.now();
-    const record = this.requests.get(keyId);
+  }> {
+    return this.withLock(() => {
+      const now = Date.now();
+      // Opportunistic cleanup for environments where background timers may pause.
+      if (now - this.lastCleanupAt > 60_000) {
+        this.lastCleanupAt = now;
+        for (const [cleanupKey, cleanupRecord] of this.requests.entries()) {
+          if (now > cleanupRecord.resetAt) {
+            this.requests.delete(cleanupKey);
+          }
+        }
+      }
+      const record = this.requests.get(keyId);
 
-    // No existing record or window expired
-    if (!record || now > record.resetAt) {
-      const resetAt = now + duration;
-      this.requests.set(keyId, { count: 1, resetAt });
+      // No existing record or window expired
+      if (!record || now > record.resetAt) {
+        const resetAt = now + duration;
+        this.requests.set(keyId, { count: 1, resetAt });
+        return {
+          allowed: true,
+          remaining: limit - 1,
+          resetAt,
+        };
+      }
+
+      // Within window - check limit
+      if (record.count >= limit) {
+        return {
+          allowed: false,
+          remaining: 0,
+          resetAt: record.resetAt,
+        };
+      }
+
+      // Increment counter
+      record.count++;
       return {
         allowed: true,
-        remaining: limit - 1,
-        resetAt,
-      };
-    }
-
-    // Within window - check limit
-    if (record.count >= limit) {
-      return {
-        allowed: false,
-        remaining: 0,
+        remaining: limit - record.count,
         resetAt: record.resetAt,
       };
-    }
-
-    // Increment counter
-    record.count++;
-    return {
-      allowed: true,
-      remaining: limit - record.count,
-      resetAt: record.resetAt,
-    };
+    });
   }
 
   /**
    * Reset rate limit for a key.
    */
-  reset(keyId: string): void {
-    this.requests.delete(keyId);
+  async reset(keyId: string): Promise<void> {
+    await this.withLock(() => {
+      this.requests.delete(keyId);
+    });
   }
 
   /**
    * Clean up expired entries.
    */
-  cleanup(): number {
-    const now = Date.now();
-    let cleaned = 0;
+  async cleanup(): Promise<number> {
+    return this.withLock(() => {
+      const now = Date.now();
+      this.lastCleanupAt = now;
+      let cleaned = 0;
 
-    for (const [key, record] of this.requests.entries()) {
-      if (now > record.resetAt) {
-        this.requests.delete(key);
-        cleaned++;
+      for (const [key, record] of this.requests.entries()) {
+        if (now > record.resetAt) {
+          this.requests.delete(key);
+          cleaned++;
+        }
       }
-    }
 
-    return cleaned;
+      return cleaned;
+    });
   }
 }
 
@@ -109,11 +145,11 @@ export const rateLimitStore = new RateLimitStore();
  * @param apiKey - The API key record with rate limit settings
  * @returns Rate limit check result
  */
-export function checkRateLimit(apiKey: McpApiKey): RateLimitResult {
+export async function checkRateLimit(apiKey: McpApiKey): Promise<RateLimitResult> {
   const limit = apiKey.rateLimit ?? 100;
   const duration = apiKey.rateLimitDuration ?? 60_000;
 
-  const result = rateLimitStore.check(apiKey.id, limit, duration);
+  const result = await rateLimitStore.check(apiKey.id, limit, duration);
 
   return {
     ...result,
@@ -125,8 +161,8 @@ export function checkRateLimit(apiKey: McpApiKey): RateLimitResult {
 /**
  * Reset rate limit for an API key (e.g., after successful key revocation).
  */
-export function resetRateLimit(keyId: string): void {
-  rateLimitStore.reset(keyId);
+export async function resetRateLimit(keyId: string): Promise<void> {
+  await rateLimitStore.reset(keyId);
 }
 
 /**
@@ -152,9 +188,14 @@ export function addRateLimitHeaders(
 }
 
 // Periodic cleanup of expired rate limit entries
-setInterval(() => {
-  const cleaned = rateLimitStore.cleanup();
-  if (cleaned > 0) {
-    // Could log here in production
-  }
+/**
+ * Performs one cleanup pass. Can be triggered in serverless paths where intervals may be suspended.
+ */
+export async function cleanupRateLimitStore(): Promise<number> {
+  return rateLimitStore.cleanup();
+}
+
+const cleanupInterval = setInterval(async () => {
+  await cleanupRateLimitStore();
 }, 60_000); // Run every minute
+cleanupInterval.unref();
