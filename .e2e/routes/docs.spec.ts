@@ -105,7 +105,9 @@ test.describe("Docs Sidebar", () => {
     await expect(page).toHaveURL(/.*\/docs\/auth\/overview/);
     // Verify the main content area is rendered after navigation.
     await expect(page.locator("main")).toBeVisible();
-    await expect(page.locator("header").first().getByRole("button", { name: "Login" })).toBeVisible();
+    await expect(
+      page.locator("header").first().getByRole("button", { name: "Login" }),
+    ).toBeVisible();
   });
 });
 
