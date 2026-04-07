@@ -133,6 +133,37 @@ export async function revokeApiKey(keyId: string, userId: string): Promise<boole
 }
 
 /**
+ * Revokes an API key while distinguishing authorization from existence.
+ *
+ * @param keyId - ID of the key to revoke
+ * @param userId - Requesting user ID used for ownership checks
+ * @returns Revoke outcome used by API routes for status-specific responses
+ */
+export async function revokeApiKeyWithReason(
+  keyId: string,
+  userId: string,
+): Promise<"revoked" | "not_found" | "forbidden"> {
+  const ownerLookup = await db.query.mcpApiKeys.findFirst({
+    where: eq(mcpApiKeys.id, keyId),
+    columns: {
+      id: true,
+      userId: true,
+    },
+  });
+
+  if (!ownerLookup) {
+    return "not_found";
+  }
+
+  if (ownerLookup.userId !== userId) {
+    return "forbidden";
+  }
+
+  await revokeApiKey(keyId, userId);
+  return "revoked";
+}
+
+/**
  * Lists all API keys for a user.
  *
  * @param userId - User ID to list keys for

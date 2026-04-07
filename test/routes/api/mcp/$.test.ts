@@ -1,6 +1,6 @@
 import { describe, it, expect } from "bun:test";
 import { mcpRoutes } from "../../../../src/routes/api/mcp/$.ts";
-import { MCP_TOOL_CATALOG } from "../../../../src/lib/mcp/tools/catalog";
+import { getMcpServer } from "../../../../src/lib/mcp/server";
 
 describe("MCP API Flows", () => {
   it("should return 404 for unknown routes", async () => {
@@ -87,15 +87,18 @@ describe("MCP API Tools", () => {
     expect(authTools.length).toBeGreaterThan(0);
   });
 
-  it("should match the shared MCP tool catalog names", async () => {
-    // Shared catalog is the source of truth for tool discovery payload.
+  it("should match currently registered MCP server tool names", async () => {
+    // Route should expose the live registered tool list to avoid static drift.
     const response = await mcpRoutes.handle(new Request("http://localhost/api/mcp/tools"));
     const json = await response.json();
+    const server = getMcpServer() as unknown as {
+      _registeredTools?: Record<string, unknown>;
+    };
 
     const responseNames = json.tools.map((tool: { name: string }) => tool.name).sort();
-    const catalogNames = MCP_TOOL_CATALOG.map((tool) => tool.name).sort();
+    const registeredNames = Object.keys(server._registeredTools ?? {}).sort();
 
-    expect(responseNames).toEqual(catalogNames);
+    expect(responseNames).toEqual(registeredNames);
   });
 
   it("should include user-related tools", async () => {

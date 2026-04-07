@@ -9,7 +9,47 @@ import { getMcpServer } from "~/lib/mcp/server";
 import { createFileRoute } from "@tanstack/react-router";
 import { composedMiddleware, errorFn, traceFn } from "~/middlewares";
 import { mcpKeysRoutes } from "./-keys";
-import { MCP_TOOL_CATALOG } from "~/lib/mcp/tools/catalog";
+
+type RegisteredToolInfo = {
+  title?: string;
+  description?: string;
+};
+
+/**
+ * Converts MCP server's live tool registry to the `/tools` HTTP response shape.
+ * This keeps discovery payload in sync with currently registered server tools.
+ */
+function getLiveToolCatalogFromServer(): Array<{
+  name: string;
+  title: string;
+  description: string;
+  category: "auth" | "users" | "organization";
+}> {
+  const server = getMcpServer() as unknown as {
+    _registeredTools?: Record<string, RegisteredToolInfo>;
+  };
+  const registeredTools = server._registeredTools ?? {};
+
+  /**
+   * Infers tool category from naming conventions used by MCP tool modules.
+   */
+  const resolveCategory = (toolName: string): "auth" | "users" | "organization" => {
+    if (toolName.includes("organization") || toolName.includes("member")) {
+      return "organization";
+    }
+    if (toolName.includes("user")) {
+      return "users";
+    }
+    return "auth";
+  };
+
+  return Object.entries(registeredTools).map(([name, metadata]) => ({
+    name,
+    title: metadata.title ?? name,
+    description: metadata.description ?? "",
+    category: resolveCategory(name),
+  }));
+}
 
 /**
  * MCP health routes.
@@ -92,7 +132,7 @@ export const mcpRoutes = new Elysia({ name: "mcp.api", prefix: "/api/mcp" })
     async () => {
       return new Response(
         JSON.stringify({
-          tools: MCP_TOOL_CATALOG,
+          tools: getLiveToolCatalogFromServer(),
         }),
         { headers: { "Content-Type": "application/json" } },
       );

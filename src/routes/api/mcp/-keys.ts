@@ -4,7 +4,12 @@
  */
 
 import { Elysia, t } from "elysia";
-import { createApiKey, listApiKeys, revokeApiKey, updateApiKey } from "~/lib/mcp/api-keys";
+import {
+  createApiKey,
+  listApiKeys,
+  revokeApiKeyWithReason,
+  updateApiKey,
+} from "~/lib/mcp/api-keys";
 import { validateMcpAuth } from "~/lib/mcp/auth";
 import { logger } from "~/lib/logger";
 
@@ -157,11 +162,17 @@ export const mcpKeysRoutes = new Elysia({ name: "mcp.keys.api" })
       }
 
       const { id } = params;
-      const revoked = await revokeApiKey(id, apiKey.userId);
+      const revokeOutcome = await revokeApiKeyWithReason(id, apiKey.userId);
 
-      if (!revoked) {
+      if (revokeOutcome === "not_found") {
         return new Response(JSON.stringify({ error: "Key not found" }), {
           status: 404,
+          headers: { "Content-Type": "application/json" },
+        });
+      }
+      if (revokeOutcome === "forbidden") {
+        return new Response(JSON.stringify({ error: "Forbidden" }), {
+          status: 403,
           headers: { "Content-Type": "application/json" },
         });
       }
