@@ -13,6 +13,11 @@ import { eq } from "drizzle-orm";
 import { getCurrentApiKey } from "../auth";
 
 /**
+ * Upper bound for `list-users` pagination to prevent oversized responses.
+ */
+const MAX_LIST_USERS_LIMIT = 100;
+
+/**
  * Registers user management MCP tools.
  */
 export function registerUserTools(server: McpServer): void {
@@ -123,8 +128,15 @@ export function registerUserTools(server: McpServer): void {
         "For organization-scoped keys, returns users in the organization. " +
         "For user-scoped keys, returns only the authenticated user.",
       inputSchema: z.object({
-        limit: z.number().optional().default(50).describe("Maximum number of users to return"),
-        offset: z.number().optional().default(0).describe("Number of users to skip"),
+        limit: z
+          .number()
+          .int()
+          .min(1)
+          .max(MAX_LIST_USERS_LIMIT)
+          .optional()
+          .default(50)
+          .describe(`Maximum number of users to return (1-${MAX_LIST_USERS_LIMIT})`),
+        offset: z.number().int().min(0).optional().default(0).describe("Number of users to skip"),
       }),
       outputSchema: z.array(
         z.object({
@@ -137,7 +149,7 @@ export function registerUserTools(server: McpServer): void {
         }),
       ),
     },
-    async (_args: Record<string, unknown>): Promise<CallToolResult> => {
+    async (args: Record<string, unknown>): Promise<CallToolResult> => {
       try {
         const apiKey = getCurrentApiKey();
         if (!apiKey) {
@@ -155,6 +167,11 @@ export function registerUserTools(server: McpServer): void {
           image: string | null;
           createdAt: Date;
         }> = [];
+        const limit = Math.min(
+          MAX_LIST_USERS_LIMIT,
+          Math.max(1, (args.limit as number | undefined) ?? 50),
+        );
+        const offset = Math.max(0, (args.offset as number | undefined) ?? 0);
 
         if (apiKey.organizationId) {
           // Until organization membership joins are implemented, do not allow broad user listing.
@@ -183,15 +200,16 @@ export function registerUserTools(server: McpServer): void {
           image: u.image ?? undefined,
           createdAt: u.createdAt.toISOString(),
         }));
+        const paginatedUserData = userData.slice(offset, offset + limit);
 
         return {
           content: [
             {
               type: "text",
-              text: JSON.stringify(userData),
+              text: JSON.stringify(paginatedUserData),
             },
           ],
-          structuredContent: { users: userData },
+          structuredContent: { users: paginatedUserData },
         };
       } catch (error) {
         return {

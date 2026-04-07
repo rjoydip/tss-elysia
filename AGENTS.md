@@ -150,7 +150,7 @@ All necessary information is in [README.md](./README.md), including:
 
 ## Recommended Workflow
 
-1. For any task, first check [PLAN.md](./.artifacts/PLAN.md) to see if it's already planned
+1. For any task, first check [PLAN.md](./.artifacts/plans/PLAN.md) to see if it's already planned
 2. For non-trivial tasks, create a plan using PLAN.md template
 3. Create/edit code
 4. Run `bun run fmt` to ensure formatting
@@ -169,7 +169,7 @@ Database configuration is managed via environment variables:
 # .env file
 DATABASE_PATH=.artifacts
 DATABASE_NAME=tss-elysia.db
-AUTH_SECRET=your-secret-key
+BETTER_AUTH_SECRET=your-secret-key
 GITHUB_TOKEN=ghp_xxx  # For GitHub MCP integration
 ```
 

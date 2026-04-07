@@ -31,8 +31,9 @@ tss-elysia/
 │   ├── routes/           # File-based routing
 │   │   ├── __root.tsx   # Root layout
 │   │   ├── index.tsx    # Home page
-│   │   └── api/         # API routes
+│   │   └── api/         # API routes (core, auth, mcp)
 │   ├── router.tsx       # Router configuration
+│   ├── lib/mcp/         # MCP server/auth/tools modules
 │   └── styles/          # CSS styles
 ├── server.ts            # Tanstack server entry
 ├── vite.config.ts       # Vite configuration
@@ -48,6 +49,7 @@ tss-elysia/
 - Server-Side Rendering (SSR) with TanStack Start
 - File-based routing
 - API endpoints via Elysia
+- MCP endpoints under `/api/mcp/*` for external tool integration
 - Type-safe development
 - Hot Module Replacement (HMR)
 - Load testing with k6

@@ -37,7 +37,7 @@ docker-compose -f docker/docker-compose.yml up app --build
 
 # Or use docker directly
 docker build -f docker/Dockerfile -t tss-elysia .
-docker run -p 3000:3000 -e AUTH_SECRET=your-secret-key-min-32chars tss-elysia
+docker run -p 3000:3000 -e BETTER_AUTH_SECRET=your-secret-key-min-32chars tss-elysia
 ```
 
 ### Development
@@ -110,7 +110,7 @@ app:
     - HOST=0.0.0.0
     - PORT=3000
     - NODE_ENV=production
-    - AUTH_SECRET=${AUTH_SECRET}
+    - BETTER_AUTH_SECRET=${BETTER_AUTH_SECRET}
     - DATABASE_PATH=.artifacts
     - DATABASE_NAME=tss-elysia.db
   volumes:
@@ -142,7 +142,7 @@ dev:
     - HOST=0.0.0.0
     - PORT=3000
     - NODE_ENV=development
-    - AUTH_SECRET=${AUTH_SECRET:-dev-secret-min-32-chars-here}
+    - BETTER_AUTH_SECRET=${BETTER_AUTH_SECRET:-dev-secret-min-32-chars-here}
   volumes:
     - ..:/app
     - bun-cache:/root/.bun
@@ -152,14 +152,14 @@ dev:
 
 ## Environment Variables
 
-| Variable        | Default                     | Description        |
-| --------------- | --------------------------- | ------------------ |
-| `HOST`          | `0.0.0.0`                   | Server host        |
-| `PORT`          | `3000`                      | Server port        |
-| `NODE_ENV`      | `production`                | Environment mode   |
-| `AUTH_SECRET`   | **Required** (min 32 chars) | Session secret     |
-| `DATABASE_PATH` | `.artifacts`                | Database directory |
-| `DATABASE_NAME` | `tss-elysia.db`             | Database filename  |
+| Variable             | Default                     | Description        |
+| -------------------- | --------------------------- | ------------------ |
+| `HOST`               | `0.0.0.0`                   | Server host        |
+| `PORT`               | `3000`                      | Server port        |
+| `NODE_ENV`           | `production`                | Environment mode   |
+| `BETTER_AUTH_SECRET` | **Required** (min 32 chars) | Session secret     |
+| `DATABASE_PATH`      | `.artifacts`                | Database directory |
+| `DATABASE_NAME`      | `tss-elysia.db`             | Database filename  |
 
 ## Usage Examples
 
@@ -168,7 +168,7 @@ dev:
 ```bash
 # Create .env file
 cat > .env << EOF
-AUTH_SECRET=your-production-secret-min-32-chars
+BETTER_AUTH_SECRET=your-production-secret-min-32-chars
 EOF
 
 # Build and start
@@ -210,7 +210,7 @@ docker build -f docker/Dockerfile -t tss-elysia .
 docker run -d \
   --name tss-elysia \
   -p 3000:3000 \
-  -e AUTH_SECRET=my-super-secret-key-32chars \
+  -e BETTER_AUTH_SECRET=my-super-secret-key-32chars \
   -v tss-elysia-data:/app/.artifacts \
   tss-elysia
 ```
@@ -282,7 +282,7 @@ deploy:
 
 ### Container Won't Start
 
-1. Check AUTH_SECRET is set:
+1. Check BETTER_AUTH_SECRET is set:
 
    ```bash
    docker logs tss-elysia-prod

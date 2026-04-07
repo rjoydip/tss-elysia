@@ -7,7 +7,7 @@
 
 import { AsyncLocalStorage } from "node:async_hooks";
 import type { McpApiKey } from "~/lib/db/schema";
-import { checkRateLimit, type RateLimitResult } from "./rate-limit";
+import { checkRateLimit, cleanupRateLimitStoreOnRequest, type RateLimitResult } from "./rate-limit";
 
 /**
  * AsyncLocalStorage for storing API key context per-request.
@@ -103,6 +103,9 @@ export async function validateMcpAuth(
   if (!apiKey) {
     return null;
   }
+
+  // Request-driven cleanup fallback for environments where intervals may be suspended.
+  await cleanupRateLimitStoreOnRequest();
 
   // Check rate limit
   const rateLimit = await checkRateLimit(apiKey);

@@ -112,7 +112,14 @@ src/
 │   └── db/           # Database (Drizzle + SQLite)
 │       ├── index.ts
 │       └── schema.ts
-├── logger.ts           # Logger configuration
+│   └── mcp/          # MCP server modules
+│       ├── server.ts
+│       ├── auth.ts
+│       ├── api-keys.ts
+│       ├── rate-limit.ts
+│       ├── transport.ts
+│       └── tools/
+├── lib/logger.ts       # Logger configuration
 ├── middlewares/        # Middleware implementations
 │   ├── cors.ts       # CORS headers
 │   ├── helmet.ts     # Security headers
@@ -139,6 +146,9 @@ src/
 │       ├── $.ts     # API catch-all
 │       └── auth/    # Auth routes
 │           └── $.ts
+│       └── mcp/     # MCP API routes
+│           ├── $.ts
+│           └── -keys.ts
 ├── server.ts         # TanStack Start server entry
 ├── types/            # TypeScript type definitions
 │   └── subscription.ts
@@ -175,7 +185,15 @@ test/                  # Unit tests (Bun)
 ├── components/       # Component tests
 │   └── ui/          # UI component tests
 ├── db.test.ts        # Database tests
-├── auth.test.ts      # Auth tests
+├── lib/auth.test.ts  # Auth tests
+├── routes/api/mcp/   # MCP API route tests
+│   ├── $.test.ts
+│   └── keys.test.ts
+├── lib/mcp/          # MCP unit tests
+│   ├── api-keys.test.ts
+│   ├── rate-limit.test.ts
+│   └── tools/
+│       └── catalog.test.ts
 └── fixtures/         # Test fixtures
     └── db.ts
 
@@ -213,7 +231,7 @@ To add a new middleware:
 
 ## API Development
 
-Add routes in `src/routes/api/$.ts`:
+Add routes in `src/routes/api/$.ts` or split feature routes under `src/routes/api/<feature>/` (for example `src/routes/api/mcp/$.ts`):
 
 ```typescript
 app.get("/endpoint", ({ set }) => {

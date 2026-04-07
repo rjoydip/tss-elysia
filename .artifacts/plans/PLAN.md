@@ -19,7 +19,7 @@ Complete the authentication system with additional security features, set up use
 - [ ] Set up proper telemetry and analytics
 - [ ] Configure enterprise infrastructure (Docker, CI/CD)
 - [x] Implement real-time features (WebSockets/SSE)
-- [ ] Build MCP server for external integrations (make product available as MCP tools)
+- [x] Build MCP server for external integrations (make product available as MCP tools)
 - [x] Configure multi-database strategy (PostgreSQL prod, SQLite dev, vector/graph for AI)
 
 ## Tasks
@@ -217,7 +217,7 @@ Complete the authentication system with additional security features, set up use
 
 ### Phase 8: Real-time Features
 
-> See detailed implementation plan: [phase-8-realtime-features.md](../phase-8-realtime-features.md)
+> Detailed Phase 8 realtime checklist was completed in prior milestone work.
 
 #### Security & Authentication
 
@@ -250,7 +250,7 @@ Complete the authentication system with additional security features, set up use
 - [x] Implement graceful disconnect handling
 - [x] Add reconnection logic with exponential backoff
 
-#### Tests
+#### Phase 9 Tests
 
 - [x] Add unit tests for connection store (`test/lib/realtime/connection-store.test.ts`)
 - [x] Add E2E tests for WebSocket (`.e2e/realtime/websocket.spec.ts`)
@@ -280,7 +280,7 @@ Complete the authentication system with additional security features, set up use
 
 - [x] Unit tests for rate limiting (`test/lib/mcp/rate-limit.test.ts`) - 12 tests passing
 - [x] Unit tests for API key utilities (`test/lib/mcp/api-keys.test.ts`) - 6 tests passing
-- [ ] E2E tests for MCP endpoints (`.e2e/mcp/mcp.spec.ts`) - 12 tests (routes need fix)
+- [x] E2E tests for MCP endpoints (`.e2e/mcp/mcp.spec.ts`, `.e2e/mcp/mcp-keys.spec.ts`)
 
 ---
 
@@ -317,7 +317,7 @@ Complete the authentication system with additional security features, set up use
 
 ### Phase 12: Verification
 
-- [ ] Set strong `AUTH_SECRET` (minimum 32 characters)
+- [ ] Set strong `BETTER_AUTH_SECRET` (minimum 32 characters)
 - [ ] Configure resource limits
 - [ ] Enable health checks
 - [ ] Set up log rotation

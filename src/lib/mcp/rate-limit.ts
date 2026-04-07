@@ -195,7 +195,32 @@ export async function cleanupRateLimitStore(): Promise<number> {
   return rateLimitStore.cleanup();
 }
 
+/**
+ * Timestamp used to throttle request-path cleanup calls.
+ * This protects serverless handlers from running cleanup too frequently.
+ */
+let lastRequestPathCleanupAt = 0;
+
+/**
+ * Best-effort cleanup fallback for serverless/runtime paths where background timers may not fire.
+ * Runs at most once per minute across request-driven invocations.
+ */
+export async function cleanupRateLimitStoreOnRequest(): Promise<void> {
+  const now = Date.now();
+  if (now - lastRequestPathCleanupAt < 60_000) {
+    return;
+  }
+
+  lastRequestPathCleanupAt = now;
+  await cleanupRateLimitStore();
+}
+
+/**
+ * Background cleanup interval for long-lived runtimes.
+ * Serverless paths additionally rely on request-triggered cleanup fallback.
+ */
 const cleanupInterval = setInterval(async () => {
   await cleanupRateLimitStore();
 }, 60_000); // Run every minute
+
 cleanupInterval.unref();

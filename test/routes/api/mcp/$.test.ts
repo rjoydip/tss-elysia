@@ -1,3 +1,7 @@
+/**
+ * Integration tests for MCP HTTP routes.
+ * Covers route availability, health checks, rate limiting behavior, and tool discovery.
+ */
 import { describe, it, expect } from "bun:test";
 import { mcpRoutes } from "../../../../src/routes/api/mcp/$.ts";
 import { getMcpServer } from "../../../../src/lib/mcp/server";
@@ -66,6 +70,53 @@ describe("MCP API Health", () => {
     const response = await mcpRoutes.handle(new Request("http://localhost/api/mcp/health"));
 
     expect(response.headers.get("content-type")).toContain("application/json");
+  });
+
+  it("should rate limit repeated health probes from the same requester", async () => {
+    let limitedResponse: Response | null = null;
+
+    for (let i = 0; i < 80; i++) {
+      const response = await mcpRoutes.handle(
+        new Request("http://localhost/api/mcp/health", {
+          headers: {
+            "x-forwarded-for": "198.51.100.10",
+          },
+        }),
+      );
+      if (response.status === 429) {
+        limitedResponse = response;
+        break;
+      }
+    }
+
+    expect(limitedResponse).not.toBeNull();
+    expect(limitedResponse?.headers.get("Retry-After")).toBeDefined();
+    expect(limitedResponse?.headers.get("X-RateLimit-Limit")).toBe("60");
+    expect(limitedResponse?.headers.get("X-RateLimit-Remaining")).toBe("0");
+  });
+
+  it("should isolate health rate limit buckets per requester", async () => {
+    // Exhaust one requester bucket first.
+    for (let i = 0; i < 70; i++) {
+      await mcpRoutes.handle(
+        new Request("http://localhost/api/mcp/health", {
+          headers: {
+            "x-forwarded-for": "203.0.113.20",
+          },
+        }),
+      );
+    }
+
+    // A different requester should still be served normally.
+    const freshRequesterResponse = await mcpRoutes.handle(
+      new Request("http://localhost/api/mcp/health", {
+        headers: {
+          "x-forwarded-for": "203.0.113.21",
+        },
+      }),
+    );
+
+    expect(freshRequesterResponse.status).toBe(200);
   });
 });
 
