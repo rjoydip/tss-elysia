@@ -137,7 +137,7 @@ export const mcpRoutes = new Elysia({ name: "mcp.api", prefix: "/api/mcp" })
   // Apply composed middleware (CORS, Helmet, Rate Limit, OpenTelemetry)
   .use(
     composedMiddleware({
-      openAPP_NAME: "MCP",
+      OPENAPI_NAME: "MCP",
     }),
   )
   .use(mcpKeysRoutes)

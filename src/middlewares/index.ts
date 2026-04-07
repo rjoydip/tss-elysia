@@ -129,7 +129,7 @@ export const errorFn: ErrorHandler = ({ code, error }) => {
  * Options for composing middleware with custom configuration.
  */
 type ComposedMiddlewareOptions = {
-  openAPP_NAME: string;
+  OPENAPI_NAME: string;
 };
 
 /**
@@ -140,12 +140,12 @@ type ComposedMiddlewareOptions = {
  *
  * @example
  * const app = new Elysia()
- *   .use(composedMiddleware({ openAPP_NAME: "My API" }))
+ *   .use(composedMiddleware({ OPENAPI_NAME: "My API" }))
  *   .listen(3000)
  */
 export const composedMiddleware = (
-  { openAPP_NAME }: ComposedMiddlewareOptions = {
-    openAPP_NAME: APP_NAME,
+  { OPENAPI_NAME }: ComposedMiddlewareOptions = {
+    OPENAPI_NAME: APP_NAME,
   },
 ) =>
   new Elysia({ name: "composed-middleware" })
@@ -161,7 +161,7 @@ export const composedMiddleware = (
         path: "reference",
         documentation: {
           info: {
-            title: `${openAPP_NAME} Documentation`,
+            title: `${OPENAPI_NAME} Documentation`,
             version: "v1",
           },
         },

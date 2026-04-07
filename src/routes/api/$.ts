@@ -30,15 +30,13 @@ export const apiRoutes = new Elysia({
   // Apply composed middleware (CORS, Helmet, Rate Limit, OpenTelemetry)
   .use(
     composedMiddleware({
-      openAPP_NAME: "API",
+      OPENAPI_NAME: APP_NAME,
     }),
   )
   // Request tracing for performance monitoring
   .trace(traceFn)
   // Centralized error handling
   .onError(errorFn)
-  // Store application name
-  .state("name", APP_NAME)
   /**
    * Compose modular route groups so endpoint ownership is explicit and maintainable.
    */

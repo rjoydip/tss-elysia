@@ -11,11 +11,13 @@ import { APP_NAME } from "~/config";
  * Mounted under `/api` by the root API application.
  */
 export const coreApiRoutes = new Elysia({ name: "api.routes.core" })
+  // Store application name
+  .state("name", APP_NAME)
   .get(
     "/",
-    ({ set }) => {
+    ({ set, store: { name } }) => {
       set.headers["Content-Type"] = "text/plain; charset=utf-8";
-      return `Welcome to ${APP_NAME} Service`;
+      return `Welcome to ${name} Service`;
     },
     {
       detail: {
@@ -30,10 +32,10 @@ export const coreApiRoutes = new Elysia({ name: "api.routes.core" })
   )
   .get(
     "/health",
-    async () =>
+    async ({ store: { name } }) =>
       new Response(
         JSON.stringify({
-          name: APP_NAME,
+          name,
           status: "healthy",
           timestamp: new Date().toISOString(),
         }),

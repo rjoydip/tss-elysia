@@ -11,6 +11,8 @@ import { Input } from "~/components/ui/input";
 import { sendPasswordReset } from "~/lib/auth/client";
 import { APP_NAME } from "~/config";
 import { Branding } from "~/components/branding";
+import { toast } from "sonner";
+import { setAuthSubmitting, useAuthFormState } from "~/lib/store/auth";
 
 const forgotPasswordSchema = z.object({
   email: z.string().min(1, "Email is required").email("Please enter a valid email address"),
@@ -26,6 +28,9 @@ type ForgotPasswordFormValues = z.infer<typeof forgotPasswordSchema>;
  * <ForgotPasswordForm />
  */
 export function ForgotPasswordForm() {
+  const forgotPasswordUi = useAuthFormState("forgotPassword");
+  const isSubmitting = forgotPasswordUi.isSubmitting;
+
   const form = useForm({
     defaultValues: {
       email: "",
@@ -34,9 +39,16 @@ export function ForgotPasswordForm() {
       onChange: forgotPasswordSchema,
     },
     onSubmit: async ({ value }) => {
-      const { error } = await sendPasswordReset(value.email);
-      if (error) {
-        throw new Error(error.message || "Failed to send reset email");
+      setAuthSubmitting("forgotPassword", true);
+      try {
+        const { error } = await sendPasswordReset(value.email);
+        if (error) {
+          toast.error(error.message || "Failed to send reset email");
+          return;
+        }
+        toast.success("Reset link sent. Please check your email.");
+      } finally {
+        setAuthSubmitting("forgotPassword", false);
       }
     },
   });
@@ -90,7 +102,7 @@ export function ForgotPasswordForm() {
                     value={field.state.value}
                     onChange={(e) => field.handleChange(e.target.value)}
                     onBlur={field.handleBlur}
-                    disabled={form.state.isSubmitting}
+                    disabled={isSubmitting}
                     required
                     autoComplete="email"
                     className="h-11"
@@ -102,8 +114,8 @@ export function ForgotPasswordForm() {
               )}
             </form.Field>
 
-            <Button type="submit" className="w-full h-11" disabled={form.state.isSubmitting}>
-              {form.state.isSubmitting ? (
+            <Button type="submit" className="w-full h-11" disabled={isSubmitting}>
+              {isSubmitting ? (
                 <>
                   <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin mr-2" />
                   Sending...

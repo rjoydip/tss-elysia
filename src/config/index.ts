@@ -104,6 +104,11 @@ export const isTest = isBun ? Bun.env.NODE_ENV === "test" : isNode ? "test" : fa
 export const AUTH_ALLOWED_METHODS = ["GET", "POST", "PUT", "DELETE"];
 
 /**
+ * Canonical auth service name used by root/health payloads.
+ */
+export const AUTH_SERVICE_NAME = "Auth";
+
+/**
  * Navigation items for the header component.
  * Defines the main sections of the site for easy access.
  * Should be updated to reflect actual site structure and content.

@@ -37,8 +37,8 @@ function RootDocument({ children }: { children: React.ReactNode }) {
               <HeadContent />
             </head>
             <body>
+              <Toaster richColors />
               {children}
-              <Toaster />
               {import.meta.env.DEV && <TanStackRouterDevtools position="bottom-right" />}
               <Scripts />
             </body>

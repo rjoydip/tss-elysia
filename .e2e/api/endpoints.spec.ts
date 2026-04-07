@@ -81,7 +81,7 @@ test.describe("Auth Health Endpoint", () => {
     expect(response.status()).toBe(200);
     const body = await response.json();
     expect(body.status).toBe("healthy");
-    expect(body.name).toBe("AUTH");
+    expect(body.name).toBe("Auth");
   });
 
   test("should return JSON content type for auth health", async ({ request }) => {
@@ -93,7 +93,7 @@ test.describe("Auth Health Endpoint", () => {
     const response = await request.get("/api/auth/");
     expect(response.status()).toBe(200);
     const body = await response.text();
-    expect(body).toContain("Welcome to AUTH Service");
+    expect(body).toContain("Welcome to Auth Service");
   });
 });
 

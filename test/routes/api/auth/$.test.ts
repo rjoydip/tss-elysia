@@ -41,7 +41,7 @@ describe("Auth API Root", () => {
     const text = await response.text();
 
     expect(text).toContain("Welcome to");
-    expect(text).toContain("AUTH");
+    expect(text).toContain("Auth");
   });
 
   it("should return text/plain content type", async () => {

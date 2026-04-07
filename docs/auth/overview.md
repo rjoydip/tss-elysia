@@ -37,13 +37,25 @@ bun run db:seed
 
 ## Configuration
 
-The auth system is configured in `src/lib/auth.ts`:
+The auth system is configured in `src/lib/auth/index.ts`:
 
 - **Email/Password**: Enabled with optional email verification
 - **Session**: 7-day expiry, 24-hour update age, 5-minute cookie cache
 - **Database**: Drizzle adapter with SQLite
 - **Password Hashing**: Argon2id (memory: 64MiB, iterations: 3, parallelism: 4)
 - **Trusted Origins**: `BETTER_AUTH_URL` and its base origin (e.g., `http://localhost:3000`)
+- **IP Header Resolution**: Better Auth uses trusted proxy headers (`x-forwarded-for`, `x-real-ip`, `cf-connecting-ip`) for rate-limiting and audit metadata.
+
+## Auth UI State (TanStack Store)
+
+Auth form UI state is centralized in `src/lib/store/auth.ts` using TanStack Store.
+
+- **Forms Covered**: Login, Register, Forgot Password
+- **Centralized State**: `isSubmitting`, `submitErrorMessage` (per form)
+- **UX Behavior**:
+  - Submit buttons show loading state (`Signing in...`, `Creating account...`, `Sending...`) until the related API request resolves.
+  - Inputs and submit actions are disabled while requests are in flight.
+  - Errors are surfaced through toast messages (no inline submit error block).
 
 ## Subscription Tiers
 
@@ -156,15 +168,15 @@ await auth.api.signOut({
 ### Unit Tests
 
 ```bash
-bun test test/auth.test.ts
+bun test test/routes/api/auth/$.test.ts test/lib/store/auth.test.ts
 ```
 
-Tests cover: sign-up, sign-in, duplicate email rejection, invalid credentials, session management, sign-out, handler integration.
+Tests cover: sign-up/sign-in route behavior, duplicate email handling path, auth UI store state transitions, session management, sign-out, and handler integration.
 
 ### E2E Tests
 
 ```bash
-bun run test:e2e
+bun run test:e2e -- .e2e/routes/auth.spec.ts .e2e/auth.spec.ts
 ```
 
-E2E tests cover the full HTTP flow including CORS headers, Origin validation, and error responses.
+E2E tests cover auth UI rendering and full HTTP auth flows (including CORS headers, Origin validation, and error responses).
