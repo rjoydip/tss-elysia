@@ -11,14 +11,14 @@ Complete the authentication system with additional security features, set up use
 - [x] Set up user account management routes (profile, settings)
 - [ ] Implement organization/team management for multi-tenant support
 - [x] Enhance security with rate limiting, CSRF protection, and audit logging
-- [ ] Complete E2E test coverage for auth flows
+- [x] Complete E2E test coverage for auth flows
 - [x] Integrate shadcn/ui component library
 - [ ] Build admin and user dashboards with user management
 - [ ] Implement enterprise SASS product features
 - [ ] Add email notifications via Resend
 - [ ] Set up proper telemetry and analytics
 - [ ] Configure enterprise infrastructure (Docker, CI/CD)
-- [x] Implement real-time features (WebSockets/SSE)
+- [x] Implement real-time features (WebSockets)
 - [x] Build MCP server for external integrations (make product available as MCP tools)
 - [x] Configure multi-database strategy (PostgreSQL prod, SQLite dev, vector/graph for AI)
 
@@ -153,7 +153,7 @@ Complete the authentication system with additional security features, set up use
 - [x] Add Markdown renderer with Shiki (`src/components/ui/markdown.tsx`)
 - [x] Create unit tests for UI components (`test/components/ui/*.test.tsx`)
 - [x] Create E2E tests for UI components split by component (`.e2e/ui/*.spec.ts`)
-- [ ] Create reusable component library
+- [x ] Create reusable component library using Shadcn UI
 - [ ] Implement design tokens (colors, spacing, typography)
 - [ ] Add Preact configuration (future optimization)
 - [ ] Document component usage patterns
@@ -206,6 +206,8 @@ Complete the authentication system with additional security features, set up use
 
 ### Phase 7: Infrastructure & DevOps
 
+> **Detailed Plan (Cache)**: See [phase-7.1-redis-implementation-plan.md](./phase-7.1-redis-implementation-plan.md) for comprehensive implementation details.
+
 - [x] Create Dockerfile for production deployment
 - [x] Set up Docker Compose for local development
 - [ ] Configure nginx for reverse proxy
@@ -213,7 +215,17 @@ Complete the authentication system with additional security features, set up use
 - [ ] Add environment-specific configs (dev, staging, prod)
 - [ ] Configure horizontal scaling support
 - [ ] Set up database connection pooling
-- [ ] Add Redis for caching/sessions
+- [x] Add Redis for caching/sessions
+  - [x] Configure Redis 7 Alpine in docker-compose with persistence and health check
+  - [x] Create custom `redis.conf` with Pub/Sub, AOF, and memory limits
+  - [x] Create Redis client module (`src/lib/redis/index.ts`) with Bun native `RedisClient`
+  - [x] Create Pub/Sub helper module (`src/lib/redis/pubsub.ts`) with typed channels
+  - [x] Add `REDIS_URL` environment variable (Docker + Upstash compatible)
+  - [x] Create Redis heartbeat route (`src/routes/api/modules/-redis.ts`)
+  - [x] Integrate Redis health check into status dashboard
+  - [x] Add Redis logger (`src/lib/logger.ts`)
+  - [x] Add unit tests (`test/lib/redis/redis.test.ts`, `test/lib/redis/pubsub.test.ts`)
+  - [x] Add E2E test (`.e2e/api/redis-health.spec.ts`)
 
 ---
 
@@ -305,7 +317,10 @@ Complete the authentication system with additional security features, set up use
 
 ### Phase 11: Scalability & Optimization
 
-- [ ] Implement Redis caching layer
+- [ ] Implement Redis caching layer (use `src/lib/redis/index.ts`)
+- [ ] Add Redis-backed rate limiting (replace in-memory)
+- [ ] Add Redis session storage for Better Auth
+- [ ] Implement Pub/Sub event broadcasting for MCP
 - [ ] Add database read replicas support
 - [ ] Configure horizontal pod autoscaling (HPA)
 - [ ] Set up CDN for static assets

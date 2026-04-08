@@ -84,6 +84,9 @@ test/
 ├── components/       # Component tests
 │   └── ui/          # UI component tests
 ├── lib/              # Library tests
+│   └── redis/       # Redis tests
+│       ├── redis.test.ts  # Redis client tests
+│       └── pubsub.test.ts # Pub/Sub tests
 └── ...
 ```
 
@@ -98,7 +101,8 @@ test/
 │   └── ...
 ├── api/              # API tests
 │   ├── endpoints.spec.ts
-│   └── middlewares.spec.ts
+│   ├── middlewares.spec.ts
+│   └── redis-health.spec.ts  # Redis heartbeat E2E
 ├── middlewares/      # Middleware-specific tests
 │   └── rate-limit.spec.ts
 └── auth.spec.ts
@@ -171,6 +175,7 @@ DATABASE_PATH=.artifacts
 DATABASE_NAME=tss-elysia.db
 BETTER_AUTH_SECRET=your-secret-key
 GITHUB_TOKEN=ghp_xxx  # For GitHub MCP integration
+REDIS_URL=redis://localhost:6379  # Or rediss://...@....upstash.io:6379
 ```
 
 ### Key Variables
@@ -181,6 +186,7 @@ GITHUB_TOKEN=ghp_xxx  # For GitHub MCP integration
 | `DATABASE_NAME` | `tss-elysia.db` | SQLite database name            |
 | `PORT`          | `3000`          | Server port                     |
 | `HOST`          | `localhost`     | Server host                     |
+| `REDIS_URL`     | -               | Redis connection URL            |
 | `GITHUB_TOKEN`  | -               | GitHub token for MCP (optional) |
 
 ## MCP Tools

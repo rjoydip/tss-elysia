@@ -17,7 +17,7 @@ test.describe("Status Page", () => {
   test("should display overall status indicator", async ({ page }) => {
     await expect(
       page.getByText(
-        /Systems Healthy|Some services are degraded and need attention|Checking service health\.\.\./,
+        /APIs are healthy|Some services are degraded and need attention|Checking service health\.\.\.|Service health is currently unknown/,
       ),
     ).toBeVisible();
   });
@@ -47,9 +47,11 @@ test.describe("Status Page", () => {
   test("should display last checked timestamps", async ({ page }) => {
     // Initial status may remain in loading state depending on health endpoint availability.
     await expect(
-      page.getByText(
-        /Checking service health\.\.\.|Systems Healthy|Some services are degraded and need attention/,
-      ),
+      page
+        .getByText(
+          /Checking service health\.\.\.|APIs are healthy|Some services are degraded and need attention|Service health is currently unknown/,
+        )
+        .first(),
     ).toBeVisible();
   });
 });

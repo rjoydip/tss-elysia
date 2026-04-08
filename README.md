@@ -110,6 +110,7 @@ Detailed documentation available in `docs/`:
 - **State Management**: TanStack Store
 - **Function Execution Timing**: Tanstack Pacer
 - **Styling**: Tailwind CSS v4
+- **Cache/Pub-Sub**: Redis / Upstash (Bun native `RedisClient`)
 
 ## Project Structure
 
@@ -174,7 +175,11 @@ src/
 │   │   └── client.ts  # Client auth hooks and methods
 │   ├── db/            # Database (Drizzle + SQLite)
 │   │   ├── index.ts
-│   │   └── schema.ts
+│   │   ├── schema.ts
+│   │   └── heartbeat.ts
+│   ├── redis/         # Redis cache and Pub/Sub (Bun native)
+│   │   ├── index.ts   # Redis client singleton, health check
+│   │   └── pubsub.ts  # Typed Pub/Sub channels and helpers
 │   └── utils.ts       # Utility functions (cn, etc.)
 ├── logger.ts          # Logger configuration
 ├── middlewares/       # Middleware implementations
@@ -232,6 +237,9 @@ test/                  # Unit tests (Bun)
 │   └── changelog.test.ts
 ├── hooks/            # Hook tests
 ├── lib/              # Library tests
+│   └── redis/       # Redis tests
+│       ├── redis.test.ts  # Redis client tests
+│       └── pubsub.test.ts # Pub/Sub tests
 ├── store/            # Store tests
 ├── components/       # Component tests
 │   └── ui/          # UI component tests
@@ -248,7 +256,8 @@ test/                  # Unit tests (Bun)
 │   └── ...
 ├── api/              # API E2E tests
 │   ├── endpoints.spec.ts
-│   └── middlewares.spec.ts
+│   ├── middlewares.spec.ts
+│   └── redis-health.spec.ts  # Redis heartbeat E2E
 ├── middlewares/      # Middleware-specific E2E tests
 │   ├── cors.spec.ts
 │   ├── helmet.spec.ts

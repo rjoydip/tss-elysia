@@ -8,6 +8,37 @@
 
 services:
   # ---------------------------------------------------------------------------
+  # Redis Service — Cache, Pub/Sub, and session storage
+  # ---------------------------------------------------------------------------
+  redis:
+    image: redis:7-alpine
+    container_name: tss-elysia-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+      - ./redis.conf:/usr/local/etc/redis/redis.conf:ro
+    command: ["redis-server", "/usr/local/etc/redis/redis.conf"]
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+        reservations:
+          memory: 128M
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "5m"
+        max-file: "3"
+
+  # ---------------------------------------------------------------------------
   # Production Service
   # ---------------------------------------------------------------------------
   app:
@@ -25,6 +56,11 @@ services:
       - AUTH_SECRET=${AUTH_SECRET:?AUTH_SECRET is required}
       - DATABASE_PATH=.artifacts
       - DATABASE_NAME=tss-elysia.db
+      # Redis connection (uses Docker service name for internal networking)
+      - REDIS_URL=redis://redis:6379
+    depends_on:
+      redis:
+        condition: service_healthy
     volumes:
       - app-data:/app/.artifacts
     # Resource limits (adjust based on needs)
@@ -68,6 +104,11 @@ services:
       - AUTH_SECRET=${AUTH_SECRET:-dev-secret-min-32-chars-here}
       - DATABASE_PATH=.artifacts
       - DATABASE_NAME=tss-elysia.db
+      # Redis connection (uses Docker service name for internal networking)
+      - REDIS_URL=redis://redis:6379
+    depends_on:
+      redis:
+        condition: service_healthy
     volumes:
       # Mount source code for hot reload
       - ..:/app
@@ -99,4 +140,7 @@ volumes:
     driver: local
   # Node modules (avoid reinstalling on every rebuild)
   node-modules:
+    driver: local
+  # Redis data persistence
+  redis-data:
     driver: local
