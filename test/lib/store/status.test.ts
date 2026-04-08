@@ -29,6 +29,7 @@ function resetStatusStore(): void {
       status: service.heartbeatUrl ? "unknown" : "degraded",
       lastUpdated: null,
       tooltip: service.defaultTooltip,
+      latencyMs: null,
     })),
     isRefreshing: false,
     lastRefreshSuccessful: null,
@@ -172,5 +173,26 @@ describe("status store", () => {
 
     expect(triggered).toBe(false);
     expect(remainingMs).toBeGreaterThan(0);
+  });
+
+  it("should handle database heartbeat network or runtime failure gracefully", async () => {
+    const fetchMock = vi.spyOn(globalThis, "fetch");
+    fetchMock.mockImplementation((input) => {
+      const requestUrl = String(input);
+      if (requestUrl.includes("/api/database/heartbeat")) {
+        return Promise.resolve(new Response("Malformed non-json data", { status: 500 }));
+      }
+      return Promise.resolve(new Response(JSON.stringify({ status: "healthy" }), { status: 200 }));
+    });
+
+    await checkStatusHealth();
+
+    const databaseStatus = statusStore.state.otherServiceStatuses.find(
+      (service) => service.name === "Database",
+    );
+    expect(databaseStatus?.status).toBe("outage");
+    expect(databaseStatus?.tooltip).toBe(
+      "Database heartbeat request failed or returned invalid data.",
+    );
   });
 });

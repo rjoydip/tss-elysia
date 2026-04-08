@@ -26,6 +26,7 @@ export interface OtherServiceStatus {
   status: "operational" | "degraded" | "outage" | "unknown";
   lastUpdated: string | null;
   tooltip: string;
+  latencyMs?: number | null;
 }
 
 /**
@@ -103,6 +104,7 @@ function buildInitialOtherStatuses(): OtherServiceStatus[] {
     status: service.heartbeatUrl ? "unknown" : "degraded",
     lastUpdated: null,
     tooltip: service.defaultTooltip,
+    latencyMs: null,
   }));
 }
 
@@ -128,6 +130,7 @@ interface DatabaseHeartbeatResponse {
   status?: "healthy" | "unhealthy";
   detail?: string;
   timestamp?: string;
+  latencyMs?: number | null;
 }
 
 /**
@@ -142,12 +145,19 @@ async function checkOtherStatusHealth(): Promise<OtherServiceStatus[]> {
           status: "degraded" as const,
           lastUpdated: null,
           tooltip: service.defaultTooltip,
+          latencyMs: null,
         };
       }
 
       try {
         const response = await fetch(service.heartbeatUrl, { method: "GET" });
-        const payload = (await response.json()) as DatabaseHeartbeatResponse;
+        const data = await response.json();
+
+        if (!data || typeof data !== "object") {
+          throw new Error("Invalid heartbeat response format");
+        }
+
+        const payload = data as DatabaseHeartbeatResponse;
         const isHealthy = response.ok && payload.status === "healthy";
 
         return {
@@ -155,13 +165,15 @@ async function checkOtherStatusHealth(): Promise<OtherServiceStatus[]> {
           status: isHealthy ? ("operational" as const) : ("outage" as const),
           lastUpdated: payload.timestamp ?? new Date().toISOString(),
           tooltip: payload.detail || service.defaultTooltip,
+          latencyMs: payload.latencyMs ?? null,
         };
       } catch {
         return {
           name: service.name,
           status: "outage" as const,
           lastUpdated: new Date().toISOString(),
-          tooltip: "Database heartbeat request failed.",
+          tooltip: "Database heartbeat request failed or returned invalid data.",
+          latencyMs: null,
         };
       }
     }),
@@ -221,7 +233,8 @@ export function canTriggerManualRefresh(now = Date.now()): boolean {
   const { isRefreshing, lastManualRefreshAt } = statusStore.state;
   if (isRefreshing) return false;
   if (lastManualRefreshAt === null) return true;
-  return now - lastManualRefreshAt >= statusPageConfig.manualRefreshCooldownMs;
+  const cooldownMs = statusPageConfig?.manualRefreshCooldownMs ?? 60000;
+  return now - lastManualRefreshAt >= cooldownMs;
 }
 
 /**
@@ -231,7 +244,8 @@ export function getManualRefreshCooldownRemainingMs(now = Date.now()): number {
   const { lastManualRefreshAt } = statusStore.state;
   if (lastManualRefreshAt === null) return 0;
   const elapsed = now - lastManualRefreshAt;
-  const remaining = statusPageConfig.manualRefreshCooldownMs - elapsed;
+  const cooldownMs = statusPageConfig?.manualRefreshCooldownMs ?? 60000;
+  const remaining = cooldownMs - elapsed;
   return remaining > 0 ? remaining : 0;
 }
 
@@ -244,6 +258,8 @@ export function refreshStatusHealth(now = Date.now()): boolean {
     return false;
   }
   statusStore.setState((prev) => ({ ...prev, lastManualRefreshAt: now }));
-  void checkStatusHealth();
+  checkStatusHealth().catch((error) => {
+    console.error("Manual status refresh failed:", error);
+  });
   return true;
 }
