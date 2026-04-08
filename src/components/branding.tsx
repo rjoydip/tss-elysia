@@ -124,6 +124,13 @@ export function Branding({
   title = {},
   description = {},
 }: BrandingProps) {
+  /**
+   * Shared auth-side panel gradient.
+   * Keeping this centralized ensures login/register/forgot-password always match visually.
+   */
+  const brandingPanelClassName =
+    "bg-gradient-to-br from-primary/20 via-primary/10 to-background/95 dark:from-primary/25 dark:via-primary/12 dark:to-background/90";
+
   const getHiddenClass = (): string => {
     if (hidden.mobile) {
       return "hidden lg:flex";
@@ -163,7 +170,7 @@ export function Branding({
     <div
       className={`
                 lg:w-1/2 
-                bg-gradient-to-br from-primary/20 via-primary/10 to-background 
+                ${brandingPanelClassName}
                 ${padding} 
                 ${getHiddenClass()} 
                 ${getJustifyClass()} 

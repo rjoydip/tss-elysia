@@ -70,11 +70,17 @@ export const traceFn: TraceHandler = async ({
   });
 
   // Track total request handling time
-  onHandle(({ onStop }) => {
+  onHandle((traceContext) => {
+    const request = (traceContext as { request?: Request }).request;
+    const endpoint = request
+      ? `${request.method} ${new URL(request.url).pathname}`
+      : "UNKNOWN /unknown";
+
+    const { onStop } = traceContext;
     onStop(({ elapsed }) => {
       const elapsedTime = typeof elapsed === "number" ? elapsed.toFixed(4) : "0.00";
       set.headers["X-Elapsed"] = elapsedTime;
-      logger.debug(`Request took: ${elapsedTime} ms`);
+      logger.debug(`Trace ${endpoint} took ${elapsedTime} ms`);
     });
   });
 };
@@ -123,7 +129,7 @@ export const errorFn: ErrorHandler = ({ code, error }) => {
  * Options for composing middleware with custom configuration.
  */
 type ComposedMiddlewareOptions = {
-  openAPP_NAME: string;
+  OPENAPI_NAME: string;
 };
 
 /**
@@ -134,12 +140,12 @@ type ComposedMiddlewareOptions = {
  *
  * @example
  * const app = new Elysia()
- *   .use(composedMiddleware({ openAPP_NAME: "My API" }))
+ *   .use(composedMiddleware({ OPENAPI_NAME: "My API" }))
  *   .listen(3000)
  */
 export const composedMiddleware = (
-  { openAPP_NAME }: ComposedMiddlewareOptions = {
-    openAPP_NAME: APP_NAME,
+  { OPENAPI_NAME }: ComposedMiddlewareOptions = {
+    OPENAPI_NAME: APP_NAME,
   },
 ) =>
   new Elysia({ name: "composed-middleware" })
@@ -152,11 +158,40 @@ export const composedMiddleware = (
     // OpenAPI documentation generation
     .use(
       openapi({
-        path: "reference",
+        /**
+         * Serves the generated OpenAPI document and UI under the API prefix.
+         *
+         * Note:
+         * - Since this middleware is mounted inside `apiRoutes` (which already has `prefix: /api`),
+         *   this becomes available at `/api/reference`.
+         */
+        path: "/reference",
         documentation: {
           info: {
-            title: `${openAPP_NAME} Documentation`,
-            version: "v1",
+            title: `${OPENAPI_NAME} Documentation`,
+            version: "v0",
+          },
+          /**
+           * Baseline server information to make the exported spec immediately usable.
+           * Clients can override this with their own runtime base URL.
+           */
+          servers: [{ url: "/api", description: "Default API base path" }],
+          /**
+           * Shared security schemes so protected endpoints can declare auth requirements.
+           *
+           * Current usage:
+           * - MCP key endpoints use `Authorization: Bearer <mcp_api_key>`.
+           */
+          components: {
+            securitySchemes: {
+              bearerAuth: {
+                type: "http",
+                scheme: "bearer",
+                bearerFormat: "JWT",
+                description:
+                  "Bearer token. For MCP endpoints, this is the MCP API key (not a user JWT).",
+              },
+            },
           },
         },
       }),

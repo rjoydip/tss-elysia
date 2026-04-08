@@ -32,13 +32,13 @@ function RootDocument({ children }: { children: React.ReactNode }) {
     <QueryClientProvider client={queryClient}>
       <ThemeProvider>
         <A11yer>
-          <html>
+          <html lang="en">
             <head>
               <HeadContent />
             </head>
             <body>
+              <Toaster richColors />
               {children}
-              <Toaster />
               {import.meta.env.DEV && <TanStackRouterDevtools position="bottom-right" />}
               <Scripts />
             </body>

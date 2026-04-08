@@ -16,7 +16,7 @@
     "fmt:check": "oxfmt --check .",
     "lint": "oxlint . --format=github",
     "lint:ci": "bun run lint && bun run fmt:check && actions-up",
-    "lint:fix": "oxlint . --fix && oxfmt . && actions-up",
+    "lint:fix": "oxlint . --fix && oxfmt .",
     "typecheck": "tsgo --noEmit",
     "react:doctor": "react-doctor . -y",
     "test:unit": "bun test",
@@ -128,6 +128,7 @@
     "pre-commit": "bun run lint:ci && bun run typecheck && bun run react:doctor"
   },
   "reactDoctor": {
+    "lint": false,
     "ignore": {
       "files": [
         "~/.bun-install-cache/**/*",

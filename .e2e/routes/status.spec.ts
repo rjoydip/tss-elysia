@@ -16,7 +16,9 @@ test.describe("Status Page", () => {
 
   test("should display overall status indicator", async ({ page }) => {
     await expect(
-      page.getByText(/All Systems Operational|Degraded|Checking\.\.\./).first(),
+      page.getByText(
+        /Systems Healthy|Some services are degraded and need attention|Checking service health\.\.\./,
+      ),
     ).toBeVisible();
   });
 
@@ -32,21 +34,22 @@ test.describe("Status Page", () => {
     await expect(page.getByText(/ms/).first()).toBeVisible();
   });
 
-  test("should have auto-refresh label", async ({ page }) => {
-    await expect(page.getByText("Auto-refresh:")).toBeVisible();
+  test("should have refresh icon control", async ({ page }) => {
+    await expect(page.getByRole("button", { name: /Refresh now|Refreshing now/ })).toBeVisible();
   });
 
   test("should display Other Services section", async ({ page }) => {
     await expect(page.getByRole("heading", { name: "Other Services" })).toBeVisible();
     await expect(page.getByText("Database")).toBeVisible();
     await expect(page.getByText("Storage")).toBeVisible();
-    await expect(page.getByText("Realtime")).toBeVisible();
   });
 
   test("should display last checked timestamps", async ({ page }) => {
     // Initial status may remain in loading state depending on health endpoint availability.
     await expect(
-      page.getByText(/Checking\.\.\.|All Systems Operational|Degraded/).first(),
+      page.getByText(
+        /Checking service health\.\.\.|Systems Healthy|Some services are degraded and need attention/,
+      ),
     ).toBeVisible();
   });
 });

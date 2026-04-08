@@ -4,7 +4,7 @@
  */
 
 import { test, expect } from "@playwright/test";
-import { E2E_BASE_URL } from "../_config";
+import { E2E_BASE_URL } from "../../_config";
 
 test.describe("API Root", () => {
   test("should return welcome message", async ({ request }) => {
@@ -64,6 +64,15 @@ test.describe("Health Endpoint", () => {
     const elapsed = response.headers()["x-elapsed"];
     expect(elapsed).toBeDefined();
   });
+
+  test("should return database heartbeat payload", async ({ request }) => {
+    const response = await request.get("/api/database/heartbeat");
+    expect([200, 503]).toContain(response.status());
+    const body = await response.json();
+    expect(["healthy", "unhealthy"]).toContain(body.status);
+    expect(body.timestamp).toBeDefined();
+    expect(body.detail).toBeDefined();
+  });
 });
 
 test.describe("Auth Health Endpoint", () => {
@@ -72,7 +81,7 @@ test.describe("Auth Health Endpoint", () => {
     expect(response.status()).toBe(200);
     const body = await response.json();
     expect(body.status).toBe("healthy");
-    expect(body.name).toBe("AUTH");
+    expect(body.name).toBe("Auth");
   });
 
   test("should return JSON content type for auth health", async ({ request }) => {
@@ -84,7 +93,7 @@ test.describe("Auth Health Endpoint", () => {
     const response = await request.get("/api/auth/");
     expect(response.status()).toBe(200);
     const body = await response.text();
-    expect(body).toContain("Welcome to AUTH Service");
+    expect(body).toContain("Welcome to Auth Service");
   });
 });
 

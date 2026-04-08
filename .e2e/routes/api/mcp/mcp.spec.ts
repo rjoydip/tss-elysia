@@ -4,9 +4,23 @@
  */
 
 import { test, expect } from "@playwright/test";
-import { E2E_BASE_URL } from "../_config";
+import { E2E_BASE_URL } from "../../../_config";
 
 const MCP_BASE_URL = `${E2E_BASE_URL}/api/mcp`;
+
+test.describe("MCP Root Endpoint", () => {
+  test("should return welcome message", async ({ request }) => {
+    const response = await request.get(`${MCP_BASE_URL}/`);
+    expect(response.status()).toBe(200);
+    const body = await response.text();
+    expect(body).toContain("Welcome to MCP Service");
+  });
+
+  test("should return text/plain content type", async ({ request }) => {
+    const response = await request.get(`${MCP_BASE_URL}/`);
+    expect(response.headers()["content-type"]).toMatch(/text\/plain/);
+  });
+});
 
 test.describe("MCP Health Endpoint", () => {
   test("should return 200 with health status", async ({ request }) => {

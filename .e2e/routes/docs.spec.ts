@@ -105,9 +105,7 @@ test.describe("Docs Sidebar", () => {
     await expect(page).toHaveURL(/.*\/docs\/auth\/overview/);
     // Verify the main content area is rendered after navigation.
     await expect(page.locator("main")).toBeVisible();
-    await expect(
-      page.locator("header").first().getByRole("button", { name: "Login" }),
-    ).toBeVisible();
+    await expect(page.locator("header").first().getByRole("link", { name: "Login" })).toBeVisible();
   });
 });
 
@@ -201,9 +199,7 @@ test.describe("Docs Theme Toggle", () => {
   test("should toggle theme on docs page", async ({ page }) => {
     await page.goto("/docs");
     await page.waitForLoadState("networkidle");
-    await expect(
-      page.locator("header").first().getByRole("button", { name: "Login" }),
-    ).toBeVisible();
+    await expect(page.locator("header").first().getByRole("link", { name: "Login" })).toBeVisible();
   });
 
   test("should persist theme across docs navigation", async ({ page }) => {
@@ -216,9 +212,7 @@ test.describe("Docs Theme Toggle", () => {
       .getByRole("link", { name: "Development", exact: true })
       .click();
     await page.waitForLoadState("networkidle");
-    await expect(
-      page.locator("header").first().getByRole("button", { name: "Login" }),
-    ).toBeVisible();
+    await expect(page.locator("header").first().getByRole("link", { name: "Login" })).toBeVisible();
   });
 });
 

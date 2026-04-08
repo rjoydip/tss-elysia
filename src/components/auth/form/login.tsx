@@ -13,6 +13,8 @@ import { Separator } from "~/components/ui/separator";
 import { signInWithEmail } from "~/lib/auth/client";
 import { Branding } from "~/components/branding";
 import { APP_NAME } from "~/config";
+import { toast } from "sonner";
+import { setAuthSubmitting, useAuthFormState } from "~/lib/store/auth";
 
 const loginSchema = z.object({
   email: z.string().min(1, "Email is required").email("Please enter a valid email address"),
@@ -29,6 +31,9 @@ type LoginFormValues = z.infer<typeof loginSchema>;
  * <LoginForm />
  */
 export function LoginForm() {
+  const loginUi = useAuthFormState("login");
+  const isSubmitting = loginUi.isSubmitting;
+
   const form = useForm({
     defaultValues: {
       email: "",
@@ -38,11 +43,18 @@ export function LoginForm() {
       onChange: loginSchema,
     },
     onSubmit: async ({ value }) => {
-      const { error } = await signInWithEmail(value.email, value.password);
-      if (error) {
-        throw new Error(error.message || "Failed to sign in");
+      setAuthSubmitting("login", true);
+      try {
+        const { error } = await signInWithEmail(value.email, value.password);
+        if (error) {
+          toast.error(error.message || "Failed to sign in");
+          return;
+        }
+        toast.success("Signed in successfully");
+        window.location.href = "/profile";
+      } finally {
+        setAuthSubmitting("login", false);
       }
-      window.location.href = "/profile";
     },
   });
 
@@ -78,7 +90,7 @@ export function LoginForm() {
 
           {/* OAuth buttons */}
           <div className="space-y-3">
-            <Button variant="outline" className="w-full h-11">
+            <Button variant="outline" className="w-full h-11" disabled={isSubmitting}>
               <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
                 <path
                   fill="currentColor"
@@ -88,7 +100,7 @@ export function LoginForm() {
               Continue with GitHub
             </Button>
 
-            <Button variant="outline" className="w-full h-11">
+            <Button variant="outline" className="w-full h-11" disabled={isSubmitting}>
               <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
                 <path
                   fill="#4285F4"
@@ -140,7 +152,7 @@ export function LoginForm() {
                     value={field.state.value}
                     onChange={(e) => field.handleChange(e.target.value)}
                     onBlur={field.handleBlur}
-                    disabled={form.state.isSubmitting}
+                    disabled={isSubmitting}
                     required
                     autoComplete="email"
                     className="h-11"
@@ -163,7 +175,7 @@ export function LoginForm() {
                     value={field.state.value}
                     onChange={(e) => field.handleChange(e.target.value)}
                     onBlur={field.handleBlur}
-                    disabled={form.state.isSubmitting}
+                    disabled={isSubmitting}
                     required
                     autoComplete="current-password"
                     className="h-11"
@@ -181,8 +193,8 @@ export function LoginForm() {
               </a>
             </div>
 
-            <Button type="submit" className="w-full h-11" disabled={form.state.isSubmitting}>
-              {form.state.isSubmitting ? (
+            <Button type="submit" className="w-full h-11" disabled={isSubmitting}>
+              {isSubmitting ? (
                 <>
                   <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin mr-2" />
                   Signing in...

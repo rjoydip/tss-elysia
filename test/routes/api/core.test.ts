@@ -139,4 +139,17 @@ describe("Eden Treaty - API Endpoints", () => {
       expect(data).toHaveProperty("timestamp");
     });
   });
+
+  describe("GET /api/database/heartbeat", () => {
+    it("should return database heartbeat payload", async () => {
+      const { data, error, status } = await api.api.database.heartbeat.get();
+
+      expect(error).toBeNull();
+      expect([200, 503]).toContain(status);
+      expect(data).toHaveProperty("status");
+      expect(data).toHaveProperty("timestamp");
+      expect(data).toHaveProperty("detail");
+      expect(["healthy", "unhealthy"]).toContain(data?.status as string);
+    });
+  });
 });

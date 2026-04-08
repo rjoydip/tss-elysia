@@ -2,19 +2,22 @@
  * Integration tests for MCP HTTP routes.
  * Covers route availability, health checks, rate limiting behavior, and tool discovery.
  */
-import { describe, it, expect } from "bun:test";
-import { mcpRoutes } from "../../../../src/routes/api/mcp/$.ts";
+import { Elysia } from "elysia";
+import { describe, expect, it } from "bun:test";
 import { getMcpServer } from "../../../../src/lib/mcp/server";
+import { mcpCoreRoutes } from "../../../../src/routes/api/mcp/modules/-core";
+
+const app = new Elysia({ prefix: "/api" }).use(mcpCoreRoutes);
 
 describe("MCP API Flows", () => {
   it("should return 404 for unknown routes", async () => {
-    const response = await mcpRoutes.handle(new Request("http://localhost/unknown-route"));
+    const response = await app.handle(new Request("http://localhost/api/mcp/unknown-route"));
 
     expect(response.status).toBe(404);
   });
 
   it("should include CORS headers", async () => {
-    const response = await mcpRoutes.handle(
+    const response = await app.handle(
       new Request("http://localhost/api/mcp", {
         method: "OPTIONS",
         headers: {
@@ -28,13 +31,13 @@ describe("MCP API Flows", () => {
   });
 
   it("should handle error response format", async () => {
-    const response = await mcpRoutes.handle(new Request("http://localhost/api/mcp/nonexistent"));
+    const response = await app.handle(new Request("http://localhost/api/mcp/nonexistent"));
 
     expect(response.status).toBe(404);
   });
 
   it("should include trace headers in response", async () => {
-    const response = await mcpRoutes.handle(new Request("http://localhost/api/mcp/"));
+    const response = await app.handle(new Request("http://localhost/api/mcp/"));
 
     expect(response.headers.get("X-Elapsed")).toBeDefined();
   });
@@ -42,7 +45,7 @@ describe("MCP API Flows", () => {
 
 describe("MCP API Root", () => {
   it("should return welcome message", async () => {
-    const response = await mcpRoutes.handle(new Request("http://localhost/api/mcp/"));
+    const response = await app.handle(new Request("http://localhost/api/mcp/"));
     const text = await response.text();
 
     expect(text).toContain("Welcome to");
@@ -50,7 +53,7 @@ describe("MCP API Root", () => {
   });
 
   it("should return text/plain content type", async () => {
-    const response = await mcpRoutes.handle(new Request("http://localhost/api/mcp/"));
+    const response = await app.handle(new Request("http://localhost/api/mcp/"));
 
     expect(response.headers.get("content-type")).toContain("text/plain");
   });
@@ -58,7 +61,7 @@ describe("MCP API Root", () => {
 
 describe("MCP API Health", () => {
   it("should return health status", async () => {
-    const response = await mcpRoutes.handle(new Request("http://localhost/api/mcp/health"));
+    const response = await app.handle(new Request("http://localhost/api/mcp/health"));
     const json = await response.json();
 
     expect(json).toHaveProperty("status", "healthy");
@@ -67,7 +70,7 @@ describe("MCP API Health", () => {
   });
 
   it("should return json content type", async () => {
-    const response = await mcpRoutes.handle(new Request("http://localhost/api/mcp/health"));
+    const response = await app.handle(new Request("http://localhost/api/mcp/health"));
 
     expect(response.headers.get("content-type")).toContain("application/json");
   });
@@ -76,7 +79,7 @@ describe("MCP API Health", () => {
     let limitedResponse: Response | null = null;
 
     for (let i = 0; i < 80; i++) {
-      const response = await mcpRoutes.handle(
+      const response = await app.handle(
         new Request("http://localhost/api/mcp/health", {
           headers: {
             "x-forwarded-for": "198.51.100.10",
@@ -98,7 +101,7 @@ describe("MCP API Health", () => {
   it("should isolate health rate limit buckets per requester", async () => {
     // Exhaust one requester bucket first.
     for (let i = 0; i < 70; i++) {
-      await mcpRoutes.handle(
+      await app.handle(
         new Request("http://localhost/api/mcp/health", {
           headers: {
             "x-forwarded-for": "203.0.113.20",
@@ -108,7 +111,7 @@ describe("MCP API Health", () => {
     }
 
     // A different requester should still be served normally.
-    const freshRequesterResponse = await mcpRoutes.handle(
+    const freshRequesterResponse = await app.handle(
       new Request("http://localhost/api/mcp/health", {
         headers: {
           "x-forwarded-for": "203.0.113.21",
@@ -122,7 +125,7 @@ describe("MCP API Health", () => {
 
 describe("MCP API Tools", () => {
   it("should return list of MCP tools", async () => {
-    const response = await mcpRoutes.handle(new Request("http://localhost/api/mcp/tools"));
+    const response = await app.handle(new Request("http://localhost/api/mcp/tools"));
     const json = await response.json();
 
     expect(json).toHaveProperty("tools");
@@ -131,7 +134,7 @@ describe("MCP API Tools", () => {
   });
 
   it("should include auth-related tools", async () => {
-    const response = await mcpRoutes.handle(new Request("http://localhost/api/mcp/tools"));
+    const response = await app.handle(new Request("http://localhost/api/mcp/tools"));
     const json = await response.json();
 
     const authTools = json.tools.filter((tool: { category: string }) => tool.category === "auth");
@@ -140,7 +143,7 @@ describe("MCP API Tools", () => {
 
   it("should match currently registered MCP server tool names", async () => {
     // Route should expose the live registered tool list to avoid static drift.
-    const response = await mcpRoutes.handle(new Request("http://localhost/api/mcp/tools"));
+    const response = await app.handle(new Request("http://localhost/api/mcp/tools"));
     const json = await response.json();
     const server = getMcpServer() as unknown as {
       _registeredTools?: Record<string, unknown>;
@@ -153,7 +156,7 @@ describe("MCP API Tools", () => {
   });
 
   it("should include user-related tools", async () => {
-    const response = await mcpRoutes.handle(new Request("http://localhost/api/mcp/tools"));
+    const response = await app.handle(new Request("http://localhost/api/mcp/tools"));
     const json = await response.json();
 
     const userTools = json.tools.filter((tool: { category: string }) => tool.category === "users");
@@ -161,7 +164,7 @@ describe("MCP API Tools", () => {
   });
 
   it("should include organization-related tools", async () => {
-    const response = await mcpRoutes.handle(new Request("http://localhost/api/mcp/tools"));
+    const response = await app.handle(new Request("http://localhost/api/mcp/tools"));
     const json = await response.json();
 
     const orgTools = json.tools.filter(
@@ -171,7 +174,7 @@ describe("MCP API Tools", () => {
   });
 
   it("should have proper tool structure", async () => {
-    const response = await mcpRoutes.handle(new Request("http://localhost/api/mcp/tools"));
+    const response = await app.handle(new Request("http://localhost/api/mcp/tools"));
     const json = await response.json();
 
     const tool = json.tools[0];
@@ -182,7 +185,7 @@ describe("MCP API Tools", () => {
   });
 
   it("should return json content type for tools", async () => {
-    const response = await mcpRoutes.handle(new Request("http://localhost/api/mcp/tools"));
+    const response = await app.handle(new Request("http://localhost/api/mcp/tools"));
 
     expect(response.headers.get("content-type")).toContain("application/json");
   });

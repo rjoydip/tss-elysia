@@ -8,6 +8,7 @@ import { changelogData, ChangelogEntry, ChangelogType } from "~/lib/changelog/da
 import { Header } from "~/components/header";
 import { Footer } from "~/components/footer";
 import { Badge } from "~/components/ui/badge";
+import { AnimatedPageBackground } from "~/components/background/animated-page-background";
 import {
   Accordion,
   AccordionContent,
@@ -88,7 +89,8 @@ function ChangelogPage() {
   const latestVersion = changelogData[0];
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="relative isolate min-h-screen bg-background">
+      <AnimatedPageBackground />
       <Header />
 
       {/* Main Content */}

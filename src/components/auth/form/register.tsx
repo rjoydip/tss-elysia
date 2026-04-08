@@ -13,6 +13,13 @@ import { Separator } from "~/components/ui/separator";
 import { signUpWithEmail } from "~/lib/auth/client";
 import { APP_NAME } from "~/config";
 import { Branding } from "~/components/branding";
+import { toast } from "sonner";
+import {
+  resetAuthFormState,
+  setAuthSubmitError,
+  setAuthSubmitting,
+  useAuthFormState,
+} from "~/lib/store/auth";
 
 interface PasswordRequirement {
   label: string;
@@ -39,6 +46,65 @@ const registerSchema = z.object({
 });
 
 type RegisterFormValues = z.infer<typeof registerSchema>;
+
+/**
+ * Extracts a readable signup error message from unknown client/server error shapes.
+ * Better Auth can return different payload structures depending on transport/runtime.
+ *
+ * @param error - Unknown error payload or thrown error
+ * @returns Normalized raw message before UX-specific mapping
+ */
+const extractRegisterErrorMessage = (error: unknown): string => {
+  if (typeof error === "string") {
+    return error;
+  }
+  if (error instanceof Error) {
+    return error.message;
+  }
+  if (error && typeof error === "object") {
+    const maybeError = error as {
+      message?: string;
+      error?: { message?: string } | string;
+      body?: { message?: string };
+    };
+    if (typeof maybeError.message === "string") {
+      return maybeError.message;
+    }
+    if (typeof maybeError.error === "string") {
+      return maybeError.error;
+    }
+    if (maybeError.error && typeof maybeError.error === "object") {
+      const nestedError = maybeError.error as { message?: string };
+      if (typeof nestedError.message === "string") {
+        return nestedError.message;
+      }
+    }
+    if (maybeError.body && typeof maybeError.body.message === "string") {
+      return maybeError.body.message;
+    }
+  }
+  return "Failed to create account";
+};
+
+/**
+ * Maps Better Auth signup errors to user-friendly toast messages.
+ * Normalizes common duplicate-account responses from different runtimes/providers.
+ *
+ * @param errorMessage - Raw backend/client error text
+ * @returns Human-friendly error message for registration failures
+ */
+const getRegisterErrorMessage = (errorMessage?: string): string => {
+  const normalizedMessage = (errorMessage ?? "").toLowerCase();
+  if (
+    normalizedMessage.includes("already exists") ||
+    normalizedMessage.includes("already registered") ||
+    normalizedMessage.includes("user exists") ||
+    normalizedMessage.includes("email has already been used")
+  ) {
+    return "User already exists. Use another email";
+  }
+  return errorMessage || "Failed to create account";
+};
 
 /**
  * Calculate password strength score.
@@ -93,6 +159,9 @@ const getStrengthColor = (score: number): string => {
  * <RegisterForm />
  */
 export function RegisterForm() {
+  const registerUi = useAuthFormState("register");
+  const isSubmitting = registerUi.isSubmitting;
+
   const form = useForm({
     defaultValues: {
       name: "",
@@ -103,11 +172,22 @@ export function RegisterForm() {
       onChange: registerSchema,
     },
     onSubmit: async ({ value }) => {
-      const { error } = await signUpWithEmail(value.name, value.email, value.password);
-      if (error) {
-        throw new Error(error.message || "Failed to create account");
+      setAuthSubmitError("register", null);
+      setAuthSubmitting("register", true);
+      try {
+        const result = await signUpWithEmail(value.name, value.email, value.password);
+        if (result?.error) {
+          const errorMessage = getRegisterErrorMessage(extractRegisterErrorMessage(result.error));
+          setAuthSubmitError("register", errorMessage);
+          toast.error(errorMessage);
+          return;
+        }
+        resetAuthFormState("register");
+        toast.success("Account created successfully");
+        window.location.href = "/profile";
+      } finally {
+        setAuthSubmitting("register", false);
       }
-      window.location.href = "/profile";
     },
   });
 
@@ -142,7 +222,7 @@ export function RegisterForm() {
 
           {/* OAuth buttons */}
           <div className="space-y-3">
-            <Button variant="outline" className="w-full h-11">
+            <Button variant="outline" className="w-full h-11" disabled={isSubmitting}>
               <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
                 <path
                   fill="currentColor"
@@ -152,7 +232,7 @@ export function RegisterForm() {
               Continue with GitHub
             </Button>
 
-            <Button variant="outline" className="w-full h-11">
+            <Button variant="outline" className="w-full h-11" disabled={isSubmitting}>
               <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
                 <path
                   fill="#4285F4"
@@ -204,7 +284,7 @@ export function RegisterForm() {
                     value={field.state.value}
                     onChange={(e) => field.handleChange(e.target.value)}
                     onBlur={field.handleBlur}
-                    disabled={form.state.isSubmitting}
+                    disabled={isSubmitting}
                     required
                     autoComplete="name"
                     className="h-11"
@@ -227,7 +307,7 @@ export function RegisterForm() {
                     value={field.state.value}
                     onChange={(e) => field.handleChange(e.target.value)}
                     onBlur={field.handleBlur}
-                    disabled={form.state.isSubmitting}
+                    disabled={isSubmitting}
                     required
                     autoComplete="email"
                     className="h-11"
@@ -250,7 +330,7 @@ export function RegisterForm() {
                     value={field.state.value}
                     onChange={(e) => field.handleChange(e.target.value)}
                     onBlur={field.handleBlur}
-                    disabled={form.state.isSubmitting}
+                    disabled={isSubmitting}
                     required
                     autoComplete="new-password"
                     className="h-11"
@@ -328,8 +408,8 @@ export function RegisterForm() {
               }
             </form.Field>
 
-            <Button type="submit" className="w-full h-11" disabled={form.state.isSubmitting}>
-              {form.state.isSubmitting ? (
+            <Button type="submit" className="w-full h-11" disabled={isSubmitting}>
+              {isSubmitting ? (
                 <>
                   <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin mr-2" />
                   Creating account...

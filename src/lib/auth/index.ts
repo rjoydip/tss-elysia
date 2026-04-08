@@ -91,6 +91,16 @@ export function createAuth() {
     // Trusted origins for CORS - prevents CSRF attacks
     trustedOrigins: [env.BETTER_AUTH_URL, new URL(env.BETTER_AUTH_URL).origin],
 
+    /**
+     * Advanced runtime networking config for auth rate-limiting and audit metadata.
+     * Ensures Better Auth can derive a client IP behind local proxies/reverse proxies.
+     */
+    advanced: {
+      ipAddress: {
+        ipAddressHeaders: ["x-forwarded-for", "x-real-ip", "cf-connecting-ip"],
+      },
+    },
+
     // Error handler for auth API failures
     onAPIError: {
       onError: (error: unknown) => {

@@ -1,13 +1,7 @@
-/**
- * MCP health check endpoint.
- * Returns server status and connection metrics.
- */
-
 import { Elysia } from "elysia";
-import { sessionManager } from "~/lib/mcp/transport";
+
 import { getMcpServer } from "~/lib/mcp/server";
-import { createFileRoute } from "@tanstack/react-router";
-import { composedMiddleware, errorFn, traceFn } from "~/middlewares";
+import { sessionManager } from "~/lib/mcp/transport";
 import { mcpKeysRoutes } from "./-keys";
 
 /**
@@ -24,6 +18,29 @@ type RegisteredToolInfo = {
   title?: string;
   description?: string;
 };
+
+/**
+ * MCP health response example for OpenAPI.
+ */
+const mcpHealthExample = {
+  status: "healthy",
+  activeConnections: 0,
+  timestamp: new Date(0).toISOString(),
+} as const;
+
+/**
+ * MCP tools discovery response example for OpenAPI.
+ */
+const mcpToolsExample = {
+  tools: [
+    {
+      name: "auth.login",
+      title: "Login",
+      description: "Authenticate a user",
+      category: "auth",
+    },
+  ],
+} as const;
 
 /**
  * In-memory health endpoint limiter keyed by requester identity.
@@ -54,7 +71,10 @@ function getHealthRateLimitResponse(request: Request): Response | null {
   const requesterKey = getHealthRequesterKey(request);
   const existing = healthRequestTracker.get(requesterKey);
 
-  // Opportunistic cleanup to avoid unbounded memory usage in long-lived processes.
+  /**
+   * Opportunistic cleanup to avoid unbounded memory usage in long-lived processes.
+   * This is intentionally lightweight (no timers) since health checks are periodic.
+   */
   for (const [key, record] of healthRequestTracker.entries()) {
     if (now > record.resetAt) {
       healthRequestTracker.delete(key);
@@ -94,8 +114,9 @@ function getHealthRateLimitResponse(request: Request): Response | null {
 }
 
 /**
- * Converts MCP server's live tool registry to the `/tools` HTTP response shape.
- * This keeps discovery payload in sync with currently registered server tools.
+ * Converts the MCP server's live tool registry to the `/tools` HTTP response shape.
+ *
+ * @returns Tool metadata currently registered on the MCP server
  */
 function getLiveToolCatalogFromServer(): Array<{
   name: string;
@@ -130,56 +151,28 @@ function getLiveToolCatalogFromServer(): Array<{
 }
 
 /**
- * MCP health routes.
- * Paths are relative to parent prefix (/api).
+ * Core mcp route group mounted under `/api/mcp`.
  */
-export const mcpRoutes = new Elysia({ name: "mcp.api", prefix: "/api/mcp" })
-  // Apply composed middleware (CORS, Helmet, Rate Limit, OpenTelemetry)
-  .use(
-    composedMiddleware({
-      openAPP_NAME: "MCP",
-    }),
-  )
+export const mcpCoreRoutes = new Elysia({ name: "mcp.routes.core", prefix: "/mcp" })
   .use(mcpKeysRoutes)
-  // Request tracing for performance monitoring
-  .trace(traceFn)
-  // Centralized error handling
-  .onError(errorFn)
-  // Store application name
-  .state("name", "MCP")
-
-  /**
-   * Root endpoint for MCP service information.
-   * Returns welcome message identifying the mcp service.
-   * This is separate from the main API root to allow for different service information if needed.
-   *
-   * Note: This is not the health check endpoint, which is defined separately at /health.
-   * This endpoint is more for informational purposes, while /health is for monitoring and load balancers.
-   * This endpoint can be used to verify that the MCP service is running and responding to requests, while /health provides more detailed status information for monitoring.
-   */
   .get(
     "/",
-    ({ store: { name }, set }) => {
+    ({ set }) => {
       set.headers["Content-Type"] = "text/plain; charset=utf-8";
-      return `Welcome to ${name} Service`;
+      return `Welcome to MCP Service`;
     },
     {
       detail: {
-        summary: "Get MCP root",
-        description: "Get MCP root",
+        summary: "MCP root",
+        description:
+          "Plain-text service identity endpoint for the MCP subsystem. Useful for smoke checks and verifying mount points.",
         tags: ["mcp"],
         responses: {
-          200: { description: "Success" },
+          200: { description: "Plain-text welcome message" },
         },
       },
     },
   )
-
-  /**
-   * Health check endpoint for monitoring.
-   * Used by load balancers and orchestration systems (Kubernetes, etc.)
-   * Returns simple JSON with service status and active connection count.
-   */
   .get(
     "/health",
     async ({ request }) => {
@@ -197,52 +190,45 @@ export const mcpRoutes = new Elysia({ name: "mcp.api", prefix: "/api/mcp" })
           activeConnections,
           timestamp: new Date().toISOString(),
         }),
-        {
-          headers: { "Content-Type": "application/json" },
-        },
-      );
-    },
-    {
-      detail: {
-        tags: ["MCP"],
-        summary: "MCP health check",
-        description: "Check MCP server health and status",
-      },
-    },
-  )
-  .get(
-    "/tools",
-    async () => {
-      return new Response(
-        JSON.stringify({
-          tools: getLiveToolCatalogFromServer(),
-        }),
         { headers: { "Content-Type": "application/json" } },
       );
     },
     {
       detail: {
-        tags: ["MCP"],
+        tags: ["mcp", "health"],
+        summary: "MCP health check",
+        description:
+          "Health probe for MCP server readiness. Includes active transport session count. Rate-limited to mitigate probing abuse.",
+        responses: {
+          200: {
+            description: "MCP is healthy",
+            content: { "application/json": { example: mcpHealthExample } },
+          },
+          429: {
+            description: "Rate limit exceeded for health probes",
+          },
+        },
+      },
+    },
+  )
+  .get(
+    "/tools",
+    async () =>
+      new Response(JSON.stringify({ tools: getLiveToolCatalogFromServer() }), {
+        headers: { "Content-Type": "application/json" },
+      }),
+    {
+      detail: {
+        tags: ["mcp"],
         summary: "List MCP tools",
-        description: "List all available MCP tools",
+        description:
+          "Returns the live tool catalog registered on the MCP server. Intended for UI discovery and debugging.",
+        responses: {
+          200: {
+            description: "Tool catalog",
+            content: { "application/json": { example: mcpToolsExample } },
+          },
+        },
       },
     },
   );
-
-/**
- * Request handler wrapper for TanStack Start integration.
- * Adapts Elysia handler to TanStack Start's server handler interface.
- */
-const handle = ({ request }: { request: Request }) => mcpRoutes.fetch(request);
-
-/**
- * TanStack Start route definition.
- * Exposes API endpoints to the server for SSR and API handling.
- */
-export const Route = createFileRoute(`/api/mcp/$`)({
-  server: {
-    handlers: {
-      GET: handle,
-    },
-  },
-});

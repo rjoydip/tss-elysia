@@ -241,6 +241,18 @@ describe("docsConfig", () => {
     expect(apiHrefs).toContain("/docs/api/overview");
   });
 
+  it("should have API references hub in API section", () => {
+    const apiSection = docsConfig.find((s) => s.title === "API");
+    const apiHrefs = apiSection!.items.map((i) => i.href);
+    expect(apiHrefs).toContain("/docs/api/api-reference");
+  });
+
+  it("should have Auth API reference in Authentication section", () => {
+    const authSection = docsConfig.find((s) => s.title === "Authentication");
+    const authHrefs = authSection!.items.map((i) => i.href);
+    expect(authHrefs).toContain("/docs/auth/api-reference");
+  });
+
   it("should display Overview as item name for all overview pages", () => {
     for (const section of docsConfig) {
       const overviewItems = section.items.filter(

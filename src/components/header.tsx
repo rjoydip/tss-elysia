@@ -10,7 +10,6 @@ import { ThemeToggle } from "~/components/theme/toggle";
 import { GITHUB_REPO_URL } from "~/config";
 import { navItems } from "~/config/index";
 import { useSession } from "~/lib/auth/client";
-import { Button } from "~/components/ui/button";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import { BrandLogo } from "./branding";
 
@@ -24,12 +23,7 @@ export function Header({ className, children, showSignIn = true }: HeaderProps) 
   const { data: session } = useSession();
 
   return (
-    <header
-      className={cn(
-        "fixed top-0 left-0 right-0 z-50 h-16 bg-background/95 backdrop-blur-sm",
-        className,
-      )}
-    >
+    <header className={cn("fixed top-0 left-0 right-0 z-50 h-16", className)}>
       <div className="flex items-center justify-between h-full px-6 mx-auto">
         <div className="flex items-center gap-8">
           <Link to="/" className="flex items-center gap-1 mt-1 font-bold text-xl">
@@ -172,13 +166,29 @@ export function Header({ className, children, showSignIn = true }: HeaderProps) 
               </DropdownMenu.Portal>
             </DropdownMenu.Root>
           ) : showSignIn ? (
-            <div className="flex items-center gap-2 text-primary">
-              <Link to="/account/login">
-                <Button variant="ghost" size="sm">
-                  Login
-                </Button>
-              </Link>
-            </div>
+            <Link
+              to="/account/login"
+              className="p-2 hover:bg-accent rounded-md transition-colors text-primary"
+              aria-label="Login"
+              title="Login"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="rotate-180"
+              >
+                <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
+                <polyline points="10 17 15 12 10 7" />
+                <line x1="15" y1="12" x2="3" y2="12" />
+              </svg>
+            </Link>
           ) : null}
 
           {children}

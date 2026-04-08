@@ -4,6 +4,7 @@
  */
 
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useEffect } from "react";
 import { buttonVariants } from "~/components/ui/button";
 import { Badge } from "~/components/ui/badge";
 import { Header } from "~/components/header";
@@ -12,6 +13,8 @@ import { CodeHighlight } from "~/components/code-highlight";
 import { cn } from "~/lib/utils";
 import { APP_VERSION, GITHUB_REPO_URL } from "~/config";
 import { BrandDescription, BrandTitle } from "~/components/branding";
+import { getShikiHighlighter } from "~/lib/shiki";
+import { AnimatedPageBackground } from "~/components/background/animated-page-background";
 
 export const Route = createFileRoute("/")({
   component: Home,
@@ -179,8 +182,17 @@ const features = [
 ];
 
 function Home() {
+  /**
+   * Preloads the shared Shiki highlighter once the landing page mounts.
+   * This reduces perceived delay before the first highlighted code block appears.
+   */
+  useEffect(() => {
+    void getShikiHighlighter();
+  }, []);
+
   return (
-    <div className="min-h-screen bg-background">
+    <div className="relative isolate min-h-screen bg-background">
+      <AnimatedPageBackground />
       <Header />
 
       {/* Hero Section */}
@@ -222,13 +234,19 @@ function Home() {
                 <path d="m12 5 7 7-7 7" />
               </svg>
             </Link>
-            <Link
-              to="/docs/$"
-              params={{ _splat: "api/reference" }}
+            {/**
+             * Interactive OpenAPI UI is served by Elysia (`@elysiajs/openapi`), not by the
+             * markdown docs app — use a real navigation so `/api/reference` loads the Scalar page.
+             * In-app hub for app + auth APIs lives at `/docs/api/api-references`.
+             */}
+            <a
+              href="/api/reference"
+              target="_blank"
+              rel="noopener noreferrer"
               className={cn(buttonVariants({ variant: "outline", size: "lg" }))}
             >
               API Reference
-            </Link>
+            </a>
           </div>
         </div>
       </section>

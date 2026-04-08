@@ -23,8 +23,6 @@ import { Route as AccountVerifyEmailRouteImport } from './routes/account/verify-
 import { Route as AccountRegisterRouteImport } from './routes/account/register'
 import { Route as AccountLoginRouteImport } from './routes/account/login'
 import { Route as AccountForgotPasswordRouteImport } from './routes/account/forgot-password'
-import { Route as ApiMcpSplatRouteImport } from './routes/api/mcp/$'
-import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 
 const StatusRoute = StatusRouteImport.update({
   id: '/status',
@@ -96,16 +94,6 @@ const AccountForgotPasswordRoute = AccountForgotPasswordRouteImport.update({
   path: '/account/forgot-password',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiMcpSplatRoute = ApiMcpSplatRouteImport.update({
-  id: '/api/mcp/$',
-  path: '/api/mcp/$',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
-  id: '/api/auth/$',
-  path: '/api/auth/$',
-  getParentRoute: () => rootRouteImport,
-} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -122,8 +110,6 @@ export interface FileRoutesByFullPath {
   '/api/$': typeof ApiSplatRoute
   '/docs/$': typeof DocsSplatRoute
   '/docs/': typeof DocsIndexRoute
-  '/api/auth/$': typeof ApiAuthSplatRoute
-  '/api/mcp/$': typeof ApiMcpSplatRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -139,8 +125,6 @@ export interface FileRoutesByTo {
   '/api/$': typeof ApiSplatRoute
   '/docs/$': typeof DocsSplatRoute
   '/docs': typeof DocsIndexRoute
-  '/api/auth/$': typeof ApiAuthSplatRoute
-  '/api/mcp/$': typeof ApiMcpSplatRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -158,8 +142,6 @@ export interface FileRoutesById {
   '/api/$': typeof ApiSplatRoute
   '/docs/$': typeof DocsSplatRoute
   '/docs/': typeof DocsIndexRoute
-  '/api/auth/$': typeof ApiAuthSplatRoute
-  '/api/mcp/$': typeof ApiMcpSplatRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -178,8 +160,6 @@ export interface FileRouteTypes {
     | '/api/$'
     | '/docs/$'
     | '/docs/'
-    | '/api/auth/$'
-    | '/api/mcp/$'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -195,8 +175,6 @@ export interface FileRouteTypes {
     | '/api/$'
     | '/docs/$'
     | '/docs'
-    | '/api/auth/$'
-    | '/api/mcp/$'
   id:
     | '__root__'
     | '/'
@@ -213,8 +191,6 @@ export interface FileRouteTypes {
     | '/api/$'
     | '/docs/$'
     | '/docs/'
-    | '/api/auth/$'
-    | '/api/mcp/$'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -230,8 +206,6 @@ export interface RootRouteChildren {
   AccountRegisterRoute: typeof AccountRegisterRoute
   AccountVerifyEmailRoute: typeof AccountVerifyEmailRoute
   ApiSplatRoute: typeof ApiSplatRoute
-  ApiAuthSplatRoute: typeof ApiAuthSplatRoute
-  ApiMcpSplatRoute: typeof ApiMcpSplatRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -334,20 +308,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AccountForgotPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/mcp/$': {
-      id: '/api/mcp/$'
-      path: '/api/mcp/$'
-      fullPath: '/api/mcp/$'
-      preLoaderRoute: typeof ApiMcpSplatRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/auth/$': {
-      id: '/api/auth/$'
-      path: '/api/auth/$'
-      fullPath: '/api/auth/$'
-      preLoaderRoute: typeof ApiAuthSplatRouteImport
-      parentRoute: typeof rootRouteImport
-    }
   }
 }
 
@@ -376,8 +336,6 @@ const rootRouteChildren: RootRouteChildren = {
   AccountRegisterRoute: AccountRegisterRoute,
   AccountVerifyEmailRoute: AccountVerifyEmailRoute,
   ApiSplatRoute: ApiSplatRoute,
-  ApiAuthSplatRoute: ApiAuthSplatRoute,
-  ApiMcpSplatRoute: ApiMcpSplatRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

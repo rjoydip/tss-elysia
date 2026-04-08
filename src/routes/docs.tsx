@@ -22,6 +22,7 @@ import {
 } from "~/components/ui/breadcrumb";
 import { DocsSidebar } from "~/components/docs/sidebar";
 import { Footer } from "~/components/footer";
+import { AnimatedPageBackground } from "~/components/background/animated-page-background";
 
 export const Route = createFileRoute("/docs")({
   component: DocsLayoutWrapper,
@@ -82,7 +83,8 @@ function DocsLayout() {
     : "mx-[calc(var(--sidebar-width-icon)+2rem)]";
 
   return (
-    <div className="flex flex-col">
+    <div className="relative isolate flex min-h-screen flex-col bg-background">
+      <AnimatedPageBackground />
       <Header />
       <>
         <DocsSidebar className={isExpanded ? "" : "pt-12"} />

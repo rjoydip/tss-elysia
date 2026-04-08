@@ -1,15 +1,25 @@
-import { describe, it, expect } from "bun:test";
-import { mcpRoutes } from "../../../../src/routes/api/mcp/$.ts";
+/**
+ * MCP keys API tests.
+ *
+ * Intent:
+ * - Validate that MCP key management endpoints enforce authentication.
+ * - These tests use the standalone `mcpKeysRoutes` router (prefix `/api/mcp`) exported from the MCP module.
+ */
+import { Elysia } from "elysia";
+import { describe, expect, it } from "bun:test";
+import { mcpKeysRoutes } from "../../../../src/routes/api/mcp/modules/-keys";
+
+const app = new Elysia({ prefix: "/api/mcp" }).use(mcpKeysRoutes);
 
 describe("MCP Keys API Flows", () => {
   it("should return 404 for unknown routes", async () => {
-    const response = await mcpRoutes.handle(new Request("http://localhost/api/mcp/unknown-route"));
+    const response = await app.handle(new Request("http://localhost/api/mcp/keys/unknown-route"));
 
     expect(response.status).toBe(404);
   });
 
   it("should return 401 without authorization", async () => {
-    const response = await mcpRoutes.handle(new Request("http://localhost/api/mcp/keys"));
+    const response = await app.handle(new Request("http://localhost/api/mcp/keys"));
 
     expect(response.status).toBe(401);
   });
@@ -17,7 +27,7 @@ describe("MCP Keys API Flows", () => {
 
 describe("MCP Keys API - Unauthorized Access", () => {
   it("should reject GET without auth", async () => {
-    const response = await mcpRoutes.handle(
+    const response = await app.handle(
       new Request("http://localhost/api/mcp/keys", { method: "GET" }),
     );
 
@@ -27,7 +37,7 @@ describe("MCP Keys API - Unauthorized Access", () => {
   });
 
   it("should reject POST without auth", async () => {
-    const response = await mcpRoutes.handle(
+    const response = await app.handle(
       new Request("http://localhost/api/mcp/keys", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -41,7 +51,7 @@ describe("MCP Keys API - Unauthorized Access", () => {
   });
 
   it("should reject PUT without auth", async () => {
-    const response = await mcpRoutes.handle(
+    const response = await app.handle(
       new Request("http://localhost/api/mcp/keys/test-key-id", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
@@ -55,7 +65,7 @@ describe("MCP Keys API - Unauthorized Access", () => {
   });
 
   it("should reject DELETE without auth", async () => {
-    const response = await mcpRoutes.handle(
+    const response = await app.handle(
       new Request("http://localhost/api/mcp/keys/test-key-id", { method: "DELETE" }),
     );
 
@@ -67,7 +77,7 @@ describe("MCP Keys API - Unauthorized Access", () => {
 
 describe("MCP Keys API - Create Key Validation", () => {
   it("should reject POST without name when no auth", async () => {
-    const response = await mcpRoutes.handle(
+    const response = await app.handle(
       new Request("http://localhost/api/mcp/keys", {
         method: "POST",
         headers: {

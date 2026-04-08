@@ -63,11 +63,26 @@ export async function signInWithEmail(email: string, password: string) {
  * @returns Promise with data and error objects
  */
 export async function signUpWithEmail(name: string, email: string, password: string) {
-  return authClient.signUp.email({
-    name,
-    email,
-    password,
-  });
+  try {
+    const result = await authClient.signUp.email({
+      name,
+      email,
+      password,
+    });
+    return {
+      data: result?.data ?? null,
+      error: result?.error ?? null,
+    };
+  } catch (error) {
+    /**
+     * Better Auth may throw for non-2xx responses depending on transport/runtime.
+     * Normalize to `{ data, error }` so UI can always show feedback.
+     */
+    return {
+      data: null,
+      error,
+    };
+  }
 }
 
 /**

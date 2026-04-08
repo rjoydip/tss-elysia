@@ -3,7 +3,7 @@
  * Getting Started overview with quick-start steps, features, and next steps
  */
 
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/docs/")({
   component: DocsLandingPage,
@@ -178,6 +178,18 @@ function DocsLandingPage() {
       <section>
         <h2 className="text-2xl font-semibold tracking-tight mb-6 text-foreground">Next Steps</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <Link
+            to="/docs/$"
+            params={{ _splat: "api/api-references" }}
+            className="block p-5 border rounded-lg hover:border-primary hover:bg-primary/5 transition-all group"
+          >
+            <h3 className="font-semibold mb-1 text-foreground group-hover:text-primary transition-colors">
+              API references
+            </h3>
+            <p className="text-sm text-muted-foreground">
+              Application and authentication APIs — links to Scalar, OpenAPI JSON, and auth docs
+            </p>
+          </Link>
           <a
             href="/docs/getting-started/development"
             className="block p-5 border rounded-lg hover:border-primary hover:bg-primary/5 transition-all group"

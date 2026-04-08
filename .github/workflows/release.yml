@@ -191,6 +191,9 @@ jobs:
       - name: Install dependencies
         run: bun install --frozen-lockfile --ignore-scripts
 
+      - name: Install better-sqlite3
+        run: cd node_modules/better-sqlite3 && bun run build-release
+
       - name: Setup database
         run: bun run db:setup
 

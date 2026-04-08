@@ -16,12 +16,7 @@ test.describe("Landing Page", () => {
   test("should display hero heading", async ({ page }) => {}); // oxlint-disable-line no-unused-vars
 
   test("should display brand-colored text in hero", async ({ page }) => {
-    await expect(
-      page
-        .locator("section")
-        .first()
-        .getByText(/TypeScript/),
-    ).toBeVisible();
+    await expect(page.getByText(/Build faster with/i)).toBeVisible();
   });
 
   test("should display version badge", async ({ page }) => {
@@ -85,9 +80,7 @@ test.describe("Landing Page Header", () => {
 
   test("should have theme toggle button in header", async ({ page }) => {
     // Current header guarantees auth action visibility for anonymous users.
-    await expect(
-      page.locator("header").first().getByRole("button", { name: "Login" }),
-    ).toBeVisible();
+    await expect(page.locator("header").first().getByRole("link", { name: "Login" })).toBeVisible();
   });
 });
 

@@ -1,6 +1,6 @@
 /**
  * Unit tests for status page
- * Tests: Health status display, service monitoring, auto-refresh functionality
+ * Tests: Health status display and service monitoring logic
  */
 
 import { describe, expect, it } from "bun:test";
@@ -71,37 +71,45 @@ describe("Status Page", () => {
       expect(authApi?.url).toBe("/api/auth/health");
     });
 
-    it("should have exactly 2 services", () => {
+    it("should have exactly 4 services", () => {
       const services = [
         { name: "Core API", url: "/api/health", description: "Main API health check" },
         { name: "Auth API", url: "/api/auth/health", description: "Authentication service health" },
+        {
+          name: "Realtime API",
+          url: "/api/realtime/health",
+          description: "Realtime service health and websocket counters",
+        },
+        {
+          name: "MCP API",
+          url: "/api/mcp/health",
+          description: "Model Context Protocol service health",
+        },
       ];
 
-      expect(services).toHaveLength(2);
+      expect(services).toHaveLength(4);
     });
   });
 
   describe("Other Services Configuration", () => {
     it("should have other services defined", () => {
       const otherServices = [
-        { name: "Database", status: "operational" as const, lastUpdated: null },
-        { name: "Storage", status: "operational" as const, lastUpdated: null },
-        { name: "Realtime", status: "operational" as const, lastUpdated: null },
+        { name: "Database", status: "degraded" as const, lastUpdated: null },
+        { name: "Storage", status: "degraded" as const, lastUpdated: null },
       ];
 
-      expect(otherServices).toHaveLength(3);
+      expect(otherServices).toHaveLength(2);
     });
 
     it("should have Database service", () => {
       const otherServices = [
-        { name: "Database", status: "operational" as const, lastUpdated: null },
-        { name: "Storage", status: "operational" as const, lastUpdated: null },
-        { name: "Realtime", status: "operational" as const, lastUpdated: null },
+        { name: "Database", status: "degraded" as const, lastUpdated: null },
+        { name: "Storage", status: "degraded" as const, lastUpdated: null },
       ];
 
       const db = otherServices.find((s) => s.name === "Database");
       expect(db).toBeDefined();
-      expect(db?.status).toBe("operational");
+      expect(db?.status).toBe("degraded");
     });
 
     it("should support different status types", () => {
@@ -156,18 +164,17 @@ describe("Status Page", () => {
     });
   });
 
-  describe("Refresh Interval Options", () => {
-    it("should have valid refresh interval options", () => {
-      const intervals = [10, 30, 60];
-      expect(intervals).toContain(10);
-      expect(intervals).toContain(30);
-      expect(intervals).toContain(60);
+  describe("Manual Refresh Label", () => {
+    it("should show default refresh label", () => {
+      const isRefreshing = false;
+      const label = isRefreshing ? "Refreshing now" : "Refresh now";
+      expect(label).toBe("Refresh now");
     });
 
-    it("should convert refresh interval to milliseconds", () => {
-      const refreshInterval = 30;
-      const expectedMs = 30 * 1000;
-      expect(refreshInterval * 1000).toBe(expectedMs);
+    it("should show in-progress refresh label", () => {
+      const isRefreshing = true;
+      const label = isRefreshing ? "Refreshing now" : "Refresh now";
+      expect(label).toBe("Refreshing now");
     });
   });
 
