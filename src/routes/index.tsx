@@ -234,13 +234,19 @@ function Home() {
                 <path d="m12 5 7 7-7 7" />
               </svg>
             </Link>
-            <Link
-              to="/docs/$"
-              params={{ _splat: "api/reference" }}
+            {/**
+             * Interactive OpenAPI UI is served by Elysia (`@elysiajs/openapi`), not by the
+             * markdown docs app — use a real navigation so `/api/reference` loads the Scalar page.
+             * In-app hub for app + auth APIs lives at `/docs/api/api-references`.
+             */}
+            <a
+              href="/api/reference"
+              target="_blank"
+              rel="noopener noreferrer"
               className={cn(buttonVariants({ variant: "outline", size: "lg" }))}
             >
               API Reference
-            </Link>
+            </a>
           </div>
         </div>
       </section>

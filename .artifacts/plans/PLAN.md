@@ -114,6 +114,8 @@ Complete the authentication system with additional security features, set up use
   - [x] `tabs.spec.ts`, `form.spec.ts`, `sidebar.spec.ts`, `avatar.spec.ts`
   - [x] `tooltip.spec.ts`, `sheet.spec.ts`, `dropdown-menu.spec.ts`, `switch.spec.ts`
   - [x] `select.spec.ts`, `accordion.spec.ts`, `label.spec.ts`, `table.spec.ts`, `skeleton.spec.ts`
+- [x] Add OpenAPI metadata unit tests across API routes (`test/routes/api/openapi-metadata/*.test.ts`)
+- [x] Add E2E tests for OpenAPI spec generation and Scalar UI (`.e2e/api/openapi.spec.ts`)
 - [x] Update README.md with new test structure
 - [x] Update AGENTS.md with testing requirements
 - [x] Update folder structure documentation in README.md

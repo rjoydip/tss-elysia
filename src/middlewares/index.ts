@@ -158,11 +158,40 @@ export const composedMiddleware = (
     // OpenAPI documentation generation
     .use(
       openapi({
-        path: "reference",
+        /**
+         * Serves the generated OpenAPI document and UI under the API prefix.
+         *
+         * Note:
+         * - Since this middleware is mounted inside `apiRoutes` (which already has `prefix: /api`),
+         *   this becomes available at `/api/reference`.
+         */
+        path: "/reference",
         documentation: {
           info: {
             title: `${OPENAPI_NAME} Documentation`,
-            version: "v1",
+            version: "v0",
+          },
+          /**
+           * Baseline server information to make the exported spec immediately usable.
+           * Clients can override this with their own runtime base URL.
+           */
+          servers: [{ url: "/api", description: "Default API base path" }],
+          /**
+           * Shared security schemes so protected endpoints can declare auth requirements.
+           *
+           * Current usage:
+           * - MCP key endpoints use `Authorization: Bearer <mcp_api_key>`.
+           */
+          components: {
+            securitySchemes: {
+              bearerAuth: {
+                type: "http",
+                scheme: "bearer",
+                bearerFormat: "JWT",
+                description:
+                  "Bearer token. For MCP endpoints, this is the MCP API key (not a user JWT).",
+              },
+            },
           },
         },
       }),

@@ -21,6 +21,26 @@ import { validateMcpAuth } from "~/lib/mcp/auth";
 import { logger } from "~/lib/logger";
 
 /**
+ * Common error response example for OpenAPI.
+ */
+const errorExample = { error: "Unauthorized" } as const;
+
+/**
+ * API key creation response example for OpenAPI.
+ *
+ * @remarks
+ * The `key` value is only returned once on creation.
+ */
+const createKeyResponseExample = {
+  key: "mcp_xxx",
+  id: "key_123",
+  name: "My key",
+  rateLimit: 60,
+  rateLimitDuration: 60_000,
+  createdAt: new Date(0).toISOString(),
+} as const;
+
+/**
  * MCP API key routes.
  *
  * @remarks
@@ -78,9 +98,17 @@ export const mcpKeysRoutes = new Elysia({ name: "api.routes.mcp.keys", prefix: "
     },
     {
       detail: {
-        tags: ["MCP"],
+        tags: ["mcp", "keys"],
         summary: "List API keys",
         description: "List all MCP API keys for the authenticated user",
+        security: [{ bearerAuth: [] }],
+        responses: {
+          200: { description: "List of API keys" },
+          401: {
+            description: "Missing or invalid MCP API key",
+            content: { "application/json": { example: errorExample } },
+          },
+        },
       },
     },
   )
@@ -154,9 +182,21 @@ export const mcpKeysRoutes = new Elysia({ name: "api.routes.mcp.keys", prefix: "
         expiresAt: t.Optional(t.String()),
       }),
       detail: {
-        tags: ["MCP"],
+        tags: ["mcp", "keys"],
         summary: "Create API key",
         description: "Create a new MCP API key",
+        security: [{ bearerAuth: [] }],
+        responses: {
+          201: {
+            description: "API key created (includes secret key value once)",
+            content: { "application/json": { example: createKeyResponseExample } },
+          },
+          400: { description: "Invalid request body (e.g. missing name)" },
+          401: {
+            description: "Missing or invalid MCP API key",
+            content: { "application/json": { example: errorExample } },
+          },
+        },
       },
     },
   )
@@ -193,9 +233,19 @@ export const mcpKeysRoutes = new Elysia({ name: "api.routes.mcp.keys", prefix: "
     {
       params: t.Object({ id: t.String() }),
       detail: {
-        tags: ["MCP"],
+        tags: ["mcp", "keys"],
         summary: "Revoke API key",
         description: "Revoke (delete) an MCP API key",
+        security: [{ bearerAuth: [] }],
+        responses: {
+          200: { description: "Key revoked" },
+          401: {
+            description: "Missing or invalid MCP API key",
+            content: { "application/json": { example: errorExample } },
+          },
+          403: { description: "Key does not belong to the caller" },
+          404: { description: "Key not found" },
+        },
       },
     },
   )
@@ -247,9 +297,18 @@ export const mcpKeysRoutes = new Elysia({ name: "api.routes.mcp.keys", prefix: "
         expiresAt: t.Optional(t.String()),
       }),
       detail: {
-        tags: ["MCP"],
+        tags: ["mcp", "keys"],
         summary: "Update API key",
         description: "Update an MCP API key's settings",
+        security: [{ bearerAuth: [] }],
+        responses: {
+          200: { description: "Key updated" },
+          401: {
+            description: "Missing or invalid MCP API key",
+            content: { "application/json": { example: errorExample } },
+          },
+          404: { description: "Key not found" },
+        },
       },
     },
   );

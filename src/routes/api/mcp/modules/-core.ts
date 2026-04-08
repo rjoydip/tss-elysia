@@ -20,6 +20,29 @@ type RegisteredToolInfo = {
 };
 
 /**
+ * MCP health response example for OpenAPI.
+ */
+const mcpHealthExample = {
+  status: "healthy",
+  activeConnections: 0,
+  timestamp: new Date(0).toISOString(),
+} as const;
+
+/**
+ * MCP tools discovery response example for OpenAPI.
+ */
+const mcpToolsExample = {
+  tools: [
+    {
+      name: "auth.login",
+      title: "Login",
+      description: "Authenticate a user",
+      category: "auth",
+    },
+  ],
+} as const;
+
+/**
  * In-memory health endpoint limiter keyed by requester identity.
  * This mitigates probing abuse without requiring authenticated API keys.
  */
@@ -130,7 +153,7 @@ function getLiveToolCatalogFromServer(): Array<{
 /**
  * Core mcp route group mounted under `/api/mcp`.
  */
-export const mcpCoreRoutes = new Elysia({ name: "auth.routes.core", prefix: "/mcp" })
+export const mcpCoreRoutes = new Elysia({ name: "mcp.routes.core", prefix: "/mcp" })
   .use(mcpKeysRoutes)
   .get(
     "/",
@@ -140,11 +163,12 @@ export const mcpCoreRoutes = new Elysia({ name: "auth.routes.core", prefix: "/mc
     },
     {
       detail: {
-        summary: "Get MCP root",
-        description: "Get MCP root",
+        summary: "MCP root",
+        description:
+          "Plain-text service identity endpoint for the MCP subsystem. Useful for smoke checks and verifying mount points.",
         tags: ["mcp"],
         responses: {
-          200: { description: "Success" },
+          200: { description: "Plain-text welcome message" },
         },
       },
     },
@@ -171,9 +195,19 @@ export const mcpCoreRoutes = new Elysia({ name: "auth.routes.core", prefix: "/mc
     },
     {
       detail: {
-        tags: ["MCP"],
+        tags: ["mcp", "health"],
         summary: "MCP health check",
-        description: "Check MCP server health and status",
+        description:
+          "Health probe for MCP server readiness. Includes active transport session count. Rate-limited to mitigate probing abuse.",
+        responses: {
+          200: {
+            description: "MCP is healthy",
+            content: { "application/json": { example: mcpHealthExample } },
+          },
+          429: {
+            description: "Rate limit exceeded for health probes",
+          },
+        },
       },
     },
   )
@@ -185,9 +219,16 @@ export const mcpCoreRoutes = new Elysia({ name: "auth.routes.core", prefix: "/mc
       }),
     {
       detail: {
-        tags: ["MCP"],
+        tags: ["mcp"],
         summary: "List MCP tools",
-        description: "List all available MCP tools",
+        description:
+          "Returns the live tool catalog registered on the MCP server. Intended for UI discovery and debugging.",
+        responses: {
+          200: {
+            description: "Tool catalog",
+            content: { "application/json": { example: mcpToolsExample } },
+          },
+        },
       },
     },
   );

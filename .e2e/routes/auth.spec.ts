@@ -203,9 +203,12 @@ test.describe("Forgot Password Page", () => {
 });
 
 test.describe("Email Verification Page", () => {
-  test("should display loading state initially", async ({ page }) => {
+  test("should display verification failed when no token is provided", async ({ page }) => {
     await page.goto(`${E2E_BASE_URL}/account/verify-email`);
-    await expect(page.locator("main").getByText(/verifying your email/i)).toBeVisible();
+
+    // Assert the deterministic final state
+    await expect(page.locator("main").getByText("Verification Failed")).toBeVisible();
+    await expect(page.locator("main").getByText("No verification token provided")).toBeVisible();
   });
 
   test("should display header", async ({ page }) => {

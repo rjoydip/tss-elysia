@@ -5,6 +5,13 @@ description: API endpoints and server routes reference
 
 ## API Reference
 
+### OpenAPI (interactive)
+
+- **[Interactive API docs (`/api/reference`)](/api/reference)** — Scalar UI for all HTTP routes (app, auth, MCP).
+- **[OpenAPI JSON (`/api/reference/json`)](/api/reference/json)** — Machine-readable spec.
+- **Hub (app + auth)**: [API references](/docs/api/api-references) — entry points for application and auth APIs.
+- **Details**: [OpenAPI reference](/docs/api/reference) — notes and base path.
+
 ## Server Routes
 
 This project uses TanStack Start with file-based routing. Routes are defined in `src/routes/`.

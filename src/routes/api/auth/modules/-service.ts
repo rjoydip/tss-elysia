@@ -24,11 +24,21 @@ export const authServiceRoutes = new Elysia({ name: "auth.routes.service" }).all
   },
   {
     detail: {
-      summary: "Auth Service",
-      description: "Handles authentication requests",
+      summary: "Auth engine passthrough",
+      description:
+        "Catch-all route that forwards requests to the Better Auth handler. The concrete paths are defined by Better Auth itself.",
       tags: ["auth"],
       responses: {
-        200: { description: "Success" },
+        200: { description: "Better Auth response (varies by endpoint)" },
+        405: {
+          description: "Method not allowed for auth endpoints",
+          headers: {
+            Allow: {
+              description: "Comma-separated list of allowed methods",
+              schema: { type: "string" },
+            },
+          },
+        },
       },
     },
   },
