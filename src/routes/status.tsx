@@ -32,6 +32,7 @@ interface OtherStatus {
   status: "operational" | "degraded" | "outage" | "unknown";
   lastUpdated: string | null;
   tooltip: string;
+  latencyMs?: number | null;
 }
 
 function HealthDashboard() {
@@ -43,7 +44,9 @@ function HealthDashboard() {
   const [refreshUiTick, setRefreshUiTick] = useState(0);
 
   useEffect(() => {
-    void checkStatusHealth();
+    checkStatusHealth().catch((error) => {
+      console.error("Initial status refresh failed:", error);
+    });
   }, []);
 
   useEffect(() => {
@@ -260,6 +263,11 @@ function HealthDashboard() {
                   <CardContent>
                     <p className="text-sm text-muted-foreground capitalize">
                       {service.status === "unknown" ? "upcoming" : service.status}
+                      {service.latencyMs != null && (
+                        <span className="ml-2 font-mono text-xs lowercase">
+                          ({service.latencyMs}ms)
+                        </span>
+                      )}
                     </p>
                     {service.lastUpdated && (
                       <p className="text-xs text-muted-foreground mt-1">

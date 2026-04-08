@@ -5,6 +5,7 @@
 
 import { createStore, useStore } from "@tanstack/react-store";
 import { statusPageConfig } from "~/config";
+import { z } from "zod";
 
 /**
  * Health card status model used by the status page.
@@ -126,12 +127,12 @@ export function useStatusState(): StatusStoreState {
   return useStore(statusStore, (state) => state);
 }
 
-interface DatabaseHeartbeatResponse {
-  status?: "healthy" | "unhealthy";
-  detail?: string;
-  timestamp?: string;
-  latencyMs?: number | null;
-}
+const DatabaseHeartbeatResponseSchema = z.object({
+  status: z.enum(["healthy", "unhealthy"]).optional(),
+  detail: z.string().optional(),
+  timestamp: z.string().optional(),
+  latencyMs: z.number().nullable().optional(),
+});
 
 /**
  * Executes external service probes (currently database heartbeat) for "Other Services".
@@ -153,11 +154,12 @@ async function checkOtherStatusHealth(): Promise<OtherServiceStatus[]> {
         const response = await fetch(service.heartbeatUrl, { method: "GET" });
         const data = await response.json();
 
-        if (!data || typeof data !== "object") {
+        const parseResult = DatabaseHeartbeatResponseSchema.safeParse(data);
+        if (!parseResult.success) {
           throw new Error("Invalid heartbeat response format");
         }
 
-        const payload = data as DatabaseHeartbeatResponse;
+        const payload = parseResult.data;
         const isHealthy = response.ok && payload.status === "healthy";
 
         return {
@@ -233,7 +235,7 @@ export function canTriggerManualRefresh(now = Date.now()): boolean {
   const { isRefreshing, lastManualRefreshAt } = statusStore.state;
   if (isRefreshing) return false;
   if (lastManualRefreshAt === null) return true;
-  const cooldownMs = statusPageConfig?.manualRefreshCooldownMs ?? 60000;
+  const cooldownMs = statusPageConfig ? (statusPageConfig.manualRefreshCooldownMs ?? 60000) : 60000;
   return now - lastManualRefreshAt >= cooldownMs;
 }
 
@@ -244,7 +246,7 @@ export function getManualRefreshCooldownRemainingMs(now = Date.now()): number {
   const { lastManualRefreshAt } = statusStore.state;
   if (lastManualRefreshAt === null) return 0;
   const elapsed = now - lastManualRefreshAt;
-  const cooldownMs = statusPageConfig?.manualRefreshCooldownMs ?? 60000;
+  const cooldownMs = statusPageConfig ? (statusPageConfig.manualRefreshCooldownMs ?? 60000) : 60000;
   const remaining = cooldownMs - elapsed;
   return remaining > 0 ? remaining : 0;
 }

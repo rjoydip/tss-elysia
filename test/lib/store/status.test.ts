@@ -180,7 +180,7 @@ describe("status store", () => {
     fetchMock.mockImplementation((input) => {
       const requestUrl = String(input);
       if (requestUrl.includes("/api/database/heartbeat")) {
-        return Promise.resolve(new Response("Malformed non-json data", { status: 500 }));
+        return Promise.resolve(new Response(JSON.stringify({ status: 123 }), { status: 200 }));
       }
       return Promise.resolve(new Response(JSON.stringify({ status: "healthy" }), { status: 200 }));
     });

@@ -28,7 +28,7 @@ test.describe("Profile Page", () => {
   });
 
   test("should redirect to login when not authenticated", async ({ page }) => {
-    await expect(page.getByText(/checking authentication/i)).toBeVisible();
+    await expect(page).toHaveURL(/.*\/account\/login/);
   });
 });
 
