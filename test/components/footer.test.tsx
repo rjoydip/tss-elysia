@@ -4,6 +4,7 @@
  */
 
 import { describe, expect, it, mock } from "bun:test";
+import React from "react";
 import { renderToString } from "react-dom/server";
 import { Footer } from "../../src/components/footer";
 
@@ -124,11 +125,12 @@ describe("Footer", () => {
       expect(html).toBe("");
     });
 
-    it("should return null (empty string) when user check is pending", () => {
+    it("should render content while user check is pending", () => {
       mockIsPending = true;
       mockSession = null;
       const html = renderToString(<Footer />);
-      expect(html).toBe("");
+      expect(html).toContain("<footer");
+      expect(html).toContain("Documentation");
     });
   });
 });

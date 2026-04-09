@@ -40,6 +40,7 @@ test.describe("Footer Navigation (Guest)", () => {
     await page.goto("/");
     await page.waitForLoadState("load");
     await page.locator("footer.py-4 a[href='/docs']").click();
+    await page.waitForLoadState("load");
     await expect(page).toHaveURL(/.*docs/);
   });
 
@@ -47,6 +48,7 @@ test.describe("Footer Navigation (Guest)", () => {
     await page.goto("/");
     await page.waitForLoadState("load");
     await page.locator("footer.py-4 a[href='/blog']").click();
+    await page.waitForLoadState("load");
     await expect(page).toHaveURL(/.*blog/);
   });
 
@@ -72,13 +74,13 @@ test.describe("Authenticated UI Visibility", () => {
     });
 
     if (signUpResponse.status() >= 400) {
-      test.skip(`Sign-up API failed with status ${signUpResponse.status()}, skipping auth test`);
+      test.skip(`Sign-up API failed with status ${signUpResponse.status()}, skipping auth test`, () => {});
       return;
     }
 
     const signUpBody = await signUpResponse.json();
     if (!signUpBody.token) {
-      test.skip("Sign-up did not return session token, skipping auth test");
+      test.skip("Sign-up did not return session token, skipping auth test", () => {});
       return;
     }
 
@@ -89,7 +91,7 @@ test.describe("Authenticated UI Visibility", () => {
     });
 
     if (signInResponse.status() >= 400) {
-      test.skip(`Sign-in API failed with status ${signInResponse.status()}, skipping auth test`);
+      test.skip(`Sign-in API failed with status ${signInResponse.status()}, skipping auth test`, () => {});
       return;
     }
 

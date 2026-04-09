@@ -362,6 +362,7 @@ Complete the authentication system with additional security features, set up use
 
 ### Completed Tasks
 
+- [x] Modernize database seeding with deterministic demo data, CLI flags, and unit test coverage
 - [x] Refactor logging to dedicated `src/logger.ts` file
 - [x] Rename `scriptLogger` to `logger` in scripts
 - [x] Update logger imports across codebase (src/env.ts, src/lib/auth/index.ts, src/utils.ts)

@@ -18,6 +18,8 @@ export default defineConfig({
   retries: isCI ? 2 : 0,
   workers: isCI ? 1 : undefined,
   reporter: "html",
+  globalSetup: "./.e2e/_setup.ts",
+  globalTeardown: "./.e2e/_teardown.ts",
   use: {
     baseURL: E2E_BASE_URL,
     trace: "on-first-retry",

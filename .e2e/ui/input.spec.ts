@@ -25,6 +25,9 @@ test.describe("Input Component", () => {
 
   test("should accept text input", async ({ page }) => {
     const input = page.locator("main").getByPlaceholder("Email");
+    // Type through the controlled field the same way a user would so the form
+    // state, validation, and rendered value stay synchronized in React.
+    await input.click();
     await input.fill("test@example.com");
     await expect(input).toHaveValue("test@example.com");
   });

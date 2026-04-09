@@ -63,10 +63,10 @@ The application follows a server-side rendering (SSR) architecture using TanStac
 
 ### 3. Configuration Layer
 
-| Component | File                  | Purpose                                              |
-| --------- | --------------------- | ---------------------------------------------------- |
-| Config    | `src/config/index.ts` | Central config (API name, rate limits, CORS, helmet) |
-| Env       | `src/env.ts`          | Type-safe environment variables                      |
+| Component | File                | Purpose                         |
+| --------- | ------------------- | ------------------------------- |
+| Config    | `src/config/env.ts` | Type-safe environment variables |
+| Env       | `src/config/env.ts` | Type-safe environment variables |
 
 ### 4. Middleware Layer
 
@@ -108,7 +108,7 @@ vite.config.ts
 src/config/index.ts (API_PREFIX, rateLimitConfig, corsConfig, helmetConfig)
     │
     ▼
-src/env.ts (runtimeEnv)
+src/config/env.ts (runtimeEnv)
     │
     ▼
 src/server.ts (createApp with middleware)
@@ -128,18 +128,23 @@ src/
 ├── components/         # React components
 │   ├── ui/            # shadcn/ui components
 │   │   ├── accordion.tsx
+│   │   ├── avatar.tsx
 │   │   ├── badge.tsx
 │   │   ├── breadcrumb.tsx
 │   │   ├── button.tsx
 │   │   ├── card.tsx
+│   │   ├── collapsible.tsx
+│   │   ├── dropdown-menu.tsx
 │   │   ├── input.tsx
 │   │   ├── label.tsx
 │   │   ├── select.tsx
 │   │   ├── separator.tsx
+│   │   ├── sheet.tsx
 │   │   ├── skeleton.tsx
 │   │   ├── switch.tsx
 │   │   ├── table.tsx
-│   │   └── tabs.tsx
+│   │   ├── tabs.tsx
+│   │   └── tooltip.tsx
 │   ├── auth/          # Auth components
 │   │   ├── form/       # Auth form components
 │   │   │   ├── login.tsx
@@ -148,8 +153,10 @@ src/
 │   │   ├── auth-guard.tsx
 │   │   ├── branding.tsx
 │   │   └── footer.tsx
+│   ├── docs/          # Documentation components
 │   ├── profile/       # Profile components
 │   ├── settings/      # Settings components
+│   ├── background/    # Background components
 │   ├── header.tsx     # Common header
 │   ├── footer.tsx     # Common footer
 │   ├── branding.tsx   # Branding component
@@ -158,57 +165,77 @@ src/
 │       ├── provider.tsx
 │       ├── toggle.tsx
 │       └── context.tsx
-├── env.ts              # Type-safe environment variables
-├── lib/                # Library code
+├── hooks/             # Custom React hooks
+│   └── use-mobile.ts
+├── lib/               # Library code
 │   ├── auth/          # Better Auth
 │   │   ├── index.ts   # Server auth instance
-│   │   └── client.ts  # Client auth hooks
-│   ├── mcp/           # MCP server runtime, auth, transport, tools
+│   │   ├── client.ts  # Client auth hooks
+│   │   └── session.ts # Session utilities
+│   ├── mcp/           # MCP server
 │   │   ├── server.ts
 │   │   ├── auth.ts
 │   │   ├── api-keys.ts
 │   │   ├── rate-limit.ts
 │   │   ├── transport.ts
-│   │   └── tools/
-│   └── db/           # Database (Drizzle + SQLite)
-│       ├── index.ts
-│       └── schema.ts
-├── lib/logger.ts       # Logger configuration
+│   │   ├── client/    # MCP client
+│   │   └── tools/     # MCP tools
+│   │       ├── catalog.ts
+│   │       └── users.ts
+│   ├── db/           # Database (Drizzle + SQLite)
+│   │   ├── index.ts
+│   │   └── schema.ts
+│   ├── redis/        # Redis client and Pub/Sub
+│   │   ├── index.ts
+│   │   └── pubsub.ts
+│   ├── cache/        # Cache utilities
+│   ├── realtime/      # WebSocket realtime
+│   ├── rate-limit/   # Rate limiting
+│   ├── store/        # State management
+│   │   ├── auth.ts
+│   │   ├── preferences.ts
+│   │   └── status.ts
+│   ├── blog/         # Blog data
+│   ├── changelog/    # Changelog data
+│   └── logger.ts     # Logger configuration
 ├── middlewares/       # Middleware implementations
 │   ├── cors.ts
 │   ├── helmet.ts
 │   ├── rate-limit.ts
 │   └── index.ts
+├── plugins/           # Elysia plugins
 ├── router.tsx         # TanStack Router
 ├── routeTree.gen.ts  # Auto-generated routes
 ├── routes/           # TanStack Start routes
 │   ├── __root.tsx
 │   ├── index.tsx     # Home route
-│   ├── account/      # Account routes
+│   ├── account/     # Account routes
 │   │   ├── login.tsx
 │   │   ├── register.tsx
 │   │   ├── forgot-password.tsx
 │   │   └── verify-email.tsx
 │   ├── profile.tsx   # Profile page
 │   ├── settings.tsx  # Settings page
-│   ├── docs.tsx      # Documentation layout
-│   ├── docs.$.tsx    # Documentation catch-all
-│   ├── blog.tsx      # Blog routes
+│   ├── docs.tsx     # Documentation layout
+│   ├── docs.$.tsx   # Documentation catch-all
+│   ├── blog.tsx     # Blog routes
 │   ├── changelog.tsx # Changelog routes
-│   ├── status.tsx     # Health monitoring dashboard
-│   └── api/          # API routes
+│   ├── status.tsx    # Health monitoring dashboard
+│   └── api/         # API routes
 │       ├── $.ts
-│       └── auth/
-│           └── $.ts
-│       └── mcp/
-│           ├── $.ts
-│           └── -keys.ts
+│       ├── auth/    # Auth routes
+│       │   ├── $.ts
+│       │   └── modules/
+│       ├── mcp/    # MCP routes
+│       │   ├── $.ts
+│       │   ├── keys.ts
+│       │   └── modules/
+│       └── modules/ # API modules
 ├── server.ts         # Server entry point
 ├── types/            # TypeScript types
 │   └── subscription.ts
-├── utils.ts          # Utility functions
-└── styles/
-    └── app.css       # Global styles (Tailwind CSS + shadcn theme)
+├── app.css          # Global styles (Tailwind CSS + shadcn theme)
+└── router.tsx       # TanStack Router configuration
 ```
 
 ## SSR/CSR Strategy

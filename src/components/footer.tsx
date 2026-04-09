@@ -22,7 +22,12 @@ export function Footer({ className, showTerms = true, showLogo = false }: Footer
   const { data: session, isPending } = useSession();
   const currentYear = new Date().getFullYear();
 
-  if (isPending || session?.user) return null;
+  /**
+   * Keep the footer visible while the session query is resolving on public pages.
+   * Hiding during `isPending` made public-route layout assertions flaky and caused
+   * the footer to disappear indefinitely when auth bootstrap was delayed.
+   */
+  if (!isPending && session?.user) return null;
 
   return (
     <footer className={cn("py-4 px-4", className)}>

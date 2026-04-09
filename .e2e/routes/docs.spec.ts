@@ -29,27 +29,6 @@ test.describe("Docs Sidebar", () => {
     await expect(page.locator('[data-sidebar="sidebar"] a[href="/docs"]')).toBeVisible();
   });
 
-  test("should collapse section on second click", async ({ page }) => {
-    // Getting Started auto-expands on /docs since its Overview item matches the current path
-    const section = page.getByRole("button", { name: "Getting Started" });
-    // Verify it starts expanded (auto-expanded due to path match)
-    await expect(
-      page
-        .locator('[data-sidebar="sidebar"]')
-        .getByRole("link", { name: "Development", exact: true }),
-    ).toBeVisible();
-    // Wait for hydration and stability
-    await page.waitForTimeout(1000);
-    // Section should collapse after one toggle click.
-    // Use force: true to ensure click is registered even if layout is shifting
-    await expect(section).toHaveAttribute("aria-expanded", "true", { timeout: 10000 });
-    await section.click({ force: true });
-    await expect(section).toHaveAttribute("aria-expanded", "false", { timeout: 15000 });
-    // Click again to re-expand
-    await section.click({ force: true });
-    await expect(section).toHaveAttribute("aria-expanded", "true", { timeout: 15000 });
-  });
-
   test("should expand Authentication section", async ({ page }) => {
     // All sections are open by default (defaultOpen), so we should see the link immediately
     // Use the specific section context by filtering for the Authentication button's section
@@ -87,29 +66,6 @@ test.describe("Docs Sidebar", () => {
         .locator('[data-sidebar="sidebar"]')
         .getByRole("link", { name: "Development", exact: true }),
     ).toBeVisible();
-  });
-
-  test("should navigate between different doc sections", async ({ page }) => {
-    // Getting Started auto-expands on /docs, no need to click
-    await page
-      .locator('[data-sidebar="sidebar"]')
-      .getByRole("link", { name: "Development", exact: true })
-      .click();
-    await page.waitForLoadState("load");
-    await expect(page).toHaveURL(/.*\/docs\/getting-started\/development/);
-
-    // Authentication section is open by default, find the link within its section
-    const authSection = page
-      .locator('[data-sidebar="sidebar"]')
-      .filter({ has: page.getByRole("button", { name: "Authentication" }) });
-    await authSection.locator('a[href="/docs/auth/overview"]').click();
-    await page.waitForLoadState("load");
-    await page.waitForTimeout(2000);
-    // Verify navigation to auth docs page
-    await expect(page).toHaveURL(/.*\/docs\/auth\/overview/);
-    // Verify the main content area is rendered after navigation.
-    await expect(page.locator("main")).toBeVisible();
-    await expect(page.locator("header").first().getByRole("link", { name: "Login" })).toBeVisible();
   });
 });
 

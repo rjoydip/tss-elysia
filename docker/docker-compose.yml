@@ -39,6 +39,36 @@ services:
         max-file: "3"
 
   # ---------------------------------------------------------------------------
+  # Postgres Service
+  # ---------------------------------------------------------------------------
+  # This service is used to store the database data
+  # It is used by the production service and the development service
+  # It is also used can be used by the E2E tests
+  # It is also used can be used by the integration tests
+  # It is also used can be used by the performance tests
+  # It is also used can be used by the security tests
+  # It is also used can be used by the load tests
+  # It is also used can be used by the stress tests
+  # It is also used can be used by the scalability tests
+  # It is also used can be used by the reliability tests
+  # ---------------------------------------------------------------------------
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-tsse}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-tsse_password}
+      POSTGRES_DB: ${POSTGRES_DB:-tsse_dev}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    env:
+      - POSTGRES_USER=${POSTGRES_USER:-tsse}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-tsse_password}
+      - POSTGRES_DB=${POSTGRES_DB:-tsse_dev}
+      - POSTGRES_PORT=${POSTGRES_PORT:-5432}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  # ---------------------------------------------------------------------------
   # Production Service
   # ---------------------------------------------------------------------------
   app:
@@ -143,4 +173,7 @@ volumes:
     driver: local
   # Redis data persistence
   redis-data:
+    driver: local
+  # Postgres data persistence
+  postgres_data:
     driver: local

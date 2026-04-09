@@ -236,7 +236,7 @@ export const corsConfig = {
 };
 ```
 
-### Environment Variables (`src/env.ts`)
+### Environment Variables (`src/config/env.ts`)
 
 Type-safe environment variable handling:
 

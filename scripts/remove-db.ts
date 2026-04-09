@@ -1,22 +1,79 @@
 import { existsSync, unlinkSync } from "node:fs";
 import { resolve } from "node:path";
-import { isCI } from "std-env";
-import { logger } from "./lib/logger";
+import { Client } from "pg";
+import { logger } from "./_logger";
 
-const dbPath =
-  process.env.DATABASE_PATH && process.env.DATABASE_NAME
-    ? `${process.env.DATABASE_PATH}/${process.env.DATABASE_NAME}`
-    : process.env.DATABASE_NAME && !process.env.DATABASE_PATH
-      ? `.artifacts/${process.env.DATABASE_NAME}`
-      : isCI
-        ? ".artifacts/tss-elysia-test.db"
-        : ".artifacts/tss-elysia.db";
+async function removePostgresDatabase() {
+  const host = process.env.POSTGRES_HOST || "localhost";
+  const port = parseInt(process.env.POSTGRES_PORT || "5432", 10);
+  const user = process.env.POSTGRES_USER || "tsse";
+  const password = process.env.POSTGRES_PASSWORD || "";
+  const database = process.env.POSTGRES_DB || "tsse_dev";
 
-const fullPath = resolve(dbPath);
+  const adminClient = new Client({
+    host,
+    port,
+    user,
+    password,
+    database: "postgres", // Connect to default postgres db to drop our db
+  });
 
-if (existsSync(fullPath)) {
-  unlinkSync(fullPath);
-  logger.success(`Removed ${fullPath}`);
-} else {
-  logger.warn(`No database file found at ${fullPath}, skipping`);
+  try {
+    await adminClient.connect();
+
+    // Terminate existing connections to the database
+    await adminClient.query(
+      `
+      SELECT pg_terminate_backend(pg_stat_activity.pid)
+      FROM pg_stat_activity
+      WHERE datname = $1 AND pid <> pg_backend_pid()
+    `,
+      [database],
+    );
+
+    // Drop the database
+    await adminClient.query(`DROP DATABASE IF EXISTS ${database}`);
+    logger.success(`Dropped PostgreSQL database: ${database}`);
+  } catch (error) {
+    logger.error(`Failed to drop PostgreSQL database: ${error}`);
+    throw error;
+  } finally {
+    await adminClient.end();
+  }
 }
+
+async function removeSQLiteDatabase(dbPath: string) {
+  const fullPath = resolve(dbPath);
+
+  if (existsSync(fullPath)) {
+    unlinkSync(fullPath);
+    logger.success(`Removed SQLite database: ${fullPath}`);
+  } else {
+    logger.warn(`No database file found at ${fullPath}, skipping`);
+  }
+}
+
+async function main() {
+  const dbType = process.env.DATABASE_TYPE || "sqlite";
+  const _dbPath = ".artifacts/tss-elysia.db";
+
+  const dbPath =
+    process.env.DATABASE_PATH && process.env.DATABASE_NAME
+      ? `${process.env.DATABASE_PATH}/${process.env.DATABASE_NAME}`
+      : process.env.DATABASE_NAME && !process.env.DATABASE_PATH
+        ? `.artifacts/${process.env.DATABASE_NAME}`
+        : process.env.NODE_ENV === "test"
+          ? _dbPath
+          : _dbPath;
+
+  if (dbType === "postgres") {
+    await removePostgresDatabase();
+  } else {
+    removeSQLiteDatabase(dbPath);
+  }
+}
+
+main().catch((error) => {
+  logger.error(error);
+  process.exit(1);
+});
