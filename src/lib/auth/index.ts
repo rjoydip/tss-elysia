@@ -12,7 +12,7 @@ import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { db, schema } from "~/lib/db";
 import { env } from "~/config/env";
 import type { SubscriptionTier } from "~/types/subscription";
-import { isBun } from "~/config";
+import { isBun, sessionConfig } from "~/config";
 import { logger } from "~/lib/logger";
 
 /**
@@ -69,8 +69,12 @@ export function createAuth() {
       requireEmailVerification: false, // Can enable for production
       password: {
         // Use Bun's native password API when available (faster), fallback to argon2
-        hash: async (input: string) =>
-          isBun ? await Bun.password.hash(input) : await hash(input, hashOpts),
+        hash: async (input: string) => {
+          if (!input) {
+            throw new Error("Password cannot be empty");
+          }
+          return isBun ? await Bun.password.hash(input) : await hash(input, hashOpts);
+        },
         verify: async ({ password, hash }) =>
           isBun
             ? await Bun.password.verify(password, hash)
@@ -80,8 +84,8 @@ export function createAuth() {
 
     // Session configuration with caching for performance
     session: {
-      expiresIn: 60 * 60 * 24 * 7, // 7 days - session lifetime
-      updateAge: 60 * 60 * 24, // 24 hours - extend session frequency
+      expiresIn: sessionConfig.expiresIn,
+      updateAge: sessionConfig.updateAge,
       cookieCache: {
         enabled: true,
         maxAge: 5 * 60, // 5 minutes - cache duration

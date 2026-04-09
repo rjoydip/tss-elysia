@@ -43,7 +43,7 @@ graph TD
 | `test/lib/redis/redis.test.ts`  | **Create** | Unit tests for Redis client module                               |
 | `test/lib/redis/pubsub.test.ts` | **Create** | Unit tests for Pub/Sub module                                    |
 | `.e2e/api/redis-health.spec.ts` | **Create** | E2E test for Redis health in status endpoint                     |
-| `.artifacts/plans/PLAN.md`      | **Modify** | Update Phase 7/11 with Redis tasks                               |
+| `.artifacts/PLAN.md`            | **Modify** | Update Phase 7/11 with Redis tasks                               |
 
 ---
 

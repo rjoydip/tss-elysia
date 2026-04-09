@@ -1,10 +1,11 @@
 {
   "recommendations": [
     "christian-kohler.npm-intellisense",
+    "davidanson.vscode-markdownlint",
+    "github.vscode-github-actions",
     "ms-azuretools.vscode-docker",
     "ms-azuretools.vscode-containers",
     "pflannery.vscode-versionlens",
-    "davidanson.vscode-markdownlint",
     "oven.bun-vscode",
     "oxc.oxc-vscode",
     "wix.vscode-import-cost"

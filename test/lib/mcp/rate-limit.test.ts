@@ -5,10 +5,10 @@
 
 import { describe, it, expect, beforeEach } from "bun:test";
 import {
-  rateLimitStore,
   checkRateLimit,
   resetRateLimit,
   cleanupRateLimitStore,
+  memoryRateLimitStore,
 } from "../../../src/lib/mcp/rate-limit";
 import type { McpApiKey } from "../../../src/lib/db/schema";
 
@@ -35,13 +35,13 @@ function createMockApiKey(overrides: Partial<McpApiKey> = {}): McpApiKey {
 
 describe("RateLimitStore", () => {
   beforeEach(async () => {
-    // Reset the store before each test
-    await rateLimitStore.reset("key-123");
+    // Use memory store for tests to avoid shared state
+    await memoryRateLimitStore.reset("key-123");
   });
 
   describe("check", () => {
     it("should allow request within limit", async () => {
-      const result = await rateLimitStore.check("key-123", 10, 60_000);
+      const result = await memoryRateLimitStore.check("key-123", 10, 60_000);
 
       expect(result.allowed).toBe(true);
       expect(result.remaining).toBe(9);
@@ -49,21 +49,19 @@ describe("RateLimitStore", () => {
     });
 
     it("should track multiple requests", async () => {
-      await rateLimitStore.check("key-123", 10, 60_000);
-      const result = await rateLimitStore.check("key-123", 10, 60_000);
+      await memoryRateLimitStore.check("key-123", 10, 60_000);
+      const result = await memoryRateLimitStore.check("key-123", 10, 60_000);
 
       expect(result.allowed).toBe(true);
       expect(result.remaining).toBe(8);
     });
 
     it("should deny requests when limit exceeded", async () => {
-      // Make 10 requests (limit is 10)
       for (let i = 0; i < 10; i++) {
-        await rateLimitStore.check("key-123", 10, 60_000);
+        await memoryRateLimitStore.check("key-123", 10, 60_000);
       }
 
-      // 11th request should be denied
-      const result = await rateLimitStore.check("key-123", 10, 60_000);
+      const result = await memoryRateLimitStore.check("key-123", 10, 60_000);
 
       expect(result.allowed).toBe(false);
       expect(result.remaining).toBe(0);
@@ -72,28 +70,28 @@ describe("RateLimitStore", () => {
     it("should reset after window expires", async () => {
       // Use up the limit
       for (let i = 0; i < 10; i++) {
-        await rateLimitStore.check("key-123", 10, 60_000);
+        await memoryRateLimitStore.check("key-123", 10, 60_000);
       }
 
       // Manually expire the window by resetting
-      await rateLimitStore.reset("key-123");
+      await memoryRateLimitStore.reset("key-123");
 
       // Should allow again after reset
-      const result = await rateLimitStore.check("key-123", 10, 60_000);
+      const result = await memoryRateLimitStore.check("key-123", 10, 60_000);
 
       expect(result.allowed).toBe(true);
       expect(result.remaining).toBe(9);
     });
 
     it("should track different keys independently", async () => {
-      await rateLimitStore.check("key-1", 5, 60_000);
-      await rateLimitStore.check("key-1", 5, 60_000);
-      await rateLimitStore.check("key-1", 5, 60_000);
-      await rateLimitStore.check("key-1", 5, 60_000);
-      await rateLimitStore.check("key-1", 5, 60_000);
+      await memoryRateLimitStore.check("key-1", 5, 60_000);
+      await memoryRateLimitStore.check("key-1", 5, 60_000);
+      await memoryRateLimitStore.check("key-1", 5, 60_000);
+      await memoryRateLimitStore.check("key-1", 5, 60_000);
+      await memoryRateLimitStore.check("key-1", 5, 60_000);
 
-      const result1 = await rateLimitStore.check("key-1", 5, 60_000);
-      const result2 = await rateLimitStore.check("key-2", 5, 60_000);
+      const result1 = await memoryRateLimitStore.check("key-1", 5, 60_000);
+      const result2 = await memoryRateLimitStore.check("key-2", 5, 60_000);
 
       expect(result1.allowed).toBe(false);
       expect(result2.allowed).toBe(true);
@@ -102,12 +100,12 @@ describe("RateLimitStore", () => {
 
   describe("reset", () => {
     it("should clear rate limit for specific key", async () => {
-      await rateLimitStore.check("key-123", 10, 60_000);
-      await rateLimitStore.check("key-123", 10, 60_000);
+      await memoryRateLimitStore.check("key-123", 10, 60_000);
+      await memoryRateLimitStore.check("key-123", 10, 60_000);
 
-      await resetRateLimit("key-123");
+      await memoryRateLimitStore.reset("key-123");
 
-      const result = await rateLimitStore.check("key-123", 10, 60_000);
+      const result = await memoryRateLimitStore.check("key-123", 10, 60_000);
       expect(result.allowed).toBe(true);
       expect(result.remaining).toBe(9);
     });
@@ -117,7 +115,7 @@ describe("RateLimitStore", () => {
     it("should clean up expired entries", async () => {
       // This test is difficult to implement reliably without time mocking
       // In production, this would be tested with a test clock
-      const cleaned = await rateLimitStore.cleanup();
+      const cleaned = await memoryRateLimitStore.cleanup();
       expect(typeof cleaned).toBe("number");
     });
   });

@@ -144,6 +144,16 @@ export const appConfig: ElysiaConfig<any> = {
 };
 
 /**
+ * Session configuration for Better Auth.
+ * @property expiresIn - Session lifetime in milliseconds (7 days)
+ * @property updateAge - How often to update session timestamp (24 hours)
+ */
+export const sessionConfig = {
+  expiresIn: 60 * 60 * 24 * 7, // 7 days (in seconds)
+  updateAge: 60 * 60 * 24, // 24 hours (in seconds)
+};
+
+/**
  * Default rate limiting configuration.
  * Applied to unauthenticated requests as baseline protection.
  * @property duration - Time window in milliseconds (60 seconds)

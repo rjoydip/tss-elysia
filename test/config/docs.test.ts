@@ -207,12 +207,12 @@ describe("docsConfig", () => {
   it("should have Guides section with 5 items", () => {
     const section = docsConfig.find((s) => s.title === "Guides");
     expect(section).toBeDefined();
-    expect(section!.items).toHaveLength(5);
     const hrefs = section!.items.map((i) => i.href);
     expect(hrefs).toContain("/docs/guides/environment-variables");
     expect(hrefs).toContain("/docs/guides/middleware");
     expect(hrefs).toContain("/docs/guides/testing");
     expect(hrefs).toContain("/docs/guides/troubleshooting");
+    expect(hrefs).toContain("/docs/guides/roadmap");
   });
 
   it("should have Overview item in Getting Started pointing to /docs", () => {

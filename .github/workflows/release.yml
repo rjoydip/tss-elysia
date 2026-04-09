@@ -26,7 +26,7 @@ on:
       dry_run:
         description: "Dry run (skip publishing)"
         required: false
-        default: "false"
+        default: false
         type: boolean
 
 concurrency:
@@ -66,7 +66,7 @@ jobs:
             ${{ runner.os }}-bun-deps-
 
       - name: Install dependencies
-        run: bun install --frozen-lockfile --ignore-scripts
+        run: bun install ${{ github.actor == 'dependabot[bot]' && '' || '--frozen-lockfile' }} --ignore-scripts
 
       # Check for uncommitted changes (except for workflow_dispatch)
       - name: Check working tree status
@@ -123,7 +123,7 @@ jobs:
             ${{ runner.os }}-bun-deps-
 
       - name: Install dependencies
-        run: bun install --frozen-lockfile --ignore-scripts
+        run: bun install ${{ github.actor == 'dependabot[bot]' && '' || '--frozen-lockfile' }} --ignore-scripts
 
       - name: Run linters
         run: bun run lint:ci
@@ -159,7 +159,7 @@ jobs:
             ${{ runner.os }}-bun-deps-
 
       - name: Install dependencies
-        run: bun install --frozen-lockfile --ignore-scripts
+        run: bun install ${{ github.actor == 'dependabot[bot]' && '' || '--frozen-lockfile' }} --ignore-scripts
 
       - name: Run security audit
         run: bun audit --audit-level=critical
@@ -189,7 +189,10 @@ jobs:
             ${{ runner.os }}-bun-deps-
 
       - name: Install dependencies
-        run: bun install --frozen-lockfile --ignore-scripts
+        run: bun install ${{ github.actor == 'dependabot[bot]' && '' || '--frozen-lockfile' }} --ignore-scripts
+
+      - name: Install node-gyp
+        run: bun install -g node-gyp
 
       - name: Install better-sqlite3
         run: cd node_modules/better-sqlite3 && bun run build-release
@@ -241,7 +244,7 @@ jobs:
             ${{ runner.os }}-bun-deps-
 
       - name: Install dependencies
-        run: bun install --frozen-lockfile --ignore-scripts
+        run: bun install ${{ github.actor == 'dependabot[bot]' && '' || '--frozen-lockfile' }} --ignore-scripts
 
       # Version bump with changesets
       - name: Version bump

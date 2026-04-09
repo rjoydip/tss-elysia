@@ -4,6 +4,7 @@
  * Includes links, copyright, and optional terms for auth pages
  */
 
+import { Link } from "@tanstack/react-router";
 import { APP_NAME, GITHUB_REPO_URL } from "~/config";
 import { cn } from "~/lib/utils";
 import { BrandLogo } from "./branding";
@@ -29,21 +30,21 @@ export function Footer({ className, showTerms = true, showLogo = false }: Footer
 
           {/* Navigation links */}
           <div className="flex items-center gap-6 text-sm text-muted-foreground">
-            <a href="/docs" className="hover:text-foreground transition-colors">
+            <Link to="/docs" className="hover:text-foreground transition-colors">
               Documentation
-            </a>
-            <a href="/blog" className="hover:text-foreground transition-colors">
+            </Link>
+            <Link to="/blog" className="hover:text-foreground transition-colors">
               Blog
-            </a>
-            <a href="/changelog" className="hover:text-foreground transition-colors">
+            </Link>
+            <Link to="/changelog" className="hover:text-foreground transition-colors">
               Changelog
-            </a>
-            <a href="/status" className="hover:text-foreground transition-colors">
+            </Link>
+            <Link to="/status" className="hover:text-foreground transition-colors">
               <span className="flex items-center gap-2">
                 <span className="w-2 h-2 mt-1 rounded-full bg-green-500 animate-pulse" />
                 Status
               </span>
-            </a>
+            </Link>
             <a
               href={GITHUB_REPO_URL}
               target="_blank"
@@ -77,13 +78,13 @@ export function Footer({ className, showTerms = true, showLogo = false }: Footer
           {showTerms && (
             <p className="text-center text-xs text-muted-foreground mb-2">
               By continuing, you agree to our{" "}
-              <a href="/terms" className="text-primary hover:underline">
+              <Link to="/terms" className="text-primary hover:underline">
                 Terms of Service
-              </a>{" "}
+              </Link>{" "}
               and{" "}
-              <a href="/privacy" className="text-primary hover:underline">
+              <Link to="/privacy" className="text-primary hover:underline">
                 Privacy Policy
-              </a>
+              </Link>
             </p>
           )}
 
