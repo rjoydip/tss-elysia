@@ -119,6 +119,27 @@ export function getRedisClient(): RedisClient | null {
   return client;
 }
 
+/** Tracks whether Redis connection has been validated */
+let validated = false;
+
+/**
+ * Validates Redis connection on first access.
+ * Ensures the client can communicate with Redis before returning.
+ * Safe to call multiple times - validation runs once.
+ */
+export async function ensureRedisConnection(): Promise<boolean> {
+  if (!env.REDIS_URL) {
+    return false;
+  }
+
+  if (validated) {
+    return client !== null;
+  }
+
+  validated = true;
+  return validateRedisConnection();
+}
+
 /**
  * Validates Redis connectivity by attempting a PING command.
  * Ensures the client can communicate with Redis before operations.

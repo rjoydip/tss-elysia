@@ -158,13 +158,11 @@ class RedisCache {
    * @param ttlSeconds - Time to live in seconds
    */
   async set<T>(key: string, value: T, ttlSeconds: number = DEFAULT_TTL): Promise<void> {
-    if (ttlSeconds <= 0) {
-      ttlSeconds = DEFAULT_TTL;
-    }
+    const ttlSecondsInt = ttlSeconds > 0 ? Math.floor(ttlSeconds) : DEFAULT_TTL;
 
     const client = this.getClient();
     if (!client) {
-      memoryCache.set(key, value, ttlSeconds);
+      memoryCache.set(key, value, ttlSecondsInt);
       return;
     }
 
@@ -172,11 +170,10 @@ class RedisCache {
       const redisKey = `${this.prefix}${key}`;
       const serialized = JSON.stringify(value);
 
-      const ttlSecondsInt = Math.max(1, Math.floor(ttlSeconds));
       await client.send("SET", [redisKey, serialized, "EX", String(ttlSecondsInt)]);
     } catch (error) {
       redisLogger.error("Redis cache set failed", error as Error);
-      memoryCache.set(key, value, ttlSeconds);
+      memoryCache.set(key, value, ttlSecondsInt);
     }
   }
 
