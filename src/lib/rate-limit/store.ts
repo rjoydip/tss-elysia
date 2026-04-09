@@ -244,15 +244,15 @@ class RedisRateLimitStore implements RateLimitStoreInterface {
     }
 
     if (limit <= 0 || duration <= 0) {
-      return { allowed: true, remaining: limit, resetAt: Date.now() + duration };
+      return { allowed: true, remaining: limit, resetAt: Date.now() + Math.max(duration, 0) };
     }
 
     const redisKey = `${this.prefix}${keyId}`;
 
     try {
       const now = Date.now();
+      const ttlSeconds = Math.ceil(Math.max(duration, 0) / 1000);
       const resetAt = now + duration;
-      const ttlSeconds = Math.ceil(duration / 1000);
 
       const [[, resultStr]] = await client.send("EVAL", [
         this.atomicScript,

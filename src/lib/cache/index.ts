@@ -172,8 +172,8 @@ class RedisCache {
       const redisKey = `${this.prefix}${key}`;
       const serialized = JSON.stringify(value);
 
-      await client.send("SET", [redisKey, serialized]);
-      await client.send("EXPIRE", [redisKey, String(ttlSeconds)]);
+      const ttlSecondsInt = Math.max(1, Math.floor(ttlSeconds));
+      await client.send("SET", [redisKey, serialized, "EX", String(ttlSecondsInt)]);
     } catch (error) {
       redisLogger.error("Redis cache set failed", error as Error);
       memoryCache.set(key, value, ttlSeconds);
