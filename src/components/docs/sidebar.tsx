@@ -55,8 +55,8 @@ export const DocsSidebar = memo(function ({ ...props }: React.HTMLAttributes<HTM
               const activeHref = sectionMatches.get(section.title);
 
               return (
-                <Collapsible key={section.title} asChild defaultOpen className="group/collapsible">
-                  <SidebarMenuItem>
+                <SidebarMenuItem key={section.title}>
+                  <Collapsible defaultOpen className="group/collapsible">
                     <CollapsibleTrigger asChild>
                       <SidebarMenuButton
                         tooltip={section.title}
@@ -86,8 +86,8 @@ export const DocsSidebar = memo(function ({ ...props }: React.HTMLAttributes<HTM
                         })}
                       </SidebarMenuSub>
                     </CollapsibleContent>
-                  </SidebarMenuItem>
-                </Collapsible>
+                  </Collapsible>
+                </SidebarMenuItem>
               );
             })}
           </SidebarMenu>

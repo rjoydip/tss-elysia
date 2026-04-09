@@ -8,8 +8,7 @@ test.describe("Landing Page", () => {
   test.beforeEach(async ({ page }) => {
     await page.goto("/");
     // Wait for page to fully load
-    await page.waitForLoadState("domcontentloaded");
-    await page.waitForTimeout(3000);
+    await page.waitForLoadState("load");
   });
 
   // Skipped - flaky test with hydration timing issues
@@ -62,7 +61,7 @@ test.describe("Landing Page", () => {
 test.describe("Landing Page Header", () => {
   test.beforeEach(async ({ page }) => {
     await page.goto("/");
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("load");
   });
 
   test("should render header", async ({ page }) => {
@@ -87,7 +86,7 @@ test.describe("Landing Page Header", () => {
 test.describe("Landing Page Footer", () => {
   test.beforeEach(async ({ page }) => {
     await page.goto("/");
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("load");
   });
 
   test("should render footer", async ({ page }) => {

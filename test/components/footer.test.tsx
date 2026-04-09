@@ -3,9 +3,18 @@
  * Tests: Footer rendering, links, dynamic year, options
  */
 
-import { describe, expect, it } from "bun:test";
+import { describe, expect, it, mock } from "bun:test";
 import { renderToString } from "react-dom/server";
 import { Footer } from "../../src/components/footer";
+
+// Mock TanStack Router's Link component
+mock.module("@tanstack/react-router", () => ({
+  Link: ({ to, children, className, ...props }: any) => (
+    <a href={to} className={className} {...props}>
+      {children}
+    </a>
+  ),
+}));
 
 describe("Footer", () => {
   it("should render without crashing", () => {

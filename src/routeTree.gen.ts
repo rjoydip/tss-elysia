@@ -9,9 +9,11 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as TermsRouteImport } from './routes/terms'
 import { Route as StatusRouteImport } from './routes/status'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as ProfileRouteImport } from './routes/profile'
+import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as DocsRouteImport } from './routes/docs'
 import { Route as ChangelogRouteImport } from './routes/changelog'
 import { Route as BlogRouteImport } from './routes/blog'
@@ -24,6 +26,11 @@ import { Route as AccountRegisterRouteImport } from './routes/account/register'
 import { Route as AccountLoginRouteImport } from './routes/account/login'
 import { Route as AccountForgotPasswordRouteImport } from './routes/account/forgot-password'
 
+const TermsRoute = TermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const StatusRoute = StatusRouteImport.update({
   id: '/status',
   path: '/status',
@@ -37,6 +44,11 @@ const SettingsRoute = SettingsRouteImport.update({
 const ProfileRoute = ProfileRouteImport.update({
   id: '/profile',
   path: '/profile',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DocsRoute = DocsRouteImport.update({
@@ -100,9 +112,11 @@ export interface FileRoutesByFullPath {
   '/blog': typeof BlogRoute
   '/changelog': typeof ChangelogRoute
   '/docs': typeof DocsRouteWithChildren
+  '/privacy': typeof PrivacyRoute
   '/profile': typeof ProfileRoute
   '/settings': typeof SettingsRoute
   '/status': typeof StatusRoute
+  '/terms': typeof TermsRoute
   '/account/forgot-password': typeof AccountForgotPasswordRoute
   '/account/login': typeof AccountLoginRoute
   '/account/register': typeof AccountRegisterRoute
@@ -115,9 +129,11 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/blog': typeof BlogRoute
   '/changelog': typeof ChangelogRoute
+  '/privacy': typeof PrivacyRoute
   '/profile': typeof ProfileRoute
   '/settings': typeof SettingsRoute
   '/status': typeof StatusRoute
+  '/terms': typeof TermsRoute
   '/account/forgot-password': typeof AccountForgotPasswordRoute
   '/account/login': typeof AccountLoginRoute
   '/account/register': typeof AccountRegisterRoute
@@ -132,9 +148,11 @@ export interface FileRoutesById {
   '/blog': typeof BlogRoute
   '/changelog': typeof ChangelogRoute
   '/docs': typeof DocsRouteWithChildren
+  '/privacy': typeof PrivacyRoute
   '/profile': typeof ProfileRoute
   '/settings': typeof SettingsRoute
   '/status': typeof StatusRoute
+  '/terms': typeof TermsRoute
   '/account/forgot-password': typeof AccountForgotPasswordRoute
   '/account/login': typeof AccountLoginRoute
   '/account/register': typeof AccountRegisterRoute
@@ -150,9 +168,11 @@ export interface FileRouteTypes {
     | '/blog'
     | '/changelog'
     | '/docs'
+    | '/privacy'
     | '/profile'
     | '/settings'
     | '/status'
+    | '/terms'
     | '/account/forgot-password'
     | '/account/login'
     | '/account/register'
@@ -165,9 +185,11 @@ export interface FileRouteTypes {
     | '/'
     | '/blog'
     | '/changelog'
+    | '/privacy'
     | '/profile'
     | '/settings'
     | '/status'
+    | '/terms'
     | '/account/forgot-password'
     | '/account/login'
     | '/account/register'
@@ -181,9 +203,11 @@ export interface FileRouteTypes {
     | '/blog'
     | '/changelog'
     | '/docs'
+    | '/privacy'
     | '/profile'
     | '/settings'
     | '/status'
+    | '/terms'
     | '/account/forgot-password'
     | '/account/login'
     | '/account/register'
@@ -198,9 +222,11 @@ export interface RootRouteChildren {
   BlogRoute: typeof BlogRoute
   ChangelogRoute: typeof ChangelogRoute
   DocsRoute: typeof DocsRouteWithChildren
+  PrivacyRoute: typeof PrivacyRoute
   ProfileRoute: typeof ProfileRoute
   SettingsRoute: typeof SettingsRoute
   StatusRoute: typeof StatusRoute
+  TermsRoute: typeof TermsRoute
   AccountForgotPasswordRoute: typeof AccountForgotPasswordRoute
   AccountLoginRoute: typeof AccountLoginRoute
   AccountRegisterRoute: typeof AccountRegisterRoute
@@ -210,6 +236,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/terms': {
+      id: '/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof TermsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/status': {
       id: '/status'
       path: '/status'
@@ -229,6 +262,13 @@ declare module '@tanstack/react-router' {
       path: '/profile'
       fullPath: '/profile'
       preLoaderRoute: typeof ProfileRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/docs': {
@@ -328,9 +368,11 @@ const rootRouteChildren: RootRouteChildren = {
   BlogRoute: BlogRoute,
   ChangelogRoute: ChangelogRoute,
   DocsRoute: DocsRouteWithChildren,
+  PrivacyRoute: PrivacyRoute,
   ProfileRoute: ProfileRoute,
   SettingsRoute: SettingsRoute,
   StatusRoute: StatusRoute,
+  TermsRoute: TermsRoute,
   AccountForgotPasswordRoute: AccountForgotPasswordRoute,
   AccountLoginRoute: AccountLoginRoute,
   AccountRegisterRoute: AccountRegisterRoute,

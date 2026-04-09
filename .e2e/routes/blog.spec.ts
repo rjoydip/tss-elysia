@@ -7,7 +7,7 @@ import { test, expect } from "@playwright/test";
 test.describe("Blog Page", () => {
   test.beforeEach(async ({ page }) => {
     await page.goto("/blog");
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("load");
   });
 
   test("should render the blog page heading", async ({ page }) => {
@@ -50,19 +50,19 @@ test.describe("Blog Page", () => {
 test.describe("Blog Page Layout", () => {
   test("should render header on blog page", async ({ page }) => {
     await page.goto("/blog");
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("load");
     await expect(page.locator("header").first()).toBeVisible();
   });
 
   test("should render footer on blog page", async ({ page }) => {
     await page.goto("/blog");
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("load");
     await expect(page.locator("footer").filter({ hasText: "TSS" }).first()).toBeVisible();
   });
 
   test("should have header nav links", async ({ page }) => {
     await page.goto("/blog");
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("load");
     await expect(page.locator("header nav a[href='/docs']").first()).toBeVisible();
   });
 });

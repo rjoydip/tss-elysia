@@ -7,7 +7,7 @@ import { test, expect } from "@playwright/test";
 test.describe("Status Page", () => {
   test.beforeEach(async ({ page }) => {
     await page.goto("/status");
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("load");
   });
 
   test("should render the status page heading", async ({ page }) => {
@@ -17,7 +17,7 @@ test.describe("Status Page", () => {
   test("should display overall status indicator", async ({ page }) => {
     await expect(
       page.getByText(
-        /Systems Healthy|Some services are degraded and need attention|Checking service health\.\.\./,
+        /APIs are healthy|Some services are degraded and need attention|Checking service health\.\.\.|Service health is currently unknown/,
       ),
     ).toBeVisible();
   });
@@ -47,9 +47,11 @@ test.describe("Status Page", () => {
   test("should display last checked timestamps", async ({ page }) => {
     // Initial status may remain in loading state depending on health endpoint availability.
     await expect(
-      page.getByText(
-        /Checking service health\.\.\.|Systems Healthy|Some services are degraded and need attention/,
-      ),
+      page
+        .getByText(
+          /Checking service health\.\.\.|APIs are healthy|Some services are degraded and need attention|Service health is currently unknown/,
+        )
+        .first(),
     ).toBeVisible();
   });
 });
@@ -57,13 +59,13 @@ test.describe("Status Page", () => {
 test.describe("Status Page Layout", () => {
   test("should render header on status page", async ({ page }) => {
     await page.goto("/status");
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("load");
     await expect(page.locator("header").first()).toBeVisible();
   });
 
   test("should render footer on status page", async ({ page }) => {
     await page.goto("/status");
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("load");
     await expect(page.locator("footer").filter({ hasText: "TSS" }).first()).toBeVisible();
   });
 });

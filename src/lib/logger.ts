@@ -185,3 +185,12 @@ export const dbLogger = createLogger({
   minLevel: isProduction ? "warn" : "debug",
   prefix: "db",
 });
+
+/**
+ * Logger for Redis-related logs.
+ * Useful for monitoring Redis connection, Pub/Sub, and caching events.
+ */
+export const redisLogger = createLogger({
+  minLevel: isProduction ? "warn" : "debug",
+  prefix: "redis",
+});

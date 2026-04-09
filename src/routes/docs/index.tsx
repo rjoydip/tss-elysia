@@ -190,8 +190,9 @@ function DocsLandingPage() {
               Application and authentication APIs — links to Scalar, OpenAPI JSON, and auth docs
             </p>
           </Link>
-          <a
-            href="/docs/getting-started/development"
+          <Link
+            to="/docs/$"
+            params={{ _splat: "getting-started/development" }}
             className="block p-5 border rounded-lg hover:border-primary hover:bg-primary/5 transition-all group"
           >
             <h3 className="font-semibold mb-1 text-foreground group-hover:text-primary transition-colors">
@@ -200,16 +201,17 @@ function DocsLandingPage() {
             <p className="text-sm text-muted-foreground">
               Configure your local development environment
             </p>
-          </a>
-          <a
-            href="/docs/auth/overview"
+          </Link>
+          <Link
+            to="/docs/$"
+            params={{ _splat: "auth/overview" }}
             className="block p-5 border rounded-lg hover:border-primary hover:bg-primary/5 transition-all group"
           >
             <h3 className="font-semibold mb-1 text-foreground group-hover:text-primary transition-colors">
               Authentication
             </h3>
             <p className="text-sm text-muted-foreground">Learn about authentication and security</p>
-          </a>
+          </Link>
         </div>
       </section>
     </>

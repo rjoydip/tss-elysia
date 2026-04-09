@@ -5,14 +5,13 @@
 
 import { createFileRoute } from "@tanstack/react-router";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "~/components/ui/tooltip";
 import { cn } from "~/lib/utils";
 import { Header } from "~/components/header";
 import { Footer } from "~/components/footer";
-import { CheckCircle2, XCircle, AlertCircle, HelpCircle, RefreshCw } from "lucide-react";
+import { CheckCircle2, XCircle, AlertCircle, HelpCircle, RefreshCw, Activity } from "lucide-react";
 import { AnimatedPageBackground } from "~/components/background/animated-page-background";
 import {
   canTriggerManualRefresh,
@@ -27,6 +26,9 @@ export const Route = createFileRoute("/status")({
   component: HealthDashboard,
 });
 
+/**
+ * Represents the health status of an external or infrastructure service.
+ */
 interface OtherStatus {
   name: string;
   status: "operational" | "degraded" | "outage" | "unknown";
@@ -35,6 +37,14 @@ interface OtherStatus {
   latencyMs?: number | null;
 }
 
+/**
+ * Health Dashboard Component.
+ *
+ * Displays the overall system API health alongside individual service cards
+ * and external infrastructure components like Database and Redis.
+ *
+ * @returns React component representing the health monitoring dashboard
+ */
 function HealthDashboard() {
   /**
    * Status dashboard state is centrally managed via TanStack Store.
@@ -107,7 +117,13 @@ function HealthDashboard() {
    */
   const overallStatusLabel = useMemo(() => {
     if (allLoading) return "Checking service health...";
-    if (allUp) return "Systems Healthy";
+    if (allUp)
+      return (
+        <div className="flex text-xs px-3 py-1 text-success hover:text-success/90 animate-pulse">
+          <span>APIs are healthy</span>&nbsp;(
+          <Activity className="w-4 h-4" />)
+        </div>
+      );
     if (someDown) return "Some services are degraded and need attention";
     return "Service health is currently unknown";
   }, [allLoading, allUp, someDown]);
@@ -125,7 +141,7 @@ function HealthDashboard() {
                 Monitor the health status of all API services
               </p>
             </div>
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-1">
               <Button
                 variant="ghost"
                 size="icon"
@@ -164,19 +180,13 @@ function HealthDashboard() {
                   <HelpCircle className="w-8 h-8 text-muted-foreground" />
                 )}
                 <div>
-                  <h2 className="text-xl font-semibold text-foreground">Overall Status</h2>
-                  <p className="text-sm text-muted-foreground">Combined health of all services</p>
+                  <h2 className="text-xl font-semibold text-foreground">Overall API Status</h2>
+                  <p className="text-sm text-muted-foreground">
+                    Combined health of all api services
+                  </p>
                 </div>
               </div>
-              <Badge
-                variant={allUp ? "default" : someDown ? "destructive" : "secondary"}
-                className={cn(
-                  "text-sm px-3 py-1",
-                  allUp && "bg-success text-success-foreground hover:bg-success/90 animate-pulse",
-                )}
-              >
-                {overallStatusLabel}
-              </Badge>
+              {overallStatusLabel}
             </div>
           </Card>
 

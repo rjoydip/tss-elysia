@@ -209,6 +209,7 @@ export const env = await _createEnv({
     DATABASE_URL: t.String(),
     DATABASE_PATH: t.String(),
     PORT: t.Number(),
+    REDIS_URL: t.Optional(t.String()),
     WS_ENABLED: t.Optional(t.Boolean()),
     WS_HEARTBEAT_INTERVAL: t.Optional(t.Number()),
     WS_MAX_MESSAGE_SIZE: t.Optional(t.Number()),
@@ -224,6 +225,7 @@ export const env = await _createEnv({
     DATABASE_PATH: _getEnv("DATABASE_PATH", _DEFAULT_DB_PATH),
     DATABASE_NAME: _getEnv("DATABASE_NAME", _DEFAULT_DB_NAME),
     PORT: parseInt(_getEnv("PORT", String(PORT)), 10),
+    REDIS_URL: _getEnv("REDIS_URL", "") || undefined,
     WS_ENABLED:
       _getEnv("WS_ENABLED", "") === "true"
         ? true

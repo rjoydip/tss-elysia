@@ -11,16 +11,17 @@ Complete the authentication system with additional security features, set up use
 - [x] Set up user account management routes (profile, settings)
 - [ ] Implement organization/team management for multi-tenant support
 - [x] Enhance security with rate limiting, CSRF protection, and audit logging
-- [ ] Complete E2E test coverage for auth flows
+- [x] Complete E2E test coverage for auth flows
 - [x] Integrate shadcn/ui component library
 - [ ] Build admin and user dashboards with user management
 - [ ] Implement enterprise SASS product features
 - [ ] Add email notifications via Resend
 - [ ] Set up proper telemetry and analytics
 - [ ] Configure enterprise infrastructure (Docker, CI/CD)
-- [x] Implement real-time features (WebSockets/SSE)
+- [x] Implement real-time features (WebSockets)
 - [x] Build MCP server for external integrations (make product available as MCP tools)
 - [x] Configure multi-database strategy (PostgreSQL prod, SQLite dev, vector/graph for AI)
+- [ ] Implement contract testing with Pact (Consumer & Provider)
 
 ## Tasks
 
@@ -153,7 +154,7 @@ Complete the authentication system with additional security features, set up use
 - [x] Add Markdown renderer with Shiki (`src/components/ui/markdown.tsx`)
 - [x] Create unit tests for UI components (`test/components/ui/*.test.tsx`)
 - [x] Create E2E tests for UI components split by component (`.e2e/ui/*.spec.ts`)
-- [ ] Create reusable component library
+- [x ] Create reusable component library using Shadcn UI
 - [ ] Implement design tokens (colors, spacing, typography)
 - [ ] Add Preact configuration (future optimization)
 - [ ] Document component usage patterns
@@ -206,6 +207,8 @@ Complete the authentication system with additional security features, set up use
 
 ### Phase 7: Infrastructure & DevOps
 
+> **Detailed Plan (Cache)**: See [phase-7.1-redis-implementation-plan.md](./plans/phase-7.1-redis-implementation-plan.md) for comprehensive implementation details.
+
 - [x] Create Dockerfile for production deployment
 - [x] Set up Docker Compose for local development
 - [ ] Configure nginx for reverse proxy
@@ -213,7 +216,17 @@ Complete the authentication system with additional security features, set up use
 - [ ] Add environment-specific configs (dev, staging, prod)
 - [ ] Configure horizontal scaling support
 - [ ] Set up database connection pooling
-- [ ] Add Redis for caching/sessions
+- [x] Add Redis for caching/sessions
+  - [x] Configure Redis 7 Alpine in docker-compose with persistence and health check
+  - [x] Create custom `redis.conf` with Pub/Sub, AOF, and memory limits
+  - [x] Create Redis client module (`src/lib/redis/index.ts`) with Bun native `RedisClient`
+  - [x] Create Pub/Sub helper module (`src/lib/redis/pubsub.ts`) with typed channels
+  - [x] Add `REDIS_URL` environment variable (Docker + Upstash compatible)
+  - [x] Create Redis heartbeat route (`src/routes/api/modules/-redis.ts`)
+  - [x] Integrate Redis health check into status dashboard
+  - [x] Add Redis logger (`src/lib/logger.ts`)
+  - [x] Add unit tests (`test/lib/redis/redis.test.ts`, `test/lib/redis/pubsub.test.ts`)
+  - [x] Add E2E test (`.e2e/api/redis-health.spec.ts`)
 
 ---
 
@@ -261,7 +274,7 @@ Complete the authentication system with additional security features, set up use
 
 ### Phase 9: MCP Server (External Integration)
 
-> **Detailed Plan**: See [phase-9-mcp-server-plan.md](./phase-9-mcp-server-plan.md) for comprehensive implementation details
+> **Detailed Plan**: See [phase-9-mcp-server-plan.md](./plans/phase-9-mcp-server-plan.md) for comprehensive implementation details
 
 - [x] Implement MCP protocol server using @modelcontextprotocol/server
 - [x] Design tool schema for available actions (auth, users, organizations)
@@ -305,7 +318,10 @@ Complete the authentication system with additional security features, set up use
 
 ### Phase 11: Scalability & Optimization
 
-- [ ] Implement Redis caching layer
+- [x] Implement Redis caching layer (use `src/lib/redis/index.ts`)
+- [x] Add Redis-backed rate limiting (replace in-memory)
+- [x] Add Redis session storage for Better Auth
+- [ ] Implement Pub/Sub event broadcasting for MCP
 - [ ] Add database read replicas support
 - [ ] Configure horizontal pod autoscaling (HPA)
 - [ ] Set up CDN for static assets
@@ -327,6 +343,22 @@ Complete the authentication system with additional security features, set up use
 - [ ] Configure backups for database volume
 - [ ] Monitor container health
 - [ ] Keep base image updated
+
+---
+
+### Phase 13: Contract Testing (Pact)
+
+> **Detailed Plan of Contract Testing**: See [phase-13-contract-testing-implementation-plan.md](./plans/phase-13-contract-testing-implementation-plan.md) for comprehensive implementation details
+
+- [ ] Install `@pact-foundation/pact`
+- [ ] Configure Pact consumer for Auth endpoints
+  - [ ] `GET /api/auth/get-session`
+  - [ ] `POST /api/auth/login`
+- [ ] Generate pact files in `pacts/` directory
+- [ ] Configure Pact provider verification for Elysia
+  - [ ] Implement state handlers for Auth flows
+- [ ] Integrate Pact verification into CI pipeline
+- [ ] Add contract testing documentation to `docs/guides/testing.md`
 
 ### Completed Tasks
 
@@ -446,5 +478,5 @@ Complete the authentication system with additional security features, set up use
 - [PostgreSQL Documentation](https://www.postgresql.org/docs/)
 - [pgvector Documentation](https://github.com/pgvector/pgvector)
 - [Neo4j Graph Database](https://neo4j.com/docs/)
-- [AGENTS.md](./AGENTS.md)
-- [Environment Variables Docs](./docs/guides/environment-variables.md)
+- [AGENTS.md](../AGENTS.md)
+- [Environment Variables Docs](../docs/guides/environment-variables.md)

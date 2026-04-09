@@ -112,6 +112,9 @@ src/
 │   └── db/           # Database (Drizzle + SQLite)
 │       ├── index.ts
 │       └── schema.ts
+│   └── redis/        # Redis cache and Pub/Sub (Bun native)
+│       ├── index.ts   # Client singleton, health check
+│       └── pubsub.ts  # Typed channels and helpers
 │   └── mcp/          # MCP server modules
 │       ├── server.ts
 │       ├── auth.ts

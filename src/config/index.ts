@@ -144,14 +144,26 @@ export const appConfig: ElysiaConfig<any> = {
 };
 
 /**
- * Default rate limiting configuration.
+ * Session configuration for Better Auth.
+ * @property expiresIn - Session lifetime in milliseconds (7 days)
+ * @property updateAge - How often to update session timestamp (24 hours)
+ */
+export const sessionConfig = {
+  expiresIn: 60 * 60 * 24 * 7, // 7 days (in seconds)
+  updateAge: 60 * 60 * 24, // 24 hours (in seconds)
+};
+
+/**
+ * Rate limiting configuration.
  * Applied to unauthenticated requests as baseline protection.
  * @property duration - Time window in milliseconds (60 seconds)
  * @property max - Maximum requests allowed in the duration window
+ * @property cleanupInterval - Interval for cleanup of expired entries in ms
  */
 export const rateLimitConfig = {
   duration: 60_000,
   max: 100,
+  cleanupInterval: 60_000,
 };
 
 /**

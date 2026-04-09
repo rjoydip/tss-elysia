@@ -1,13 +1,13 @@
 /**
  * Per-connection rate limiting for WebSocket messages.
- * Prevents abuse by limiting message frequency per connection.
+ * Uses in-memory store for synchronous WebSocket message checks.
  */
 
 import { connectionStore } from "./connection-store";
 import { logger } from "~/lib/logger";
 
 /**
- * Rate limit configuration.
+ * Realtime-specific rate limit configuration.
  */
 export interface RateLimitConfig {
   /** Maximum messages allowed in the window */
@@ -32,9 +32,10 @@ export const defaultRateLimitConfig: RateLimitConfig = {
 };
 
 /**
- * Tracks message counts for rate limiting.
+ * In-memory rate limiter for WebSocket connections.
+ * Uses synchronous checks for real-time message handling.
  */
-class RateLimiter {
+class RealtimeRateLimiter {
   private messageCounts = new Map<string, number[]>();
 
   /**
@@ -116,11 +117,10 @@ class RateLimiter {
 /**
  * Singleton rate limiter instance.
  */
-export const rateLimiter = new RateLimiter();
+export const rateLimiter = new RealtimeRateLimiter();
 
 /**
- * Middleware for rate limiting WebSocket messages.
- * Should be called before processing any message.
+ * Check rate limit for a WebSocket connection.
  *
  * @param connectionId - Connection identifier
  * @param config - Optional rate limit configuration

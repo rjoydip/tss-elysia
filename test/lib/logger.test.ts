@@ -11,6 +11,7 @@ import {
   apiLogger,
   dbLogger,
   type LogLevel,
+  redisLogger,
 } from "../../src/lib/logger";
 
 describe("createLogger", () => {
@@ -98,6 +99,11 @@ describe("logger instances", () => {
     expect(dbLogger.info).toBeDefined();
   });
 
+  it("should have redis logger", () => {
+    expect(redisLogger).toBeDefined();
+    expect(redisLogger.info).toBeDefined();
+  });
+
   it("should log with app prefix", () => {
     logger.info("test");
   });
@@ -112,6 +118,10 @@ describe("logger instances", () => {
 
   it("should log with db prefix", () => {
     dbLogger.info("test");
+  });
+
+  it("should log with redis prefix", () => {
+    redisLogger.info("test");
   });
 });
 

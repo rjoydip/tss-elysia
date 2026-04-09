@@ -14,6 +14,13 @@ import {
 } from "../../../src/lib/store/status";
 
 /**
+ * Total expected fetch calls per health check cycle.
+ * Includes all API health endpoints plus other services with heartbeat URLs.
+ */
+const expectedFetchCount =
+  statusServices.length + otherStatusServices.filter((s) => s.heartbeatUrl).length;
+
+/**
  * Restores status store to its deterministic baseline for isolated test execution.
  */
 function resetStatusStore(): void {
@@ -81,7 +88,7 @@ describe("status store", () => {
 
     await checkStatusHealth();
 
-    expect(fetchMock).toHaveBeenCalledTimes(statusServices.length + 1);
+    expect(fetchMock).toHaveBeenCalledTimes(expectedFetchCount);
     expect(statusStore.state.serviceStatuses.every((service) => service.status === "up")).toBe(
       true,
     );
@@ -152,7 +159,7 @@ describe("status store", () => {
     await new Promise((resolve) => setTimeout(resolve, 0));
 
     expect(triggered).toBe(true);
-    expect(fetchMock).toHaveBeenCalledTimes(statusServices.length + 1);
+    expect(fetchMock).toHaveBeenCalledTimes(expectedFetchCount);
   });
 
   it("should block refresh while a check is already in progress", () => {

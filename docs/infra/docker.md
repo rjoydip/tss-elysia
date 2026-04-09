@@ -97,6 +97,30 @@ Single-stage for quick iteration:
 
 ## Docker Compose Services
 
+### redis (Cache/Pub-Sub)
+
+```yaml
+redis:
+  image: redis:7-alpine
+  ports:
+    - "6379:6379"
+  volumes:
+    - redis-data:/data
+    - ./redis.conf:/usr/local/etc/redis/redis.conf:ro
+  command: ["redis-server", "/usr/local/etc/redis/redis.conf"]
+  healthcheck:
+    test: ["CMD", "redis-cli", "ping"]
+    interval: 10s
+    timeout: 5s
+    retries: 5
+  deploy:
+    resources:
+      limits:
+        memory: 256M
+```
+
+Both `app` and `dev` services depend on `redis` with `condition: service_healthy`.
+
 ### app (Production)
 
 ```yaml
@@ -152,14 +176,15 @@ dev:
 
 ## Environment Variables
 
-| Variable             | Default                     | Description        |
-| -------------------- | --------------------------- | ------------------ |
-| `HOST`               | `0.0.0.0`                   | Server host        |
-| `PORT`               | `3000`                      | Server port        |
-| `NODE_ENV`           | `production`                | Environment mode   |
-| `BETTER_AUTH_SECRET` | **Required** (min 32 chars) | Session secret     |
-| `DATABASE_PATH`      | `.artifacts`                | Database directory |
-| `DATABASE_NAME`      | `tss-elysia.db`             | Database filename  |
+| Variable             | Default                     | Description          |
+| -------------------- | --------------------------- | -------------------- |
+| `HOST`               | `0.0.0.0`                   | Server host          |
+| `PORT`               | `3000`                      | Server port          |
+| `NODE_ENV`           | `production`                | Environment mode     |
+| `BETTER_AUTH_SECRET` | **Required** (min 32 chars) | Session secret       |
+| `DATABASE_PATH`      | `.artifacts`                | Database directory   |
+| `DATABASE_NAME`      | `tss-elysia.db`             | Database filename    |
+| `REDIS_URL`          | `redis://redis:6379`        | Redis connection URL |
 
 ## Usage Examples
 
@@ -238,6 +263,16 @@ docker inspect --format='{{.State.Health.Status}}' tss-elysia-prod
 
 # Manual health check
 docker exec tss-elysia-prod wget -q --spider http://localhost:3000/api/health
+```
+
+### Redis Health
+
+```bash
+# Check Redis heartbeat via API
+curl http://localhost:3000/api/redis/heartbeat
+
+# Direct Redis health check in Docker
+docker exec tss-elysia-redis redis-cli ping
 ```
 
 ## Performance Optimization

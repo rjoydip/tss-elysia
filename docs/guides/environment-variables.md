@@ -23,6 +23,7 @@ This project uses type-safe environment variables with isomorphic fetching, supp
 | `WS_MAX_MESSAGE_SIZE`    | -               | Max websocket message size               |
 | `WS_RATE_LIMIT_MESSAGES` | -               | Websocket messages allowed per window    |
 | `WS_RATE_LIMIT_WINDOW`   | -               | Websocket rate-limit window (ms)         |
+| `REDIS_URL`              | -               | Redis connection URL (Docker or Upstash) |
 
 ## Database Configuration
 
@@ -98,6 +99,7 @@ export const env = await _createEnv({
     DATABASE_URL: t.String(),
     DATABASE_PATH: t.String(),
     PORT: t.Number(),
+    REDIS_URL: t.Optional(t.String()),
   },
   runtimeEnv: () => ({
     VITE_API_URL: _getEnv("VITE_API_URL", ""),

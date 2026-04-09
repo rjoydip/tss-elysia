@@ -7,52 +7,46 @@ import { test, expect } from "@playwright/test";
 test.describe("Header Navigation", () => {
   test("should navigate to Docs from landing page", async ({ page }) => {
     await page.goto("/");
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("load");
     await page.locator("header nav a[href='/docs']").first().click();
-    await page.waitForLoadState("networkidle");
-    expect(page.url()).toContain("/docs");
+    await expect(page).toHaveURL(/.*docs/);
   });
 
   test("should navigate to Blog from landing page", async ({ page }) => {
     await page.goto("/");
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("load");
     await page.locator("header nav a[href='/blog']").first().click();
-    await page.waitForLoadState("networkidle");
-    expect(page.url()).toContain("/blog");
+    await expect(page).toHaveURL(/.*blog/);
   });
 
   test("should navigate to Changelog from landing page", async ({ page }) => {
     await page.goto("/");
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("load");
     await page.locator("header nav a[href='/changelog']").first().click();
-    await page.waitForLoadState("networkidle");
-    expect(page.url()).toContain("/changelog");
+    await expect(page).toHaveURL(/.*changelog/);
   });
 });
 
 test.describe("Footer Navigation", () => {
   test("should navigate to Docs from footer", async ({ page }) => {
     await page.goto("/");
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("load");
     await page.locator("footer a[href='/docs']").click();
-    await page.waitForLoadState("networkidle");
-    expect(page.url()).toContain("/docs");
+    await expect(page).toHaveURL(/.*docs/);
   });
 
   test("should navigate to Blog from footer", async ({ page }) => {
     await page.goto("/");
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("load");
     await page.locator("footer a[href='/blog']").click();
-    await page.waitForLoadState("networkidle");
-    expect(page.url()).toContain("/blog");
+    await expect(page).toHaveURL(/.*blog/);
   });
 
   test("should navigate to Status from footer", async ({ page }) => {
     await page.goto("/");
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("load");
     await page.locator("footer a[href='/status']").click();
-    await page.waitForLoadState("networkidle");
-    expect(page.url()).toContain("/status");
+    await expect(page).toHaveURL(/.*status/);
   });
 });
 
@@ -61,7 +55,7 @@ test.describe("Cross-Page Transitions", () => {
     const paths = ["/", "/docs", "/blog", "/changelog"];
     for (const path of paths) {
       await page.goto(path);
-      await page.waitForLoadState("networkidle");
+      await page.waitForLoadState("load");
       await expect(page.locator("header").first()).toBeVisible();
     }
   });
@@ -70,31 +64,31 @@ test.describe("Cross-Page Transitions", () => {
     const paths = ["/", "/docs", "/blog", "/changelog"];
     for (const path of paths) {
       await page.goto(path);
-      await page.waitForLoadState("networkidle");
+      await page.waitForLoadState("load");
       await expect(page.locator("footer").filter({ hasText: "TSS" }).first()).toBeVisible();
     }
   });
 
   test("should handle browser back navigation", async ({ page }) => {
     await page.goto("/");
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("load");
     await page.goto("/docs");
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("load");
     await page.goBack();
-    await page.waitForLoadState("networkidle");
-    expect(page.url()).toMatch(/\/docs|\/$/);
+    await page.waitForLoadState("load");
+    await expect(page).toHaveURL(/.*docs|\/$/);
   });
 
   test("should handle browser forward navigation", async ({ page }) => {
     await page.goto("/");
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("load");
     await page.goto("/docs");
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("load");
     await page.goBack();
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("load");
     await page.goForward();
-    await page.waitForLoadState("networkidle");
-    expect(page.url()).toContain("/docs");
+    await page.waitForLoadState("load");
+    await expect(page).toHaveURL(/.*docs/);
   });
 });
 

@@ -1,3 +1,12 @@
+/**
+ * Playwright End-to-End Testing Configuration
+ *
+ * Provides centralized settings for Playwright tests, including test directory,
+ * parallelization, retries, and browser selection.
+ *
+ * @see https://playwright.dev/docs/test-configuration
+ */
+
 import { defineConfig, devices } from "@playwright/test";
 import { isCI } from "std-env";
 import { E2E_BASE_URL, E2E_HOST, E2E_PORT } from "./.e2e/_config";

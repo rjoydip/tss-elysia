@@ -67,6 +67,11 @@ export const otherStatusServices = [
     defaultTooltip: "Database heartbeat is pending",
   },
   {
+    name: "Redis",
+    heartbeatUrl: "/api/redis/heartbeat",
+    defaultTooltip: "Redis heartbeat is pending",
+  },
+  {
     name: "Storage",
     heartbeatUrl: null,
     defaultTooltip: "Storage service is partially available; full monitoring is pending.",
