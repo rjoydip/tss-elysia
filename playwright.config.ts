@@ -21,6 +21,7 @@ export default defineConfig({
   use: {
     baseURL: E2E_BASE_URL,
     trace: "on-first-retry",
+    // Pass test env to the server via process.env
   },
   projects: [
     {
@@ -31,7 +32,10 @@ export default defineConfig({
   webServer: isCI
     ? undefined
     : {
-        command: `bun run preview --host=${E2E_HOST} --port=${E2E_PORT}`,
+        command:
+          process.platform === "win32"
+            ? `set NODE_ENV=test&& bun run preview --host=${E2E_HOST} --port=${E2E_PORT}`
+            : `NODE_ENV=test bun run preview --host=${E2E_HOST} --port=${E2E_PORT}`,
         url: E2E_BASE_URL,
         reuseExistingServer: !isCI,
         timeout: 120 * 1000,

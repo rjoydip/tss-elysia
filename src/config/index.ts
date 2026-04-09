@@ -95,7 +95,11 @@ export const isProduction = isBun
     ? process.env.NODE_ENV === "production"
     : false;
 
-export const isTest = isBun ? Bun.env.NODE_ENV === "test" : isNode ? "test" : false;
+export const isTest = isBun
+  ? Bun.env.NODE_ENV === "test"
+  : isNode
+    ? process.env.NODE_ENV === "test"
+    : false;
 
 /**
  * Allowed HTTP methods for authentication endpoints.

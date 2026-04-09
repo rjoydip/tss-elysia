@@ -12,7 +12,7 @@ import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { db, schema } from "~/lib/db";
 import { env } from "~/config/env";
 import type { SubscriptionTier } from "~/types/subscription";
-import { isBun, sessionConfig } from "~/config";
+import { isBun, isTest, sessionConfig } from "~/config";
 import { logger } from "~/lib/logger";
 
 /**
@@ -110,6 +110,11 @@ export function createAuth() {
       onError: (error: unknown) => {
         logger.error(`Auth API error: ${error}`);
       },
+    },
+
+    // Logger configuration - disable in test environment to reduce noise in test output
+    logger: {
+      disabled: isTest,
     },
   });
 }
