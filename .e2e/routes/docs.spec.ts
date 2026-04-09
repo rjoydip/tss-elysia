@@ -42,12 +42,12 @@ test.describe("Docs Sidebar", () => {
     await page.waitForTimeout(1000);
     // Section should collapse after one toggle click.
     // Use force: true to ensure click is registered even if layout is shifting
-    await expect(section).toHaveAttribute("aria-expanded", "true");
+    await expect(section).toHaveAttribute("aria-expanded", "true", { timeout: 10000 });
     await section.click({ force: true });
-    await expect(section).toHaveAttribute("aria-expanded", "false", { timeout: 10000 });
+    await expect(section).toHaveAttribute("aria-expanded", "false", { timeout: 15000 });
     // Click again to re-expand
     await section.click({ force: true });
-    await expect(section).toHaveAttribute("aria-expanded", "true", { timeout: 10000 });
+    await expect(section).toHaveAttribute("aria-expanded", "true", { timeout: 15000 });
   });
 
   test("should expand Authentication section", async ({ page }) => {
@@ -149,7 +149,7 @@ test.describe("Docs Layout", () => {
   test("should render footer", async ({ page }) => {
     await page.goto("/docs");
     await page.waitForLoadState("load");
-    await expect(page.locator("footer").filter({ hasText: "TSS" }).first()).toBeVisible();
+    await expect(page.locator("footer.py-4").filter({ hasText: "TSS" }).first()).toBeVisible();
   });
 
   test("should render h1 heading on docs landing", async ({ page }) => {

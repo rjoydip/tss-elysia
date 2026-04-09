@@ -14,8 +14,6 @@ import {
   SidebarContent,
   SidebarFooter,
   SidebarGroup,
-  SidebarGroupLabel,
-  SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
@@ -46,14 +44,11 @@ export const DocsSidebar = memo(function ({ ...props }: React.HTMLAttributes<HTM
 
   return (
     <Sidebar {...props}>
-      <SidebarHeader></SidebarHeader>
-      <SidebarContent>
+      <SidebarContent className="scrollbar-hide">
         <SidebarGroup>
-          <SidebarGroupLabel></SidebarGroupLabel>
           <SidebarMenu>
             {docsConfig.map((section) => {
               const activeHref = sectionMatches.get(section.title);
-
               return (
                 <SidebarMenuItem key={section.title}>
                   <Collapsible defaultOpen className="group/collapsible">

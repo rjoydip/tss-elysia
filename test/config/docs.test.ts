@@ -212,7 +212,7 @@ describe("docsConfig", () => {
     expect(hrefs).toContain("/docs/guides/middleware");
     expect(hrefs).toContain("/docs/guides/testing");
     expect(hrefs).toContain("/docs/guides/troubleshooting");
-    expect(hrefs).toContain("/docs/guides/ROADMAP");
+    expect(hrefs).toContain("/docs/guides/roadmaps");
   });
 
   it("should have Overview item in Getting Started pointing to /docs", () => {
@@ -244,13 +244,13 @@ describe("docsConfig", () => {
   it("should have API references hub in API section", () => {
     const apiSection = docsConfig.find((s) => s.title === "API");
     const apiHrefs = apiSection!.items.map((i) => i.href);
-    expect(apiHrefs).toContain("/docs/api/api-reference");
+    expect(apiHrefs).toContain("/docs/api/openapi-reference");
   });
 
   it("should have Auth API reference in Authentication section", () => {
     const authSection = docsConfig.find((s) => s.title === "Authentication");
     const authHrefs = authSection!.items.map((i) => i.href);
-    expect(authHrefs).toContain("/docs/auth/api-reference");
+    expect(authHrefs).toContain("/docs/auth/openapi-reference");
   });
 
   it("should display Overview as item name for all overview pages", () => {

@@ -57,7 +57,7 @@ test.describe("Blog Page Layout", () => {
   test("should render footer on blog page", async ({ page }) => {
     await page.goto("/blog");
     await page.waitForLoadState("load");
-    await expect(page.locator("footer").filter({ hasText: "TSS" }).first()).toBeVisible();
+    await expect(page.locator("footer.py-4").filter({ hasText: "TSS" }).first()).toBeVisible();
   });
 
   test("should have header nav links", async ({ page }) => {

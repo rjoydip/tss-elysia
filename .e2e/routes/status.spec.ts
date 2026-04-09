@@ -66,6 +66,6 @@ test.describe("Status Page Layout", () => {
   test("should render footer on status page", async ({ page }) => {
     await page.goto("/status");
     await page.waitForLoadState("load");
-    await expect(page.locator("footer").filter({ hasText: "TSS" }).first()).toBeVisible();
+    await expect(page.locator("footer.py-4").filter({ hasText: "TSS" }).first()).toBeVisible();
   });
 });

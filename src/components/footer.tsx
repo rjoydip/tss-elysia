@@ -8,6 +8,7 @@ import { Link } from "@tanstack/react-router";
 import { APP_NAME, GITHUB_REPO_URL } from "~/config";
 import { cn } from "~/lib/utils";
 import { BrandLogo } from "./branding";
+import { useSession } from "~/lib/auth/client";
 
 interface FooterProps {
   className?: string;
@@ -18,7 +19,10 @@ interface FooterProps {
 }
 
 export function Footer({ className, showTerms = true, showLogo = false }: FooterProps) {
+  const { data: session, isPending } = useSession();
   const currentYear = new Date().getFullYear();
+
+  if (isPending || session?.user) return null;
 
   return (
     <footer className={cn("py-4 px-4", className)}>
