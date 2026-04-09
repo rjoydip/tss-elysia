@@ -35,8 +35,8 @@ const SECTION_TITLE_MAP: Record<string, string> = {
 
 const FILE_NAME_MAP: Record<string, string> = {
   "ci-cd": "CI/CD",
+  roadmap: "Roadmap",
   /** Hub page: app + auth API links (sidebar label). */
-  "api-references": "API references",
   /** Auth section: Better Auth OpenAPI entry (sidebar label). */
   "api-reference": "API reference",
 };

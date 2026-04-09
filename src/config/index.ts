@@ -154,14 +154,16 @@ export const sessionConfig = {
 };
 
 /**
- * Default rate limiting configuration.
+ * Rate limiting configuration.
  * Applied to unauthenticated requests as baseline protection.
  * @property duration - Time window in milliseconds (60 seconds)
  * @property max - Maximum requests allowed in the duration window
+ * @property cleanupInterval - Interval for cleanup of expired entries in ms
  */
 export const rateLimitConfig = {
   duration: 60_000,
   max: 100,
+  cleanupInterval: 60_000,
 };
 
 /**

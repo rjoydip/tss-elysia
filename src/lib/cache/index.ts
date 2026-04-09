@@ -137,7 +137,13 @@ class RedisCache {
       if (!result) return null;
 
       const str = Array.isArray(result) ? result[0] : result;
-      return JSON.parse(str ?? "") as T;
+      if (!str) return null;
+      try {
+        return JSON.parse(str) as T;
+      } catch {
+        redisLogger.warn("Failed to parse cache JSON", { key });
+        return null;
+      }
     } catch (error) {
       redisLogger.error("Redis cache get failed", error as Error);
       return memoryCache.get<T>(key);
@@ -152,6 +158,10 @@ class RedisCache {
    * @param ttlSeconds - Time to live in seconds
    */
   async set<T>(key: string, value: T, ttlSeconds: number = DEFAULT_TTL): Promise<void> {
+    if (ttlSeconds <= 0) {
+      ttlSeconds = DEFAULT_TTL;
+    }
+
     const client = this.getClient();
     if (!client) {
       memoryCache.set(key, value, ttlSeconds);
@@ -201,7 +211,7 @@ class RedisCache {
     }
 
     try {
-      // Use SCAN to find keys, then delete them
+      // Use SCAN to find keys, then delete in batch using pipeline
       let cursor = "0";
       do {
         const [nextCursor, keys] = await client.send("SCAN", [
@@ -214,7 +224,11 @@ class RedisCache {
         cursor = nextCursor;
 
         if (keys && keys.length > 0) {
-          await client.send("DEL", keys);
+          // Use pipeline for batch deletion
+          const pipelineCommands: [string, string[]][] = keys.map((key: string) => ["DEL", [key]]);
+          await Promise.all(
+            pipelineCommands.map(([cmd, args]) => client.send(cmd as string, args)),
+          );
         }
       } while (cursor !== "0");
     } catch (error) {

@@ -7,6 +7,7 @@
 
 import { getRedisClient } from "~/lib/redis";
 import { redisLogger } from "~/lib/logger";
+import { rateLimitConfig } from "~/config";
 
 /**
  * Rate limit check result.
@@ -119,8 +120,8 @@ class InMemoryRateLimitStore implements RateLimitStoreInterface {
     return this.withLock(() => {
       const now = Date.now();
 
-      // Opportunistic cleanup: run every 60 seconds to remove expired entries
-      if (now - this.lastCleanupAt > 60_000) {
+      // Opportunistic cleanup: run at configured interval to remove expired entries
+      if (now - this.lastCleanupAt > rateLimitConfig.cleanupInterval) {
         this.lastCleanupAt = now;
         for (const [cleanupKey, cleanupRecord] of this.requests.entries()) {
           if (now > cleanupRecord.resetAt) {
@@ -198,6 +199,16 @@ class RedisRateLimitStore implements RateLimitStoreInterface {
   /** Key prefix for Redis storage */
   private readonly prefix = "ratelimit:";
 
+  /** Lua script for atomic INCRBY with EXPIRE */
+  private readonly atomicScript = `
+    local count = redis.call('INCRBY', KEYS[1], 1)
+    if count == 1 then
+      redis.call('EXPIRE', KEYS[1], ARGV[1])
+    end
+    local ttl = redis.call('TTL', KEYS[1])
+    return {count, ttl}
+  `;
+
   /**
    * Gets the Redis client, returning null if unavailable.
    * Logs a warning when falling back to memory store.
@@ -215,7 +226,7 @@ class RedisRateLimitStore implements RateLimitStoreInterface {
 
   /**
    * Checks rate limit using Redis atomic operations.
-   * Uses INCRBY for counting and EXPIRE for TTL.
+   * Uses Lua script to ensure INCRBY and EXPIRE are atomic.
    *
    * @param keyId - Unique identifier for rate limit scope
    * @param limit - Maximum requests allowed
@@ -232,25 +243,30 @@ class RedisRateLimitStore implements RateLimitStoreInterface {
       return memoryStore.check(keyId, limit, duration);
     }
 
+    if (limit <= 0 || duration <= 0) {
+      return { allowed: true, remaining: limit, resetAt: Date.now() + duration };
+    }
+
     const redisKey = `${this.prefix}${keyId}`;
 
     try {
       const now = Date.now();
       const resetAt = now + duration;
+      const ttlSeconds = Math.ceil(duration / 1000);
 
-      const [[, countStr]] = await client.send("INCRBY", [redisKey, "1"]);
+      const [[, resultStr]] = await client.send("EVAL", [
+        this.atomicScript,
+        "1",
+        redisKey,
+        String(ttlSeconds),
+      ]);
 
-      let count = Number.parseInt(countStr ?? "0", 10);
-
-      if (count === 1) {
-        await client.send("EXPIRE", [redisKey, String(Math.ceil(duration / 1000))]);
-      }
+      const [countStr, ttlStr] = (resultStr as string).split(":");
+      const count = Number.parseInt(countStr ?? "0", 10);
+      const ttl = Number.parseInt(ttlStr ?? "0", 10);
 
       if (count > limit) {
-        const [[, ttlStr]] = await client.send("TTL", [redisKey]);
-        const ttl = Number.parseInt(ttlStr ?? "0", 10);
         const actualResetAt = now + ttl * 1000;
-
         return { allowed: false, remaining: 0, resetAt: actualResetAt };
       }
 
@@ -287,6 +303,7 @@ class RedisRateLimitStore implements RateLimitStoreInterface {
 
   /**
    * Cleanup is automatic via Redis TTL.
+   * Returns 0 as Redis handles expiration internally.
    *
    * @returns Always returns 0 (no manual cleanup needed)
    */

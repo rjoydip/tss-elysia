@@ -33,9 +33,13 @@ export class RedisSessionStorage {
 
   /**
    * Gets a storage key for a session.
+   * Uses composite key: session:{userId}:{sessionId} for user-scoped deletion.
+   *
+   * @param userId - User ID
+   * @param sessionId - Session ID
    */
-  private getKey(sessionId: string): string {
-    return `session:${sessionId}`;
+  private getKey(userId: string, sessionId: string): string {
+    return `session:${userId}:${sessionId}`;
   }
 
   /**
@@ -52,15 +56,15 @@ export class RedisSessionStorage {
     }
 
     try {
-      const key = this.getKey(session.id);
+      const userId = session.userId;
+      const key = this.getKey(userId, session.id);
       const expiresIn = session.expiresAt
         ? Math.ceil((new Date(session.expiresAt).getTime() - Date.now()) / 1000)
         : Math.ceil(this.defaultExpiresIn / 1000);
 
-      await client.send("SET", [key, JSON.stringify(session)]);
-      await client.send("EXPIRE", [key, String(expiresIn)]);
+      await client.send("SET", [key, JSON.stringify(session), "EX", String(expiresIn)]);
 
-      redisLogger.debug("Session cached", { sessionId: session.id });
+      redisLogger.debug("Session cached", { sessionId: session.id, userId });
     } catch (error) {
       redisLogger.error("Failed to cache session", error as Error);
     }
@@ -68,24 +72,32 @@ export class RedisSessionStorage {
 
   /**
    * Gets a session by ID.
+   * Note: Requires userId to construct the key.
    *
    * @param sessionId - Session ID
+   * @param userId - User ID (required to locate session key)
    * @returns Cached session data or null
    */
-  async get(sessionId: string): Promise<Session | null> {
+  async get(sessionId: string, userId: string): Promise<Session | null> {
     const client = this.getClient();
     if (!client) {
       return null;
     }
 
     try {
-      const key = this.getKey(sessionId);
+      const key = this.getKey(userId, sessionId);
       const result = await client.send("GET", [key]);
 
       if (!result) return null;
 
       const str = Array.isArray(result) ? result[0] : result;
-      return str ? (JSON.parse(str) as Session) : null;
+      if (!str) return null;
+      try {
+        return JSON.parse(str) as Session;
+      } catch {
+        redisLogger.warn("Failed to parse session JSON", { sessionId });
+        return null;
+      }
     } catch (error) {
       redisLogger.error("Failed to get cached session", error as Error);
       return null;
@@ -105,15 +117,16 @@ export class RedisSessionStorage {
    * Deletes a session from cache.
    *
    * @param sessionId - Session ID to delete
+   * @param userId - User ID (required to locate session key)
    */
-  async delete(sessionId: string): Promise<void> {
+  async delete(sessionId: string, userId: string): Promise<void> {
     const client = this.getClient();
     if (!client) {
       return;
     }
 
     try {
-      const key = this.getKey(sessionId);
+      const key = this.getKey(userId, sessionId);
       await client.send("DEL", [key]);
     } catch (error) {
       redisLogger.error("Failed to delete cached session", error as Error);

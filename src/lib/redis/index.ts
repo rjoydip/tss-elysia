@@ -49,6 +49,9 @@ let initialized = false;
 function maskRedisUrl(url: string): string {
   try {
     const parsed = new URL(url);
+    if (parsed.username) {
+      parsed.username = "***";
+    }
     if (parsed.password) {
       parsed.password = "***";
     }
@@ -114,6 +117,26 @@ export function getRedisClient(): RedisClient | null {
   }
 
   return client;
+}
+
+/**
+ * Validates Redis connectivity by attempting a PING command.
+ * Ensures the client can communicate with Redis before operations.
+ *
+ * @returns True if connection is working, false otherwise
+ */
+export async function validateRedisConnection(): Promise<boolean> {
+  const redisClient = getRedisClient();
+  if (!redisClient) {
+    return false;
+  }
+
+  try {
+    const pong = await redisClient.send("PING", []);
+    return pong === "PONG";
+  } catch {
+    return false;
+  }
 }
 
 /**

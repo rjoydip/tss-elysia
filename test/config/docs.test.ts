@@ -212,7 +212,7 @@ describe("docsConfig", () => {
     expect(hrefs).toContain("/docs/guides/middleware");
     expect(hrefs).toContain("/docs/guides/testing");
     expect(hrefs).toContain("/docs/guides/troubleshooting");
-    expect(hrefs).toContain("/docs/guides/roadmap");
+    expect(hrefs).toContain("/docs/guides/ROADMAP");
   });
 
   it("should have Overview item in Getting Started pointing to /docs", () => {

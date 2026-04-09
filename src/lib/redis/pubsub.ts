@@ -99,7 +99,7 @@ export async function getSubscriber(): Promise<RedisClient | null> {
  *
  * @returns Publisher RedisClient or null if Redis is unavailable
  */
-export function getPublisher(): RedisClient | null {
+export async function getPublisher(): Promise<RedisClient | null> {
   if (!env.REDIS_URL) {
     return null;
   }
@@ -113,7 +113,10 @@ export function getPublisher(): RedisClient | null {
         enableOfflineQueue: true,
         enableAutoPipelining: true,
       });
-      redisLogger.info("Pub/Sub publisher initialized");
+
+      // Explicitly connect the publisher before first use
+      await publisherClient.connect();
+      redisLogger.info("Pub/Sub publisher connected");
     } catch (error) {
       redisLogger.error("Failed to create publisher", error as Error);
       publisherClient = null;
@@ -146,7 +149,7 @@ export async function publish<T>(
   channel: RedisChannel,
   message: PubSubMessage<T>,
 ): Promise<number> {
-  const publisher = getPublisher();
+  const publisher = await getPublisher();
   if (!publisher) {
     redisLogger.debug("Publisher not available, skipping publish", {
       channel,
