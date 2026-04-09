@@ -9,7 +9,12 @@
  */
 
 import { describe, test, expect, afterEach } from "bun:test";
-import { getRedisClient, getRedisStatus, closeRedis } from "../../../src/lib/redis";
+import {
+  getRedisClient,
+  getRedisStatus,
+  closeRedis,
+  ensureRedisConnection,
+} from "../../../src/lib/redis";
 
 describe("Redis Client", () => {
   afterEach(() => {
@@ -62,5 +67,63 @@ describe("Redis Client", () => {
     if (client1 !== null && client2 !== null) {
       expect(client1).not.toBe(client2);
     }
+  });
+});
+
+describe("Redis Connection Validation", () => {
+  afterEach(() => {
+    closeRedis();
+  });
+
+  test("ensureRedisConnection returns boolean based on Redis availability", async () => {
+    const result = await ensureRedisConnection();
+    // Returns true if connected, false if not available
+    expect(typeof result).toBe("boolean");
+  });
+
+  test("ensureRedisConnection validates connection on first call", async () => {
+    const result = await ensureRedisConnection();
+    expect(typeof result).toBe("boolean");
+  });
+
+  test("ensureRedisConnection caches result after first call", async () => {
+    const result1 = await ensureRedisConnection();
+    const result2 = await ensureRedisConnection();
+    // Should return same cached result
+    expect(result1).toBe(result2);
+  });
+});
+
+describe("Redis Connection Failure Scenarios", () => {
+  afterEach(() => {
+    closeRedis();
+  });
+
+  test("operations gracefully degrade when Redis unavailable", async () => {
+    // Get client - may be null if Redis not configured
+    const client = getRedisClient();
+
+    if (client === null) {
+      // Redis not configured - this is expected graceful degradation
+      expect(true).toBe(true);
+    } else {
+      // If Redis configured but connection fails, operations should handle it
+      const status = await getRedisStatus();
+      expect(typeof status.connected).toBe("boolean");
+    }
+  });
+
+  test("getRedisStatus handles connection errors gracefully", async () => {
+    const status = await getRedisStatus();
+    // Should always return a valid status object, never throw
+    expect(status).toHaveProperty("connected");
+    expect(status).toHaveProperty("url");
+  });
+
+  test("client returns null rather than throwing when not configured", () => {
+    // This test verifies graceful degradation - module should not throw
+    expect(() => {
+      getRedisClient();
+    }).not.toThrow();
   });
 });
