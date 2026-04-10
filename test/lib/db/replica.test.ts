@@ -100,6 +100,43 @@ describe("getDatabasePools", () => {
     const pools = getDatabasePools();
     expect(Array.isArray(pools.replicas)).toBe(true);
   });
+
+  it("should return empty replicas array in test/CI environment", () => {
+    const pools = getDatabasePools();
+    expect(pools.replicas).toEqual([]);
+  });
+
+  it("should return undefined primary in SQLite test environment", () => {
+    const pools = getDatabasePools();
+    // In SQLite test environment, primary is undefined
+    expect(pools.primary).toBeUndefined();
+  });
+});
+
+describe("getReadDb round-robin selection", () => {
+  it("should return consistent db instance on multiple calls in test environment", () => {
+    // In test environment with SQLite, getReadDb always returns the same instance
+    // This verifies the function is stable and doesn't throw errors
+    const result1 = getReadDb();
+    const result2 = getReadDb();
+    const result3 = getReadDb();
+
+    // All calls should return the same instance in test environment
+    expect(result1).toBe(result2);
+    expect(result2).toBe(result3);
+  });
+
+  it("should return db with select method", () => {
+    const readDb = getReadDb();
+    expect(readDb).toHaveProperty("select");
+    expect(typeof readDb.select).toBe("function");
+  });
+
+  it("should return db with insert method", () => {
+    const readDb = getReadDb();
+    expect(readDb).toHaveProperty("insert");
+    expect(typeof readDb.insert).toBe("function");
+  });
 });
 
 describe("getReadDb", () => {
