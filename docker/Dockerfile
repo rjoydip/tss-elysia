@@ -3,7 +3,7 @@
 # =============================================================================
 # Stage 1: Dependencies - Install only production dependencies
 # =============================================================================
-FROM oven/bun:1.3-slim AS deps
+FROM dhi.io/bun:1-alpine3.22 AS deps
 
 WORKDIR /app
 
@@ -16,7 +16,7 @@ RUN bun install --frozen-lockfile --omit=dev --ignore-scripts
 # =============================================================================
 # Stage 2: Builder - Build the application
 # =============================================================================
-FROM oven/bun:1.3-slim AS builder
+FROM dhi.io/bun:1-alpine3.22 AS builder
 
 WORKDIR /app
 
@@ -39,7 +39,7 @@ RUN bun run build
 # =============================================================================
 # Stage 3: Production - Minimal runtime image
 # =============================================================================
-FROM oven/bun:1.3-slim AS production
+FROM dhi.io/bun:1-alpine3.22 AS production
 
 WORKDIR /app
 
