@@ -24,6 +24,9 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY package.json bun.lock* ./
 
+# Install all dependencies needed for building (vite, tailwind, typescript, etc.)
+RUN bun install --frozen-lockfile --ignore-scripts
+
 # Copy source code
 COPY . .
 

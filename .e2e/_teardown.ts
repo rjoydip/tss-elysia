@@ -60,7 +60,7 @@ export async function cleanupTestUser(email: string): Promise<void> {
       .limit(1);
 
     if (users.length === 0) {
-      console.log(`[Cleanup] User ${email} not found, skipping`);
+      console.log(`[E2E Cleanup] User ${email} not found, skipping`);
       return;
     }
 
@@ -73,9 +73,9 @@ export async function cleanupTestUser(email: string): Promise<void> {
     await db.delete(schema.mcpApiKeys).where(eq(schema.mcpApiKeys.userId, user.id));
     await db.delete(schema.users).where(eq(schema.users.id, user.id));
 
-    console.log(`[Cleanup] Successfully deleted user: ${email}`);
+    console.log(`[E2E Cleanup] Successfully deleted user: ${email}`);
   } catch (error) {
-    console.warn(`[Cleanup] Failed to clean up user ${email}:`, error);
+    console.warn(`[E2E Cleanup] Failed to clean up user ${email}:`, error);
   }
 }
 
@@ -92,11 +92,11 @@ export async function cleanupAllTestData(): Promise<void> {
       .where(like(schema.users.email, `${TEST_PREFIX}%`));
 
     if (testUsers.length === 0) {
-      console.log("[Cleanup] No test users found to clean up");
+      console.log("[E2E Cleanup] No test users found to clean up");
       return;
     }
 
-    console.log(`[Cleanup] Found ${testUsers.length} test users to clean up`);
+    console.log(`[E2E Cleanup] Found ${testUsers.length} test users to clean up`);
 
     for (const user of testUsers) {
       try {
@@ -108,15 +108,15 @@ export async function cleanupAllTestData(): Promise<void> {
         await db.delete(schema.subscriptions).where(eq(schema.subscriptions.userId, user.id));
         await db.delete(schema.mcpApiKeys).where(eq(schema.mcpApiKeys.userId, user.id));
         await db.delete(schema.users).where(eq(schema.users.id, user.id));
-        console.log(`[Cleanup] Deleted user: ${user.email}`);
+        console.log(`[E2E Cleanup] Deleted user: ${user.email}`);
       } catch (error) {
-        console.warn(`[Cleanup] Failed to delete user ${user.email}:`, error);
+        console.warn(`[E2E Cleanup] Failed to delete user ${user.email}:`, error);
       }
     }
 
-    console.log("[Cleanup] All test data cleaned up successfully");
+    console.log("[E2E Cleanup] All test data cleaned up successfully");
   } catch (error) {
-    console.error("[Cleanup] Failed to clean up test data:", error);
+    console.error("[E2E Cleanup] Failed to clean up test data:", error);
   }
 }
 
