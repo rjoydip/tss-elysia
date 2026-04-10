@@ -3,7 +3,7 @@
 # =============================================================================
 # Stage 1: Dependencies - Install only what's needed for production
 # =============================================================================
-FROM oven/bun:1.3.11-debian AS deps
+FROM oven/bun:1.3-debian AS deps
 
 WORKDIR /app
 
@@ -37,7 +37,7 @@ RUN bun run build
 # =============================================================================
 # Stage 3: Production - Minimal runtime image
 # =============================================================================
-FROM oven/bun:1.3.11-debian AS production
+FROM oven/bun:1.3-debian AS production
 
 # Create non-root user for security
 RUN addgroup --system --gid 1000 appgroup && \
