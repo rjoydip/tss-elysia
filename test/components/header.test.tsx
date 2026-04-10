@@ -1,37 +1,111 @@
-/**
- * Unit tests for src/components/header.tsx
- * Tests: Header type contracts, prop acceptance
- *
- * Note: Full rendering tests are covered by E2E tests (.e2e/ui/auth.spec.ts)
- * because Header uses <Link> from @tanstack/react-router requiring router context.
- */
+import { describe, expect, it, mock } from "bun:test";
+import { renderToString } from "react-dom/server";
+import { Header } from "../../src/components/header";
 
-import { describe, expect, it } from "bun:test";
+// Mock auth client
+let mockSession: any = null;
+let mockIsPending = false;
+mock.module("../../src/lib/auth/client", () => ({
+  useSession: () => ({ data: mockSession, isPending: mockIsPending }),
+}));
 
-const HEADER_PATH = "../../src/components/header";
+// Mock scroll direction hook
+mock.module("../../src/hooks/use-scroll-direction", () => ({
+  useScrollDirection: () => true, // default to visible
+}));
+
+// Mock ThemeToggle component
+mock.module("../../src/components/theme/toggle", () => ({
+  ThemeToggle: () => <button>Toggle theme</button>,
+}));
+
+// Mock TanStack Router's Link component
+mock.module("@tanstack/react-router", () => ({
+  Link: ({ to, children, className, ...props }: any) => (
+    <a href={to} className={className} {...props}>
+      {children}
+    </a>
+  ),
+}));
 
 describe("Header", () => {
-  it("should export Header component", async () => {
-    const { Header } = await import(HEADER_PATH);
-    expect(typeof Header).toBe("function");
+  it("should render without crashing", () => {
+    const html = renderToString(<Header />);
+    expect(html).toContain("<header");
   });
 
-  it("should have correct display behavior", async () => {
-    // Header uses Link from TanStack Router which requires router context.
-    // Verify the component exists and can be imported without errors.
-    const { Header } = await import(HEADER_PATH);
-    expect(Header.name).toBe("Header");
+  describe("Loading State", () => {
+    it("should hide navigation links when session is pending", () => {
+      mockIsPending = true;
+      mockSession = null;
+      const html = renderToString(<Header />);
+      expect(html).not.toContain("Documentation");
+      expect(html).not.toContain("Blog");
+    });
+
+    it("should hide GitHub link when session is pending", () => {
+      mockIsPending = true;
+      const html = renderToString(<Header />);
+      expect(html).not.toContain('aria-label="GitHub"');
+    });
+
+    it("should hide Theme Toggle when session is pending", () => {
+      mockIsPending = true;
+      const html = renderToString(<Header />);
+      expect(html).not.toContain("Toggle theme");
+    });
   });
 
-  it("should accept show SignIn prop", async () => {
-    // Verify the prop is accepted by checking the component can be imported
-    // The actual behavior is tested in E2E tests
-    const { Header } = await import(HEADER_PATH);
-    // Function should exist
-    expect(Header.name).toBe("Header");
-    // Check that the source includes the showSignIn prop
-    const fs = await import("fs");
-    const source = fs.readFileSync("./src/components/header.tsx", "utf-8");
-    expect(source).toContain("showSignIn");
+  describe("Guest State", () => {
+    it("should render navigation links when not logged in", () => {
+      mockIsPending = false;
+      mockSession = null;
+      const html = renderToString(<Header />);
+      expect(html).toContain("Documentation");
+      expect(html).toContain("Blog");
+    });
+
+    it("should render GitHub link when not logged in", () => {
+      mockSession = null;
+      const html = renderToString(<Header />);
+      expect(html).toContain('aria-label="GitHub"');
+    });
+
+    it("should render Login button when not logged in", () => {
+      mockSession = null;
+      const html = renderToString(<Header />);
+      expect(html).toContain('href="/account/login"');
+    });
+  });
+
+  describe("Authenticated State", () => {
+    it("should hide navigation links when logged in", () => {
+      mockSession = { user: { id: "1", name: "Test User" } };
+      const html = renderToString(<Header />);
+      expect(html).not.toContain("Documentation");
+      expect(html).not.toContain("Blog");
+      expect(html).not.toContain("Changelog");
+    });
+
+    it("should hide GitHub link when logged in", () => {
+      mockSession = { user: { id: "1", name: "Test User" } };
+      const html = renderToString(<Header />);
+      expect(html).not.toContain('aria-label="GitHub"');
+    });
+
+    it("should hide Theme Toggle when logged in", () => {
+      mockSession = { user: { id: "1", name: "Test User" } };
+      const html = renderToString(<Header />);
+      // ThemeToggle renders as a button with theme icons
+      expect(html).not.toContain("Toggle theme");
+    });
+
+    it("should render user profile when logged in", () => {
+      mockSession = { user: { id: "1", name: "Test User" } };
+      const html = renderToString(<Header />);
+      expect(html).toContain("Test User");
+      // Sign In should be hidden
+      expect(html).not.toContain('href="/account/login"');
+    });
   });
 });

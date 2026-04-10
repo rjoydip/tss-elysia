@@ -208,6 +208,14 @@ export const env = await _createEnv({
     BETTER_AUTH_SECRET: t.String(),
     DATABASE_URL: t.String(),
     DATABASE_PATH: t.String(),
+    DATABASE_TYPE: t.Union([t.Literal("sqlite"), t.Literal("postgres")]),
+    POSTGRES_USER: t.Optional(t.String()),
+    POSTGRES_PASSWORD: t.Optional(t.String()),
+    POSTGRES_DB: t.Optional(t.String()),
+    POSTGRES_HOST: t.Optional(t.String()),
+    POSTGRES_PORT: t.Optional(t.Number()),
+    POSTGRES_URL: t.Optional(t.String()),
+    POSTGRES_REPLICAS: t.Optional(t.String()),
     PORT: t.Number(),
     REDIS_URL: t.Optional(t.String()),
     WS_ENABLED: t.Optional(t.Boolean()),
@@ -224,6 +232,26 @@ export const env = await _createEnv({
     DATABASE_URL: _getEnv("DATABASE_URL", ""),
     DATABASE_PATH: _getEnv("DATABASE_PATH", _DEFAULT_DB_PATH),
     DATABASE_NAME: _getEnv("DATABASE_NAME", _DEFAULT_DB_NAME),
+    DATABASE_TYPE: _getEnv("DATABASE_TYPE", "sqlite") as "sqlite" | "postgres",
+    POSTGRES_USER: _getEnv("POSTGRES_USER", "") || undefined,
+    POSTGRES_PASSWORD: _getEnv("POSTGRES_PASSWORD", "") || undefined,
+    POSTGRES_DB: _getEnv("POSTGRES_DB", "") || undefined,
+    POSTGRES_HOST: _getEnv("POSTGRES_HOST", "") || undefined,
+    POSTGRES_PORT: parseInt(_getEnv("POSTGRES_PORT", ""), 10) || undefined,
+    POSTGRES_URL: _getEnv("POSTGRES_URL", "") || undefined,
+    POSTGRES_REPLICAS: (() => {
+      const replicas = _getEnv("POSTGRES_REPLICAS", "");
+      if (!replicas) return undefined;
+      try {
+        const parsed = JSON.parse(replicas);
+        if (Array.isArray(parsed)) {
+          return parsed.filter((url): url is string => typeof url === "string" && url.length > 0);
+        }
+        return undefined;
+      } catch {
+        return undefined;
+      }
+    })() as string | undefined,
     PORT: parseInt(_getEnv("PORT", String(PORT)), 10),
     REDIS_URL: _getEnv("REDIS_URL", "") || undefined,
     WS_ENABLED:

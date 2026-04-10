@@ -210,8 +210,10 @@ test.describe("Email Verification Page", () => {
   test("should display verification failed when no token is provided", async ({ page }) => {
     await page.goto(`${E2E_BASE_URL}/account/verify-email`);
 
-    // Assert the deterministic final state
-    await expect(page.locator("main").getByText("Verification Failed")).toBeVisible();
+    // Assert the deterministic final state - wait for transition from loading to error
+    await expect(page.locator("main").getByText("Verification Failed")).toBeVisible({
+      timeout: 10000,
+    });
     await expect(page.locator("main").getByText("No verification token provided")).toBeVisible();
   });
 
@@ -222,6 +224,6 @@ test.describe("Email Verification Page", () => {
 
   test("should display footer", async ({ page }) => {
     await page.goto(`${E2E_BASE_URL}/account/verify-email`);
-    await expect(page.locator("footer")).toBeVisible();
+    await expect(page.locator("footer.py-4")).toBeVisible();
   });
 });

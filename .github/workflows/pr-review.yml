@@ -17,6 +17,7 @@ concurrency:
 jobs:
   review:
     runs-on: ubuntu-latest
+    if: github.actor != 'dependabot[bot]'
     permissions:
       contents: write
       pull-requests: write
@@ -30,7 +31,7 @@ jobs:
           git config --global user.email "${{ vars.GH_USER_EMAIL || 'github-actions[bot]@users.noreply.github.com' }}"
           git config --global user.name "${{ vars.GH_USER_NAME || 'github-actions[bot]' }}"
           git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
-      - uses: anomalyco/opencode/github@98325dcdc6a566de6b7ab42cc87af544bed3658d # v1.4.0
+      - uses: anomalyco/opencode/github@877be7e8e04142cd8fbebcb5e6c4b9617bf28cce # v1.4.3
         if: ${{ !github.event.pull_request.merged }}
         timeout-minutes: 10
         env:
@@ -45,29 +46,29 @@ jobs:
 
             ## Review Guidelines
 
-            ### 1. Code Quality
+            ### 1. Code Quality ✅
             - Identify readability issues, naming inconsistencies, or unclear logic
             - Check adherence to best practices and coding standards
             - Highlight overly complex or redundant code
 
-            ### 2. Potential Bugs & Edge Cases
+            ### 2. Potential Bugs & Edge Cases ⚡
             - Look for logical errors, race conditions, or incorrect assumptions
             - Identify missing error handling or null/undefined checks
             - Consider edge cases that are not handled
 
-            ### 3. Performance & Scalability
+            ### 3. Performance & Scalability 📈
             - Point out inefficient algorithms or unnecessary computations
             - Highlight potential bottlenecks or memory issues
 
-            ### 4. Security Concerns
+            ### 4. Security Concerns 🛡️
             - Identify vulnerabilities (e.g., injection risks, improper validation)
             - Check for sensitive data exposure or unsafe operations
 
-            ### 5. Testing & Reliability
+            ### 5. Testing & Reliability 📝
             - Verify if adequate test coverage exists
             - Suggest missing test cases (unit/integration/edge cases)
 
-            ### 6. Maintainability & Design
+            ### 6. Maintainability & Design 🏗️
             - Evaluate modularity, separation of concerns, and reusability
             - Suggest improvements for long-term maintainability
 
@@ -75,14 +76,50 @@ jobs:
 
             ## Output Format
 
-            - Use bullet points grouped by category
-            - Be concise but specific
-            - Reference exact parts of the code when possible
-            - Provide reasoning for each suggestion
+            Use a table format for each category with columns: **Status | Category | Description | Location | Suggestion**
+
+            ### Review Table Template
+            ```
+            | Status | Category | Description | Location | Suggestion |
+            |--------|----------|-------------|----------|-------------|
+            | ✅ | Code Quality | Issue description | file:line | Suggested fix |
+            ```
+
+            - Each row represents one finding
+            - **Status**: Emoji from the legend below
+            - **Category**: One of: Code Quality, Edge Cases, Performance, Security, Testing, Maintainability
+            - **Description**: Brief description of the issue (1-2 sentences)
+            - **Location**: File path and line number (e.g., `src/utils.ts:42`)
+            - **Suggestion**: Concrete improvement or fix
+
+            ### Group by Category
+            - Present findings grouped by category as separate tables
+            - If no issues in a category, omit the table or show a single row with ✅
+
+            ### Emoji Status Legend
+            Use these emojis to indicate the severity/priority of each issue:
+
+            | Emoji | Status | Meaning |
+            |-------|--------|---------|
+            | ✅ | Good | Code is well-written, follows best practices |
+            | 💡 | Observation | Not an issue, but worth noting or considering |
+            | ⚠️ | Concern | Potential issue that needs attention |
+            | 🔧 | Minor | Small improvement or nitpick |
+            | 🔴 | Major | Important issue that should be addressed |
+            | 🛡️ | Security Concerns | Security vulnerability or risk |
+            | 🎯 | LGTM | Looks Good To Me - no issues found |
+            | 📝 | Gaps | Missing tests or incomplete coverage |
+            | ⚡ | Edge Cases | Missing handling for edge cases |
+            | 📈 | Reliability | Potential reliability or stability concerns |
+            | 🏗️ | Maintainability | Code maintainability or design improvements |
 
             ---
 
             ## Final Verdict
 
-            - If no issues are found, respond with: **LGTM**
-            - Otherwise, summarize the overall assessment in 1–2 lines
+            - Use the appropriate emoji status from the legend above
+            - If no issues are found, respond with: **✅🎯 LGTM**
+            - For minor issues only, respond with: **🔧🎯 LGTM (minor)**
+            - For concerns that should be addressed, respond with: **⚠️ Review needed**
+            - For major issues, respond with: **🔴 Changes requested**
+            - Summarize the overall assessment in 1–2 lines

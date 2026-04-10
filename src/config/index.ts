@@ -95,7 +95,47 @@ export const isProduction = isBun
     ? process.env.NODE_ENV === "production"
     : false;
 
-export const isTest = isBun ? Bun.env.NODE_ENV === "test" : isNode ? "test" : false;
+export const isTest = isBun
+  ? Bun.env.NODE_ENV === "test"
+  : isNode
+    ? process.env.NODE_ENV === "test"
+    : false;
+
+/**
+ * CI environment detection.
+ * Used to force SQLite in CI pipelines regardless of DATABASE_TYPE setting.
+ */
+export const isCI = isNode ? process.env.CI === "true" : false;
+
+/**
+ * Development environment detection.
+ * Used for local development with hot-reload features.
+ */
+export const isDev = isBun
+  ? Bun.env.NODE_ENV === "development"
+  : isNode
+    ? process.env.NODE_ENV === "development"
+    : false;
+
+/**
+ * Staging environment detection.
+ * Used for pre-production testing environments.
+ */
+export const isStage = isBun
+  ? Bun.env.NODE_ENV === "stage"
+  : isNode
+    ? process.env.NODE_ENV === "stage"
+    : false;
+
+/**
+ * QA environment detection.
+ * Used for quality assurance testing environments.
+ */
+export const isQA = isBun
+  ? Bun.env.NODE_ENV === "qa"
+  : isNode
+    ? process.env.NODE_ENV === "qa"
+    : false;
 
 /**
  * Allowed HTTP methods for authentication endpoints.
@@ -116,7 +156,6 @@ export const AUTH_SERVICE_NAME = "Auth";
 export const navItems = [
   { name: "Documentation", href: "/docs" },
   { name: "Blog", href: "/blog" },
-  { name: "Changelog", href: "/changelog" },
 ];
 
 /**

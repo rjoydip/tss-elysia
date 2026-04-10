@@ -28,6 +28,17 @@ export interface OtherServiceStatus {
   lastUpdated: string | null;
   tooltip: string;
   latencyMs?: number | null;
+  pools?: PoolStatusInfo[];
+}
+
+/**
+ * Pool status information for display in UI.
+ */
+export interface PoolStatusInfo {
+  name: string;
+  role: "primary" | "replica";
+  healthy: boolean;
+  latencyMs?: number | null;
 }
 
 /**
@@ -137,6 +148,17 @@ const DatabaseHeartbeatResponseSchema = z.object({
   detail: z.string().optional(),
   timestamp: z.string().optional(),
   latencyMs: z.number().nullable().optional(),
+  pools: z
+    .array(
+      z.object({
+        name: z.string(),
+        role: z.enum(["primary", "replica"]),
+        healthy: z.boolean(),
+        latencyMs: z.number().nullable().optional(),
+        error: z.string().optional(),
+      }),
+    )
+    .optional(),
 });
 
 /**
@@ -167,12 +189,30 @@ async function checkOtherStatusHealth(): Promise<OtherServiceStatus[]> {
         const payload = parseResult.data;
         const isHealthy = response.ok && payload.status === "healthy";
 
+        // Build detailed tooltip with pool information
+        let tooltip = payload.detail || service.defaultTooltip;
+        if (payload.pools && payload.pools.length > 0) {
+          const poolDetails = payload.pools
+            .map(
+              (p) =>
+                `${p.name}: ${p.healthy ? "healthy" : "unhealthy"}${p.latencyMs != null ? ` (${p.latencyMs}ms)` : ""}`,
+            )
+            .join(", ");
+          tooltip = `${payload.detail || "Database status"}\n\nPools: ${poolDetails}`;
+        }
+
         return {
           name: service.name,
           status: isHealthy ? ("operational" as const) : ("outage" as const),
           lastUpdated: payload.timestamp ?? new Date().toISOString(),
-          tooltip: payload.detail || service.defaultTooltip,
+          tooltip,
           latencyMs: payload.latencyMs ?? null,
+          pools: payload.pools?.map((p) => ({
+            name: p.name,
+            role: p.role,
+            healthy: p.healthy,
+            latencyMs: p.latencyMs,
+          })),
         };
       } catch {
         return {
@@ -181,6 +221,7 @@ async function checkOtherStatusHealth(): Promise<OtherServiceStatus[]> {
           lastUpdated: new Date().toISOString(),
           tooltip: "Database heartbeat request failed or returned invalid data.",
           latencyMs: null,
+          pools: [],
         };
       }
     }),

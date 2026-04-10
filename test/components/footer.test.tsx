@@ -4,8 +4,16 @@
  */
 
 import { describe, expect, it, mock } from "bun:test";
+import React from "react";
 import { renderToString } from "react-dom/server";
 import { Footer } from "../../src/components/footer";
+
+// Mock auth client
+let mockSession: any = null;
+let mockIsPending = false;
+mock.module("../../src/lib/auth/client", () => ({
+  useSession: () => ({ data: mockSession, isPending: mockIsPending }),
+}));
 
 // Mock TanStack Router's Link component
 mock.module("@tanstack/react-router", () => ({
@@ -99,5 +107,30 @@ describe("Footer", () => {
     const html = renderToString(<Footer showLogo={false} />);
     // Logo section should be empty - app name should not appear in logo area
     expect(html).not.toContain("TSSE</span>");
+  });
+
+  describe("Authentication States", () => {
+    it("should render content when user is not logged in", () => {
+      mockIsPending = false;
+      mockSession = null;
+      const html = renderToString(<Footer />);
+      expect(html).toContain("<footer");
+      expect(html).toContain("Documentation");
+    });
+
+    it("should return null (empty string) when user is logged in", () => {
+      mockIsPending = false;
+      mockSession = { user: { id: "1", name: "Test User" } };
+      const html = renderToString(<Footer />);
+      expect(html).toBe("");
+    });
+
+    it("should render content while user check is pending", () => {
+      mockIsPending = true;
+      mockSession = null;
+      const html = renderToString(<Footer />);
+      expect(html).toContain("<footer");
+      expect(html).toContain("Documentation");
+    });
   });
 });

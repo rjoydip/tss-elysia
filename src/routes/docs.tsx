@@ -23,6 +23,8 @@ import {
 import { DocsSidebar } from "~/components/docs/sidebar";
 import { Footer } from "~/components/footer";
 import { AnimatedPageBackground } from "~/components/background/animated-page-background";
+import { useScrollDirection } from "~/hooks/use-scroll-direction";
+import { cn } from "~/lib/utils";
 
 export const Route = createFileRoute("/docs")({
   component: DocsLayoutWrapper,
@@ -74,6 +76,7 @@ function DocsLayout() {
   const { breadcrumbs, isLoading } = useBreadcrumbs(currentPath);
   const { state } = useSidebar();
   const isExpanded = state === "expanded";
+  const isHeaderVisible = useScrollDirection();
 
   const headerMargin = isExpanded
     ? "mx-[var(--sidebar-width)]"
@@ -83,12 +86,22 @@ function DocsLayout() {
     : "mx-[calc(var(--sidebar-width-icon)+2rem)]";
 
   return (
-    <div className="relative isolate flex min-h-screen flex-col bg-background">
+    <div className="relative isolate flex min-h-screen flex-col">
       <AnimatedPageBackground />
       <Header />
       <>
-        <DocsSidebar className={isExpanded ? "" : "pt-12"} />
-        <SidebarInset className="flex pt-12">
+        <DocsSidebar
+          className={cn(
+            "transition-all duration-300 ease-in-out",
+            isHeaderVisible ? "pt-12" : "pt-0",
+          )}
+        />
+        <SidebarInset
+          className={cn(
+            "flex transition-all duration-300 ease-in-out",
+            isHeaderVisible ? "pt-12" : "pt-0",
+          )}
+        >
           <header className={`flex h-16 shrink-0 items-center gap-2 ${headerMargin}`}>
             <SidebarTrigger />
             <Separator orientation="vertical" className="mr-2 h-4" />

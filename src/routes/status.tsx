@@ -8,10 +8,19 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "~/components/ui/tooltip";
+import { Badge } from "~/components/ui/badge";
 import { cn } from "~/lib/utils";
 import { Header } from "~/components/header";
 import { Footer } from "~/components/footer";
-import { CheckCircle2, XCircle, AlertCircle, HelpCircle, RefreshCw, Activity } from "lucide-react";
+import {
+  CheckCircle2,
+  XCircle,
+  AlertCircle,
+  HelpCircle,
+  RefreshCw,
+  Activity,
+  Server,
+} from "lucide-react";
 import { AnimatedPageBackground } from "~/components/background/animated-page-background";
 import {
   canTriggerManualRefresh,
@@ -27,6 +36,16 @@ export const Route = createFileRoute("/status")({
 });
 
 /**
+ * Pool status information for display in UI.
+ */
+interface PoolStatusInfo {
+  name: string;
+  role: "primary" | "replica";
+  healthy: boolean;
+  latencyMs?: number | null;
+}
+
+/**
  * Represents the health status of an external or infrastructure service.
  */
 interface OtherStatus {
@@ -35,6 +54,7 @@ interface OtherStatus {
   lastUpdated: string | null;
   tooltip: string;
   latencyMs?: number | null;
+  pools?: PoolStatusInfo[];
 }
 
 /**
@@ -265,10 +285,37 @@ function HealthDashboard() {
                               )}
                             </button>
                           </TooltipTrigger>
-                          <TooltipContent>{service.tooltip}</TooltipContent>
+                          <TooltipContent className="whitespace-pre-wrap">
+                            {service.tooltip}
+                          </TooltipContent>
                         </Tooltip>
                       </TooltipProvider>
                     </div>
+                    {/* Pool badges for database service */}
+                    {service.pools && service.pools.length > 0 && (
+                      <div className="flex flex-wrap gap-1 mt-2">
+                        {service.pools.map((pool) => (
+                          <Badge
+                            key={pool.name}
+                            variant={pool.healthy ? "default" : "destructive"}
+                            className={cn(
+                              "text-xs font-normal",
+                              // pool.role === "primary" &&
+                              // "bg-blue-500 text-blue-600 dark:text-blue-400",
+                              pool.role === "replica" &&
+                                "bg-purple-500 text-purple-600 dark:text-purple-400",
+                              !pool.healthy && "opacity-60",
+                            )}
+                          >
+                            <Server className="w-3 h-3 mr-1" />
+                            {pool.name}
+                            {pool.latencyMs != null && (
+                              <span className="ml-1 opacity-70">{pool.latencyMs}ms</span>
+                            )}
+                          </Badge>
+                        ))}
+                      </div>
+                    )}
                   </CardHeader>
                   <CardContent>
                     <p className="text-sm text-muted-foreground capitalize">

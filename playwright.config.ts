@@ -18,9 +18,12 @@ export default defineConfig({
   retries: isCI ? 2 : 0,
   workers: isCI ? 1 : undefined,
   reporter: "html",
+  globalSetup: "./.e2e/_setup.ts",
+  globalTeardown: "./.e2e/_teardown.ts",
   use: {
     baseURL: E2E_BASE_URL,
     trace: "on-first-retry",
+    // Pass test env to the server via process.env
   },
   projects: [
     {
@@ -31,7 +34,10 @@ export default defineConfig({
   webServer: isCI
     ? undefined
     : {
-        command: `bun run preview --host=${E2E_HOST} --port=${E2E_PORT}`,
+        command:
+          process.platform === "win32"
+            ? `set NODE_ENV=test&& bun run preview --host=${E2E_HOST} --port=${E2E_PORT}`
+            : `NODE_ENV=test bun run preview --host=${E2E_HOST} --port=${E2E_PORT}`,
         url: E2E_BASE_URL,
         reuseExistingServer: !isCI,
         timeout: 120 * 1000,

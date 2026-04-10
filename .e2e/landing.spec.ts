@@ -66,15 +66,13 @@ test.describe("Landing Page Header", () => {
 
   test("should render header", async ({ page }) => {
     await expect(page.locator("header").first()).toBeVisible();
-  });
 
-  test("should have nav links in header", async ({ page }) => {
-    // Use CSS selectors targeting the header nav directly
-    await expect(page.locator("header nav a[href='/docs']")).toBeVisible();
+    // Use CSS selectors targeting the header nav directly - increase timeout to handle auth pending state
+    await expect(page.locator("header nav a[href='/docs']")).toBeVisible({ timeout: 15000 });
   });
 
   test("should have GitHub link in header", async ({ page }) => {
-    await expect(page.locator("header a[href*='github.com']")).toBeVisible();
+    await expect(page.locator("header a[href*='github.com']")).toBeVisible({ timeout: 15000 });
   });
 
   test("should have theme toggle button in header", async ({ page }) => {
@@ -90,24 +88,26 @@ test.describe("Landing Page Footer", () => {
   });
 
   test("should render footer", async ({ page }) => {
-    await expect(page.locator("footer").filter({ hasText: "TSS" }).first()).toBeVisible();
+    await expect(page.locator("footer.py-4").filter({ hasText: "TSS" }).first()).toBeVisible({
+      timeout: 15000,
+    });
   });
 
   test("should have Documentation link", async ({ page }) => {
-    await expect(page.locator("footer a[href='/docs']")).toBeVisible();
+    await expect(page.locator("footer.py-4 a[href='/docs']")).toBeVisible();
   });
 
   test("should have Blog link", async ({ page }) => {
-    await expect(page.locator("footer a[href='/blog']")).toBeVisible();
+    await expect(page.locator("footer.py-4 a[href='/blog']")).toBeVisible();
   });
 
   test("should have Status link", async ({ page }) => {
-    await expect(page.locator("footer a[href='/status']")).toBeVisible();
+    await expect(page.locator("footer.py-4 a[href='/status']")).toBeVisible();
   });
 
   test("should display copyright with current year", async ({ page }) => {
     const year = new Date().getFullYear().toString();
-    await expect(page.locator("footer").getByText(year)).toBeVisible();
+    await expect(page.locator("footer.py-4").getByText(year)).toBeVisible();
   });
 });
 

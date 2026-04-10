@@ -237,6 +237,53 @@ E2E tests run automatically in GitHub Actions:
   run: bun run test:e2e
 ```
 
+### Docker Security Scanning (Trivy)
+
+The CI pipeline includes container security scanning using Trivy. This scans the built Docker image for vulnerabilities and malware before deployment.
+
+#### What Gets Scanned
+
+- **Vulnerabilities**: Scans for known CVEs in OS packages and application dependencies
+- **Malware**: Scans for known malicious files or patterns
+
+#### Configuration
+
+The Trivy scan is configured in `.github/workflows/ci.yml`:
+
+```yaml
+docker-scan:
+  name: Docker Security Scan
+  runs-on: ubuntu-latest
+  needs: [test]
+  steps:
+    - name: Build Docker image
+      uses: docker/build-push-action@v6
+      with:
+        context: .
+        file: docker/Dockerfile
+        load: true
+        tags: tss-elysia:${{ github.sha }}
+
+    - name: Run Trivy vulnerability scanner
+      uses: aquasecurity/trivy-action@master
+      with:
+        image-ref: "tss-elysia:${{ github.sha }}"
+        severity: "CRITICAL,HIGH"
+        exit-code: "1"
+        ignore-unfixed: true
+```
+
+#### Scan Behavior
+
+| Setting        | Value          | Description                       |
+| -------------- | -------------- | --------------------------------- |
+| Severity       | CRITICAL, HIGH | Only fail on critical/high issues |
+| Ignore unfixed | true           | Don't fail for known unfixed CVEs |
+| Exit code      | 1              | Block PR if critical issues found |
+| Malware scan   | enabled        | Scan for malware patterns         |
+
+The scan runs after tests pass (`needs: [test]`) to avoid scanning failed builds.
+
 ## Load Tests (k6)
 
 ### Running Load Tests

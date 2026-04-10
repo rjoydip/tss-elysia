@@ -83,7 +83,7 @@ cp .env.example .env
 
 ## Isomorphic Env Fetching
 
-The project uses `src/env.ts` for type-safe environment variables that work in both client and server contexts:
+The project uses `src/config/env.ts` for type-safe environment variables that work in both client and server contexts:
 
 ```typescript
 // src/env.ts

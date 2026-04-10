@@ -4,6 +4,7 @@
 # Usage:
 #   Production: docker-compose up app
 #   Development: docker-compose up dev
+#   With replicas: docker-compose up -f docker-compose.yml -f docker-compose.replicas.yml up
 # =============================================================================
 
 services:
@@ -39,6 +40,103 @@ services:
         max-file: "3"
 
   # ---------------------------------------------------------------------------
+  # PostgreSQL Primary (Write) Service
+  # ---------------------------------------------------------------------------
+  postgres-primary:
+    image: postgres:16-alpine
+    container_name: tss-elysia-postgres-primary
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-tsse}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-tsse_password}
+      POSTGRES_DB: ${POSTGRES_DB:-tsse_dev}
+      POSTGRES_HOST: ${POSTGRES_HOST:-localhost}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    env:
+      - POSTGRES_USER=${POSTGRES_USER:-tsse}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-tsse_password}
+      - POSTGRES_DB=${POSTGRES_DB:-tsse_dev}
+      - POSTGRES_PORT=${POSTGRES_PORT:-5432}
+    volumes:
+      - postgres_primary_data:/var/lib/postgresql/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-tsse}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    command: >
+      postgres
+      -c max_connections=100
+      -c shared_buffers=128MB
+
+  # ---------------------------------------------------------------------------
+  # PostgreSQL Read Replica 1
+  # ---------------------------------------------------------------------------
+  postgres-replica-1:
+    image: postgres:16-alpine
+    container_name: tss-elysia-postgres-replica-1
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-tsse}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-tsse_password}
+      POSTGRES_DB: ${POSTGRES_DB:-tsse_dev}
+    ports:
+      - "${POSTGRES_REPLICA_1_PORT:-5433}:5432"
+    env:
+      - POSTGRES_USER=${POSTGRES_USER:-tsse}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-tsse_password}
+      - POSTGRES_DB=${POSTGRES_DB:-tsse_dev}
+    volumes:
+      - postgres_replica_1_data:/var/lib/postgresql/data
+    restart: unless-stopped
+    depends_on:
+      - postgres-primary
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-tsse}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    command: >
+      postgres
+      -c max_connections=50
+      -c shared_buffers=64MB
+      -c hot_standby=on
+      -c hot_standby_feedback=on
+
+  # ---------------------------------------------------------------------------
+  # PostgreSQL Read Replica 2
+  # ---------------------------------------------------------------------------
+  postgres-replica-2:
+    image: postgres:16-alpine
+    container_name: tss-elysia-postgres-replica-2
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-tsse}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-tsse_password}
+      POSTGRES_DB: ${POSTGRES_DB:-tsse_dev}
+    ports:
+      - "${POSTGRES_REPLICA_2_PORT:-5434}:5432"
+    env:
+      - POSTGRES_USER=${POSTGRES_USER:-tsse}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-tsse_password}
+      - POSTGRES_DB=${POSTGRES_DB:-tsse_dev}
+    volumes:
+      - postgres_replica_2_data:/var/lib/postgresql/data
+    restart: unless-stopped
+    depends_on:
+      - postgres-primary
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-tsse}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    command: >
+      postgres
+      -c max_connections=50
+      -c shared_buffers=64MB
+      -c hot_standby=on
+      -c hot_standby_feedback=on
+
+  # ---------------------------------------------------------------------------
   # Production Service
   # ---------------------------------------------------------------------------
   app:
@@ -56,10 +154,20 @@ services:
       - AUTH_SECRET=${AUTH_SECRET:?AUTH_SECRET is required}
       - DATABASE_PATH=.artifacts
       - DATABASE_NAME=tss-elysia.db
+      # PostgreSQL primary connection
+      - POSTGRES_URL=postgresql://${POSTGRES_USER:-tsse}:${POSTGRES_PASSWORD:-tsse_password}@postgres-primary:5432/${POSTGRES_DB:-tsse_dev}
+      # PostgreSQL read replicas (JSON array format)
+      - POSTGRES_REPLICAS=["postgresql://${POSTGRES_USER:-tsse}:${POSTGRES_PASSWORD:-tsse_password}@postgres-replica-1:5432/${POSTGRES_DB:-tsse_dev}","postgresql://${POSTGRES_USER:-tsse}:${POSTGRES_PASSWORD:-tsse_password}@postgres-replica-2:5432/${POSTGRES_DB:-tsse_dev}"]
       # Redis connection (uses Docker service name for internal networking)
       - REDIS_URL=redis://redis:6379
     depends_on:
       redis:
+        condition: service_healthy
+      postgres-primary:
+        condition: service_healthy
+      postgres-replica-1:
+        condition: service_healthy
+      postgres-replica-2:
         condition: service_healthy
     volumes:
       - app-data:/app/.artifacts
@@ -104,10 +212,20 @@ services:
       - AUTH_SECRET=${AUTH_SECRET:-dev-secret-min-32-chars-here}
       - DATABASE_PATH=.artifacts
       - DATABASE_NAME=tss-elysia.db
+      # PostgreSQL primary connection
+      - POSTGRES_URL=postgresql://${POSTGRES_USER:-tsse}:${POSTGRES_PASSWORD:-tsse_password}@postgres-primary:5432/${POSTGRES_DB:-tsse_dev}
+      # PostgreSQL read replicas (JSON array format)
+      - POSTGRES_REPLICAS=["postgresql://${POSTGRES_USER:-tsse}:${POSTGRES_PASSWORD:-tsse_password}@postgres-replica-1:5432/${POSTGRES_DB:-tsse_dev}","postgresql://${POSTGRES_USER:-tsse}:${POSTGRES_PASSWORD:-tsse_password}@postgres-replica-2:5432/${POSTGRES_DB:-tsse_dev}"]
       # Redis connection (uses Docker service name for internal networking)
       - REDIS_URL=redis://redis:6379
     depends_on:
       redis:
+        condition: service_healthy
+      postgres-primary:
+        condition: service_healthy
+      postgres-replica-1:
+        condition: service_healthy
+      postgres-replica-2:
         condition: service_healthy
     volumes:
       # Mount source code for hot reload
@@ -143,4 +261,13 @@ volumes:
     driver: local
   # Redis data persistence
   redis-data:
+    driver: local
+  # PostgreSQL primary data persistence
+  postgres_primary_data:
+    driver: local
+  # PostgreSQL replica 1 data persistence
+  postgres_replica_1_data:
+    driver: local
+  # PostgreSQL replica 2 data persistence
+  postgres_replica_2_data:
     driver: local

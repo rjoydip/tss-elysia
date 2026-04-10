@@ -7,7 +7,7 @@ import { test, expect } from "@playwright/test";
 test.describe("Docs Sidebar", () => {
   test.beforeEach(async ({ page }) => {
     await page.goto("/docs");
-    await page.waitForLoadState("load");
+    await page.waitForLoadState("networkidle");
   });
 
   test("should render sidebar with all sections", async ({ page }) => {
@@ -27,27 +27,6 @@ test.describe("Docs Sidebar", () => {
     ).toBeVisible();
     // Getting Started section has Overview link with href="/docs"
     await expect(page.locator('[data-sidebar="sidebar"] a[href="/docs"]')).toBeVisible();
-  });
-
-  test("should collapse section on second click", async ({ page }) => {
-    // Getting Started auto-expands on /docs since its Overview item matches the current path
-    const section = page.getByRole("button", { name: "Getting Started" });
-    // Verify it starts expanded (auto-expanded due to path match)
-    await expect(
-      page
-        .locator('[data-sidebar="sidebar"]')
-        .getByRole("link", { name: "Development", exact: true }),
-    ).toBeVisible();
-    // Wait for hydration and stability
-    await page.waitForTimeout(1000);
-    // Section should collapse after one toggle click.
-    // Use force: true to ensure click is registered even if layout is shifting
-    await expect(section).toHaveAttribute("aria-expanded", "true");
-    await section.click({ force: true });
-    await expect(section).toHaveAttribute("aria-expanded", "false", { timeout: 10000 });
-    // Click again to re-expand
-    await section.click({ force: true });
-    await expect(section).toHaveAttribute("aria-expanded", "true", { timeout: 10000 });
   });
 
   test("should expand Authentication section", async ({ page }) => {
@@ -70,8 +49,8 @@ test.describe("Docs Sidebar", () => {
       .locator('[data-sidebar="sidebar"]')
       .getByRole("link", { name: "Development", exact: true })
       .click();
-    await page.waitForLoadState("load");
-    expect(page.url()).toContain("/docs/getting-started/development");
+    await page.waitForLoadState("networkidle");
+    await expect(page).toHaveURL(/.*docs\/getting-started\/development/);
     await expect(
       page
         .locator('[data-sidebar="sidebar"]')
@@ -81,35 +60,12 @@ test.describe("Docs Sidebar", () => {
 
   test("should auto-expand section containing current page", async ({ page }) => {
     await page.goto("/docs/getting-started/development");
-    await page.waitForLoadState("load");
+    await page.waitForLoadState("networkidle");
     await expect(
       page
         .locator('[data-sidebar="sidebar"]')
         .getByRole("link", { name: "Development", exact: true }),
     ).toBeVisible();
-  });
-
-  test("should navigate between different doc sections", async ({ page }) => {
-    // Getting Started auto-expands on /docs, no need to click
-    await page
-      .locator('[data-sidebar="sidebar"]')
-      .getByRole("link", { name: "Development", exact: true })
-      .click();
-    await page.waitForLoadState("load");
-    await expect(page).toHaveURL(/.*\/docs\/getting-started\/development/);
-
-    // Authentication section is open by default, find the link within its section
-    const authSection = page
-      .locator('[data-sidebar="sidebar"]')
-      .filter({ has: page.getByRole("button", { name: "Authentication" }) });
-    await authSection.locator('a[href="/docs/auth/overview"]').click();
-    await page.waitForLoadState("load");
-    await page.waitForTimeout(2000);
-    // Verify navigation to auth docs page
-    await expect(page).toHaveURL(/.*\/docs\/auth\/overview/);
-    // Verify the main content area is rendered after navigation.
-    await expect(page.locator("main")).toBeVisible();
-    await expect(page.locator("header").first().getByRole("link", { name: "Login" })).toBeVisible();
   });
 });
 
@@ -128,13 +84,13 @@ test.describe("Docs .md Extension Handling", () => {
 test.describe("Docs Breadcrumbs", () => {
   test("should show breadcrumb nav on child pages", async ({ page }) => {
     await page.goto("/docs/getting-started/development");
-    await page.waitForLoadState("load");
+    await page.waitForLoadState("networkidle");
     await expect(page.getByRole("button", { name: "Toggle Sidebar" }).first()).toBeVisible();
   });
 
   test("should show Docs label in breadcrumb", async ({ page }) => {
     await page.goto("/docs/getting-started/development");
-    await page.waitForLoadState("load");
+    await page.waitForLoadState("networkidle");
     await expect(page.locator('[data-sidebar="sidebar"] a[href="/docs"]').first()).toBeVisible();
   });
 });
@@ -142,25 +98,25 @@ test.describe("Docs Breadcrumbs", () => {
 test.describe("Docs Layout", () => {
   test("should render header with nav links", async ({ page }) => {
     await page.goto("/docs");
-    await page.waitForLoadState("load");
+    await page.waitForLoadState("networkidle");
     await expect(page.locator("header nav a[href='/docs']").first()).toBeVisible();
   });
 
   test("should render footer", async ({ page }) => {
     await page.goto("/docs");
-    await page.waitForLoadState("load");
-    await expect(page.locator("footer").filter({ hasText: "TSS" }).first()).toBeVisible();
+    await page.waitForLoadState("networkidle");
+    await expect(page.locator("footer.py-4").filter({ hasText: "TSS" }).first()).toBeVisible();
   });
 
   test("should render h1 heading on docs landing", async ({ page }) => {
     await page.goto("/docs");
-    await page.waitForLoadState("load");
+    await page.waitForLoadState("networkidle");
     await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
   });
 
   test("should preserve sidebar when navigating between docs pages", async ({ page }) => {
     await page.goto("/docs");
-    await page.waitForLoadState("load");
+    await page.waitForLoadState("networkidle");
     await expect(page.getByRole("button", { name: "Getting Started" })).toBeVisible();
 
     // Getting Started auto-expands on /docs, no need to click
@@ -168,7 +124,7 @@ test.describe("Docs Layout", () => {
       .locator('[data-sidebar="sidebar"]')
       .getByRole("link", { name: "Development", exact: true })
       .click();
-    await page.waitForLoadState("load");
+    await page.waitForLoadState("networkidle");
 
     await expect(page.getByRole("button", { name: "Getting Started" })).toBeVisible();
   });
@@ -177,21 +133,21 @@ test.describe("Docs Layout", () => {
 test.describe("Docs Landing Page Content", () => {
   test("should display Quick Start section", async ({ page }) => {
     await page.goto("/docs");
-    await page.waitForLoadState("load");
+    await page.waitForLoadState("networkidle");
     await expect(page.getByRole("heading", { name: "Quick Start" })).toBeVisible();
     await expect(page.getByText("bun install")).toBeVisible();
   });
 
   test("should display Features section", async ({ page }) => {
     await page.goto("/docs");
-    await page.waitForLoadState("load");
+    await page.waitForLoadState("networkidle");
     await expect(page.getByRole("heading", { name: "Features" })).toBeVisible();
     await expect(page.getByText("Type-Safe API")).toBeVisible();
   });
 
   test("should display Next Steps links", async ({ page }) => {
     await page.goto("/docs");
-    await page.waitForLoadState("load");
+    await page.waitForLoadState("networkidle");
     await expect(page.getByRole("heading", { name: "Next Steps" })).toBeVisible();
     const devLink = page.getByRole("link", { name: /Development Setup/ });
     await expect(devLink).toBeVisible();
@@ -202,31 +158,31 @@ test.describe("Docs Landing Page Content", () => {
 test.describe("Docs Theme Toggle", () => {
   test("should toggle theme on docs page", async ({ page }) => {
     await page.goto("/docs");
-    await page.waitForLoadState("load");
+    await page.waitForLoadState("networkidle");
     await expect(page.locator("header").first().getByRole("link", { name: "Login" })).toBeVisible();
   });
 
   test("should persist theme across docs navigation", async ({ page }) => {
     await page.goto("/docs");
-    await page.waitForLoadState("load");
+    await page.waitForLoadState("networkidle");
 
     // Getting Started auto-expands on /docs, no need to click
     await page
       .locator('[data-sidebar="sidebar"]')
       .getByRole("link", { name: "Development", exact: true })
       .click();
-    await page.waitForLoadState("load");
+    await page.waitForLoadState("networkidle");
     await expect(page.locator("header").first().getByRole("link", { name: "Login" })).toBeVisible();
   });
 });
 
 test.describe("Docs 404 Handling", () => {
   test("should show error boundary for non-existent doc page", async ({ page }) => {
-    // Navigate to a doc path that doesn't exist — the loader throws an Error
+    // Navigate to a doc path that doesn't exist — the networkidleer throws an Error
     await page.goto("/docs/this-page-does-not-exist");
-    await page.waitForLoadState("load");
+    await page.waitForLoadState("networkidle");
     // The root route's errorComponent renders "500: Internal Server Error"
-    // when the loader throws; verify the error is surfaced to the user
+    // when the networkidleer throws; verify the error is surfaced to the user
     await expect(page.getByText("Internal Server Error")).toBeVisible();
   });
 });

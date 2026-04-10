@@ -9,10 +9,10 @@ import { hash, type Options, verify } from "@node-rs/argon2";
 import { betterAuth } from "better-auth";
 import { openAPI } from "better-auth/plugins";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
-import { db, schema } from "~/lib/db";
+import { db, schema, getDatabaseType } from "~/lib/db";
 import { env } from "~/config/env";
 import type { SubscriptionTier } from "~/types/subscription";
-import { isBun, sessionConfig } from "~/config";
+import { isBun, isTest, sessionConfig } from "~/config";
 import { logger } from "~/lib/logger";
 
 /**
@@ -43,9 +43,9 @@ export function createAuth() {
   };
 
   return betterAuth({
-    // Database adapter using Drizzle ORM with SQLite provider
+    // Database adapter using Drizzle ORM with dynamic provider based on env
     database: drizzleAdapter(db, {
-      provider: "sqlite",
+      provider: getDatabaseType() === "postgres" ? "pg" : "sqlite",
       schema: {
         user: schema.users,
         session: schema.sessions,
@@ -110,6 +110,11 @@ export function createAuth() {
       onError: (error: unknown) => {
         logger.error(`Auth API error: ${error}`);
       },
+    },
+
+    // Logger configuration - disable in test environment to reduce noise in test output
+    logger: {
+      disabled: isTest,
     },
   });
 }

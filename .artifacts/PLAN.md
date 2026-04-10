@@ -213,6 +213,12 @@ Complete the authentication system with additional security features, set up use
 - [x] Set up Docker Compose for local development
 - [ ] Configure nginx for reverse proxy
 - [x] Set up CI/CD pipeline (GitHub Actions)
+- [x] Add Trivy container security scanning in CI
+  - [x] Add docker-scan job to CI workflow
+  - [x] Build Docker image locally in CI
+  - [x] Scan for vulnerabilities (CRITICAL, HIGH severity)
+  - [x] Scan for malware
+  - [x] Fail pipeline on critical findings
 - [ ] Add environment-specific configs (dev, staging, prod)
 - [ ] Configure horizontal scaling support
 - [ ] Set up database connection pooling
@@ -301,13 +307,13 @@ Complete the authentication system with additional security features, set up use
 
 ### Phase 10: Database Strategy
 
-- [ ] Migrate from SQLite to PostgreSQL for production
-- [ ] Configure environment-based database selection (SQLite dev, PostgreSQL prod)
+- [x] Migrate from SQLite to PostgreSQL for production
+- [x] Configure environment-based database selection (SQLite dev, PostgreSQL prod)
 - [ ] Set up PostgreSQL connection pooling (pgBouncer)
-- [ ] Configure database migrations for PostgreSQL
+- [x] Configure database migrations for PostgreSQL
 - [ ] Add database schema versioning system
-- [ ] Set up database replication (read replicas)
-- [ ] Implement database health checks
+- [x] Set up database replication (read replicas)
+- [x] Implement database health checks
 - [ ] Add database backup/restore automation
 - [ ] Configure vector database for LLM embeddings (pgvector or Pinecone)
 - [ ] Add graph database for relationship data (Neo4j or Redis Graph)
@@ -321,8 +327,8 @@ Complete the authentication system with additional security features, set up use
 - [x] Implement Redis caching layer (use `src/lib/redis/index.ts`)
 - [x] Add Redis-backed rate limiting (replace in-memory)
 - [x] Add Redis session storage for Better Auth
-- [ ] Implement Pub/Sub event broadcasting for MCP
-- [ ] Add database read replicas support
+- [x] Implement Pub/Sub event broadcasting for MCP
+- [x] Add database read replicas support
 - [ ] Configure horizontal pod autoscaling (HPA)
 - [ ] Set up CDN for static assets
 - [ ] Implement API request coalescing
@@ -362,6 +368,7 @@ Complete the authentication system with additional security features, set up use
 
 ### Completed Tasks
 
+- [x] Modernize database seeding with deterministic demo data, CLI flags, and unit test coverage
 - [x] Refactor logging to dedicated `src/logger.ts` file
 - [x] Rename `scriptLogger` to `logger` in scripts
 - [x] Update logger imports across codebase (src/env.ts, src/lib/auth/index.ts, src/utils.ts)
@@ -409,6 +416,16 @@ Complete the authentication system with additional security features, set up use
 - [x] Remove OAuth buttons from forgot password page
 - [x] Add showSignIn prop to Header component
 - [x] Fix Branding component to hide on mobile properly
+- [x] Add PostgreSQL replica configuration with `POSTGRES_REPLICAS` env var
+- [x] Configure primary database for read+write when no replicas configured
+- [x] Implement round-robin replica selection for read queries
+- [x] Add database pool configuration for health checks (`src/lib/db/index.ts`)
+- [x] Add database heartbeat API endpoint (`src/routes/api/modules/-database.ts`)
+- [x] Add database replica status to status dashboard UI
+- [x] Fix unused import warning in status.test.ts
+- [x] Add unit tests for database replica configuration (`test/lib/db/replica.test.ts`)
+- [x] Improve navigation E2E tests with proper wait states for parallel execution
+- [x] Update docs E2E tests to use networkidle for reliable navigation
 
 #### Notification & State Management
 
@@ -434,6 +451,11 @@ Complete the authentication system with additional security features, set up use
 - [x] Split UI component E2E tests into separate files (`.e2e/ui/*.spec.ts`)
 - [x] Update README.md with new test structure and folder structure
 - [x] Update AGENTS.md with testing requirements
+- [x] Add Trivy container security scanning in CI (`.github/workflows/ci.yml`)
+  - [x] Add docker-scan job that builds image locally
+  - [x] Scan for vulnerabilities (CRITICAL, HIGH) with Trivy
+  - [x] Scan for malware with Trivy
+  - [x] Configure fail-on-critical for security gates
 
 ---
 

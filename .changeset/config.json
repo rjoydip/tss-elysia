@@ -3,7 +3,7 @@
   "changelog": [
     "@changesets/changelog-github",
     {
-      "repository": "rjoydip/tss-elysia"
+      "repo": "rjoydip/tss-elysia"
     }
   ],
   "commit": false,

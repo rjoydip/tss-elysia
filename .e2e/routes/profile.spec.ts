@@ -24,7 +24,7 @@ test.describe("Profile Page", () => {
   });
 
   test("should display footer", async ({ page }) => {
-    await expect(page.locator("footer")).toBeVisible();
+    await expect(page.locator("footer.py-4")).toBeVisible();
   });
 
   test("should redirect to login when not authenticated", async ({ page }) => {

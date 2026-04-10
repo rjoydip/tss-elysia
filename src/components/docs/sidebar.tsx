@@ -5,7 +5,7 @@
  */
 
 import { useMemo, memo } from "react";
-import { useLocation } from "@tanstack/react-router";
+import { Link, useLocation } from "@tanstack/react-router";
 import { ChevronRight } from "lucide-react";
 import { docsConfig } from "~/config/docs";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "~/components/ui/collapsible";
@@ -14,8 +14,6 @@ import {
   SidebarContent,
   SidebarFooter,
   SidebarGroup,
-  SidebarGroupLabel,
-  SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
@@ -46,14 +44,11 @@ export const DocsSidebar = memo(function ({ ...props }: React.HTMLAttributes<HTM
 
   return (
     <Sidebar {...props}>
-      <SidebarHeader></SidebarHeader>
-      <SidebarContent>
+      <SidebarContent className="scrollbar-hide">
         <SidebarGroup>
-          <SidebarGroupLabel></SidebarGroupLabel>
           <SidebarMenu>
             {docsConfig.map((section) => {
               const activeHref = sectionMatches.get(section.title);
-
               return (
                 <SidebarMenuItem key={section.title}>
                   <Collapsible defaultOpen className="group/collapsible">
@@ -77,9 +72,14 @@ export const DocsSidebar = memo(function ({ ...props }: React.HTMLAttributes<HTM
                                 isActive={isActive}
                                 className="data-[active=true]:bg-primary data-[active=true]:text-primary-foreground"
                               >
-                                <a href={item.href}>
+                                {/**
+                                 * Use TanStack Router links so sidebar navigation stays in-app
+                                 * and Playwright interactions observe the same client-side route
+                                 * transitions that users get in production.
+                                 */}
+                                <Link to={item.href}>
                                   <span>{item.name}</span>
-                                </a>
+                                </Link>
                               </SidebarMenuSubButton>
                             </SidebarMenuSubItem>
                           );

@@ -37,6 +37,7 @@ function resetStatusStore(): void {
       lastUpdated: null,
       tooltip: service.defaultTooltip,
       latencyMs: null,
+      pools: [],
     })),
     isRefreshing: false,
     lastRefreshSuccessful: null,
@@ -78,6 +79,11 @@ describe("status store", () => {
               status: "healthy",
               detail: "Database heartbeat query succeeded",
               timestamp: new Date().toISOString(),
+              pools: [
+                { name: "primary", role: "primary", healthy: true, latencyMs: 5 },
+                { name: "replica-1", role: "replica", healthy: true, latencyMs: 3 },
+                { name: "replica-2", role: "replica", healthy: true, latencyMs: 4 },
+              ],
             }),
             { status: 200 },
           ),
@@ -96,6 +102,10 @@ describe("status store", () => {
       (service) => service.name === "Database",
     );
     expect(databaseStatus?.status).toBe("operational");
+    expect(databaseStatus?.pools).toHaveLength(3);
+    expect(databaseStatus?.pools?.[0].name).toBe("primary");
+    expect(databaseStatus?.pools?.[0].role).toBe("primary");
+    expect(databaseStatus?.pools?.[1].role).toBe("replica");
     expect(statusStore.state.lastRefreshSuccessful).toBe(true);
     expect(statusStore.state.isRefreshing).toBe(false);
   });
@@ -201,5 +211,41 @@ describe("status store", () => {
     expect(databaseStatus?.tooltip).toBe(
       "Database heartbeat request failed or returned invalid data.",
     );
+  });
+
+  it("should include pool information in tooltip when database has replicas", async () => {
+    vi.spyOn(globalThis, "fetch").mockImplementation((input) => {
+      const requestUrl = String(input);
+      if (requestUrl.includes("/api/database/heartbeat")) {
+        return Promise.resolve(
+          new Response(
+            JSON.stringify({
+              status: "healthy",
+              detail: "All 3 PostgreSQL pools are healthy",
+              timestamp: new Date().toISOString(),
+              latencyMs: 10,
+              pools: [
+                { name: "primary", role: "primary", healthy: true, latencyMs: 5 },
+                { name: "replica-1", role: "replica", healthy: true, latencyMs: 3 },
+                { name: "replica-2", role: "replica", healthy: false, error: "Connection timeout" },
+              ],
+            }),
+            { status: 200 },
+          ),
+        );
+      }
+      return Promise.resolve(new Response(JSON.stringify({ status: "healthy" }), { status: 200 }));
+    });
+
+    await checkStatusHealth();
+
+    const databaseStatus = statusStore.state.otherServiceStatuses.find(
+      (service) => service.name === "Database",
+    );
+    // Overall status is "healthy" at top level, so it's operational even with one unhealthy replica
+    expect(databaseStatus?.status).toBe("operational");
+    expect(databaseStatus?.pools).toHaveLength(3);
+    expect(databaseStatus?.tooltip).toContain("primary: healthy (5ms)");
+    expect(databaseStatus?.tooltip).toContain("replica-2: unhealthy");
   });
 });
