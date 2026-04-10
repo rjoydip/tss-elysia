@@ -171,10 +171,10 @@ jobs:
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@6c6b1989731c405f0b4a5897e2e4a5d1dea3e57e # v3.7.1
+        uses: docker/setup-buildx-action@4d04d5d9486b7bd6fa91e7baf45bbb4f8b9deedd # v4.0.0
 
       - name: Build Docker image
-        uses: docker/build-push-action@5cd3c6ab1f3d6d3bba6f7c91a6f79f3f1e3a9f9e # v6.7.0
+        uses: docker/build-push-action@d08e5c354a6adb9ed34480a06d141179aa583294 # v7.0.0
         with:
           context: .
           file: docker/Dockerfile
@@ -184,7 +184,7 @@ jobs:
           cache-to: type=gha,mode=max
 
       - name: Run Trivy vulnerability scanner
-        uses: aquasecurity/trivy-action@1c3f9a6d3abf58c16fde51c7c4bb5d5fcc5f8d51 # master
+        uses: aquasecurity/trivy-action@57a97c7e7821a5776cebc9bb87c984fa69cba8f1 # v0.35.0
         with:
           image-ref: "tss-elysia:${{ github.sha }}"
           format: "table"
@@ -193,7 +193,7 @@ jobs:
           ignore-unfixed: true
 
       - name: Scan for malware
-        uses: aquasecurity/trivy-action@1c3f9a6d3abf58c16fde51c7c4bb5d5fcc5f8d51 # master
+        uses: aquasecurity/trivy-action@57a97c7e7821a5776cebc9bb87c984fa69cba8f1 # v0.35.0
         with:
           image-ref: "tss-elysia:${{ github.sha }}"
           scanner: "malware"
