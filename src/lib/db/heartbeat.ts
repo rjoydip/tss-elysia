@@ -3,7 +3,18 @@
  * Provides a lightweight read-only liveness check for status monitoring endpoints.
  */
 
-import { sqlite } from "./index";
+import { getDatabasePools, getDatabasePoolConfigs, type DatabaseType } from "./index";
+
+/**
+ * Individual pool status for heartbeat response.
+ */
+export interface PoolHealthStatus {
+  name: string;
+  role: "primary" | "replica";
+  healthy: boolean;
+  latencyMs?: number | null;
+  error?: string;
+}
 
 /**
  * Heartbeat payload shape for database liveness checks.
@@ -13,41 +24,140 @@ export interface DatabaseHeartbeat {
   latencyMs: number | null;
   timestamp: string;
   detail: string;
+  databaseType?: DatabaseType;
+  pools: PoolHealthStatus[];
 }
 
 /**
- * Executes a minimal SQLite heartbeat query and returns probe metadata.
+ * Executes a database heartbeat query based on database type.
  * Uses `SELECT 1` to verify read access without mutating application state.
  */
-export function getDatabaseHeartbeat(): DatabaseHeartbeat {
+export async function getDatabaseHeartbeat(): Promise<DatabaseHeartbeat> {
   const startedAt = Date.now();
+  const pools = getDatabasePools();
 
   try {
-    // Guard against misconfigured runtime where the database driver is unavailable.
-    if (!sqlite) {
+    // Check SQLite heartbeat
+    if (pools.sqlite) {
+      const result = pools.sqlite.query("SELECT 1 AS ok").get() as { ok?: number } | null;
+      if (!result || result.ok !== 1) {
+        return {
+          status: "unhealthy",
+          latencyMs: null,
+          timestamp: new Date().toISOString(),
+          detail: "Database heartbeat query returned unexpected result",
+          databaseType: "sqlite",
+          pools: [
+            {
+              name: "sqlite",
+              role: "primary",
+              healthy: false,
+              latencyMs: null,
+              error: "Query returned unexpected result",
+            },
+          ],
+        };
+      }
+
       return {
-        status: "unhealthy",
-        latencyMs: null,
+        status: "healthy",
+        latencyMs: Date.now() - startedAt,
         timestamp: new Date().toISOString(),
-        detail: "SQLite instance is not initialized",
+        detail: "SQLite heartbeat query succeeded",
+        databaseType: "sqlite",
+        pools: [
+          {
+            name: "sqlite",
+            role: "primary",
+            healthy: true,
+            latencyMs: Date.now() - startedAt,
+          },
+        ],
       };
     }
 
-    const result = sqlite.query("SELECT 1 AS ok").get() as { ok?: number } | null;
-    if (!result || result.ok !== 1) {
+    // Check PostgreSQL heartbeat
+    const pgPrimary = pools.primary;
+    if (!pgPrimary) {
       return {
         status: "unhealthy",
         latencyMs: null,
         timestamp: new Date().toISOString(),
-        detail: "Database heartbeat query returned unexpected result",
+        detail: "PostgreSQL primary pool is not initialized",
+        databaseType: "postgres",
+        pools: [],
       };
+    }
+
+    const poolConfigs = getDatabasePoolConfigs();
+    const poolHealthResults: PoolHealthStatus[] = [];
+
+    // Check primary pool
+    try {
+      const primaryStart = Date.now();
+      const primaryResult = await pgPrimary.query("SELECT 1 AS ok");
+      poolHealthResults.push({
+        name: "primary",
+        role: "primary",
+        healthy: primaryResult.rows[0]?.ok === 1,
+        latencyMs: Date.now() - primaryStart,
+      });
+    } catch (error) {
+      poolHealthResults.push({
+        name: "primary",
+        role: "primary",
+        healthy: false,
+        latencyMs: null,
+        error: error instanceof Error ? error.message : "Unknown error",
+      });
+    }
+
+    // Check all replica pools dynamically
+    for (let i = 0; i < pools.replicas.length; i++) {
+      const replica = pools.replicas[i];
+      const config = poolConfigs.find((c) => c.role === "replica" && c.name === `replica-${i + 1}`);
+
+      try {
+        const replicaStart = Date.now();
+        const replicaResult = await replica.query("SELECT 1 AS ok");
+        poolHealthResults.push({
+          name: config?.name || `replica-${i + 1}`,
+          role: "replica",
+          healthy: replicaResult.rows[0]?.ok === 1,
+          latencyMs: Date.now() - replicaStart,
+        });
+      } catch (error) {
+        poolHealthResults.push({
+          name: config?.name || `replica-${i + 1}`,
+          role: "replica",
+          healthy: false,
+          latencyMs: null,
+          error: error instanceof Error ? error.message : "Unknown error",
+        });
+      }
+    }
+
+    // Determine overall status
+    const allHealthy = poolHealthResults.every((p) => p.healthy);
+    const healthyCount = poolHealthResults.filter((p) => p.healthy).length;
+    const totalCount = poolHealthResults.length;
+
+    let detail: string;
+    if (allHealthy) {
+      detail = `All ${totalCount} PostgreSQL pools are healthy`;
+    } else if (healthyCount === 0) {
+      detail = "All PostgreSQL pools are unhealthy";
+    } else {
+      detail = `${healthyCount}/${totalCount} PostgreSQL pools are healthy`;
     }
 
     return {
-      status: "healthy",
+      status: allHealthy ? "healthy" : "unhealthy",
       latencyMs: Date.now() - startedAt,
       timestamp: new Date().toISOString(),
-      detail: "Database heartbeat query succeeded",
+      detail,
+      databaseType: "postgres",
+      pools: poolHealthResults,
     };
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unknown database heartbeat error";
@@ -56,6 +166,7 @@ export function getDatabaseHeartbeat(): DatabaseHeartbeat {
       latencyMs: null,
       timestamp: new Date().toISOString(),
       detail: message,
+      pools: [],
     };
   }
 }

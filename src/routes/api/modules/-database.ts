@@ -24,8 +24,8 @@ const databaseHeartbeatExample = {
  */
 export const databaseRoutes = new Elysia({ name: "api.routes.database", prefix: "/database" }).get(
   "/heartbeat",
-  () => {
-    const heartbeat = getDatabaseHeartbeat();
+  async () => {
+    const heartbeat = await getDatabaseHeartbeat();
     const statusCode = heartbeat.status === "healthy" ? 200 : 503;
 
     return new Response(JSON.stringify(heartbeat), {

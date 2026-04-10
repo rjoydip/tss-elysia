@@ -38,24 +38,28 @@ test.describe("Header Navigation", () => {
 test.describe("Footer Navigation (Guest)", () => {
   test("should navigate to Docs from footer", async ({ page }) => {
     await page.goto("/");
-    await page.waitForLoadState("load");
+    await page.waitForLoadState("networkidle");
+    await expect(page.locator("footer.py-4 a[href='/docs']")).toBeVisible({ timeout: 10000 });
     await page.locator("footer.py-4 a[href='/docs']").click();
-    await page.waitForLoadState("load");
+    await page.waitForLoadState("networkidle");
     await expect(page).toHaveURL(/.*docs/);
   });
 
   test("should navigate to Blog from footer", async ({ page }) => {
     await page.goto("/");
-    await page.waitForLoadState("load");
+    await page.waitForLoadState("networkidle");
+    await expect(page.locator("footer.py-4 a[href='/blog']")).toBeVisible({ timeout: 10000 });
     await page.locator("footer.py-4 a[href='/blog']").click();
-    await page.waitForLoadState("load");
+    await page.waitForLoadState("networkidle");
     await expect(page).toHaveURL(/.*blog/);
   });
 
   test("should navigate to Status from footer", async ({ page }) => {
     await page.goto("/");
-    await page.waitForLoadState("load");
+    await page.waitForLoadState("networkidle");
+    await expect(page.locator("footer.py-4 a[href='/status']")).toBeVisible({ timeout: 10000 });
     await page.locator("footer.py-4 a[href='/status']").click();
+    await page.waitForLoadState("networkidle");
     await expect(page).toHaveURL(/.*status/);
   });
 });

@@ -2,6 +2,10 @@
  * Database connection and initialization using Drizzle ORM.
  * Supports both SQLite (Bun) and PostgreSQL based on environment.
  *
+ * PostgreSQL setup includes:
+ * - One primary (write) pool
+ * - Multiple read replica pools for read queries (configurable via POSTGRES_REPLICAS env var)
+ *
  * Only initializes on server-side (typeof window === "undefined")
  * to prevent client-side bundle from including database code.
  */
@@ -20,17 +24,36 @@ import { isCI, isDev, isStage, isQA, isProduction, isTest } from "~/config";
 export type DatabaseType = "sqlite" | "postgres";
 
 /**
+ * Database pool configuration for health checks.
+ */
+export interface DatabasePoolConfig {
+  name: string;
+  role: "primary" | "replica";
+  url: string;
+}
+
+/**
  * SQLite database instance - Bun's native SQLite driver
  */
 let sqlite: Database | undefined;
 
 /**
- * PostgreSQL pool instance - node-postgres driver
+ * PostgreSQL primary (write) pool instance - node-postgres driver
  */
-let pgPool: Pool | undefined;
+let pgPoolPrimary: Pool | undefined;
 
 /**
- * Drizzle ORM instance with typed schema
+ * PostgreSQL read replica pools - dynamic array based on env config
+ */
+let pgPoolsReplicas: Pool[] = [];
+
+/**
+ * Round-robin index for replica selection
+ */
+let replicaRoundRobinIndex = 0;
+
+/**
+ * Drizzle ORM instance with typed schema (primary/write)
  * eslint-disable-next-line @typescript-eslint/no-explicit-any
  */
 let db: any;
@@ -85,26 +108,38 @@ function createSQLiteConnection() {
 }
 
 /**
- * Creates a PostgreSQL connection pool.
+ * Creates a PostgreSQL connection pool with primary and read replicas.
  *
- * @returns PostgreSQL pool and Drizzle ORM
+ * @returns PostgreSQL pools and Drizzle ORM instances
  */
 function createPostgresConnection() {
   const connectionString = env.POSTGRES_URL || buildPostgresConnectionString();
 
-  pgPool = new Pool({
+  // Primary (write) pool
+  pgPoolPrimary = new Pool({
     connectionString,
-    // Connection pool settings
     max: 20,
     idleTimeoutMillis: 30000,
     connectionTimeoutMillis: 2000,
   });
 
-  db = drizzlePg(pgPool, {
+  // Dynamic read replicas from POSTGRES_REPLICAS env var (JSON array)
+  const replicaUrls: string[] = env.POSTGRES_REPLICAS || [];
+  pgPoolsReplicas = replicaUrls.map((url: string) => {
+    return new Pool({
+      connectionString: url,
+      max: 20,
+      idleTimeoutMillis: 30000,
+      connectionTimeoutMillis: 2000,
+    });
+  });
+
+  // Primary (write) Drizzle instance
+  db = drizzlePg(pgPoolPrimary, {
     schema,
   });
 
-  return { pgPool, db };
+  return { pgPoolPrimary, pgPoolsReplicas, db };
 }
 
 /**
@@ -153,6 +188,93 @@ function getDatabaseName(): string {
 }
 
 /**
+ * Returns the write (primary) database instance.
+ * For read-heavy workloads, use getReadDb() for read queries.
+ *
+ * @returns The primary Drizzle ORM instance for write operations
+ */
+export function getWriteDb() {
+  return db;
+}
+
+/**
+ * Returns a read database instance, routing to available replicas.
+ * Uses round-robin selection between available replicas.
+ * Falls back to primary if no replicas are configured.
+ *
+ * @returns A read Drizzle ORM instance (from replica or primary)
+ */
+export function getReadDb() {
+  // No replicas configured, use primary
+  if (pgPoolsReplicas.length === 0) {
+    return db;
+  }
+
+  // Round-robin selection between available replicas
+  const index = replicaRoundRobinIndex % pgPoolsReplicas.length;
+  replicaRoundRobinIndex++;
+  const selectedPool = pgPoolsReplicas[index];
+
+  return drizzlePg(selectedPool, {
+    schema,
+  });
+}
+
+/**
+ * Returns all database pools for health checks.
+ *
+ * @returns Object containing all database pools
+ */
+export function getDatabasePools() {
+  return {
+    primary: pgPoolPrimary,
+    replicas: pgPoolsReplicas,
+    sqlite,
+  };
+}
+
+/**
+ * Returns database pool configurations for health check reporting.
+ * Includes primary and all replicas with their roles and URLs.
+ *
+ * @returns Array of database pool configurations
+ */
+export function getDatabasePoolConfigs(): DatabasePoolConfig[] {
+  const configs: DatabasePoolConfig[] = [];
+
+  // Primary pool (always for writes)
+  if (pgPoolPrimary) {
+    configs.push({
+      name: "primary",
+      role: "primary",
+      url: env.POSTGRES_URL || buildPostgresConnectionString(),
+    });
+  }
+
+  // Replica pools
+  const replicaUrls: string[] = env.POSTGRES_REPLICAS || [];
+
+  // If no replicas configured, primary also serves reads
+  if (replicaUrls.length === 0 && pgPoolPrimary) {
+    configs.push({
+      name: "primary-read",
+      role: "replica",
+      url: env.POSTGRES_URL || buildPostgresConnectionString(),
+    });
+  } else {
+    replicaUrls.forEach((url: string, index: number) => {
+      configs.push({
+        name: `replica-${index + 1}`,
+        role: "replica",
+        url,
+      });
+    });
+  }
+
+  return configs;
+}
+
+/**
  * Initializes the database based on environment configuration.
  * This function handles the decision between SQLite and PostgreSQL.
  *
@@ -188,5 +310,5 @@ if (typeof window === "undefined") {
 }
 
 // Export for use in other modules (auth, migrations, etc.)
-export { sqlite, pgPool, db, schema };
+export { sqlite, pgPoolPrimary, pgPoolsReplicas, db, schema };
 export type DbType = NonNullable<typeof db>;
