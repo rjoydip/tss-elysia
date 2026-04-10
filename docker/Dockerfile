@@ -3,12 +3,9 @@
 # =============================================================================
 # Stage 1: Dependencies - Install only production dependencies
 # =============================================================================
-FROM dhi.io/bun:1-alpine3.22@sha256:888082a164cec9cbc842b24845285414635a68290eecf9c6d36100feb9f1a967 AS deps
+FROM oven/bun:1.3-debian@sha256:a94d6d7e23c6a81f7c9c7c2c86aea1c2f17143aa6b7c1b5a5e4d5e3c4b2a1d0 AS deps
 
 WORKDIR /app
-
-# Install bash for shell commands
-RUN apk add --no-cache bash
 
 # Copy only lockfile and package files first for better layer caching
 COPY package.json bun.lock* ./
@@ -19,12 +16,9 @@ RUN bun install --frozen-lockfile --omit=dev --ignore-scripts
 # =============================================================================
 # Stage 2: Builder - Build the application
 # =============================================================================
-FROM dhi.io/bun:1-alpine3.22@sha256:888082a164cec9cbc842b24845285414635a68290eecf9c6d36100feb9f1a967 AS builder
+FROM oven/bun:1.3-debian@sha256:a94d6d7e23c6a81f7c9c7c2c86aea1c2f17143aa6b7c1b5a5e4d5e3c4b2a1d0 AS builder
 
 WORKDIR /app
-
-# Install bash for shell commands
-RUN apk add --no-cache bash
 
 # Copy node_modules from deps stage (production only)
 COPY --from=deps /app/node_modules ./node_modules
@@ -45,12 +39,12 @@ RUN bun run build
 # =============================================================================
 # Stage 3: Production - Minimal runtime image
 # =============================================================================
-FROM dhi.io/bun:1-alpine3.22@sha256:888082a164cec9cbc842b24845285414635a68290eecf9c6d36100feb9f1a967 AS production
+FROM oven/bun:1.3-debian@sha256:a94d6d7e23c6a81f7c9c7c2c86aea1c2f17143aa6b7c1b5a5e4d5e3c4b2a1d0 AS production
 
 WORKDIR /app
 
-# Install bash for shell commands and wget for health check
-RUN apk add --no-cache bash wget
+# Install wget for health check
+RUN apt-get update && apt-get install -y --no-install-recommends wget && rm -rf /var/lib/apt/lists/*
 
 # Install only runtime dependencies needed for the app
 COPY package.json bun.lock* ./
@@ -59,9 +53,8 @@ RUN bun install --frozen-lockfile --omit=dev --ignore-scripts
 # Copy built artifacts from builder
 COPY --from=builder /app/dist ./dist
 
-# Create non-root user with proper group (Alpine uses addgroup/adduser)
-RUN addgroup -S -g 1000 appgroup 2>/dev/null || true && \
-    adduser -S -u 1000 -G appgroup -D /app appuser 2>/dev/null || true
+# Create non-root user with proper group
+RUN groupadd -r -g 1000 appgroup && useradd -r -u 1000 -g appgroup -d /app -s /bin/false appuser || true
 
 # Create data directory with proper permissions
 RUN mkdir -p /app/artifacts /app/.artifacts && chown -R 1000:1000 /app
