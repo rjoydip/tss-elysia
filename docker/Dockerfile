@@ -39,9 +39,10 @@ RUN bun run build
 # =============================================================================
 FROM oven/bun:1.3-debian AS production
 
-# Create non-root user for security
-RUN addgroup --system --gid 1000 appgroup && \
-    adduser --system --uid 1000 appuser --ingroup appgroup
+# Create non-root user for security (using groupadd/useradd if adduser not available)
+RUN groupadd --system --gid 1000 appgroup 2>/dev/null || \
+    (apt-get update && apt-get install -y --no-install-recommends shadow && groupadd --system --gid 1000 appgroup) && \
+    useradd --system --uid 1000 --gid 1000 appuser 2>/dev/null || true
 
 WORKDIR /app
 
