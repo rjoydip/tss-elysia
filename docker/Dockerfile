@@ -44,7 +44,7 @@ FROM oven/bun:alpine AS production
 WORKDIR /app
 
 # Install wget for health check
-RUN apk update && apk install -y --no-install-recommends wget && rm -rf /var/lib/apt/lists/*
+RUN apk add --no-cache wget
 
 # Install only runtime dependencies needed for the app
 COPY package.json bun.lock* ./
