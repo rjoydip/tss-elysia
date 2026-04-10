@@ -1,11 +1,7 @@
 # =============================================================================
 # Development Dockerfile - Optimized for hot reload and fast rebuilds
 # =============================================================================
-FROM oven/bun:1.3.11-debian
-
-# Create non-root user for security (matches production)
-RUN addgroup --system --gid 1000 appgroup && \
-    adduser --system --uid 1000 appuser --ingroup appgroup
+FROM oven/bun:1.3-debian
 
 WORKDIR /app
 
@@ -16,7 +12,12 @@ COPY package.json bun.lock* ./
 RUN bun install --frozen-lockfile --ignore-scripts
 
 # Copy source code
-COPY --chown=appuser:appgroup . .
+COPY --chown=1000:1000 . .
+
+# Create non-root user with matching UID/GID
+RUN groupadd -r -g 1000 appgroup 2>/dev/null || true && \
+    useradd -r -u 1000 -g appgroup -d /app -s /bin/false appuser 2>/dev/null || true && \
+    chown -R appuser:appgroup /app
 
 # Switch to non-root user
 USER appuser
@@ -30,5 +31,4 @@ ENV NODE_ENV=development
 EXPOSE 3000
 
 # Development command with hot reload
-# --host enables external access, --port specifies port
 CMD ["bun", "run", "dev"]
