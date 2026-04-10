@@ -52,15 +52,15 @@ COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/.output ./.output
 COPY --from=builder /app/public ./public
 
-# Copy database directory (optional)
-COPY --from=builder /app/.artifacts/ ./.artifacts/
+# Copy database directory if exists (optional)
+COPY --from=builder /app/.artifacts ./artifacts 2>/dev/null || true
 
 # Create non-root user with proper group
 RUN groupadd -r -g 1000 appgroup && \
     useradd -r -u 1000 -g appgroup -d /app -s /bin/false appuser || true
 
 # Create data directory with proper permissions
-RUN mkdir -p /app/.artifacts && chown -R appuser:appgroup /app
+RUN mkdir -p /app/artifacts /app/.artifacts && chown -R appuser:appgroup /app
 
 # Switch to non-root user
 USER appuser
