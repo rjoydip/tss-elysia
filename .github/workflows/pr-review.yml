@@ -80,10 +80,27 @@ jobs:
             - Be concise but specific
             - Reference exact parts of the code when possible
             - Provide reasoning for each suggestion
+            - Prefix each category or issue with an emoji status indicator
+
+            ### Emoji Status Legend
+            Use these emojis to indicate the severity/priority of each issue:
+
+            | Emoji | Status | Meaning |
+            |-------|--------|---------|
+            | ✅ | Good | Code is well-written, follows best practices |
+            | ⚠️ | Concern | Potential issue that needs attention |
+            | 🔧 | Minor | Small improvement or nitpick |
+            | 🔴 | Major | Important issue that should be addressed |
+            | 🎯 | LGTM | Looks Good To Me - no issues found |
+            | 📝 | Missing Coverage | Tests are missing or incomplete |
 
             ---
 
             ## Final Verdict
 
-            - If no issues are found, respond with: **LGTM**
-            - Otherwise, summarize the overall assessment in 1–2 lines
+            - Use the appropriate emoji status from the legend above
+            - If no issues are found, respond with: **✅🎯 LGTM**
+            - For minor issues only, respond with: **🔧🎯 LGTM (minor)**
+            - For concerns that should be addressed, respond with: **⚠️ Review needed**
+            - For major issues, respond with: **🔴 Changes requested**
+            - Summarize the overall assessment in 1–2 lines
