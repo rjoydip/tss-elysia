@@ -11,8 +11,8 @@ WORKDIR /app
 COPY package.json bun.lock* ./
 
 # Install production dependencies only
-# --production=false includes devDependencies needed for build
-RUN bun install --frozen-lockfile --production=false --ignore-scripts
+# Use --omit=dev to exclude devDependencies (needed for build)
+RUN bun install --frozen-lockfile --omit=dev --ignore-scripts
 
 # =============================================================================
 # Stage 2: Builder - Build the application
