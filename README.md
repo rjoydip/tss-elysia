@@ -174,9 +174,15 @@ src/
 │   │   ├── index.ts   # Server auth instance
 │   │   └── client.ts  # Client auth hooks and methods
 │   ├── db/            # Database (Drizzle + SQLite)
-│   │   ├── index.ts
-│   │   ├── schema.ts
-│   │   └── heartbeat.ts
+│   │   ├── index.ts   # Database connection and pooling
+│   │   ├── core.ts    # CORE schema (users, sessions, accounts, subscriptions)
+│   │   ├── schema.ts  # Unified schema exports
+│   │   ├── heartbeat.ts # Health checks
+│   │   ├── versioning/ # Schema versioning system
+│   │   ├── backup/    # Backup/restore automation
+│   │   ├── optimize/  # Query optimization
+│   │   ├── monitor/   # Monitoring and alerting
+│   │   └── manage.ts  # Database management utilities
 │   ├── redis/         # Redis cache and Pub/Sub (Bun native)
 │   │   ├── index.ts   # Redis client singleton, health check
 │   │   └── pubsub.ts  # Typed Pub/Sub channels and helpers
@@ -237,9 +243,15 @@ test/                  # Unit tests (Bun)
 │   └── changelog.test.ts
 ├── hooks/            # Hook tests
 ├── lib/              # Library tests
-│   └── redis/       # Redis tests
-│       ├── redis.test.ts  # Redis client tests
-│       └── pubsub.test.ts # Pub/Sub tests
+│   ├── redis/       # Redis tests
+│   │   ├── redis.test.ts  # Redis client tests
+│   │   └── pubsub.test.ts # Pub/Sub tests
+│   └── db/         # Database management tests
+│       ├── versioning.test.ts  # Schema versioning tests
+│       ├── backup.test.ts       # Backup/restore tests
+│       ├── optimize.test.ts    # Query optimization tests
+│       ├── monitor.test.ts     # Monitoring/alerting tests
+│       └── replica.test.ts     # Database replica tests
 ├── store/            # Store tests
 ├── components/       # Component tests
 │   └── ui/          # UI component tests
@@ -256,6 +268,7 @@ test/                  # Unit tests (Bun)
 │   └── ...
 ├── api/              # API E2E tests
 │   ├── endpoints.spec.ts
+│   ├── database.spec.ts  # Database heartbeat tests
 │   ├── middlewares.spec.ts
 │   └── redis-health.spec.ts  # Redis heartbeat E2E
 ├── middlewares/      # Middleware-specific E2E tests

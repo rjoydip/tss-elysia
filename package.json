@@ -109,7 +109,7 @@
     "@types/pg": "^8.20.0",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
-    "@typescript/native-preview": "^7.0.0-dev.20260409.1",
+    "@typescript/native-preview": "^7.0.0-dev.20260410.1",
     "@vitejs/plugin-react": "^6.0.1",
     "actions-up": "^1.13.0",
     "better-sqlite3": "^12.8.0",

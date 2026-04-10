@@ -33,6 +33,11 @@ test/
 │   └── index.test.ts # Middleware index tests (traceFn, errorFn, composedMiddleware)
 ├── hooks/            # Hook tests
 ├── lib/              # Library tests (logger, blog, utils, changelog)
+│   └── db/          # Database management tests
+│       ├── versioning.test.ts  # Schema versioning tests (compareVersions, checksums)
+│       ├── backup.test.ts      # Backup/restore tests
+│       ├── optimize.test.ts    # Query optimization tests (hashQuery, analyzeQuery)
+│       └── monitor.test.ts     # Monitoring/alerting tests (metrics, alerts)
 ├── routes/           # Route tests
 │   └── status.test.ts # Status page tests
 ├── store/            # Store tests
@@ -142,7 +147,11 @@ E2E tests are in `.e2e/`:
 │   └── mobile.spec.ts    # Mobile responsiveness tests
 ├── api/              # API E2E tests
 │   ├── endpoints.spec.ts # API endpoint tests
+│   ├── database.spec.ts # Database heartbeat tests
 │   └── middlewares.spec.ts # Middleware tests (CORS, Helmet, Trace, Rate Limit, Error)
+├── routes/          # Route E2E tests
+│   └── api/         # API route tests
+│       └── mcp/    # MCP server tests
 ├── mcp/              # MCP E2E tests
 │   ├── mcp.spec.ts
 │   └── mcp-keys.spec.ts

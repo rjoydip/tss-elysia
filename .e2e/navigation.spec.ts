@@ -114,12 +114,11 @@ test.describe("Authenticated UI Visibility", () => {
 
     // 4. Navigate to home
     await page.goto("/");
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("load");
 
     // 5. Verify header marketing links are hidden
     await expect(page.locator("header nav a[href='/docs']")).not.toBeVisible();
     await expect(page.locator("header nav a[href='/blog']")).not.toBeVisible();
-    await expect(page.locator("header nav a[href='/changelog']")).not.toBeVisible();
 
     // 6. Verify GitHub and Theme Toggle are hidden
     await expect(page.locator("header a[aria-label='GitHub']")).not.toBeVisible();

@@ -221,7 +221,7 @@ Complete the authentication system with additional security features, set up use
   - [x] Fail pipeline on critical findings
 - [ ] Add environment-specific configs (dev, staging, prod)
 - [ ] Configure horizontal scaling support
-- [ ] Set up database connection pooling
+- [x] Set up database connection pooling
 - [x] Add Redis for caching/sessions
   - [x] Configure Redis 7 Alpine in docker-compose with persistence and health check
   - [x] Create custom `redis.conf` with Pub/Sub, AOF, and memory limits
@@ -309,16 +309,46 @@ Complete the authentication system with additional security features, set up use
 
 - [x] Migrate from SQLite to PostgreSQL for production
 - [x] Configure environment-based database selection (SQLite dev, PostgreSQL prod)
-- [ ] Set up PostgreSQL connection pooling (pgBouncer)
+- [x] Set up PostgreSQL connection pooling (node-postgres Pool)
 - [x] Configure database migrations for PostgreSQL
-- [ ] Add database schema versioning system
+- [x] Add database schema versioning system
+  - [x] Version tracking with migration history
+  - [x] Rollback point creation and validation
+  - [x] Schema integrity checksums
+  - [x] Semantic version comparison utilities
+  - [x] Unit tests for versioning module
 - [x] Set up database replication (read replicas)
 - [x] Implement database health checks
-- [ ] Add database backup/restore automation
+- [x] Add database backup/restore automation
+  - [x] Full, incremental, and differential backups
+  - [x] Gzip compression support
+  - [x] Backup verification via checksums
+  - [x] Automated backup scheduling
+  - [x] Restore history tracking
+  - [x] Unit tests for backup module
 - [ ] Configure vector database for LLM embeddings (pgvector or Pinecone)
 - [ ] Add graph database for relationship data (Neo4j or Redis Graph)
-- [ ] Implement database query optimization
-- [ ] Add database monitoring and alerting
+- [x] Implement database query optimization
+  - [x] Query caching with TTL
+  - [x] Slow query detection and logging
+  - [x] Index recommendations
+  - [x] Query analysis with optimization suggestions
+  - [x] Unit tests for optimization module
+- [x] Add database monitoring and alerting
+  - [x] Real-time metrics collection
+  - [x] Configurable alert rules with severity levels
+  - [x] Active alerts with acknowledgement
+  - [x] Health check history
+  - [x] Connection pool statistics
+  - [x] Unit tests for monitoring module
+  - [x] E2E tests for database heartbeat API
+
+#### Database Schema Organization
+
+- [x] Core schema in `src/lib/db/core.ts` (users, sessions, accounts, subscriptions)
+- [x] Extended schemas in `src/lib/db/{versioning,backup,optimize,monitor}/schema.ts`
+- [x] Unified schema exports via `src/lib/db/schema.ts`
+- [x] Database management utilities via `src/lib/db/manage.ts`
 
 ---
 

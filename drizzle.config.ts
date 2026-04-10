@@ -11,9 +11,11 @@ const sqliteDbUrl =
 
 const postgresUrl =
   process.env.POSTGRES_URL ||
-  `postgresql://${process.env.POSTGRES_USER || "tsse"}:${process.env.POSTGRES_PASSWORD || ""}@${
-    process.env.POSTGRES_HOST || "localhost"
-  }:${process.env.POSTGRES_PORT || 5432}/${process.env.POSTGRES_DB || "tsse_dev"}`;
+  `postgresql://${process.env.POSTGRES_USER || "tsse"}:${
+    process.env.POSTGRES_PASSWORD || ""
+  }@${process.env.POSTGRES_HOST || "localhost"}:${
+    process.env.POSTGRES_PORT || 5432
+  }/${process.env.POSTGRES_DB || "tsse_dev"}`;
 
 export default defineConfig({
   schema: "./src/lib/db/schema.ts",

@@ -14,9 +14,25 @@ import { drizzle as drizzleSQLite } from "drizzle-orm/bun-sqlite";
 import { Database } from "bun:sqlite";
 import { drizzle as drizzlePg } from "drizzle-orm/node-postgres";
 import { Pool } from "pg";
-import * as schema from "./schema";
+import * as core from "./core/schema";
+import * as versioning from "./versioning/schema";
+import * as backup from "./backup/schema";
+import * as optimize from "./optimize/schema";
+import * as monitor from "./monitor/schema";
 import { env } from "~/config/env";
 import { isCI, isDev, isStage, isQA, isProduction, isTest } from "~/config";
+
+/**
+ * Combined schema for Drizzle ORM.
+ * Includes core schema + extended schemas for management features.
+ */
+const schema = {
+  ...core,
+  ...versioning,
+  ...backup,
+  ...optimize,
+  ...monitor,
+};
 
 /**
  * Database type based on environment configuration.
