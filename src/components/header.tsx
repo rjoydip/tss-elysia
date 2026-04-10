@@ -33,10 +33,12 @@ export function Header({ className, children, showSignIn = true }: HeaderProps) 
       )}
     >
       <div className="flex items-center justify-between h-full px-6 mx-auto">
-        <div className="flex items-center gap-8">
+        <div className="flex items-center gap-2">
           <Link to="/" className="flex items-center gap-1 mt-1 font-bold text-xl">
             <BrandLogo size="sm" />
           </Link>
+        </div>
+        <div className="flex items-center gap-3">
           {!(isPending || session?.user) && (
             <nav className="hidden md:flex items-center gap-6">
               {navItems.map((item) => (
@@ -50,8 +52,7 @@ export function Header({ className, children, showSignIn = true }: HeaderProps) 
               ))}
             </nav>
           )}
-        </div>
-        <div className="flex items-center gap-3">
+
           {!(isPending || session?.user) && (
             <>
               <a
