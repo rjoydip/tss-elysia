@@ -3,7 +3,7 @@
 # =============================================================================
 # Stage 1: Dependencies - Install only production dependencies
 # =============================================================================
-FROM oven/bun:1.3-debian@sha256:a94d6d7e23c6a81f7c9c7c2c86aea1c2f17143aa6b7c1b5a5e4d5e3c4b2a1d0 AS deps
+FROM oven/bun:1.3-debian AS deps
 
 WORKDIR /app
 
@@ -16,7 +16,7 @@ RUN bun install --frozen-lockfile --omit=dev --ignore-scripts
 # =============================================================================
 # Stage 2: Builder - Build the application
 # =============================================================================
-FROM oven/bun:1.3-debian@sha256:a94d6d7e23c6a81f7c9c7c2c86aea1c2f17143aa6b7c1b5a5e4d5e3c4b2a1d0 AS builder
+FROM oven/bun:1.3-debian AS builder
 
 WORKDIR /app
 
@@ -39,7 +39,7 @@ RUN bun run build
 # =============================================================================
 # Stage 3: Production - Minimal runtime image
 # =============================================================================
-FROM oven/bun:1.3-debian@sha256:a94d6d7e23c6a81f7c9c7c2c86aea1c2f17143aa6b7c1b5a5e4d5e3c4b2a1d0 AS production
+FROM oven/bun:1.3-debian AS production
 
 WORKDIR /app
 
