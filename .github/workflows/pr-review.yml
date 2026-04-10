@@ -76,11 +76,25 @@ jobs:
 
             ## Output Format
 
-            - Use bullet points grouped by category
-            - Be concise but specific
-            - Reference exact parts of the code when possible
-            - Provide reasoning for each suggestion
-            - Prefix each category or issue with an emoji status indicator
+            Use a table format for each category with columns: **Status | Category | Description | Location | Suggestion**
+
+            ### Review Table Template
+            ```
+            | Status | Category | Description | Location | Suggestion |
+            |--------|----------|-------------|----------|-------------|
+            | ✅ | Code Quality | Issue description | file:line | Suggested fix |
+            ```
+
+            - Each row represents one finding
+            - **Status**: Emoji from the legend below
+            - **Category**: One of: Code Quality, Edge Cases, Performance, Security, Testing, Maintainability
+            - **Description**: Brief description of the issue (1-2 sentences)
+            - **Location**: File path and line number (e.g., `src/utils.ts:42`)
+            - **Suggestion**: Concrete improvement or fix
+
+            ### Group by Category
+            - Present findings grouped by category as separate tables
+            - If no issues in a category, omit the table or show a single row with ✅
 
             ### Emoji Status Legend
             Use these emojis to indicate the severity/priority of each issue:
