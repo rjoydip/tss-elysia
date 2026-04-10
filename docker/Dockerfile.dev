@@ -1,7 +1,7 @@
 # =============================================================================
 # Development Dockerfile - Optimized for hot reload and fast rebuilds
 # =============================================================================
-FROM dhi.io/bun:1-alpine3.2
+FROM oven/bun:1.3-alpine@sha256:888082a164cec9cbc842b24845285414635a68290eecf9c6d36100feb9f1a967
 
 WORKDIR /app
 
