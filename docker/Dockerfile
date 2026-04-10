@@ -49,11 +49,6 @@ RUN bun install --frozen-lockfile --omit=dev --ignore-scripts
 
 # Copy built artifacts from builder
 COPY --from=builder /app/dist ./dist
-COPY --from=builder /app/.output ./.output
-COPY --from=builder /app/public ./public
-
-# Copy database directory if exists (optional)
-COPY --from=builder /app/.artifacts ./artifacts 2>/dev/null || true
 
 # Create non-root user with proper group
 RUN groupadd -r -g 1000 appgroup && \
