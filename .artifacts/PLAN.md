@@ -301,13 +301,13 @@ Complete the authentication system with additional security features, set up use
 
 ### Phase 10: Database Strategy
 
-- [ ] Migrate from SQLite to PostgreSQL for production
-- [ ] Configure environment-based database selection (SQLite dev, PostgreSQL prod)
+- [x] Migrate from SQLite to PostgreSQL for production
+- [x] Configure environment-based database selection (SQLite dev, PostgreSQL prod)
 - [ ] Set up PostgreSQL connection pooling (pgBouncer)
-- [ ] Configure database migrations for PostgreSQL
+- [x] Configure database migrations for PostgreSQL
 - [ ] Add database schema versioning system
-- [ ] Set up database replication (read replicas)
-- [ ] Implement database health checks
+- [x] Set up database replication (read replicas)
+- [x] Implement database health checks
 - [ ] Add database backup/restore automation
 - [ ] Configure vector database for LLM embeddings (pgvector or Pinecone)
 - [ ] Add graph database for relationship data (Neo4j or Redis Graph)
@@ -321,8 +321,8 @@ Complete the authentication system with additional security features, set up use
 - [x] Implement Redis caching layer (use `src/lib/redis/index.ts`)
 - [x] Add Redis-backed rate limiting (replace in-memory)
 - [x] Add Redis session storage for Better Auth
-- [ ] Implement Pub/Sub event broadcasting for MCP
-- [ ] Add database read replicas support
+- [x] Implement Pub/Sub event broadcasting for MCP
+- [x] Add database read replicas support
 - [ ] Configure horizontal pod autoscaling (HPA)
 - [ ] Set up CDN for static assets
 - [ ] Implement API request coalescing
@@ -410,6 +410,16 @@ Complete the authentication system with additional security features, set up use
 - [x] Remove OAuth buttons from forgot password page
 - [x] Add showSignIn prop to Header component
 - [x] Fix Branding component to hide on mobile properly
+- [x] Add PostgreSQL replica configuration with `POSTGRES_REPLICAS` env var
+- [x] Configure primary database for read+write when no replicas configured
+- [x] Implement round-robin replica selection for read queries
+- [x] Add database pool configuration for health checks (`src/lib/db/index.ts`)
+- [x] Add database heartbeat API endpoint (`src/routes/api/modules/-database.ts`)
+- [x] Add database replica status to status dashboard UI
+- [x] Fix unused import warning in status.test.ts
+- [x] Add unit tests for database replica configuration (`test/lib/db/replica.test.ts`)
+- [x] Improve navigation E2E tests with proper wait states for parallel execution
+- [x] Update docs E2E tests to use networkidle for reliable navigation
 
 #### Notification & State Management
 
