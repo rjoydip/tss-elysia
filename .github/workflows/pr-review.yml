@@ -46,29 +46,29 @@ jobs:
 
             ## Review Guidelines
 
-            ### 1. Code Quality
+            ### 1. Code Quality ✅
             - Identify readability issues, naming inconsistencies, or unclear logic
             - Check adherence to best practices and coding standards
             - Highlight overly complex or redundant code
 
-            ### 2. Potential Bugs & Edge Cases
+            ### 2. Potential Bugs & Edge Cases ⚡
             - Look for logical errors, race conditions, or incorrect assumptions
             - Identify missing error handling or null/undefined checks
             - Consider edge cases that are not handled
 
-            ### 3. Performance & Scalability
+            ### 3. Performance & Scalability 📈
             - Point out inefficient algorithms or unnecessary computations
             - Highlight potential bottlenecks or memory issues
 
-            ### 4. Security Concerns
+            ### 4. Security Concerns 🛡️
             - Identify vulnerabilities (e.g., injection risks, improper validation)
             - Check for sensitive data exposure or unsafe operations
 
-            ### 5. Testing & Reliability
+            ### 5. Testing & Reliability 📝
             - Verify if adequate test coverage exists
             - Suggest missing test cases (unit/integration/edge cases)
 
-            ### 6. Maintainability & Design
+            ### 6. Maintainability & Design 🏗️
             - Evaluate modularity, separation of concerns, and reusability
             - Suggest improvements for long-term maintainability
 
@@ -88,11 +88,16 @@ jobs:
             | Emoji | Status | Meaning |
             |-------|--------|---------|
             | ✅ | Good | Code is well-written, follows best practices |
+            | 💡 | Observation | Not an issue, but worth noting or considering |
             | ⚠️ | Concern | Potential issue that needs attention |
             | 🔧 | Minor | Small improvement or nitpick |
             | 🔴 | Major | Important issue that should be addressed |
+            | 🛡️ | Security Concerns | Security vulnerability or risk |
             | 🎯 | LGTM | Looks Good To Me - no issues found |
-            | 📝 | Missing Coverage | Tests are missing or incomplete |
+            | 📝 | Gaps | Missing tests or incomplete coverage |
+            | ⚡ | Edge Cases | Missing handling for edge cases |
+            | 📈 | Reliability | Potential reliability or stability concerns |
+            | 🏗️ | Maintainability | Code maintainability or design improvements |
 
             ---
 
