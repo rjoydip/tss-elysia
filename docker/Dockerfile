@@ -51,11 +51,10 @@ RUN bun install --frozen-lockfile --omit=dev --ignore-scripts
 COPY --from=builder /app/dist ./dist
 
 # Create non-root user with proper group
-RUN groupadd -r -g 1000 appgroup && \
-    useradd -r -u 1000 -g appgroup -d /app -s /bin/false appuser || true
+RUN groupadd -r -g 1000 appgroup && useradd -r -u 1000 -g appgroup -d /app -s /bin/false appuser || useradd -r -u 1000 -d /app -s /bin/false appuser || true
 
 # Create data directory with proper permissions
-RUN mkdir -p /app/artifacts /app/.artifacts && chown -R appuser:appgroup /app
+RUN mkdir -p /app/artifacts /app/.artifacts && chown -R 1000:1000 /app
 
 # Switch to non-root user
 USER appuser
