@@ -63,7 +63,6 @@ describe("Header", () => {
       const html = renderToString(<Header />);
       expect(html).toContain("Documentation");
       expect(html).toContain("Blog");
-      expect(html).toContain("Changelog");
     });
 
     it("should render GitHub link when not logged in", () => {

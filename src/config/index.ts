@@ -156,7 +156,6 @@ export const AUTH_SERVICE_NAME = "Auth";
 export const navItems = [
   { name: "Documentation", href: "/docs" },
   { name: "Blog", href: "/blog" },
-  { name: "Changelog", href: "/changelog" },
 ];
 
 /**

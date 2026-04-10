@@ -38,9 +38,9 @@ export function Header({ className, children, showSignIn = true }: HeaderProps) 
             <BrandLogo size="sm" />
           </Link>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-1">
           {!(isPending || session?.user) && (
-            <nav className="hidden md:flex items-center gap-6">
+            <nav className="hidden md:flex items-center gap-3">
               {navItems.map((item) => (
                 <Link
                   key={item.href}
@@ -103,7 +103,7 @@ export function Header({ className, children, showSignIn = true }: HeaderProps) 
                 <DropdownMenu.Content
                   align="end"
                   sideOffset={8}
-                  className="min-w-[180px] bg-background rounded-md border shadow-md p-1 animate-in fade-in-0 zoom-in-95"
+                  className="min-w-45 bg-background rounded-md border shadow-md p-1 animate-in fade-in-0 zoom-in-95"
                 >
                   <DropdownMenu.Item asChild>
                     <Link

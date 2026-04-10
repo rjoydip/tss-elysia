@@ -160,3 +160,42 @@ jobs:
       - name: Cleanup database
         if: always()
         run: bun run scripts/remove-db.ts
+
+  docker-scan:
+    name: Docker Security Scan
+    runs-on: ubuntu-latest
+    if: github.actor != 'dependabot[bot]'
+    needs: [test]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@6c6b1989731c405f0b4a5897e2e4a5d1dea3e57e # v3.7.1
+
+      - name: Build Docker image
+        uses: docker/build-push-action@5cd3c6ab1f3d6d3bba6f7c91a6f79f3f1e3a9f9e # v6.7.0
+        with:
+          context: .
+          file: docker/Dockerfile
+          load: true
+          tags: tss-elysia:${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@1c3f9a6d3abf58c16fde51c7c4bb5d5fcc5f8d51 # master
+        with:
+          image-ref: "tss-elysia:${{ github.sha }}"
+          format: "table"
+          severity: "CRITICAL,HIGH"
+          exit-code: "1"
+          ignore-unfixed: true
+
+      - name: Scan for malware
+        uses: aquasecurity/trivy-action@1c3f9a6d3abf58c16fde51c7c4bb5d5fcc5f8d51 # master
+        with:
+          image-ref: "tss-elysia:${{ github.sha }}"
+          scanner: "malware"
+          format: "table"
+          exit-code: "1"

@@ -320,13 +320,7 @@ describe("navItems", () => {
     expect(blog!.href).toBe("/blog");
   });
 
-  it("should contain Changelog link", () => {
-    const changelog = navItems.find((i) => i.name === "Changelog");
-    expect(changelog).toBeDefined();
-    expect(changelog!.href).toBe("/changelog");
-  });
-
-  it("should have exactly 3 nav items", () => {
-    expect(navItems).toHaveLength(3);
+  it("should have exactly 2 nav items", () => {
+    expect(navItems).toHaveLength(2);
   });
 });

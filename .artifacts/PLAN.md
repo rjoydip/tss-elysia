@@ -213,6 +213,12 @@ Complete the authentication system with additional security features, set up use
 - [x] Set up Docker Compose for local development
 - [ ] Configure nginx for reverse proxy
 - [x] Set up CI/CD pipeline (GitHub Actions)
+- [x] Add Trivy container security scanning in CI
+  - [x] Add docker-scan job to CI workflow
+  - [x] Build Docker image locally in CI
+  - [x] Scan for vulnerabilities (CRITICAL, HIGH severity)
+  - [x] Scan for malware
+  - [x] Fail pipeline on critical findings
 - [ ] Add environment-specific configs (dev, staging, prod)
 - [ ] Configure horizontal scaling support
 - [ ] Set up database connection pooling
@@ -445,6 +451,11 @@ Complete the authentication system with additional security features, set up use
 - [x] Split UI component E2E tests into separate files (`.e2e/ui/*.spec.ts`)
 - [x] Update README.md with new test structure and folder structure
 - [x] Update AGENTS.md with testing requirements
+- [x] Add Trivy container security scanning in CI (`.github/workflows/ci.yml`)
+  - [x] Add docker-scan job that builds image locally
+  - [x] Scan for vulnerabilities (CRITICAL, HIGH) with Trivy
+  - [x] Scan for malware with Trivy
+  - [x] Configure fail-on-critical for security gates
 
 ---
 

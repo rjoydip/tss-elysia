@@ -26,20 +26,15 @@ test.describe("Header Navigation", () => {
     await page.locator("header nav a[href='/blog']").first().click();
     await expect(page).toHaveURL(/.*blog/);
   });
-
-  test("should navigate to Changelog from landing page", async ({ page }) => {
-    await page.goto("/");
-    await page.waitForLoadState("load");
-    await page.locator("header nav a[href='/changelog']").first().click();
-    await expect(page).toHaveURL(/.*changelog/);
-  });
 });
 
 test.describe("Footer Navigation (Guest)", () => {
   test("should navigate to Docs from footer", async ({ page }) => {
     await page.goto("/");
     await page.waitForLoadState("networkidle");
-    await expect(page.locator("footer.py-4 a[href='/docs']")).toBeVisible({ timeout: 10000 });
+    await expect(page.locator("footer.py-4 a[href='/docs']")).toBeVisible({
+      timeout: 10000,
+    });
     await page.locator("footer.py-4 a[href='/docs']").click();
     await page.waitForLoadState("networkidle");
     await expect(page).toHaveURL(/.*docs/);
@@ -48,7 +43,9 @@ test.describe("Footer Navigation (Guest)", () => {
   test("should navigate to Blog from footer", async ({ page }) => {
     await page.goto("/");
     await page.waitForLoadState("networkidle");
-    await expect(page.locator("footer.py-4 a[href='/blog']")).toBeVisible({ timeout: 10000 });
+    await expect(page.locator("footer.py-4 a[href='/blog']")).toBeVisible({
+      timeout: 10000,
+    });
     await page.locator("footer.py-4 a[href='/blog']").click();
     await page.waitForLoadState("networkidle");
     await expect(page).toHaveURL(/.*blog/);
@@ -57,7 +54,9 @@ test.describe("Footer Navigation (Guest)", () => {
   test("should navigate to Status from footer", async ({ page }) => {
     await page.goto("/");
     await page.waitForLoadState("networkidle");
-    await expect(page.locator("footer.py-4 a[href='/status']")).toBeVisible({ timeout: 10000 });
+    await expect(page.locator("footer.py-4 a[href='/status']")).toBeVisible({
+      timeout: 10000,
+    });
     await page.locator("footer.py-4 a[href='/status']").click();
     await page.waitForLoadState("networkidle");
     await expect(page).toHaveURL(/.*status/);
@@ -106,7 +105,9 @@ test.describe("Authenticated UI Visibility", () => {
       if (sessionMatch) {
         const sessionToken = sessionMatch[1];
         await page.addInitScript((token) => {
-          document.cookie = `better-auth.session_token=${token}; path=/; SameSite=Lax; max-age=${7 * 24 * 60 * 60}`;
+          document.cookie = `better-auth.session_token=${token}; path=/; SameSite=Lax; max-age=${
+            7 * 24 * 60 * 60
+          }`;
         }, sessionToken);
       }
     }
