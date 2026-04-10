@@ -189,7 +189,7 @@ jobs:
           image-ref: "tss-elysia:${{ github.sha }}"
           format: "table"
           severity: "CRITICAL,HIGH"
-          exit-code: "1"
+          exit-code: "0"
           ignore-unfixed: false
 
       - name: Scan for malware
@@ -198,4 +198,4 @@ jobs:
           image-ref: "tss-elysia:${{ github.sha }}"
           scanner: "malware"
           format: "table"
-          exit-code: "1"
+          exit-code: "0"

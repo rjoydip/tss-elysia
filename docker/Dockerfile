@@ -3,7 +3,7 @@
 # =============================================================================
 # Stage 1: Dependencies - Install only production dependencies
 # =============================================================================
-FROM oven/bun:1.3-debian AS deps
+FROM oven/bun:alpine AS deps
 
 WORKDIR /app
 
@@ -16,7 +16,7 @@ RUN bun install --frozen-lockfile --omit=dev --ignore-scripts
 # =============================================================================
 # Stage 2: Builder - Build the application
 # =============================================================================
-FROM oven/bun:1.3-debian AS builder
+FROM oven/bun:alpine AS builder
 
 WORKDIR /app
 
@@ -39,12 +39,12 @@ RUN bun run build
 # =============================================================================
 # Stage 3: Production - Minimal runtime image
 # =============================================================================
-FROM oven/bun:1.3-debian AS production
+FROM oven/bun:alpine AS production
 
 WORKDIR /app
 
 # Install wget for health check
-RUN apt-get update && apt-get install -y --no-install-recommends wget && rm -rf /var/lib/apt/lists/*
+RUN apk update && apk install -y --no-install-recommends wget && rm -rf /var/lib/apt/lists/*
 
 # Install only runtime dependencies needed for the app
 COPY package.json bun.lock* ./
