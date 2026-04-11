@@ -14,9 +14,9 @@ import {
 } from "./schema";
 import { getWriteDb } from "../index";
 import { eq, desc, and, lt } from "drizzle-orm";
-import { createHash } from "node:crypto";
-import { mkdir, readFile, rm, stat } from "node:fs/promises";
-import { join } from "node:path";
+import { createHash } from "crypto";
+import { mkdir, readFile, rm, stat } from "fs/promises";
+import { join } from "path";
 import { env } from "~/config/env";
 
 /**

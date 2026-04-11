@@ -3,7 +3,7 @@
  * Handles key generation, hashing, validation, and management.
  */
 
-import { randomBytes, createHash } from "node:crypto";
+import { randomBytes, createHash } from "crypto";
 import { db } from "~/lib/db";
 import { mcpApiKeys, type McpApiKey } from "~/lib/db/schema";
 import { eq, and, desc } from "drizzle-orm";

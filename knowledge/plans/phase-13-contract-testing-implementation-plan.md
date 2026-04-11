@@ -26,7 +26,7 @@ This plan outlines the steps to introduce contract testing using Pact to ensure 
 
 ### [Planning & Documentation]
 
-#### [MODIFY] [PLAN.md](file:///c:/Users/rjoydip/codebase/tss-elysia/.artifacts/PLAN.md)
+#### [MODIFY] [PLAN.md](file:///c:/Users/rjoydip/codebase/tss-elysia/knowledge/PLAN.md)
 
 - Add Phase 13: Contract Testing.
 - Update goals and tasks to include Pact integration.

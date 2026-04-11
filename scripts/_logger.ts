@@ -3,8 +3,8 @@
  * Provides consistent logging across all scripts in the project.
  */
 
-import { fileURLToPath } from "node:url";
-import { dirname } from "node:path";
+import { fileURLToPath } from "url";
+import { dirname } from "path";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 

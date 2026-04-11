@@ -154,13 +154,13 @@ All necessary information is in [README.md](./README.md), including:
 
 ## Recommended Workflow
 
-1. For any task, first check [PLAN.md](./.artifacts/PLAN.md) to see if it's already planned
+1. For any task, first check [PLAN.md](./knowledge/PLAN.md) to see if it's already planned
 2. For non-trivial tasks, create a plan using PLAN.md template
 3. Create/edit code
 4. Run `bun run fmt` to ensure formatting
 5. Run `bun run lint:fix` to auto-fix issues
 6. Run `bun run typecheck` to verify types
-7. Run `bun test` to verify unit test
+7. Run `bun run test:unit` to verify unit test
 8. Run `bun run test:e2e` to verify E2E test
 9. Once changes are complete, verify and update `PLAN.md` (mark completed tasks/goals)
 10. Commit changes (hooks will verify)

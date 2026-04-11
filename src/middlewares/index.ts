@@ -17,7 +17,7 @@ import { openapi } from "@elysiajs/openapi";
 import { opentelemetry } from "@elysiajs/opentelemetry";
 import { BatchSpanProcessor } from "@opentelemetry/sdk-trace-node";
 import { OTLPTraceExporter } from "@opentelemetry/exporter-trace-otlp-proto";
-import { APP_NAME } from "~/config";
+import { APP_NAME, isProduction } from "~/config";
 import { cors, corsWithCredentials } from "./cors";
 import { helmet } from "./helmet";
 import { rateLimitMiddleware } from "./rate-limit";
@@ -100,9 +100,6 @@ export const traceFn: TraceHandler = async ({
  * .onError(errorFn)
  */
 export const errorFn: ErrorHandler = ({ code, error }) => {
-  // Determine if running in production to control error detail exposure
-  const isProduction = typeof process !== "undefined" && process.env.NODE_ENV === "production";
-
   // Sanitize error message: show full details in dev, generic message in prod
   const errorMessage = isProduction
     ? "An unexpected error occurred"

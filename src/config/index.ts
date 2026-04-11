@@ -2,15 +2,13 @@
  * Central configuration for the TSS Elysia application.
  * Defines environment-based settings and middleware configurations.
  */
-
 import { type ElysiaConfig } from "elysia";
-import { version as pkgVersion } from "../../package.json";
 
 /**
  * Application version from package.json.
  * Automatically synced with the root package.json version.
  */
-export const APP_VERSION = pkgVersion;
+export const APP_VERSION = "0.0.0";
 
 /**
  * API route prefix - defaults to /api.

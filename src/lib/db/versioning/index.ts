@@ -13,7 +13,7 @@ import {
   type MigrationHistory as MigrationHistoryType,
   type RollbackPoint,
 } from "./schema";
-import { createHash } from "node:crypto";
+import { createHash } from "crypto";
 
 /**
  * Current schema version.

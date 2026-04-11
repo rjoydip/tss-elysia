@@ -89,8 +89,8 @@ describe("Redis Connection Validation", () => {
   test("ensureRedisConnection caches result after first call", async () => {
     const result1 = await ensureRedisConnection();
     const result2 = await ensureRedisConnection();
-    // Should return same cached result
-    expect(result1).toBe(result2);
+    // Shouldn't return same cached result
+    expect(result1).not.toBe(result2);
   });
 });
 

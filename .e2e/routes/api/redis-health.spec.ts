@@ -4,15 +4,22 @@
  */
 
 import { test, expect } from "@playwright/test";
+import { apiGet } from "../../helpers/api-route";
 
 test.describe("Redis Heartbeat API", () => {
-  test("GET /api/redis/heartbeat returns valid response", async ({ request }) => {
-    const response = await request.get("/api/redis/heartbeat");
+  test("GET /api/redis/heartbeat returns valid response", async ({ page }) => {
+    const response = await apiGet(page, "/api/redis/heartbeat");
 
     // Should return either 200 (healthy) or 503 (unhealthy)
-    expect([200, 503]).toContain(response.status());
+    expect([200, 503]).toContain(response.status);
 
-    const body = await response.json();
+    const body = response.body as {
+      status: string;
+      connected: boolean;
+      url: string;
+      timestamp: string;
+      detail: string;
+    };
 
     // Response should include required fields regardless of status
     expect(body).toHaveProperty("status");
@@ -31,9 +38,9 @@ test.describe("Redis Heartbeat API", () => {
     expect(new Date(body.timestamp).toISOString()).toBe(body.timestamp);
   });
 
-  test("GET /api/redis/heartbeat returns correct Content-Type", async ({ request }) => {
-    const response = await request.get("/api/redis/heartbeat");
-    const contentType = response.headers()["content-type"];
+  test("GET /api/redis/heartbeat returns correct Content-Type", async ({ page }) => {
+    const response = await apiGet(page, "/api/redis/heartbeat");
+    const contentType = response.headers["content-type"];
     expect(contentType).toContain("application/json");
   });
 });

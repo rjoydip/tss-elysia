@@ -11,8 +11,8 @@
  */
 
 import { drizzle as drizzleSQLite } from "drizzle-orm/bun-sqlite";
-import { Database } from "bun:sqlite";
 import { drizzle as drizzlePg } from "drizzle-orm/node-postgres";
+import { Database } from "bun:sqlite";
 import { Pool } from "pg";
 import * as core from "./core/schema";
 import * as versioning from "./versioning/schema";
@@ -111,8 +111,8 @@ export function getDatabaseType(): DatabaseType {
  *
  * @returns SQLite database instance and Drizzle ORM
  */
-function createSQLiteConnection() {
-  const dbName = getDatabaseName();
+export function createSQLiteConnection() {
+  const dbName = getSQLiteDatabaseName();
   const dbPath = `${env.DATABASE_PATH}/${dbName}`;
 
   sqlite = new Database(dbPath);
@@ -178,29 +178,17 @@ function buildPostgresConnectionString(): string {
  *
  * @returns Database filename
  */
-function getDatabaseName(): string {
+function getSQLiteDatabaseName(): string {
   // Test environment always uses test database
   if (isTest || isCI) {
     return "tss-elysia.db";
   }
 
-  // Extract environment from NODE_ENV
-  const nodeEnv = isDev
-    ? "development"
-    : isStage
-      ? "stage"
-      : isQA
-        ? "qa"
-        : isProduction
-          ? "production"
-          : "development";
-
   // Use custom name if set, otherwise use environment-specific name
   if (env.DATABASE_NAME && !env.DATABASE_NAME.includes("tss-elysia")) {
     return env.DATABASE_NAME;
   }
-
-  return `tsse-${nodeEnv}.db`;
+  return "tss-elysia.db";
 }
 
 /**

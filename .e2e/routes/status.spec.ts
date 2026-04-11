@@ -17,7 +17,7 @@ test.describe("Status Page", () => {
   test("should display overall status indicator", async ({ page }) => {
     await expect(
       page.getByText(
-        /APIs are healthy|Some services are degraded and need attention|Checking service health\.\.\.|Service health is currently unknown/,
+        /Operational|Some services are degraded and need attention|Checking service health\.\.\.|Service health is currently unknown/,
       ),
     ).toBeVisible();
   });

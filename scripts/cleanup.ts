@@ -23,9 +23,9 @@
  *   --dry-run    Show what would be deleted without deleting
  */
 
-import { existsSync, rmSync, readdirSync, statSync } from "node:fs";
-import { join, dirname } from "node:path";
-import { fileURLToPath } from "node:url";
+import { existsSync, rmSync, readdirSync, statSync } from "fs";
+import { join, dirname } from "path";
+import { fileURLToPath } from "url";
 import { logger } from "./_logger";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));

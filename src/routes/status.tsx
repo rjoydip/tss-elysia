@@ -140,7 +140,7 @@ function HealthDashboard() {
     if (allUp)
       return (
         <div className="flex text-xs px-3 py-1 text-success hover:text-success/90 animate-pulse">
-          <span>APIs are healthy</span>&nbsp;(
+          <span>Operational</span>&nbsp;(
           <Activity className="w-4 h-4" />)
         </div>
       );

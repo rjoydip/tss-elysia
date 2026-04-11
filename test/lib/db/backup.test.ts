@@ -1,7 +1,7 @@
 import { describe, expect, it, beforeEach, afterAll } from "bun:test";
 import { Database } from "bun:sqlite";
-import { mkdir, rm } from "node:fs/promises";
-import { join } from "node:path";
+import { mkdir, rm } from "fs/promises";
+import { join } from "path";
 
 const TEST_DB_PATH = join(import.meta.dir, "..", "..", "fixtures", ".test-backup.db");
 const TEST_BACKUP_DIR = join(import.meta.dir, "..", "..", "fixtures", ".test-backups");

@@ -3,6 +3,7 @@
  * Prevents cross-site WebSocket hijacking attacks.
  */
 
+import { isProduction } from "~/config";
 import { logger } from "~/lib/logger";
 
 /**
@@ -21,7 +22,7 @@ export interface CsrfConfig {
  * Default CSRF configuration.
  */
 export const defaultCsrfConfig: CsrfConfig = {
-  enabled: process.env.NODE_ENV === "production",
+  enabled: isProduction,
   tokenLength: 32,
   headerName: "x-csrf-token",
 };

@@ -15,10 +15,11 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
+    "types": ["bun", "react"],
     "paths": {
       "~/*": ["./src/*"],
       "*": ["./*"]
     }
   },
-  "include": ["src", "src/server.ts", "vite.config.ts"]
+  "include": ["src", "src/server.ts", "playwright.config.ts", "vite.config.ts"]
 }

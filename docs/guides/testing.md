@@ -188,16 +188,36 @@ test("should display home page", async ({ page }) => {
 });
 ```
 
-### API Tests (`.e2e/api/*.spec.ts`)
+### API Tests (`.e2e/routes/api/*.spec.ts`)
+
+E2E API tests use Playwright's `page.request` API via helper functions for stability:
 
 ```typescript
-import { test, expect } from "@playwright/test";
+// .e2e/helpers/api-route.ts
+import { apiGet, apiPost, apiFetch, signUp, signIn } from "./helpers/api-route";
 
-test("should respond to /api/test", async ({ request }) => {
-  const response = await request.get("/api/test");
-  expect(response.status()).toBeGreaterThanOrEqual(200);
+test("should return health status", async ({ page }) => {
+  const response = await apiGet(page, "/api/health");
+  expect(response.status).toBe(200);
+  expect(response.body.status).toBe("healthy");
+});
+
+test("should register user", async ({ page }) => {
+  const response = await signUp(page, "test@example.com", "password123");
+  expect(response.status).toBe(200);
 });
 ```
+
+#### Helper Functions
+
+| Function                              | Usage                                      |
+| ------------------------------------- | ------------------------------------------ |
+| `apiGet(page, url)`                   | GET requests                               |
+| `apiPost(page, url, data)`            | POST requests                              |
+| `apiFetch(page, url, options)`        | Generic fetch (POST, PUT, DELETE, OPTIONS) |
+| `signUp(page, email, password, name)` | Authentication signup                      |
+| `signIn(page, email, password)`       | Authentication signin                      |
+| `uniqueEmail(prefix)`                 | Generate unique test email                 |
 
 ### Selectors
 

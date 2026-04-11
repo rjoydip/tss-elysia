@@ -4,29 +4,34 @@
  */
 
 import { test, expect } from "@playwright/test";
+import { apiGet } from "../../helpers/api-route";
 
 test.describe("OpenAPI Documentation", () => {
-  test("should expose Scalar reference UI at /api/reference", async ({ request }) => {
-    const response = await request.get(`/api/reference`);
-    expect(response.status()).toBe(200);
+  test("should expose Scalar reference UI at /api/reference", async ({ page }) => {
+    const response = await apiGet(page, "/api/reference");
+    expect(response.status).toBe(200);
 
-    const contentType = response.headers()["content-type"];
+    const contentType = response.headers["content-type"];
     expect(contentType).toContain("text/html");
 
-    const body = await response.text();
+    const body = response.text;
     // Usually Scalar UI contains 'Scalar' or something similar in its HTML,
     // or just checking if it looks like an HTML file
     expect(body).toContain("<html");
   });
 
-  test("should expose OpenAPI spec JSON at /api/reference/json", async ({ request }) => {
-    const response = await request.get(`/api/reference/json`);
-    expect(response.status()).toBe(200);
+  test("should expose OpenAPI spec JSON at /api/reference/json", async ({ page }) => {
+    const response = await apiGet(page, "/api/reference/json");
+    expect(response.status).toBe(200);
 
-    const contentType = response.headers()["content-type"];
+    const contentType = response.headers["content-type"];
     expect(contentType).toContain("application/json");
 
-    const body = await response.json();
+    const body = response.body as {
+      openapi: string;
+      info: { title: string };
+      paths: Record<string, unknown>;
+    };
 
     // Verifying it looks like an OpenAPI spec
     expect(body.openapi).toBeDefined();

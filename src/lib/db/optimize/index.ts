@@ -5,7 +5,7 @@
 
 import { sqlite, getWriteDb } from "../index";
 import { eq, desc, and, gt, sql } from "drizzle-orm";
-import { createHash } from "node:crypto";
+import { createHash } from "crypto";
 import {
   queryMetrics,
   indexRecommendations,

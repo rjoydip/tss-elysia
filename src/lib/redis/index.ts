@@ -1,190 +1,315 @@
 /**
- * Redis client singleton using Bun's native RedisClient.
- * Provides lazy connection, health monitoring, and graceful shutdown.
+ * Unstorage-based storage client supporting multiple backends.
+ * Uses unstorage with db0 connectors for database storage.
  *
- * Uses REDIS_URL environment variable for connection string, supporting:
- * - Local Docker: redis://localhost:6379
- * - Upstash:      rediss://default:TOKEN@HOST.upstash.io:6379
- *
- * The client is optional — when REDIS_URL is not set, all functions
- * return null/disabled state so the app can run without Redis.
+ * Priority: Redis > SQLite/PostgreSQL based on DATABASE_TYPE
  *
  * @module redis
- * @see https://bun.com/docs/runtime/redis
+ * @see https://unstorage.unjs.io/
+ * @see https://db0.unjs.io/
  */
 
-import { RedisClient } from "bun";
+import { createStorage, type Storage } from "unstorage";
+import { createDatabase } from "db0";
+import type { Connector } from "db0";
 import { env } from "~/config/env";
 import { redisLogger } from "../logger";
 
 /**
- * Redis connection status for health checks.
- * Used by the status endpoint to report Redis availability.
+ * Storage connection status for health checks.
  */
 export interface RedisStatus {
-  /** Whether Redis is currently connected */
   connected: boolean;
-  /** Redis URL (masked for security — hides passwords/tokens) */
+  type: string;
   url: string;
-  /** Error message if connection failed */
   error?: string;
 }
 
-/** Redis client instance — null if REDIS_URL is not configured */
-let client: RedisClient | null = null;
+/** Unstorage instance */
+let storage: Storage | null = null;
 
-/** Track initialization state to avoid multiple connect attempts */
+/** Track initialization state */
 let initialized = false;
 
+/** Track initialization error */
+let initError: Error | null = null;
+
 /**
- * Masks sensitive parts of the Redis URL for logging.
- * Preserves host, port, and scheme but hides passwords and tokens.
- *
- * @param url - Raw Redis connection URL
- * @returns Masked URL safe for logging
- *
- * @example
- * maskRedisUrl("redis://user:secret@host:6379") // "redis://user:***@host:6379/"
+ * Masks sensitive parts of the connection URL for logging.
  */
-function maskRedisUrl(url: string): string {
+function maskUrl(url: string): string {
   try {
     const parsed = new URL(url);
-    if (parsed.username) {
-      parsed.username = "***";
-    }
-    if (parsed.password) {
-      parsed.password = "***";
-    }
+    if (parsed.username) parsed.username = "***";
+    if (parsed.password) parsed.password = "***";
     return parsed.toString();
   } catch {
-    return "redis://***";
+    return "***";
   }
 }
 
 /**
- * Returns the Redis client singleton.
- * Creates the client on first call (lazy initialization).
- * No connection is made until the first Redis command is executed.
- *
- * Returns null if REDIS_URL is not configured, allowing the app
- * to run gracefully without Redis.
- *
- * @returns RedisClient instance or null if Redis is unavailable
+ * Gets the database connection URI based on DATABASE_TYPE.
  */
-export function getRedisClient(): RedisClient | null {
-  if (!env.REDIS_URL) {
-    redisLogger.debug("REDIS_URL not configured, Redis disabled");
+function getDatabaseUri(): string {
+  const dbPath = env.DATABASE_PATH ?? ".artifacts";
+  const dbName = env.DATABASE_NAME ?? "tss-elysia.db";
+
+  if (env.DATABASE_TYPE === "postgres") {
+    if (env.POSTGRES_URL) return env.POSTGRES_URL;
+    const host = env.POSTGRES_HOST ?? "localhost";
+    const port = env.POSTGRES_PORT ?? 5432;
+    const user = env.POSTGRES_USER ?? "postgres";
+    const password = env.POSTGRES_PASSWORD ?? "";
+    const database = env.POSTGRES_DB ?? "tss-elysia";
+    return `postgresql://${user}:${password}@${host}:${port}/${database}`;
+  }
+
+  return `sqlite://${dbPath}/${dbName}`;
+}
+
+/**
+ * Creates and initializes the storage instance.
+ * Uses dynamic imports to avoid bundling issues with different environments.
+ */
+async function initStorageAsync(): Promise<Storage | null> {
+  if (env.REDIS_URL) {
+    try {
+      const { default: redisDriver } = await import("unstorage/drivers/redis");
+      const store = createStorage({
+        driver: redisDriver({ url: env.REDIS_URL }),
+      });
+      redisLogger.info("Redis storage initialized", {
+        url: maskUrl(env.REDIS_URL),
+      });
+      return store;
+    } catch (error) {
+      redisLogger.warn("Failed to initialize Redis storage, falling back to database", {
+        error: (error as Error).message,
+      });
+    }
+  }
+
+  try {
+    let connector: Connector;
+
+    if (env.DATABASE_TYPE === "postgres") {
+      const { default: postgresql } = await import("db0/connectors/postgresql");
+      connector = postgresql({ url: getDatabaseUri() });
+    } else {
+      const { default: sqlite } = await import("db0/connectors/better-sqlite3");
+      const dbPath = env.DATABASE_PATH ?? ".artifacts";
+      const dbName = env.DATABASE_NAME ?? "tss-elysia.db";
+      connector = sqlite({ path: `${dbPath}/${dbName}` });
+    }
+
+    const database = createDatabase(connector);
+    const { default: dbDriver } = await import("unstorage/drivers/db0");
+
+    const store = createStorage({
+      driver: dbDriver({
+        database,
+        tableName: "storage",
+      }),
+    });
+
+    const uri = getDatabaseUri();
+    redisLogger.info("Database storage initialized", {
+      type: env.DATABASE_TYPE ?? "sqlite",
+      url: maskUrl(uri),
+    });
+
+    return store;
+  } catch (error) {
+    redisLogger.error("Failed to initialize database storage", error as Error);
+    initError = error as Error;
     return null;
   }
+}
+
+/**
+ * Returns the storage instance (async initialization).
+ */
+export async function getStorageAsync(): Promise<Storage | null> {
+  if (storage) return storage;
 
   if (!initialized) {
     initialized = true;
-    try {
-      client = new RedisClient(env.REDIS_URL as string, {
-        // Connection timeout: 10 seconds
-        connectionTimeout: 10_000,
-        // Auto-reconnect with exponential backoff on disconnection
-        autoReconnect: true,
-        // Max reconnection attempts before giving up
-        maxRetries: 5,
-        // Queue commands while disconnected (replayed on reconnect)
-        enableOfflineQueue: true,
-        // Auto-pipeline concurrent commands for better throughput
-        enableAutoPipelining: true,
-        // TLS is inferred automatically from rediss:// scheme
-      });
+    storage = await initStorageAsync();
+  }
 
-      // Log connection lifecycle events for monitoring
-      client.onconnect = () => {
-        redisLogger.info("Connected to Redis", {
-          url: maskRedisUrl(env.REDIS_URL as string),
-        });
-      };
+  return storage;
+}
 
-      client.onclose = (error) => {
-        redisLogger.warn("Redis connection closed", {
-          error: error?.message ?? "unknown",
-        });
-      };
+/**
+ * Returns the storage instance (sync, may return null if not initialized).
+ */
+export function getStorage(): Storage | null {
+  return storage;
+}
 
-      redisLogger.info("Redis client initialized", {
-        url: maskRedisUrl(env.REDIS_URL as string),
-      });
-    } catch (error) {
-      redisLogger.error("Failed to initialize Redis client", error as Error);
-      client = null;
+/**
+ * Wrapper class that provides RedisClient-compatible interface for unstorage
+ */
+class StorageWrapper implements PromiseLike<any> {
+  private storage: Storage;
+
+  constructor(storage: Storage) {
+    this.storage = storage;
+  }
+
+  async send(command: string, args: string[]): Promise<any> {
+    const cmd = command.toUpperCase();
+
+    switch (cmd) {
+      case "SET": {
+        const [key, value, EX, ttl] = args;
+        if (EX && ttl) {
+          await this.storage.set(key, value, { ttl: parseInt(ttl, 10) * 1000 });
+        } else {
+          await this.storage.set(key, value);
+        }
+        return "OK";
+      }
+
+      case "GET": {
+        const [key] = args;
+        const value = await this.storage.getItem(key);
+        return value ?? null;
+      }
+
+      case "DEL": {
+        const keys = args;
+        let deleted = 0;
+        for (const key of keys) {
+          await this.storage.removeItem(key);
+          deleted++;
+        }
+        return deleted;
+      }
+
+      case "SCAN": {
+        const [_cursor, _match, pattern, countStr] = args;
+        const count = parseInt(countStr || "100", 10);
+        const keys = await this.storage.getKeys();
+
+        const filteredKeys = keys
+          .filter((key: string) => {
+            if (pattern) {
+              const regex = new RegExp(pattern.replace(/\*/g, ".*"));
+              return regex.test(key);
+            }
+            return true;
+          })
+          .slice(0, count);
+
+        return ["0", filteredKeys];
+      }
+
+      case "PING": {
+        return "PONG";
+      }
+
+      case "EXPIRE": {
+        const [key, seconds] = args;
+        const ttlMs = parseInt(seconds, 10) * 1000;
+        const value = await this.storage.getItem(key);
+        if (value !== null && value !== undefined) {
+          await this.storage.set(key, value, { ttl: ttlMs });
+          return 1;
+        }
+        return 0;
+      }
+
+      case "TTL": {
+        const [key] = args;
+        const value = await this.storage.getItem(key);
+        return value !== null && value !== undefined ? -1 : -2;
+      }
+
+      default:
+        redisLogger.warn("Unsupported Redis command in storage wrapper", { command });
+        return null;
     }
   }
 
-  return client;
+  then<TResult1 = any, TResult2 = never>(
+    onfulfilled?: ((value: any) => TResult1 | PromiseLike<TResult1>) | null,
+    onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | null,
+  ): Promise<TResult1 | TResult2> {
+    return Promise.resolve(this).then(onfulfilled, onrejected);
+  }
+
+  catch<TResult = never>(
+    onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | null,
+  ): Promise<any> {
+    return Promise.resolve(this).catch(onrejected);
+  }
+
+  finally(onfinally?: (() => void) | null): Promise<any> {
+    return Promise.resolve(this).finally(onfinally);
+  }
 }
 
-/** Tracks whether Redis connection has been validated */
+/**
+ * @deprecated Use getStorageAsync() and getStorage() instead.
+ * Returns storage wrapper for compatibility.
+ */
+export function getRedisClient(): StorageWrapper | null {
+  return storage ? new StorageWrapper(storage) : null;
+}
+
+/** Track whether storage connection has been validated */
 let validated = false;
 
 /**
- * Validates Redis connection on first access.
- * Ensures the client can communicate with Redis before returning.
- * Safe to call multiple times - validation runs once.
+ * Validates storage connection on first access.
  */
 export async function ensureRedisConnection(): Promise<boolean> {
-  if (!env.REDIS_URL) {
-    return false;
-  }
+  const store = await getStorageAsync();
+  if (!store) return false;
 
-  if (validated) {
-    return client !== null;
-  }
+  if (validated) return store !== null;
 
   validated = true;
   return validateRedisConnection();
 }
 
 /**
- * Validates Redis connectivity by attempting a PING command.
- * Ensures the client can communicate with Redis before operations.
- *
- * @returns True if connection is working, false otherwise
+ * Validates storage connectivity.
  */
 export async function validateRedisConnection(): Promise<boolean> {
-  const redisClient = getRedisClient();
-  if (!redisClient) {
-    return false;
-  }
+  const store = await getStorageAsync();
+  if (!store) return false;
 
   try {
-    const pong = await redisClient.send("PING", []);
-    return pong === "PONG";
+    await store.get("_health_check");
+    return true;
   } catch {
     return false;
   }
 }
 
 /**
- * Checks Redis connectivity by sending a PING command.
- * Used by the health check endpoint to report Redis status.
- *
- * @returns Redis connection status object with connectivity info
+ * Checks storage connectivity for health endpoint.
  */
 export async function getRedisStatus(): Promise<RedisStatus> {
-  const redisUrl = env.REDIS_URL as string | undefined;
-  const url = redisUrl ? maskRedisUrl(redisUrl) : "not configured";
+  const uri = env.REDIS_URL ?? getDatabaseUri();
+  const url = maskUrl(uri);
+  const type = env.REDIS_URL ? "redis" : (env.DATABASE_TYPE ?? "sqlite");
 
-  const redisClient = getRedisClient();
-  if (!redisClient) {
-    return { connected: false, url, error: "Redis not configured" };
+  const store = await getStorageAsync();
+  if (!store) {
+    return { connected: false, type, url, error: initError?.message ?? "Storage not configured" };
   }
 
   try {
-    // PING returns "PONG" if the server is reachable and responsive
-    const pong = await redisClient.send("PING", []);
-    return {
-      connected: pong === "PONG",
-      url,
-    };
+    await store.get("_health_check");
+    return { connected: true, type, url };
   } catch (error) {
     return {
       connected: false,
+      type,
       url,
       error: (error as Error).message,
     };
@@ -192,15 +317,21 @@ export async function getRedisStatus(): Promise<RedisStatus> {
 }
 
 /**
- * Gracefully closes the Redis connection.
- * Should be called during application shutdown to clean up resources.
- * Safe to call multiple times — subsequent calls are no-ops.
+ * Gracefully closes the storage connection.
  */
 export function closeRedis(): void {
-  if (client) {
-    redisLogger.info("Closing Redis connection");
-    client.close();
-    client = null;
+  if (storage) {
+    redisLogger.info("Closing storage connection");
+    if (typeof storage.dispose === "function") {
+      try {
+        storage.dispose();
+      } catch {
+        // Ignore during shutdown
+      }
+    }
+    storage = null;
     initialized = false;
+    validated = false;
+    initError = null;
   }
 }

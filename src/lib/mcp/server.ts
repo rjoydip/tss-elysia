@@ -5,7 +5,7 @@
  */
 
 import { McpServer, ResourceTemplate } from "@modelcontextprotocol/server";
-import { randomUUID } from "node:crypto";
+import { randomUUID } from "crypto";
 import { logger } from "~/lib/logger";
 import { registerAuthTools } from "./tools/auth";
 import { registerUserTools } from "./tools/users";

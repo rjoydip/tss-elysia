@@ -13,13 +13,13 @@ import { E2E_BASE_URL, E2E_HOST, E2E_PORT } from "./.e2e/_config";
 
 export default defineConfig({
   testDir: "./.e2e",
-  fullyParallel: true,
+  testMatch: "**/*.spec.ts",
   forbidOnly: !!isCI,
   retries: isCI ? 2 : 0,
   workers: isCI ? 1 : undefined,
   reporter: "html",
-  globalSetup: "./.e2e/_setup.ts",
-  globalTeardown: "./.e2e/_teardown.ts",
+  globalSetup: "./.e2e/setup.ts",
+  globalTeardown: "./.e2e/teardown.ts",
   use: {
     baseURL: E2E_BASE_URL,
     trace: "on-first-retry",
@@ -34,12 +34,12 @@ export default defineConfig({
   webServer: isCI
     ? undefined
     : {
-        command:
-          process.platform === "win32"
-            ? `set NODE_ENV=test&& bun run preview --host=${E2E_HOST} --port=${E2E_PORT}`
-            : `NODE_ENV=test bun run preview --host=${E2E_HOST} --port=${E2E_PORT}`,
+        command: `bun run preview --host=${E2E_HOST} --port=${E2E_PORT}`,
         url: E2E_BASE_URL,
         reuseExistingServer: !isCI,
         timeout: 120 * 1000,
+        env: {
+          NODE_ENV: "test",
+        },
       },
 });

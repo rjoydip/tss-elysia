@@ -1,5 +1,5 @@
-import { existsSync, unlinkSync } from "node:fs";
-import { resolve } from "node:path";
+import { existsSync, unlinkSync } from "fs";
+import { resolve } from "path";
 import { Client } from "pg";
 import { logger } from "./_logger";
 

@@ -13,9 +13,9 @@
  *   bun run scripts/release.ts --skip-tag    # Skip git tagging
  */
 
-import { existsSync, readdirSync, readFileSync } from "node:fs";
-import { join, dirname } from "node:path";
-import { fileURLToPath } from "node:url";
+import { existsSync, readdirSync, readFileSync } from "fs";
+import { join, dirname } from "path";
+import { fileURLToPath } from "url";
 import { logger } from "./_logger";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));

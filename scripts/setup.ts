@@ -23,9 +23,9 @@
  *   bun run scripts/setup.ts --skip-db
  */
 
-import { existsSync, copyFileSync } from "node:fs";
-import { join, dirname } from "node:path";
-import { fileURLToPath } from "node:url";
+import { existsSync, copyFileSync } from "fs";
+import { join, dirname } from "path";
+import { fileURLToPath } from "url";
 import { logger } from "./_logger";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));

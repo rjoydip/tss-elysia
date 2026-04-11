@@ -43,7 +43,7 @@ graph TD
 | `test/lib/redis/redis.test.ts`  | **Create** | Unit tests for Redis client module                               |
 | `test/lib/redis/pubsub.test.ts` | **Create** | Unit tests for Pub/Sub module                                    |
 | `.e2e/api/redis-health.spec.ts` | **Create** | E2E test for Redis health in status endpoint                     |
-| `.artifacts/PLAN.md`            | **Modify** | Update Phase 7/11 with Redis tasks                               |
+| `knowledge/PLAN.md`             | **Modify** | Update Phase 7/11 with Redis tasks                               |
 
 ---
 
@@ -288,11 +288,6 @@ function maskRedisUrl(url: string): string {
  * @returns RedisClient instance or null if Redis is unavailable
  */
 export function getRedisClient(): RedisClient | null {
-  if (!env.REDIS_URL) {
-    redisLogger.debug("REDIS_URL not configured, Redis disabled");
-    return null;
-  }
-
   if (!initialized) {
     initialized = true;
     try {

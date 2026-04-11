@@ -1,0 +1,72 @@
+// Folder-specific settings
+// For a full list of overridable settings, and general information on folder-specific settings,
+// see the documentation: https://zed.dev/docs/configuring-zed#settings-files
+{
+  "edit_predictions": {
+    "provider": "zed"
+  },
+  "format_on_save": "off",
+  "ensure_final_newline_on_save": true,
+  "soft_wrap": "editor_width",
+  "disable_ai": false,
+  "show_completion_documentation": false,
+  "theme": {
+    "mode": "dark",
+    "light": "Catppuccin Latte",
+    "dark": "Catppuccin Frappé"
+  },
+  "terminal": {
+    "shell": {
+      "program": "C:\\Program Files\\Git\\usr\\bin\\bash.exe"
+    }
+  },
+  "inlay_hints": {
+    "enabled": false,
+    "show_parameter_hints": true,
+    "show_type_hints": true,
+    "show_value_hints": true,
+    "show_other_hints": true
+  },
+  "lsp": {
+    "vtsls": {
+      "settings": {
+        "typescript": {
+          "tsserver": {
+            "experimental": {
+              "enableProjectDiagnostics": true
+            }
+          }
+        }
+      }
+    }
+  },
+  "languages": {
+    "TypeScript": {
+      "language_servers": ["vtsls", "eslint", "biome"],
+      "formatter": { "language_server": { "name": "biome" } },
+      "format_on_save": "on",
+      "use_on_type_format": false // FIX that annoying gap when closing brackets
+    },
+    "TSX": {
+      "language_servers": ["vtsls", "eslint", "biome"],
+      "formatter": { "language_server": { "name": "biome" } },
+      "format_on_save": "on",
+      "use_on_type_format": false // FIX that annoying gap when closing brackets
+    },
+    "JavaScript": {
+      "language_servers": ["vtsls", "eslint", "biome"],
+      "formatter": { "language_server": { "name": "biome" } },
+      "format_on_save": "on",
+      "use_on_type_format": false // FIX that annoying gap when closing brackets
+    },
+    "JSON": {
+      "soft_wrap": "editor_width"
+    },
+    "YAML": {
+      "soft_wrap": "editor_width"
+    },
+    "Dockerfile": {
+      "soft_wrap": "editor_width"
+    }
+  }
+}

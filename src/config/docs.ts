@@ -104,11 +104,11 @@ function scanDocModules(): Record<string, string> {
       eager: true,
     }) as Record<string, string>;
   } catch {
-    // Bun test fallback: use createRequire so Vite doesn't attempt to bundle node:fs
-    const { createRequire } = require("node:module") as typeof import("node:module");
+    // Bun test fallback: use createRequire so Vite doesn't attempt to bundle fs
+    const { createRequire } = require("module") as typeof import("module");
     const nodeRequire = createRequire(import.meta.url);
-    const { readdirSync, readFileSync } = nodeRequire("node:fs") as typeof import("node:fs");
-    const { join } = nodeRequire("node:path") as typeof import("node:path");
+    const { readdirSync, readFileSync } = nodeRequire("fs") as typeof import("fs");
+    const { join } = nodeRequire("path") as typeof import("path");
     const docsDir = join(__dirname, "../../docs");
     const modules: Record<string, string> = {};
 

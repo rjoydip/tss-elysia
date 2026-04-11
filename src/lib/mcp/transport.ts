@@ -5,7 +5,7 @@
 
 import { NodeStreamableHTTPServerTransport } from "@modelcontextprotocol/node";
 import type { McpServer } from "@modelcontextprotocol/server";
-import { randomUUID } from "node:crypto";
+import { randomUUID } from "crypto";
 
 /**
  * Creates an MCP HTTP transport with proper configuration.

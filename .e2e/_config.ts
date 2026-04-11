@@ -1,3 +1,6 @@
+/**
+ * E2E Test Configuration
+ */
 const host = process.env.E2E_HOST || process.env.HOST || "localhost";
 const port = process.env.E2E_PORT || process.env.PORT || "3000";
 

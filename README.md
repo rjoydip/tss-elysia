@@ -12,7 +12,7 @@ description: A full-stack TypeScript application using TanStack Start, Elysia, R
 
 A full-stack TypeScript application using TanStack Start, Elysia, React 19, and Bun.
 
-> **Project Roadmap**: See [PLAN.md](./.artifacts/PLAN.md) for detailed feature planning and progress tracking.
+> **Project Roadmap**: See [PLAN.md](./knowledge/PLAN.md) for detailed feature planning and progress tracking.
 
 ## Quick Start
 
@@ -111,6 +111,8 @@ Detailed documentation available in `docs/`:
 - **Function Execution Timing**: Tanstack Pacer
 - **Styling**: Tailwind CSS v4
 - **Cache/Pub-Sub**: Redis / Upstash (Bun native `RedisClient`)
+- **Database**: SQLite (better-sqlite3) / PostgreSQL with Drizzle ORM
+- **E2E Testing**: Playwright with page.request API
 
 ## Project Structure
 
@@ -367,4 +369,4 @@ Common issues:
 
 For detailed agent coding guidelines, see [AGENTS.md](./AGENTS.md).
 
-For feature planning and progress tracking, see [PLAN.md](./.artifacts/PLAN.md).
+For feature planning and progress tracking, see [PLAN.md](./knowledge/PLAN.md).

@@ -1,4 +1,5 @@
 import { defineConfig } from "drizzle-kit";
+import { DB_MIGRATION_OUT } from "./config/db/constant";
 
 const dbType = process.env.DATABASE_TYPE || "sqlite";
 
@@ -19,7 +20,7 @@ const postgresUrl =
 
 export default defineConfig({
   schema: "./src/lib/db/schema.ts",
-  out: "./drizzle",
+  out: DB_MIGRATION_OUT,
   dialect: dbType === "postgres" ? "postgresql" : "sqlite",
   dbCredentials: {
     url: dbType === "postgres" ? postgresUrl : sqliteDbUrl,

@@ -5,7 +5,7 @@
  * Includes rate limiting per API key.
  */
 
-import { AsyncLocalStorage } from "node:async_hooks";
+import { AsyncLocalStorage } from "async_hooks";
 import type { McpApiKey } from "~/lib/db/schema";
 import { checkRateLimit, cleanupRateLimitStoreOnRequest, type RateLimitResult } from "./rate-limit";
 
