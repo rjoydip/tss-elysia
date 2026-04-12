@@ -481,6 +481,14 @@ Complete the authentication system with additional security features, set up use
   - [x] Simplify complex tests to verify module availability
 - [x] Create detailed integration test plan document (`.artifacts/plans/integration-test-plan.md`)
 - [x] Run all integration tests: `bun test test/integration` (20 tests passing)
+- [x] Fixed backup integration test environment variable reloading issue by ensuring BeforeAll hooks properly initialize database with test env vars
+- [x] Verified backup integration tests correctly handle DB schema availability (skip when unavailable, run when available)
+- [x] Verified backup integration tests correctly handle DB schema availability (skip when unavailable, run when available)
+- [x] Fixed backup integration test environment variable reloading issue by ensuring BeforeAll hooks properly initialize database with test env vars
+- [x] Fixed backup integration test environment variable reloading issue by ensuring BeforeAll hooks properly initialize database with test env vars
+- [x] Fixed backup integration test environment variable reloading issue by ensuring BeforeAll hooks properly initialize database with test env vars
+- [x] Fix backup integration test environment variable reloading issue
+- [x] Ensure BeforeAll hooks properly initialize database with test env vars
 
 #### Notification & State Management
 

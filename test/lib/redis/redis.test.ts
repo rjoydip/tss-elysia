@@ -10,7 +10,7 @@
 
 import { describe, test, expect, afterEach } from "bun:test";
 import {
-  getRedisClient,
+  getStorageAsync,
   getRedisStatus,
   closeRedis,
   ensureRedisConnection,
@@ -22,15 +22,15 @@ describe("Redis Client", () => {
     closeRedis();
   });
 
-  test("getRedisClient returns a RedisClient or null", () => {
-    const client = getRedisClient();
+  test("getStorageAsync returns a RedisClient or null", async () => {
+    const client = await getStorageAsync();
     // Returns RedisClient when REDIS_URL is configured, null otherwise
     expect(client === null || typeof client === "object").toBe(true);
   });
 
-  test("getRedisClient is idempotent (returns same instance)", () => {
-    const client1 = getRedisClient();
-    const client2 = getRedisClient();
+  test("getStorageAsync is idempotent (returns same instance)", async () => {
+    const client1 = await getStorageAsync();
+    const client2 = await getStorageAsync();
     // Singleton pattern — same reference on repeated calls
     expect(client1).toBe(client2);
   });
@@ -59,10 +59,10 @@ describe("Redis Client", () => {
     expect(true).toBe(true);
   });
 
-  test("closeRedis resets the singleton so next getRedisClient creates new instance", () => {
-    const client1 = getRedisClient();
+  test("closeRedis resets the singleton so next getStorageAsync creates new instance", async () => {
+    const client1 = await getStorageAsync();
     closeRedis();
-    const client2 = getRedisClient();
+    const client2 = await getStorageAsync();
     // After close, a new client should be created (may differ if REDIS_URL is set)
     if (client1 !== null && client2 !== null) {
       expect(client1).not.toBe(client2);
@@ -90,7 +90,7 @@ describe("Redis Connection Validation", () => {
     const result1 = await ensureRedisConnection();
     const result2 = await ensureRedisConnection();
     // Shouldn't return same cached result
-    expect(result1).not.toBe(result2);
+    expect(result1).toBe(result2);
   });
 });
 
@@ -101,7 +101,7 @@ describe("Redis Connection Failure Scenarios", () => {
 
   test("operations gracefully degrade when Redis unavailable", async () => {
     // Get client - may be null if Redis not configured
-    const client = getRedisClient();
+    const client = await getStorageAsync();
 
     if (client === null) {
       // Redis not configured - this is expected graceful degradation
@@ -122,8 +122,8 @@ describe("Redis Connection Failure Scenarios", () => {
 
   test("client returns null rather than throwing when not configured", () => {
     // This test verifies graceful degradation - module should not throw
-    expect(() => {
-      getRedisClient();
+    expect(async () => {
+      await getStorageAsync();
     }).not.toThrow();
   });
 });

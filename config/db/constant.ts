@@ -1,1 +1,0 @@
-export const DB_MIGRATION_OUT = "./drizzle";

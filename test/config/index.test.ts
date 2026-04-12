@@ -13,8 +13,8 @@ import {
   corsConfig,
   helmetConfig,
   sessionConfig,
-} from "../../src/config/index.ts";
-import { logger } from "../../src/lib/logger.ts";
+} from "../../src/config/index";
+import { logger } from "../../src/lib/logger";
 
 describe("_config", () => {
   describe("API Configuration", () => {

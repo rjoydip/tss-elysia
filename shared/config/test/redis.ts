@@ -3,7 +3,7 @@
  * Provides setup, teardown, and health check functions for Redis during tests.
  */
 
-import { getRedisStatus, closeRedis } from "../../src/lib/redis";
+import { getRedisStatus, closeRedis } from "../../../src/lib/redis";
 
 export interface RedisTestConfig {
   required: boolean;

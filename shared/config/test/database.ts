@@ -6,15 +6,14 @@
 import { execSync } from "child_process";
 import { existsSync, rmSync } from "fs";
 import { resolve } from "path";
-import { migrate } from "drizzle-orm/bun-sqlite/migrator";
-import { sqlite, getWriteDb, createSQLiteConnection } from "../../src/lib/db";
-import { env } from "../../src/config/env";
-import { DB_MIGRATION_OUT } from "../db/constant";
+import { sqlite, getWriteDb } from "../../../src/lib/db";
+import { env } from "../../../src/config/env";
+import { DEFAULT_DATABASE_PATH } from "../../../src/config/db";
 
 export interface DatabaseTestConfig {
   /** Database path (default: .artifacts) */
   dbPath?: string;
-  /** Database name (default: tss-elysia.db) */
+  /** Database name (default: tss-elysia) */
   dbName?: string;
   /** Whether to reset database before each test */
   resetBeforeEach?: boolean;
@@ -53,7 +52,7 @@ export const TEST_TABLES = [
  */
 export const defaultDbConfig: Required<DatabaseTestConfig> = {
   dbPath: ".artifacts",
-  dbName: "tss-elysia.db",
+  dbName: "tss-elysia",
   resetBeforeEach: true,
 };
 
@@ -100,7 +99,7 @@ export function generateSchema(): void {
   try {
     execSync("bun run db:generate", {
       stdio: "inherit",
-      env: { ...process.env, DATABASE_TYPE: "sqlite", DATABASE_NAME: "tss-elysia.db" },
+      env: { ...process.env, DATABASE_TYPE: "sqlite", DATABASE_NAME: "tss-elysia" },
     });
     console.log("[DB Config] Schema generated successfully");
   } catch (error) {
@@ -110,18 +109,22 @@ export function generateSchema(): void {
 }
 
 /**
- * Push database schema using drizzle-kit.
+ * Push database schema using drizzle-kit CLI.
  */
-export function pushSchema(): void {
+export async function pushSchema(): Promise<void> {
   console.log("[DB Config] Pushing schema...");
   try {
-    const { db } = createSQLiteConnection();
-
-    process.env["DATABASE_TYPE"] = "sqlite";
-    process.env["DATABASE_NAME"] = "tss-elysia.db";
-
-    migrate(db, { migrationsFolder: DB_MIGRATION_OUT });
-    console.log("[DB Config] Schema pushed successfully");
+    // The db connection is established for any runtime queries needed
+    execSync("bun run db:push", {
+      stdio: "inherit",
+      env: {
+        ...process.env,
+        DATABASE_TYPE: "sqlite",
+        DATABASE_NAME: ":memory:",
+        DATABASE_PATH: "",
+      },
+    });
+    console.log("[DB Config] Schema push via drizzle-kit CLI");
   } catch (error) {
     console.warn("[DB Config] Schema push failed:", error);
   }
@@ -170,7 +173,7 @@ export function resetDb(): void {
  * Clear backup files directory.
  */
 export function clearBackups(): void {
-  const backupDir = resolve(env.DATABASE_PATH || ".artifacts", "backups");
+  const backupDir = resolve(env.DATABASE_PATH || DEFAULT_DATABASE_PATH, "backups");
   try {
     rmSync(backupDir, { recursive: true, force: true });
     console.log("[DB Config] Cleared backup directory");
@@ -182,10 +185,8 @@ export function clearBackups(): void {
 /**
  * Database test setup function.
  */
-export async function setupDatabase(config?: DatabaseTestConfig): Promise<void> {
-  const cfg = { ...defaultDbConfig, ...config };
-  ensureDatabaseExists(cfg);
-  pushSchema();
+export async function setupDatabase(_?: DatabaseTestConfig): Promise<void> {
+  await pushSchema();
   resetDb();
 }
 

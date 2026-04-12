@@ -11,10 +11,25 @@ import { type ElysiaConfig } from "elysia";
 export const APP_VERSION = "0.0.0";
 
 /**
+ * Safe access to import.meta.env with fallback defaults.
+ * Handles cases where import.meta.env may be undefined (e.g., some test environments).
+ */
+const getEnv = (key: string, fallback: string): string => {
+  if (
+    typeof import.meta !== "undefined" &&
+    import.meta.env &&
+    typeof import.meta.env === "object"
+  ) {
+    return (import.meta.env as Record<string, string>)[key] ?? fallback;
+  }
+  return fallback;
+};
+
+/**
  * API route prefix - defaults to /api.
  * Used for organizing API endpoints under a common path.
  */
-export const API_PREFIX = import.meta.env.API_PREFIX ?? `/api`;
+export const API_PREFIX = getEnv("API_PREFIX", "/api");
 
 /**
  * Authentication route pattern - catches all auth-related requests.
@@ -33,19 +48,19 @@ export const GITHUB_REPO_URL = "https://github.com/rjoydip/tss-elysia";
  * Application name for display and OpenAPI documentation.
  * Falls back to "TSS ELYSIA" if not set in environment.
  */
-export const APP_NAME = import.meta.env.VITE_APP_NAME ?? "TSSE";
+export const APP_NAME = getEnv("VITE_APP_NAME", "TSSE");
 
 /**
  * Server host - defaults to localhost for development.
  * Should be configured for production deployments.
  */
-export const HOST = import.meta.env.HOST || "localhost";
+export const HOST = getEnv("HOST", "localhost");
 
 /**
  * Server port - defaults to 3000 for local development.
  * Must match the port the Vite dev server runs on.
  */
-export const PORT = parseInt(import.meta.env.PORT || "3000", 10);
+export const PORT = parseInt(getEnv("PORT", "3000"), 10);
 
 /**
  * Runtime environment detection - checks if code runs in browser.

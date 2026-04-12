@@ -136,7 +136,7 @@ app:
     - NODE_ENV=production
     - BETTER_AUTH_SECRET=${BETTER_AUTH_SECRET}
     - DATABASE_PATH=.artifacts
-    - DATABASE_NAME=tss-elysia.db
+    - DATABASE_NAME=tss-elysia
   volumes:
     - app-data:/app/.artifacts
   deploy:
@@ -183,7 +183,7 @@ dev:
 | `NODE_ENV`           | `production`                | Environment mode     |
 | `BETTER_AUTH_SECRET` | **Required** (min 32 chars) | Session secret       |
 | `DATABASE_PATH`      | `.artifacts`                | Database directory   |
-| `DATABASE_NAME`      | `tss-elysia.db`             | Database filename    |
+| `DATABASE_NAME`      | `tss-elysia`                | Database filename    |
 | `REDIS_URL`          | `redis://redis:6379`        | Redis connection URL |
 
 ## Usage Examples

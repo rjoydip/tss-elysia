@@ -12,8 +12,9 @@
  */
 
 import { t, getSchemaValidator, type TSchema } from "elysia";
-import { isBun, isNode, isProduction, PORT } from ".";
+import { isBun, isNode, isProduction, PORT, HOST } from ".";
 import { logger } from "../lib/logger";
+import { DEFAULT_DATABASE_NAME, DEFAULT_DATABASE_PATH } from "./db";
 
 /**
  * Configuration options for environment validation.
@@ -171,8 +172,6 @@ const _getEnv = (key: string, defaultValue: string = ""): string => {
  * These are used when environment variables are not explicitly set.
  */
 const _BASE_URL = `http://localhost:${PORT}`;
-const _DEFAULT_DB_PATH = ".artifacts";
-const _DEFAULT_DB_NAME = "tss-elysia.db";
 
 /**
  * Retrieves and validates the Better Auth secret key.
@@ -216,6 +215,7 @@ export const env = await _createEnv({
     POSTGRES_PORT: t.Optional(t.Number()),
     POSTGRES_URL: t.Optional(t.String()),
     POSTGRES_REPLICAS: t.Optional(t.String()),
+    HOST: t.String(),
     PORT: t.Number(),
     REDIS_URL: t.Optional(t.String()),
     WS_ENABLED: t.Optional(t.Boolean()),
@@ -230,8 +230,8 @@ export const env = await _createEnv({
     BETTER_AUTH_URL: _getEnv("BETTER_AUTH_URL", `${_BASE_URL}/api/auth`),
     BETTER_AUTH_SECRET: _getAuthSecret(),
     DATABASE_URL: _getEnv("DATABASE_URL", ""),
-    DATABASE_PATH: _getEnv("DATABASE_PATH", _DEFAULT_DB_PATH),
-    DATABASE_NAME: _getEnv("DATABASE_NAME", _DEFAULT_DB_NAME),
+    DATABASE_PATH: _getEnv("DATABASE_PATH", DEFAULT_DATABASE_PATH),
+    DATABASE_NAME: _getEnv("DATABASE_NAME", DEFAULT_DATABASE_NAME),
     DATABASE_TYPE: _getEnv("DATABASE_TYPE", "sqlite") as "sqlite" | "postgres",
     POSTGRES_USER: _getEnv("POSTGRES_USER", "") || undefined,
     POSTGRES_PASSWORD: _getEnv("POSTGRES_PASSWORD", "") || undefined,
@@ -252,6 +252,7 @@ export const env = await _createEnv({
         return undefined;
       }
     })() as string | undefined,
+    HOST: _getEnv("HOST", String(HOST)),
     PORT: parseInt(_getEnv("PORT", String(PORT)), 10),
     REDIS_URL: _getEnv("REDIS_URL", "") || undefined,
     WS_ENABLED:

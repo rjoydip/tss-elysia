@@ -4,10 +4,7 @@
 
 import { test, expect } from "@playwright/test";
 import { E2E_BASE_URL } from "./_config";
-
-function uniqueEmail(prefix = "test") {
-  return `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2)}@example.com`;
-}
+import { uniqueEmail } from "./helpers/api-route";
 
 test.describe("Header Navigation", () => {
   test("should navigate to Docs from landing page", async ({ page }) => {

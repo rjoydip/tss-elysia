@@ -14,6 +14,7 @@ import { createDatabase } from "db0";
 import type { Connector } from "db0";
 import { env } from "~/config/env";
 import { redisLogger } from "../logger";
+import { DEFAULT_DATABASE_NAME, DEFAULT_DATABASE_PATH } from "~/config/db";
 
 /**
  * Storage connection status for health checks.
@@ -52,8 +53,8 @@ function maskUrl(url: string): string {
  * Gets the database connection URI based on DATABASE_TYPE.
  */
 function getDatabaseUri(): string {
-  const dbPath = env.DATABASE_PATH ?? ".artifacts";
-  const dbName = env.DATABASE_NAME ?? "tss-elysia.db";
+  const dbPath = env.DATABASE_PATH ?? DEFAULT_DATABASE_PATH;
+  const dbName = env.DATABASE_NAME ?? DEFAULT_DATABASE_NAME;
 
   if (env.DATABASE_TYPE === "postgres") {
     if (env.POSTGRES_URL) return env.POSTGRES_URL;
@@ -61,7 +62,7 @@ function getDatabaseUri(): string {
     const port = env.POSTGRES_PORT ?? 5432;
     const user = env.POSTGRES_USER ?? "postgres";
     const password = env.POSTGRES_PASSWORD ?? "";
-    const database = env.POSTGRES_DB ?? "tss-elysia";
+    const database = env.POSTGRES_DB ?? DEFAULT_DATABASE_NAME;
     return `postgresql://${user}:${password}@${host}:${port}/${database}`;
   }
 
@@ -96,30 +97,36 @@ async function initStorageAsync(): Promise<Storage | null> {
     if (env.DATABASE_TYPE === "postgres") {
       const { default: postgresql } = await import("db0/connectors/postgresql");
       connector = postgresql({ url: getDatabaseUri() });
+
+      const database = createDatabase(connector);
+      const { default: dbDriver } = await import("unstorage/drivers/db0");
+
+      const store = createStorage({
+        driver: dbDriver({
+          database,
+          tableName: "storage",
+        }),
+      });
+
+      const uri = getDatabaseUri();
+      redisLogger.info("PostgreSQL cache storage initialized", {
+        type: env.DATABASE_TYPE ?? "sqlite",
+        url: maskUrl(uri),
+      });
+
+      return store;
     } else {
-      const { default: sqlite } = await import("db0/connectors/better-sqlite3");
-      const dbPath = env.DATABASE_PATH ?? ".artifacts";
-      const dbName = env.DATABASE_NAME ?? "tss-elysia.db";
-      connector = sqlite({ path: `${dbPath}/${dbName}` });
+      const { default: lruCacheDriver } = await import("unstorage/drivers/lru-cache");
+      const store = createStorage({
+        driver: lruCacheDriver({
+          maxSize: 10000,
+        }),
+      });
+      redisLogger.info("LRU cache initialized", {
+        type: "lru-cache",
+      });
+      return store;
     }
-
-    const database = createDatabase(connector);
-    const { default: dbDriver } = await import("unstorage/drivers/db0");
-
-    const store = createStorage({
-      driver: dbDriver({
-        database,
-        tableName: "storage",
-      }),
-    });
-
-    const uri = getDatabaseUri();
-    redisLogger.info("Database storage initialized", {
-      type: env.DATABASE_TYPE ?? "sqlite",
-      url: maskUrl(uri),
-    });
-
-    return store;
   } catch (error) {
     redisLogger.error("Failed to initialize database storage", error as Error);
     initError = error as Error;
@@ -233,6 +240,7 @@ class StorageWrapper implements PromiseLike<any> {
     }
   }
 
+  // oxlint-disable-line: no-thenable
   then<TResult1 = any, TResult2 = never>(
     onfulfilled?: ((value: any) => TResult1 | PromiseLike<TResult1>) | null,
     onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | null,

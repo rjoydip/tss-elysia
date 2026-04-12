@@ -1,17 +1,14 @@
-import { describe, expect, it, beforeEach, afterAll } from "bun:test";
+import { describe, expect, it, beforeEach } from "bun:test";
 import { Database } from "bun:sqlite";
-import { mkdir, rm } from "fs/promises";
-import { join } from "path";
 
-const TEST_DB_PATH = join(import.meta.dir, "..", "..", "fixtures", ".test-backup.db");
-const TEST_BACKUP_DIR = join(import.meta.dir, "..", "..", "fixtures", ".test-backups");
+const TEST_DB_PATH = ":memory:";
 
 let db: Database;
 
 function createTestDatabase(): Database {
   const dbInstance = new Database(TEST_DB_PATH);
 
-  dbInstance.exec(`
+  dbInstance.run(`
     CREATE TABLE IF NOT EXISTS users (
       id TEXT PRIMARY KEY,
       name TEXT NOT NULL,
@@ -25,7 +22,7 @@ function createTestDatabase(): Database {
     );
   `);
 
-  dbInstance.exec(`
+  dbInstance.run(`
     INSERT INTO users (id, name, email) VALUES ('1', 'John', 'john@test.com');
     INSERT INTO users (id, name, email) VALUES ('2', 'Jane', 'jane@test.com');
     INSERT INTO posts (id, title, user_id) VALUES ('1', 'First Post', '1');
@@ -34,46 +31,11 @@ function createTestDatabase(): Database {
   return dbInstance;
 }
 
-async function cleanupTestArtifacts() {
-  try {
-    if (db) {
-      db.close();
-      db = undefined as unknown as Database;
-    }
-  } catch {
-    // DB may already be closed
-  }
-
-  try {
-    await Bun.sleep(50);
-  } catch {
-    // Ignore sleep errors
-  }
-
-  try {
-    await rm(TEST_DB_PATH, { force: true });
-  } catch {
-    // File may not exist or be locked
-  }
-
-  try {
-    await rm(TEST_BACKUP_DIR, { recursive: true, force: true });
-  } catch {
-    // Directory may not exist
-  }
-}
-
-beforeEach(async () => {
-  await cleanupTestArtifacts();
-  await mkdir(TEST_BACKUP_DIR, { recursive: true });
-  db = createTestDatabase();
-});
-
-afterAll(async () => {
-  await cleanupTestArtifacts();
-});
-
 describe("Database Backup", () => {
+  beforeEach(() => {
+    db = createTestDatabase();
+  });
+
   describe("Backup Structure", () => {
     it("should have valid database with tables", () => {
       const tables = db.query("SELECT name FROM sqlite_master WHERE type='table'").all() as {
@@ -93,7 +55,7 @@ describe("Database Backup", () => {
   });
 
   describe("Backup File Format", () => {
-    it("should generate valid SQL backup content", async () => {
+    it("should generate valid SQL backup content", () => {
       const tables = db
         .query("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'")
         .all() as { name: string }[];
@@ -102,7 +64,7 @@ describe("Database Backup", () => {
 
       for (const table of tables) {
         const createStmt = db
-          .query(`SELECT sql FROM sqlite_master WHERE type='table' AND name = ?`)
+          .query("SELECT sql FROM sqlite_master WHERE type='table' AND name = ?")
           .get(table.name) as { sql: string } | undefined;
 
         if (createStmt) {
@@ -132,7 +94,7 @@ describe("Database Backup", () => {
     });
 
     it("should calculate checksum for backup verification", () => {
-      const content = "SELECT * FROM users;";
+      const content = "SELECT * from users;";
       const hashArray = Array.from(new Bun.CryptoHasher("sha256").update(content).digest());
       const checksum = hashArray
         .map((b: number) => b.toString(16).padStart(2, "0"))
@@ -157,12 +119,8 @@ describe("Database Backup", () => {
     });
 
     it("should handle backup with multiple tables", () => {
-      const users = db.query("SELECT COUNT(*) as count FROM users").get() as {
-        count: number;
-      };
-      const posts = db.query("SELECT COUNT(*) as count FROM posts").get() as {
-        count: number;
-      };
+      const users = db.query("SELECT COUNT(*) as count FROM users").get() as { count: number };
+      const posts = db.query("SELECT COUNT(*) as count FROM posts").get() as { count: number };
 
       expect(users.count).toBe(2);
       expect(posts.count).toBe(1);

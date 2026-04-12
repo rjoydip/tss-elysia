@@ -10,6 +10,7 @@ import { createStorage, type Storage } from "unstorage";
 import { createDatabase } from "db0";
 import type { Connector } from "db0";
 import { env } from "~/config/env";
+import { DEFAULT_DATABASE_PATH, DEFAULT_DATABASE_NAME } from "~/config/db";
 import { redisLogger } from "../logger";
 
 /**
@@ -51,8 +52,8 @@ const activePollIntervals: Map<string, NodeJS.Timeout> = new Map();
  * Gets the database connection URI based on DATABASE_TYPE.
  */
 function getDatabaseUri(): string {
-  const dbPath = env.DATABASE_PATH ?? ".artifacts";
-  const dbName = env.DATABASE_NAME ?? "tss-elysia.db";
+  const dbPath = env.DATABASE_PATH ?? DEFAULT_DATABASE_PATH;
+  const dbName = env.DATABASE_NAME ?? DEFAULT_DATABASE_NAME;
 
   if (env.DATABASE_TYPE === "postgres") {
     if (env.POSTGRES_URL) return env.POSTGRES_URL;
@@ -60,7 +61,7 @@ function getDatabaseUri(): string {
     const port = env.POSTGRES_PORT ?? 5432;
     const user = env.POSTGRES_USER ?? "postgres";
     const password = env.POSTGRES_PASSWORD ?? "";
-    const database = env.POSTGRES_DB ?? "tss-elysia";
+    const database = env.POSTGRES_DB ?? DEFAULT_DATABASE_NAME;
     return `postgresql://${user}:${password}@${host}:${port}/${database}`;
   }
 
@@ -94,8 +95,8 @@ async function initPubSubStorageAsync(): Promise<Storage | null> {
       connector = postgresql({ url: getDatabaseUri() });
     } else {
       const { default: sqlite } = await import("db0/connectors/better-sqlite3");
-      const dbPath = env.DATABASE_PATH ?? ".artifacts";
-      const dbName = env.DATABASE_NAME ?? "tss-elysia.db";
+      const dbPath = env.DATABASE_PATH ?? DEFAULT_DATABASE_PATH;
+      const dbName = env.DATABASE_NAME ?? DEFAULT_DATABASE_NAME;
       connector = sqlite({ path: `${dbPath}/${dbName}` });
     }
 

@@ -18,6 +18,7 @@ import { createHash } from "crypto";
 import { mkdir, readFile, rm, stat } from "fs/promises";
 import { join } from "path";
 import { env } from "~/config/env";
+import { DEFAULT_DATABASE_PATH } from "~/config/db";
 
 /**
  * Backup result type.
@@ -65,8 +66,9 @@ const DEFAULT_BACKUP_DIR = "backups";
  * Gets the backup directory path.
  */
 export function getBackupDirectory(): string {
-  const basePath = env.DATABASE_PATH || ".artifacts";
-  return join(basePath, DEFAULT_BACKUP_DIR);
+  const basePath = env.DATABASE_PATH || DEFAULT_DATABASE_PATH;
+  const normalizedPath = basePath === "" ? "." : basePath;
+  return join(normalizedPath, DEFAULT_BACKUP_DIR);
 }
 
 /**

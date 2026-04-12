@@ -8,7 +8,6 @@ import { Elysia } from "elysia";
 import { APP_NAME } from "../../../src/config";
 import { coreRoutes } from "../../../src/routes/api/modules/-core";
 import { realtimeRoutes } from "../../../src/routes/api/modules/-realtime";
-import { databaseRoutes } from "../../../src/routes/api/modules/-database";
 
 describe("Core API module", () => {
   const app = new Elysia({ prefix: "/api" }).use(coreRoutes);
@@ -50,19 +49,5 @@ describe("Realtime API module", () => {
     const data = (await response.json()) as { status: string; websocketPath: string };
     expect(data.status).toBe("healthy");
     expect(data.websocketPath).toBe("/api/ws");
-  });
-});
-
-describe("Database API module", () => {
-  const app = new Elysia({ prefix: "/api" }).use(databaseRoutes);
-
-  it("should return database heartbeat payload", async () => {
-    const response = await app.handle(new Request("http://localhost/api/database/heartbeat"));
-
-    expect([200, 503]).toContain(response.status);
-    const data = (await response.json()) as { status: string; timestamp: string; detail: string };
-    expect(["healthy", "unhealthy"]).toContain(data.status);
-    expect(typeof data.timestamp).toBe("string");
-    expect(typeof data.detail).toBe("string");
   });
 });

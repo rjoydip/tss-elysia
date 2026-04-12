@@ -1,14 +1,16 @@
 import { defineConfig } from "drizzle-kit";
-import { DB_MIGRATION_OUT } from "./config/db/constant";
+import { DB_MIGRATION_OUT, DEFAULT_DATABASE_PATH, getDatabaseFullPath } from "./src/config/db";
 
 const dbType = process.env.DATABASE_TYPE || "sqlite";
 
 const sqliteDbUrl =
-  process.env.DATABASE_PATH && process.env.DATABASE_NAME
-    ? `${process.env.DATABASE_PATH}/${process.env.DATABASE_NAME}`
-    : process.env.DATABASE_NAME && !process.env.DATABASE_PATH
-      ? `.artifacts/${process.env.DATABASE_NAME}`
-      : ".artifacts/tss-elysia.db";
+  process.env.DATABASE_NAME === ":memory:" && !process.env.DATABASE_PATH
+    ? ":memory:"
+    : process.env.DATABASE_PATH && process.env.DATABASE_NAME
+      ? `${process.env.DATABASE_PATH}/${process.env.DATABASE_NAME}`
+      : process.env.DATABASE_NAME && !process.env.DATABASE_PATH
+        ? `${DEFAULT_DATABASE_PATH}/${process.env.DATABASE_NAME}`
+        : getDatabaseFullPath();
 
 const postgresUrl =
   process.env.POSTGRES_URL ||

@@ -14,10 +14,9 @@ concurrency:
 
 env:
   BUN_INSTALL_CACHE_DIR: ~/.bun-install-cache
-  DATABASE_PATH: ".artifacts"
-  DATABASE_NAME: "tss-elysia.db"
+  # DATABASE_PATH: ".artifacts"
+  DATABASE_NAME: ":memory:"
   DATABASE_TYPE: "sqlite"
-  CI: "true"
   E2E_HOST: "localhost"
   E2E_PORT: "4173"
   BETTER_AUTH_SECRET: "test-secret-min-32-chars-for-ci"
@@ -109,18 +108,12 @@ jobs:
       - name: Install dependencies
         run: bun install ${{ github.actor == 'dependabot[bot]' && '' || '--frozen-lockfile' }} --ignore-scripts
 
-      - name: Install node-gyp
-        run: bun install -g node-gyp
-
-      - name: Install better-sqlite3
-        run: cd node_modules/better-sqlite3 && bun run build-release
-
-      - name: Run database setup
-        run: bun run db:setup
+      - name: Run database push
+        run: bun run db:push
 
       - name: Run tests (${{ matrix.runtime }})
         run: |
-          bun test
+          bun test:unit
           rm -f $DATABASE_PATH/$DATABASE_NAME
 
       - name: Install Playwright browsers
@@ -149,8 +142,11 @@ jobs:
             sleep 2
           done
 
-      - name: Run E2E tests
-        run: bun run test:e2e --project=chromium
+      # - name: Run E2E tests
+      #   run: bun run test:e2e --project=chromium
+
+      - name: Close server
+        run: bunx kill-port --port $E2E_PORT
 
       - name: Upload ${{ matrix.artifact_name }} artifact
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1

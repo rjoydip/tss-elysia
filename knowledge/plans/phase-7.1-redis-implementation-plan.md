@@ -178,7 +178,7 @@ Add a `redis` service and wire it into both `app` and `dev` services.
 ```diff
  # Database Configuration
  DATABASE_PATH=.artifacts
- DATABASE_NAME=tss-elysia.db
+ DATABASE_NAME=tss-elysia
 +
 +# Redis Configuration
 +# Local Docker: redis://localhost:6379
@@ -772,7 +772,7 @@ Add `REDIS_URL` to the environment variables documentation table in `AGENTS.md`:
  | Variable        | Default         | Description                     |
  | --------------- | --------------- | ------------------------------- |
  | `DATABASE_PATH` | `.artifacts`    | SQLite database path            |
- | `DATABASE_NAME` | `tss-elysia.db` | SQLite database name            |
+ | `DATABASE_NAME` | `tss-elysia`    | SQLite database name            |
  | `PORT`          | `3000`          | Server port                     |
  | `HOST`          | `localhost`     | Server host                     |
 +| `REDIS_URL`     | -               | Redis connection URL            |

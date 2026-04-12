@@ -7,6 +7,6 @@
  * @module e2e/teardown
  */
 
-import { globalTeardown } from "../config/test";
+import { globalTeardown } from "../shared/config/test";
 
 export default globalTeardown;

@@ -46,13 +46,13 @@ If warnings persist, increase the limit or consider:
 
 ---
 
-### Bun:sqlite Externalized Warning
+### db0/sqlite3 Externalized Warning
 
 ```txt
-Module "bun:sqlite" has been externalized for browser compatibility
+Module "db0/connectors/sqlite3" has been externalized for browser compatibility
 ```
 
-**Cause**: The database driver (`bun:sqlite`) is server-only but Vite tries to bundle it for the browser.
+**Cause**: The database driver (`sqlite3` via db0) is server-only but Vite tries to bundle it for the browser.
 
 **Solution**: This is expected behavior. The module is correctly externalized for SSR. To suppress the warning:
 
@@ -68,7 +68,7 @@ export default defineConfig({
 Or in `src/lib/db/index.ts`, add a check:
 
 ```typescript
-import { Database } from "bun:sqlite";
+import { createDatabase } from "db0";
 
 // This file only runs on server
 if (typeof window !== "undefined") {

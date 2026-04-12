@@ -67,7 +67,7 @@ export function BrandTitle({ size = "4xl", children }: BrandTitleProps) {
     <div className={`text-${size} md:text-${getMobileSize()} font-bold tracking-tight`}>
       {children || (
         <>
-          Build faster with <span className="text-primary">{APP_NAME}</span>
+          Build faster with <span className="text-primary">{APP_NAME}</span> template
         </>
       )}
     </div>
@@ -169,13 +169,13 @@ export function Branding({
   return (
     <div
       className={`
-                lg:w-1/2 
+                lg:w-1/2
                 ${brandingPanelClassName}
-                ${padding} 
-                ${getHiddenClass()} 
-                ${getJustifyClass()} 
-                ${getAlignClass()} 
-                flex-col 
+                ${padding}
+                ${getHiddenClass()}
+                ${getJustifyClass()}
+                ${getAlignClass()}
+                flex-col
                 ${className}
             `}
     >
@@ -211,7 +211,7 @@ export function BrandLogo({
     <>
       <div
         className={`
-          rounded-lg flex items-center justify-center 
+          rounded-lg flex items-center justify-center
           ${sizeClasses[size]}
         `}
       >

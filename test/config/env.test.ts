@@ -1,8 +1,8 @@
 import { describe, expect, it } from "bun:test";
 import { t } from "elysia";
-import { API_PREFIX, PORT } from "../../src/config/index.ts";
+import { API_PREFIX, PORT } from "../../src/config/index";
 
-const envPath = "../../src/config/env.ts";
+const envPath = "../../src/config/env";
 
 describe("_env", () => {
   describe("Environment Variables Configuration", () => {

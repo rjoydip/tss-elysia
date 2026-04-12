@@ -1,91 +1,67 @@
 import { faker } from "@faker-js/faker";
-import { drizzle } from "drizzle-orm/bun-sqlite";
 import { Database } from "bun:sqlite";
+import { drizzle } from "drizzle-orm/bun-sqlite";
 import * as schema from "../../src/lib/db/schema";
-import type { SubscriptionTier } from "../../src/types/subscription";
 
 const TEST_DB_PATH = ":memory:";
 
-const CREATE_TABLES_SQL = `
-  CREATE TABLE IF NOT EXISTS user (
-    id TEXT PRIMARY KEY,
-    name TEXT,
-    email TEXT NOT NULL UNIQUE,
-    emailVerified INTEGER NOT NULL DEFAULT 0,
-    image TEXT,
-    createdAt INTEGER NOT NULL,
-    updatedAt INTEGER NOT NULL,
-    subscriptionTier TEXT NOT NULL DEFAULT 'free',
-    subscriptionId TEXT,
-    subscriptionStatus TEXT,
-    subscriptionExpiresAt INTEGER
-  );
-  CREATE TABLE IF NOT EXISTS session (
-    id TEXT PRIMARY KEY,
-    expiresAt INTEGER NOT NULL,
-    token TEXT NOT NULL UNIQUE,
-    createdAt INTEGER NOT NULL,
-    updatedAt INTEGER NOT NULL,
-    ipAddress TEXT,
-    userAgent TEXT,
-    userId TEXT NOT NULL REFERENCES user(id) ON DELETE CASCADE
-  );
-  CREATE TABLE IF NOT EXISTS account (
-    id TEXT PRIMARY KEY,
-    accountId TEXT NOT NULL,
-    providerId TEXT NOT NULL,
-    userId TEXT NOT NULL REFERENCES user(id) ON DELETE CASCADE,
-    accessToken TEXT,
-    refreshToken TEXT,
-    idToken TEXT,
-    accessTokenExpiresAt INTEGER,
-    refreshTokenExpiresAt INTEGER,
-    scope TEXT,
-    password TEXT,
-    createdAt INTEGER NOT NULL,
-    updatedAt INTEGER NOT NULL
-  );
-  CREATE TABLE IF NOT EXISTS verification (
-    id TEXT PRIMARY KEY,
-    identifier TEXT NOT NULL,
-    value TEXT NOT NULL,
-    expiresAt INTEGER NOT NULL,
-    createdAt INTEGER,
-    updatedAt INTEGER
-  );
-  CREATE TABLE IF NOT EXISTS subscription_plan (
-    id TEXT PRIMARY KEY,
-    name TEXT NOT NULL,
-    description TEXT,
-    price INTEGER NOT NULL,
-    currency TEXT NOT NULL DEFAULT 'USD',
-    interval TEXT NOT NULL,
-    intervalCount INTEGER NOT NULL DEFAULT 1,
-    features TEXT,
-    rateLimit INTEGER NOT NULL,
-    rateLimitDuration INTEGER NOT NULL DEFAULT 60000,
-    createdAt INTEGER NOT NULL,
-    updatedAt INTEGER NOT NULL
-  );
-  CREATE TABLE IF NOT EXISTS subscription (
-    id TEXT PRIMARY KEY,
-    userId TEXT NOT NULL REFERENCES user(id) ON DELETE CASCADE,
-    planId TEXT NOT NULL REFERENCES subscription_plan(id) ON DELETE CASCADE,
-    status TEXT NOT NULL DEFAULT 'active',
-    currentPeriodStart INTEGER NOT NULL,
-    currentPeriodEnd INTEGER NOT NULL,
-    cancelAtPeriodEnd INTEGER NOT NULL DEFAULT 0,
-    createdAt INTEGER NOT NULL,
-    updatedAt INTEGER NOT NULL
-  );
+/**
+ * SQL to create test tables - user, session, account, verification for auth tests.
+ */
+export const CREATE_TABLES_SQL = `
+CREATE TABLE IF NOT EXISTS user (
+  id TEXT PRIMARY KEY NOT NULL,
+  name TEXT NOT NULL,
+  email TEXT NOT NULL UNIQUE,
+  emailVerified INTEGER DEFAULT 0,
+  image TEXT,
+  createdAt TEXT NOT NULL,
+  updatedAt TEXT NOT NULL,
+  subscriptionTier TEXT DEFAULT 'free',
+  subscriptionId TEXT,
+  subscriptionStatus TEXT,
+  subscriptionExpiresAt TEXT
+);
+
+CREATE TABLE IF NOT EXISTS session (
+  id TEXT PRIMARY KEY NOT NULL,
+  expiresAt TEXT NOT NULL,
+  token TEXT NOT NULL UNIQUE,
+  createdAt TEXT NOT NULL,
+  updatedAt TEXT NOT NULL,
+  userId TEXT NOT NULL REFERENCES user(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS account (
+  id TEXT PRIMARY KEY NOT NULL,
+  userId TEXT NOT NULL REFERENCES user(id) ON DELETE CASCADE,
+  accountId TEXT NOT NULL,
+  providerId TEXT NOT NULL,
+  accessToken TEXT,
+  refreshToken TEXT,
+  idToken TEXT,
+  accessTokenExpiresAt TEXT,
+  refreshTokenExpiresAt TEXT,
+  scope TEXT,
+  password TEXT,
+  createdAt TEXT NOT NULL,
+  updatedAt TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS verification (
+  id TEXT PRIMARY KEY NOT NULL,
+  identifier TEXT NOT NULL,
+  value TEXT NOT NULL,
+  expiresAt TEXT NOT NULL,
+  createdAt TEXT NOT NULL,
+  updatedAt TEXT NOT NULL
+);
 `;
 
-export { CREATE_TABLES_SQL };
-
 export function createTestDatabase(): ReturnType<typeof drizzle> {
-  const sqlite = new Database(TEST_DB_PATH);
-  sqlite.exec(CREATE_TABLES_SQL);
-  return drizzle(sqlite, { schema });
+  const db = new Database(TEST_DB_PATH);
+  db.run(CREATE_TABLES_SQL);
+  return drizzle(db, { schema });
 }
 
 export function cleanupTestDatabase() {

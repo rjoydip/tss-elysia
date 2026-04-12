@@ -7,6 +7,6 @@
  * @module e2e/setup
  */
 
-import { globalSetup } from "../config/test";
+import { globalSetup } from "../shared/config/test";
 
 export default globalSetup;

@@ -153,7 +153,7 @@ services:
       # Required: Generate a secure secret (min 32 chars)
       - AUTH_SECRET=${AUTH_SECRET:?AUTH_SECRET is required}
       - DATABASE_PATH=.artifacts
-      - DATABASE_NAME=tss-elysia.db
+      - DATABASE_NAME=tss-elysia
       # PostgreSQL primary connection
       - POSTGRES_URL=postgresql://${POSTGRES_USER:-tsse}:${POSTGRES_PASSWORD:-tsse_password}@postgres-primary:5432/${POSTGRES_DB:-tsse_dev}
       # PostgreSQL read replicas (JSON array format)
@@ -211,7 +211,7 @@ services:
       # Dev secret (auto-generated if not provided)
       - AUTH_SECRET=${AUTH_SECRET:-dev-secret-min-32-chars-here}
       - DATABASE_PATH=.artifacts
-      - DATABASE_NAME=tss-elysia.db
+      - DATABASE_NAME=tss-elysia
       # PostgreSQL primary connection
       - POSTGRES_URL=postgresql://${POSTGRES_USER:-tsse}:${POSTGRES_PASSWORD:-tsse_password}@postgres-primary:5432/${POSTGRES_DB:-tsse_dev}
       # PostgreSQL read replicas (JSON array format)

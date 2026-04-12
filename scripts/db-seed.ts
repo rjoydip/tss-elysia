@@ -5,14 +5,26 @@
  *
  * This script creates deterministic demo data so local environments can be reset
  * and reproduced without relying on stale one-off SQL statements.
+ *
+ * Uses bun:sqlite directly for better stability on Windows (db0 can crash on Windows).
  */
 
 import { faker } from "@faker-js/faker";
 import { Database } from "bun:sqlite";
+import { drizzle as drizzleBun } from "drizzle-orm/bun-sqlite";
 import { sql } from "drizzle-orm";
-import { drizzle } from "drizzle-orm/bun-sqlite";
 import { logger } from "./_logger";
 import * as schema from "../src/lib/db/schema";
+import { DEFAULT_DATABASE_PATH, getDatabaseFullPath } from "../src/config/db";
+
+/**
+ * SQLite database connection using bun:sqlite (more stable on Windows than db0).
+ */
+function createDbConnection(): Database {
+  const databasePath = resolveDatabasePath();
+  logger.info(`Connecting to database at ${databasePath}`);
+  return new Database(databasePath);
+}
 
 /**
  * Shared configuration helpers for database seeding scripts.
@@ -222,10 +234,10 @@ function resolveDatabasePath(): string {
   }
 
   if (process.env.DATABASE_NAME && !process.env.DATABASE_PATH) {
-    return `.artifacts/${process.env.DATABASE_NAME}`;
+    return `${DEFAULT_DATABASE_PATH}/${process.env.DATABASE_NAME}`;
   }
 
-  return ".artifacts/tss-elysia.db";
+  return getDatabaseFullPath(process.env.DATABASE_PATH, process.env.DATABASE_NAME);
 }
 
 /**
@@ -303,21 +315,21 @@ function buildDemoUsers(
 function removeExistingSeedData(sqlite: Database): void {
   logger.info("Removing previously generated demo users and subscriptions...");
 
-  sqlite.transaction(() => {
-    sqlite.exec(`
-      DELETE FROM subscription
-      WHERE userId IN (
-        SELECT id
-        FROM user
-        WHERE email LIKE '%@${SEED_EMAIL_DOMAIN}'
-      );
-    `);
+  sqlite.run(`
+    DELETE FROM subscription
+    WHERE userId IN (
+      SELECT id
+      FROM user
+      WHERE email LIKE '%@${SEED_EMAIL_DOMAIN}'
+    );
+  `);
 
-    sqlite.exec(`
-      DELETE FROM user
-      WHERE email LIKE '%@${SEED_EMAIL_DOMAIN}';
-    `);
-  })();
+  sqlite.run(`
+    DELETE FROM user
+    WHERE email LIKE '%@${SEED_EMAIL_DOMAIN}';
+  `);
+
+  logger.success("Existing demo data removed.");
 }
 
 /**
@@ -327,21 +339,18 @@ function removeExistingSeedData(sqlite: Database): void {
  * @param sqlite SQLite connection used for metadata queries.
  * @throws Error when the database schema has not been migrated yet.
  */
-function ensureRequiredTablesExist(sqlite: Database): void {
+async function ensureRequiredTablesExist(sqlite: Database): Promise<void> {
   const requiredTables = ["user", "subscription_plan", "subscription"];
-  const missingTables = requiredTables.filter((tableName) => {
-    const row = sqlite
-      .query<{ name: string }, [string]>(
-        `
-          SELECT name
-          FROM sqlite_master
-          WHERE type = 'table' AND name = ?;
-        `,
-      )
-      .get(tableName);
+  const missingTables: string[] = [];
 
-    return !row;
-  });
+  for (const tableName of requiredTables) {
+    const row = sqlite
+      .query("SELECT name FROM sqlite_master WHERE type='table' AND name = ?")
+      .get(tableName) as { name: string } | undefined;
+    if (!row) {
+      missingTables.push(tableName);
+    }
+  }
 
   if (missingTables.length > 0) {
     throw new Error(
@@ -356,7 +365,7 @@ function ensureRequiredTablesExist(sqlite: Database): void {
  * @param db Drizzle database instance.
  * @param baseDate Shared timestamp anchor.
  */
-function seedPlans(db: ReturnType<typeof createDatabase>, baseDate: Date): void {
+function seedPlans(db: ReturnType<typeof drizzleBun>, baseDate: Date): void {
   const plans = PLAN_DATA.map((plan) => ({
     ...plan,
     createdAt: baseDate,
@@ -394,7 +403,7 @@ function seedPlans(db: ReturnType<typeof createDatabase>, baseDate: Date): void 
  * @returns Counts of inserted or updated demo rows.
  */
 function seedUsers(
-  db: ReturnType<typeof createDatabase>,
+  db: ReturnType<typeof drizzleBun>,
   userCount: number,
   baseDate: Date,
   seed: number,
@@ -445,27 +454,19 @@ function seedUsers(
 }
 
 /**
- * Creates the typed Drizzle database instance used by the seed script.
- *
- * @param sqlite SQLite connection used for seeding.
- * @returns Typed Drizzle database client.
- */
-function createDatabase(sqlite: Database) {
-  return drizzle(sqlite, { schema });
-}
-
-/**
  * Executes the full seed workflow.
  */
-function main(): void {
+async function main(): Promise<void> {
   const options = parseSeedOptions(process.argv.slice(2));
   const databasePath = resolveDatabasePath();
-  const sqlite = new Database(databasePath);
+
+  const db = createDbConnection();
+
   try {
-    const db = createDatabase(sqlite);
+    const drizzleDb = drizzleBun(db);
     const baseDate = new Date();
 
-    sqlite.exec("PRAGMA foreign_keys = ON;");
+    db.run("PRAGMA foreign_keys = ON;");
 
     logger.section("Database Seeding");
     logger.step(1, `Seeding database at ${databasePath}`);
@@ -473,19 +474,19 @@ function main(): void {
       `Options: users=${options.users}, seed=${options.seed}, fresh=${options.fresh}, only=${options.only?.join(",") ?? "all"}`,
     );
 
-    ensureRequiredTablesExist(sqlite);
+    await ensureRequiredTablesExist(db);
     faker.seed(options.seed);
 
     if (options.fresh) {
-      removeExistingSeedData(sqlite);
+      removeExistingSeedData(db);
     }
 
     if (shouldRunSeedTarget(options, "plans")) {
-      seedPlans(db, baseDate);
+      seedPlans(drizzleDb, baseDate);
     }
 
     if (shouldRunSeedTarget(options, "users")) {
-      const result = seedUsers(db, options.users, baseDate, options.seed);
+      const result = seedUsers(drizzleDb, options.users, baseDate, options.seed);
       logger.success(
         `Seeded ${result.users} demo users and ${result.subscriptions} subscriptions.`,
       );
@@ -500,7 +501,7 @@ function main(): void {
     logger.error(error instanceof Error ? error.message : `Unknown seed failure: ${error}`);
     process.exitCode = 1;
   } finally {
-    sqlite.close();
+    db.close();
   }
 }
 

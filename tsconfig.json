@@ -21,5 +21,13 @@
       "*": ["./*"]
     }
   },
-  "include": ["src", "src/server.ts", "playwright.config.ts", "vite.config.ts"]
+  "include": [
+    "src",
+    "scripts",
+    ".e2e",
+    "config",
+    "drizzle.config.ts",
+    "playwright.config.ts",
+    "vite.config.ts"
+  ]
 }
