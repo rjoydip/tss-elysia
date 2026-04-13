@@ -75,15 +75,14 @@ describe("ThemeProvider", () => {
 });
 
 describe("useTheme", () => {
-  it("should throw when used outside ThemeProvider", () => {
+  it("should return default theme when used outside ThemeProvider", () => {
     function TestComponent() {
       const { theme } = useTheme();
       return <div>{theme}</div>;
     }
 
-    expect(() => renderToString(<TestComponent />)).toThrow(
-      "useTheme must be used within a ThemeProvider",
-    );
+    const html = renderToString(<TestComponent />);
+    expect(html).toContain("system");
   });
 
   it("should provide theme context inside ThemeProvider", () => {

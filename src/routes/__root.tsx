@@ -1,14 +1,19 @@
 /// <reference types="vite/client" />
-import { HeadContent, Scripts, createRootRoute } from "@tanstack/react-router";
+import { createRootRoute, HeadContent, Scripts } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import { QueryClientProvider } from "@tanstack/react-query";
 import { A11yer } from "a11yer";
-import * as React from "react";
-import { ThemeProvider } from "~/components/theme/provider";
+import { StrictMode } from "react";
+import { NavigationProgress } from "~/components/navigation-progress";
+import { GeneralError } from "~/features/errors/general-error";
+import { NotFoundError } from "~/features/errors/not-found-error";
 import { Toaster } from "~/components/ui/sonner";
-import appCss from "~/app.css?url";
-
-const queryClient = new QueryClient();
+import { DirectionProvider } from "~/context/direction-provider";
+import { FontProvider } from "~/context/font-provider";
+import { ThemeProvider } from "~/context/theme-provider";
+import { queryClient } from "~/router";
+import appCss from "~/styles/app.css?url";
 
 export const Route = createRootRoute({
   head: () => ({
@@ -22,29 +27,41 @@ export const Route = createRootRoute({
       { rel: "icon", type: "image/svg+xml", href: "/favicon.svg" },
     ],
   }),
-  errorComponent: () => <h1>500: Internal Server Error</h1>,
-  notFoundComponent: () => <h1>404: Page Not Found</h1>,
+  errorComponent: GeneralError,
+  notFoundComponent: NotFoundError,
   shellComponent: RootDocument,
 });
 
 function RootDocument({ children }: { children: React.ReactNode }) {
   return (
-    <QueryClientProvider client={queryClient}>
-      <ThemeProvider>
-        <A11yer>
-          <html lang="en">
-            <head>
-              <HeadContent />
-            </head>
-            <body>
-              <Toaster richColors />
-              {children}
-              {import.meta.env.DEV && <TanStackRouterDevtools position="bottom-right" />}
-              <Scripts />
-            </body>
-          </html>
-        </A11yer>
-      </ThemeProvider>
-    </QueryClientProvider>
+    <StrictMode>
+      <QueryClientProvider client={queryClient}>
+        <ThemeProvider>
+          <FontProvider>
+            <DirectionProvider>
+              <A11yer>
+                <html lang="en">
+                  <head>
+                    <HeadContent />
+                  </head>
+                  <body>
+                    <NavigationProgress />
+                    {children}
+                    <Toaster duration={5000} />
+                    {import.meta.env.MODE === "development" && (
+                      <>
+                        <ReactQueryDevtools buttonPosition="bottom-left" />
+                        <TanStackRouterDevtools position="bottom-right" />
+                      </>
+                    )}
+                    <Scripts />
+                  </body>
+                </html>
+              </A11yer>
+            </DirectionProvider>
+          </FontProvider>
+        </ThemeProvider>
+      </QueryClientProvider>
+    </StrictMode>
   );
 }

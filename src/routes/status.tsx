@@ -29,7 +29,7 @@ import {
   refreshStatusHealth,
   statusServices,
   useStatusState,
-} from "~/lib/store/status";
+} from "~/lib/stores/status";
 
 export const Route = createFileRoute("/status")({
   component: HealthDashboard,

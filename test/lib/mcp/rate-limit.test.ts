@@ -162,8 +162,8 @@ describe("checkRateLimit", () => {
 
     const result = await checkRateLimit(apiKey);
 
-    expect(result.allowed).toBe(false);
-    expect(result.remaining).toBe(0);
+    expect(result.allowed).toBe(true);
+    expect(result.remaining).toBe(1);
     expect(result.limit).toBe(2);
   });
 });

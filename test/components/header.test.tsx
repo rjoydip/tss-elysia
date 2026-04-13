@@ -74,7 +74,7 @@ describe("Header", () => {
     it("should render Login button when not logged in", () => {
       mockSession = null;
       const html = renderToString(<Header />);
-      expect(html).toContain('href="/account/login"');
+      expect(html).toContain('href="/sign-in"');
     });
   });
 

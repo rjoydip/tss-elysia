@@ -8,7 +8,7 @@ type ThemeProviderState = {
   setTheme: (theme: Theme) => void;
 };
 
-const ThemeProviderContext = createContext<ThemeProviderState | undefined>(undefined);
+const ThemeProviderContext = createContext<ThemeProviderState | null>(null);
 
 function getSystemTheme(): "light" | "dark" {
   if (typeof window === "undefined") return "dark";
@@ -34,6 +34,8 @@ export function ThemeProvider({
   });
 
   React.useEffect(() => {
+    if (typeof window === "undefined") return;
+
     const root = window.document.documentElement;
     root.classList.remove("light", "dark");
 
@@ -47,6 +49,8 @@ export function ThemeProvider({
   }, [theme]);
 
   React.useEffect(() => {
+    if (typeof window === "undefined") return;
+
     const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
     const handleChange = () => {
       if (theme === "system") {
@@ -64,6 +68,7 @@ export function ThemeProvider({
     () => ({
       theme,
       setTheme: (newTheme: Theme) => {
+        if (typeof window === "undefined") return;
         localStorage.setItem(storageKey, newTheme);
         setTheme(newTheme);
       },
@@ -76,8 +81,12 @@ export function ThemeProvider({
 
 export function useTheme() {
   const context = React.useContext(ThemeProviderContext);
-  if (context === undefined) {
-    throw new Error("useTheme must be used within a ThemeProvider");
+  // Return default values if used outside provider (SSR safety)
+  if (!context) {
+    return {
+      theme: "system" as Theme,
+      setTheme: () => undefined,
+    };
   }
   return context;
 }

@@ -9,7 +9,7 @@ import {
   setAuthSubmitError,
   setAuthSubmitting,
   type AuthFormKey,
-} from "../../../src/lib/store/auth";
+} from "../../../src/lib/stores/auth";
 
 /**
  * Resets all auth form states for deterministic test isolation.

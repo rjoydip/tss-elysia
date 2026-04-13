@@ -1,52 +1,63 @@
 /**
- * Redis client singleton using Bun's native RedisClient.
- * Provides lazy connection, health monitoring, and graceful shutdown.
+ * Universal storage abstraction layer using unstorage.
+ * Supports multiple storage backends based on environment configuration:
  *
- * Uses REDIS_URL environment variable for connection string, supporting:
- * - Local Docker: redis://localhost:6379
- * - Upstash:      rediss://default:TOKEN@HOST.upstash.io:6379
+ * - Redis:    When REDIS_URL is set in environment
+ * - LRU:     When DATABASE_TYPE is "sqlite" (in-memory cache)
+ * - Postgres: When DATABASE_TYPE is "postgres" with db0 connector
  *
- * The client is optional — when REDIS_URL is not set, all functions
- * return null/disabled state so the app can run without Redis.
+ * Provides a unified API for key-value storage operations across all backends.
+ * The storage is optional — when no backend is configured, all operations
+ * gracefully degrade to no-op behavior.
  *
  * @module redis
- * @see https://bun.com/docs/runtime/redis
+ * @see https://unstorage.unjs.io
  */
 
-import { RedisClient } from "bun";
+import { createStorage, type Storage } from "unstorage";
+import redisDriver from "unstorage/drivers/redis";
+import lruCacheDriver from "unstorage/drivers/lru-cache";
+import dbDriver from "unstorage/drivers/db0";
+import { createDatabase } from "db0";
+import postgresql from "db0/connectors/postgresql";
 import { env } from "~/config/env";
 import { redisLogger } from "../logger";
 
 /**
- * Redis connection status for health checks.
- * Used by the status endpoint to report Redis availability.
+ * Storage connection status for health checks.
+ * Used by the status endpoint to report storage availability.
  */
-export interface RedisStatus {
-  /** Whether Redis is currently connected */
+export interface StorageStatus {
+  /** Whether storage is currently connected */
   connected: boolean;
-  /** Redis URL (masked for security — hides passwords/tokens) */
+  /** Storage backend type (redis, lru, or postgres) */
+  backend: string;
+  /** URL or connection info (masked for security) */
   url: string;
   /** Error message if connection failed */
   error?: string;
 }
 
-/** Redis client instance — null if REDIS_URL is not configured */
-let client: RedisClient | null = null;
+/** Unstorage instance */
+let storage: Storage | null = null;
 
-/** Track initialization state to avoid multiple connect attempts */
+/** Track which backend is being used */
+let backendType: "redis" | "lru" | "postgres" | null = null;
+
+/** Track initialization state */
 let initialized = false;
 
 /**
- * Masks sensitive parts of the Redis URL for logging.
- * Preserves host, port, and scheme but hides passwords and tokens.
+ * Masks sensitive parts of a connection URL for logging.
+ * Preserves host and port but hides passwords and tokens.
  *
- * @param url - Raw Redis connection URL
+ * @param url - Raw connection URL
  * @returns Masked URL safe for logging
  *
  * @example
- * maskRedisUrl("redis://user:secret@host:6379") // "redis://user:***@host:6379/"
+ * maskUrl("postgresql://user:secret@host:5432") // "postgresql://user:***@host:5432"
  */
-function maskRedisUrl(url: string): string {
+function maskUrl(url: string): string {
   try {
     const parsed = new URL(url);
     if (parsed.username) {
@@ -57,150 +68,261 @@ function maskRedisUrl(url: string): string {
     }
     return parsed.toString();
   } catch {
-    return "redis://***";
+    return "***";
   }
 }
 
 /**
- * Returns the Redis client singleton.
- * Creates the client on first call (lazy initialization).
- * No connection is made until the first Redis command is executed.
- *
- * Returns null if REDIS_URL is not configured, allowing the app
- * to run gracefully without Redis.
- *
- * @returns RedisClient instance or null if Redis is unavailable
+ * Determines the storage backend based on environment configuration.
+ * Priority: REDIS_URL > postgres > sqlite (lru)
  */
-export function getRedisClient(): RedisClient | null {
-  if (!env.REDIS_URL) {
-    redisLogger.debug("REDIS_URL not configured, Redis disabled");
-    return null;
+function getBackendConfig(): {
+  backend: "redis" | "lru" | "postgres";
+  url: string;
+} {
+  // Priority 1: Redis URL is set
+  if (env.REDIS_URL) {
+    return { backend: "redis", url: env.REDIS_URL };
   }
 
-  if (!initialized) {
-    initialized = true;
-    try {
-      client = new RedisClient(env.REDIS_URL as string, {
-        // Connection timeout: 10 seconds
-        connectionTimeout: 10_000,
-        // Auto-reconnect with exponential backoff on disconnection
-        autoReconnect: true,
-        // Max reconnection attempts before giving up
-        maxRetries: 5,
-        // Queue commands while disconnected (replayed on reconnect)
-        enableOfflineQueue: true,
-        // Auto-pipeline concurrent commands for better throughput
-        enableAutoPipelining: true,
-        // TLS is inferred automatically from rediss:// scheme
-      });
-
-      // Log connection lifecycle events for monitoring
-      client.onconnect = () => {
-        redisLogger.info("Connected to Redis", {
-          url: maskRedisUrl(env.REDIS_URL as string),
-        });
-      };
-
-      client.onclose = (error) => {
-        redisLogger.warn("Redis connection closed", {
-          error: error?.message ?? "unknown",
-        });
-      };
-
-      redisLogger.info("Redis client initialized", {
-        url: maskRedisUrl(env.REDIS_URL as string),
-      });
-    } catch (error) {
-      redisLogger.error("Failed to initialize Redis client", error as Error);
-      client = null;
+  // Priority 2: PostgreSQL is configured
+  if (env.DATABASE_TYPE === "postgres") {
+    const postgresUrl = env.POSTGRES_URL || env.DATABASE_URL;
+    if (postgresUrl) {
+      return { backend: "postgres", url: postgresUrl };
     }
   }
 
-  return client;
+  // Default: SQLite (use LRU cache for in-memory storage)
+  return { backend: "lru", url: "in-memory" };
 }
 
-/** Tracks whether Redis connection has been validated */
+/**
+ * Creates and initializes the storage instance based on backend configuration.
+ *
+ * @returns Configured storage instance or null if initialization failed
+ */
+function createStorageInstance(): Storage | null {
+  const config = getBackendConfig();
+  backendType = config.backend;
+
+  redisLogger.info(`Initializing cache storage with ${config.backend}`, {
+    url: maskUrl(config.url),
+  });
+
+  let storageInstance: Storage | null = null;
+
+  try {
+    switch (config.backend) {
+      case "redis": {
+        storageInstance = createStorage({
+          driver: redisDriver({
+            base: "tss",
+            url: env.REDIS_URL,
+            // Lazy initialization - connect on first operation
+            preConnect: false,
+          }),
+        });
+        break;
+      }
+
+      case "postgres": {
+        const db0 = createDatabase(
+          postgresql({
+            url: env.POSTGRES_URL || env.DATABASE_URL,
+          }),
+        );
+        storageInstance = createStorage({
+          driver: dbDriver({
+            database: db0,
+            tableName: "tss_storage",
+          }),
+        });
+        break;
+      }
+
+      default: {
+        storageInstance = createStorage({
+          driver: lruCacheDriver({
+            // Default max items
+            max: 1000,
+          }),
+        });
+        break;
+      }
+    }
+
+    storage = storageInstance;
+    redisLogger.info(`Storage initialized with ${config.backend} backend`);
+    return storageInstance;
+  } catch (error) {
+    redisLogger.error(`Failed to initialize ${config.backend} storage`, error as Error);
+    return null;
+  }
+}
+
+/**
+ * Returns the storage singleton.
+ * Creates the storage on first call (lazy initialization).
+ *
+ * Returns null if no storage backend is configured, allowing the app
+ * to run gracefully without storage.
+ *
+ * @returns Storage instance or null if unavailable
+ */
+export function getStorage(): Storage | null {
+  if (!initialized) {
+    initialized = true;
+    createStorageInstance();
+  }
+
+  return storage;
+}
+
+/** Tracks whether storage connection has been validated */
 let validated = false;
 
 /**
- * Validates Redis connection on first access.
- * Ensures the client can communicate with Redis before returning.
+ * Validates storage connection on first access.
+ * Ensures the storage can communicate before returning.
  * Safe to call multiple times - validation runs once.
  */
-export async function ensureRedisConnection(): Promise<boolean> {
-  if (!env.REDIS_URL) {
+export async function ensureStorageConnection(): Promise<boolean> {
+  const storage = getStorage();
+  if (!storage) {
     return false;
   }
 
   if (validated) {
-    return client !== null;
+    return storage !== null;
   }
 
   validated = true;
-  return validateRedisConnection();
+  return validateStorageConnection();
 }
 
 /**
- * Validates Redis connectivity by attempting a PING command.
- * Ensures the client can communicate with Redis before operations.
+ * Validates storage connectivity by attempting a read operation.
+ * Ensures the storage is accessible before operations.
  *
  * @returns True if connection is working, false otherwise
  */
-export async function validateRedisConnection(): Promise<boolean> {
-  const redisClient = getRedisClient();
-  if (!redisClient) {
+export async function validateStorageConnection(): Promise<boolean> {
+  const storage = getStorage();
+  if (!storage) {
     return false;
   }
 
   try {
-    const pong = await redisClient.send("PING", []);
-    return pong === "PONG";
+    // Attempt a test operation to verify connectivity
+    await storage.get("__health_check__");
+    return true;
   } catch {
     return false;
   }
 }
 
 /**
- * Checks Redis connectivity by sending a PING command.
- * Used by the health check endpoint to report Redis status.
+ * Checks storage connectivity.
+ * Used by the health check endpoint to report storage status.
  *
- * @returns Redis connection status object with connectivity info
+ * @returns Storage connection status object
  */
-export async function getRedisStatus(): Promise<RedisStatus> {
-  const redisUrl = env.REDIS_URL as string | undefined;
-  const url = redisUrl ? maskRedisUrl(redisUrl) : "not configured";
+export async function getStorageStatus(): Promise<StorageStatus> {
+  const storage = getStorage();
+  const config = getBackendConfig();
 
-  const redisClient = getRedisClient();
-  if (!redisClient) {
-    return { connected: false, url, error: "Redis not configured" };
+  if (!storage) {
+    return {
+      connected: false,
+      backend: config.backend,
+      url: maskUrl(config.url),
+      error: "Storage not configured",
+    };
   }
 
   try {
-    // PING returns "PONG" if the server is reachable and responsive
-    const pong = await redisClient.send("PING", []);
+    // Attempt a test operation to verify connectivity
+    await storage.get("__health_check__");
     return {
-      connected: pong === "PONG",
-      url,
+      connected: true,
+      backend: config.backend,
+      url: maskUrl(config.url),
     };
   } catch (error) {
     return {
       connected: false,
-      url,
+      backend: config.backend,
+      url: maskUrl(config.url),
       error: (error as Error).message,
     };
   }
 }
 
 /**
- * Gracefully closes the Redis connection.
+ * Gracefully closes the storage connection.
  * Should be called during application shutdown to clean up resources.
  * Safe to call multiple times — subsequent calls are no-ops.
  */
-export function closeRedis(): void {
-  if (client) {
-    redisLogger.info("Closing Redis connection");
-    client.close();
-    client = null;
+export function closeStorage(): void {
+  if (storage) {
+    redisLogger.info(`Closing ${backendType} storage`);
+    // Clear the storage instance
+    storage = null;
     initialized = false;
+    backendType = null;
   }
 }
+
+/**
+ * @deprecated Use getStorage() instead. Kept for backward compatibility.
+ * Returns the Redis client singleton.
+ *
+ * This function is deprecated and provided only for backward compatibility.
+ * New code should use getStorage() for the unified storage API.
+ *
+ * @returns Always returns null (RedisClient no longer used)
+ * @deprecated Use getStorage() instead
+ */
+export function getRedisClient(): null | unknown {
+  const storage = getStorage();
+  if (storage) {
+    return storage;
+  }
+  redisLogger.warn("getRedisClient() is deprecated, use getStorage() instead");
+  return null;
+}
+
+/**
+ * @deprecated Use ensureStorageConnection() instead.
+ */
+export async function ensureRedisConnection(): Promise<boolean> {
+  return ensureStorageConnection();
+}
+
+/**
+ * @deprecated Use validateStorageConnection() instead.
+ */
+export async function validateRedisConnection(): Promise<boolean> {
+  return validateStorageConnection();
+}
+
+/**
+ * @deprecated Use getStorageStatus() instead.
+ */
+export async function getRedisStatus(): Promise<StorageStatus> {
+  return getStorageStatus();
+}
+
+/**
+ * @deprecated Use closeStorage() instead.
+ */
+export function closeRedis(): void {
+  closeStorage();
+}
+
+/**
+ * Type alias for backward compatibility.
+ * @deprecated Use StorageStatus instead
+ */
+export type RedisStatus = StorageStatus;

@@ -11,7 +11,7 @@ import {
   refreshStatusHealth,
   statusServices,
   statusStore,
-} from "../../../src/lib/store/status";
+} from "../../../src/lib/stores/status";
 
 /**
  * Total expected fetch calls per health check cycle.

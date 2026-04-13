@@ -14,10 +14,10 @@ import { signInWithEmail } from "~/lib/auth/client";
 import { Branding } from "~/components/branding";
 import { APP_NAME } from "~/config";
 import { toast } from "sonner";
-import { setAuthSubmitting, useAuthFormState } from "~/lib/store/auth";
+import { setAuthSubmitting, useAuthFormState } from "~/lib/stores/auth";
 
 const loginSchema = z.object({
-  email: z.string().min(1, "Email is required").email("Please enter a valid email address"),
+  email: z.email("Please enter a valid email address"),
   password: z.string().min(1, "Password is required"),
 });
 
@@ -69,7 +69,7 @@ export function LoginForm() {
           {/* Mobile logo */}
           <div className="lg:hidden text-center mb-8">
             <div className="inline-flex items-center gap-2">
-              <div className="w-10 h-10 bg-gradient-to-br from-primary/80 to-primary rounded-lg flex items-center justify-center">
+              <div className="w-10 h-10 bg-liner-to-br from-primary/80 to-primary rounded-lg flex items-center justify-center">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
                   <path
                     fill="white"

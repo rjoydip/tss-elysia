@@ -5,6 +5,7 @@
  */
 
 import { Link } from "@tanstack/react-router";
+import { CircleUserRound } from "lucide-react";
 import { cn } from "~/lib/utils";
 import { ThemeToggle } from "~/components/theme/toggle";
 import { GITHUB_REPO_URL } from "~/config";
@@ -182,27 +183,12 @@ export function Header({ className, children, showSignIn = true }: HeaderProps) 
             </DropdownMenu.Root>
           ) : showSignIn ? (
             <Link
-              to="/account/login"
+              to="/sign-in"
               className="p-2 hover:bg-accent rounded-md transition-colors text-primary"
               aria-label="Login"
               title="Login"
             >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="rotate-180"
-              >
-                <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
-                <polyline points="10 17 15 12 10 7" />
-                <line x1="15" y1="12" x2="3" y2="12" />
-              </svg>
+              <CircleUserRound />
             </Link>
           ) : null}
 

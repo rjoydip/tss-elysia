@@ -168,23 +168,12 @@ function getDatabaseName(): string {
     return "tss-elysia.db";
   }
 
-  // Extract environment from NODE_ENV
-  const nodeEnv = isDev
-    ? "development"
-    : isStage
-      ? "stage"
-      : isQA
-        ? "qa"
-        : isProduction
-          ? "production"
-          : "development";
-
   // Use custom name if set, otherwise use environment-specific name
   if (env.DATABASE_NAME && !env.DATABASE_NAME.includes("tss-elysia")) {
     return env.DATABASE_NAME;
   }
 
-  return `tsse-${nodeEnv}.db`;
+  return `tss-elysia.db`;
 }
 
 /**

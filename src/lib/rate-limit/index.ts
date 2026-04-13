@@ -11,6 +11,7 @@ export {
   getRateLimitStore,
   rateLimitStore,
   memoryRateLimitStore,
+  storageRateLimitStore,
   redisRateLimitStore,
   checkRateLimit,
   resetRateLimit,
