@@ -13,7 +13,7 @@ import { UserPlus, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { IconFacebook, IconGithub } from "~/assets/brand-icons";
 import { signUpWithEmail } from "~/lib/auth/client";
-import { useAuthStore } from "~/lib/stores/auth-store";
+import { authActions } from "~/lib/stores/auth-store";
 import { cn } from "~/lib/utils";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
@@ -153,7 +153,6 @@ const getStrengthLabel = (score: number): string => {
 export function SignUpForm({ className, ...props }: React.HTMLAttributes<HTMLFormElement>) {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
-  const { auth } = useAuthStore();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -185,8 +184,8 @@ export function SignUpForm({ className, ...props }: React.HTMLAttributes<HTMLFor
           role: ["user"],
           exp: Date.now() + 24 * 60 * 60 * 1000,
         };
-        auth.setUser(mockUser);
-        auth.setAccessToken("auth-access-token");
+        authActions.setUser(mockUser);
+        authActions.setAccessToken("auth-access-token");
         toast.success("Account created successfully");
         navigate({ to: "/dashboard", replace: true });
       }

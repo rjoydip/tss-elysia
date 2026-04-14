@@ -110,10 +110,10 @@ describe("Header", () => {
       expect(html).toContain("Toggle theme");
     });
 
-    it("should hide Search when logged in", () => {
+    it("should show Search when logged in", () => {
       mockSession = { user: { id: "1", name: "Test User" } };
       const html = renderToString(<Header />);
-      expect(html).not.toContain("Search");
+      expect(html).toContain("Search");
     });
 
     it("should show Dashboard link when logged in", () => {

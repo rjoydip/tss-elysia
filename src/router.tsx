@@ -6,9 +6,9 @@
 import { createRouter } from "@tanstack/react-router";
 import { toast } from "sonner";
 import { QueryCache, QueryClient } from "@tanstack/react-query";
-import { useAuthStore } from "~/lib/stores/auth-store";
 import { routeTree } from "./routeTree.gen";
 import { getErrorMessage, getErrorStatus, isAuthError, isServerError } from "~/lib/errors";
+import { authActions } from "./lib/stores/auth-store";
 
 const router = createRouter({
   routeTree,
@@ -77,7 +77,7 @@ export const queryClient = new QueryClient({
     onError: (error) => {
       if (isAuthError(error)) {
         toast.error("Session expired!");
-        useAuthStore.getState().auth.reset();
+        authActions.reset();
         router.navigate({
           to: "/sign-in",
           search: { redirect: `${router.history.location.href}` },

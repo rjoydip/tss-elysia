@@ -13,7 +13,7 @@ import { Loader2, LogIn } from "lucide-react";
 import { toast } from "sonner";
 import { IconFacebook, IconGithub } from "~/assets/brand-icons";
 import { signInWithEmail } from "~/lib/auth/client";
-import { useAuthStore } from "~/lib/stores/auth-store";
+import { authActions } from "~/lib/stores/auth-store";
 import { cn } from "~/lib/utils";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
@@ -77,7 +77,6 @@ interface UserAuthFormProps extends React.HTMLAttributes<HTMLFormElement> {
 export function UserAuthForm({ className, redirectTo, ...props }: UserAuthFormProps) {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
-  const { auth } = useAuthStore();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -100,14 +99,13 @@ export function UserAuthForm({ className, redirectTo, ...props }: UserAuthFormPr
 
       if (result.data?.user) {
         const user = result.data.user;
-        const mockUser = {
+        authActions.setUser({
           accountNo: user.id || "ACC001",
           email: user.email,
           role: ["user"],
           exp: Date.now() + 24 * 60 * 60 * 1000,
-        };
-        auth.setUser(mockUser);
-        auth.setAccessToken("auth-access-token");
+        });
+        authActions.setAccessToken("auth-access-token");
         toast.success("Signed in successfully");
         const targetPath = redirectTo || "/dashboard";
         navigate({ to: targetPath, replace: true });

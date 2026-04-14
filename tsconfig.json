@@ -15,12 +15,10 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
-    "types": ["bun-types"],
     "paths": {
       "~/*": ["./src/*"],
       "*": ["./*"]
     }
   },
-  "include": ["src", "playwright.config.ts", "drizzle.config.ts", "vite.config.ts"],
-  "exclude": ["node_modules"]
+  "include": ["src", "playwright.config.ts", "drizzle.config.ts", "vite.config.ts"]
 }

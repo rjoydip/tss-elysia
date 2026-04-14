@@ -9,15 +9,15 @@ export const Route = createFileRoute("/_authenticated")({
 
 function AuthenticatedRouteWrapper() {
   const navigate = useNavigate();
-  const { auth } = useAuthStore();
+  const authStore = useAuthStore();
 
   useEffect(() => {
-    if (!auth.accessToken || !auth.user) {
+    if (!authStore.accessToken || !authStore.user) {
       navigate({ to: "/sign-in", replace: true });
     }
-  }, [auth.accessToken, auth.user, navigate]);
+  }, [authStore.accessToken, authStore.user, navigate]);
 
-  if (!auth.accessToken || !auth.user) {
+  if (!authStore.accessToken || !authStore.user) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="flex flex-col items-center gap-4">

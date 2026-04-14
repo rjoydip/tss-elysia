@@ -11,7 +11,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useNavigate } from "@tanstack/react-router";
 import { ShieldCheck, Loader2 } from "lucide-react";
 import { toast } from "sonner";
-import { useAuthStore } from "~/lib/stores/auth-store";
+import { authActions } from "~/lib/stores/auth-store";
 import { cn } from "~/lib/utils";
 import { Button } from "~/components/ui/button";
 import {
@@ -38,7 +38,6 @@ type OtpFormProps = React.HTMLAttributes<HTMLFormElement>;
 export function OtpForm({ className, ...props }: OtpFormProps) {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
-  const { auth } = useAuthStore();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -57,8 +56,8 @@ export function OtpForm({ className, ...props }: OtpFormProps) {
         role: ["user"],
         exp: Date.now() + 24 * 60 * 60 * 1000,
       };
-      auth.setUser(mockUser);
-      auth.setAccessToken("verified-access-token");
+      authActions.setUser(mockUser);
+      authActions.setAccessToken("verified-access-token");
 
       toast.success("Verification successful");
       navigate({ to: "/dashboard" });

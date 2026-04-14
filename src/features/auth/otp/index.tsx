@@ -14,15 +14,15 @@ import { OtpForm } from "./components/otp-form";
 
 export function Otp() {
   const navigate = useNavigate();
-  const { auth } = useAuthStore();
+  const authStore = useAuthStore();
 
   useEffect(() => {
-    if (auth.accessToken && auth.user) {
+    if (authStore.accessToken && authStore.user) {
       navigate({ to: "/dashboard", replace: true });
     }
-  }, [auth.accessToken, auth.user, navigate]);
+  }, [authStore.accessToken, authStore.user, navigate]);
 
-  if (auth.accessToken && auth.user) {
+  if (authStore.accessToken && authStore.user) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />

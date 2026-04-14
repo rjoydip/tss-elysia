@@ -14,6 +14,12 @@ import {
   AudioWaveform,
   Command,
   GalleryVerticalEnd,
+  Bug,
+  Lock,
+  UserX,
+  FileX,
+  ServerOff,
+  Construction,
 } from "lucide-react";
 import { type SidebarData } from "../types";
 import { APP_NAME } from "~/config";
@@ -70,6 +76,42 @@ export const sidebarData: SidebarData = {
           title: "Users",
           url: "/dashboard/users",
           icon: Users,
+        },
+      ],
+    },
+    {
+      title: "Pages",
+      items: [
+        {
+          title: "Errors",
+          icon: Bug,
+          items: [
+            {
+              title: "Unauthorized",
+              url: "/errors/unauthorized",
+              icon: Lock,
+            },
+            {
+              title: "Forbidden",
+              url: "/errors/forbidden",
+              icon: UserX,
+            },
+            {
+              title: "Not Found",
+              url: "/errors/not-found",
+              icon: FileX,
+            },
+            {
+              title: "Internal Server Error",
+              url: "/errors/internal-server-error",
+              icon: ServerOff,
+            },
+            {
+              title: "Maintenance Error",
+              url: "/errors/maintenance-error",
+              icon: Construction,
+            },
+          ],
         },
       ],
     },
