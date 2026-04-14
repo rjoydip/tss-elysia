@@ -206,7 +206,7 @@ class StorageCache {
 
     try {
       const keys = await storage.getKeys(this.prefix);
-      await Promise.all(keys.map((k) => storage.removeItem(k)));
+      await Promise.all(keys.map((k: string) => storage.removeItem(k)));
     } catch (error) {
       redisLogger.error("Storage cache clear failed", error as Error);
     }

@@ -144,7 +144,7 @@ export class StorageSessionAdapter {
 
     try {
       const keys = await storage.getKeys(`session:${userId}:`);
-      await Promise.all(keys.map((k) => storage.removeItem(k)));
+      await Promise.all(keys.map((k: string) => storage.removeItem(k)));
     } catch (error) {
       redisLogger.error("Failed to delete user session cache", error as Error);
     }
