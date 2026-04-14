@@ -8,7 +8,7 @@ import { resolve } from "node:path";
 import { execSync } from "node:child_process";
 
 const dbPath = process.env.DATABASE_PATH || ".artifacts";
-const dbName = process.env.DATABASE_NAME || "tss-elysia.db";
+const dbName = process.env.DATABASE_NAME || "tsse-elysia.db";
 
 export default async function globalSetup() {
   console.log("[E2E Setup] Setting up database...");

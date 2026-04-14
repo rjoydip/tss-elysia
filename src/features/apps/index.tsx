@@ -19,7 +19,7 @@ import { Search } from "~/components/search";
 import { ThemeSwitch } from "~/components/theme-switch";
 import { apps } from "./data/apps";
 
-const route = getRouteApi("/_authenticated/apps/");
+const route = getRouteApi("/_authenticated/dashboard/apps/");
 
 type AppType = "all" | "connected" | "notConnected";
 
@@ -93,7 +93,7 @@ export function Apps() {
           <div className="flex flex-col gap-4 sm:my-4 sm:flex-row">
             <Input
               placeholder="Filter apps..."
-              className="h-9 w-40 lg:w-[250px]"
+              className="h-9 w-40 lg:w-62.5"
               value={searchTerm}
               onChange={handleSearch}
             />
@@ -142,7 +142,11 @@ export function Apps() {
                 <Button
                   variant="outline"
                   size="sm"
-                  className={`${app.connected ? "border border-blue-300 bg-blue-50 hover:bg-blue-100 dark:border-blue-700 dark:bg-blue-950 dark:hover:bg-blue-900" : ""}`}
+                  className={`${
+                    app.connected
+                      ? "border border-blue-300 bg-blue-50 hover:bg-blue-100 dark:border-blue-700 dark:bg-blue-950 dark:hover:bg-blue-900"
+                      : ""
+                  }`}
                 >
                   {app.connected ? "Connected" : "Connect"}
                 </Button>

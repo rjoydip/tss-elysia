@@ -72,8 +72,8 @@ Complete the authentication system with additional security features, set up use
 
 #### User Account Management
 
-- [x] Create profile route `/profile`
-- [x] Create settings route `/settings`
+- [x] Create profile route `/dashboard/profile`
+- [x] Create settings route `/dashboard/settings`
 - [x] Add password change functionality
 - [x] Add email change with verification
 - [x] Implement session management (view/revoke sessions)
@@ -375,6 +375,19 @@ Complete the authentication system with additional security features, set up use
 - [x] Create auth client utilities (`src/lib/auth/client.ts`)
 - [x] Create auth server instance (`src/lib/auth/index.ts`)
 - [x] Create auth guard component (`src/components/auth/auth-guard.tsx`)
+- [x] Apply AuthGuard to all authenticated routes:
+  - [x] `_authenticated/dashboard/index.tsx`
+  - [x] `_authenticated/tasks/index.tsx`
+  - [x] `_authenticated/users/index.tsx`
+  - [x] `_authenticated/chats/index.tsx`
+  - [x] `_authenticated/apps/index.tsx`
+  - [x] `_authenticated/dashboard/settings/route.tsx`
+  - [x] `_authenticated/dashboard/settings/index.tsx`
+  - [x] `_authenticated/dashboard/settings/account.tsx`
+  - [x] `_authenticated/dashboard/settings/appearance.tsx`
+  - [x] `_authenticated/dashboard/settings/notifications.tsx`
+  - [x] `_authenticated/dashboard/settings/display.tsx`
+  - [x] `_authenticated/help-center/index.tsx`
 - [x] Create login page (`src/routes/auth/login.tsx`) and form (`src/components/auth/form/login.tsx`)
 - [x] Create register page (`src/routes/auth/register.tsx`) and form (`src/components/auth/form/register.tsx`)
 - [x] Create forgot password page (`src/routes/account/forgot-password.tsx`) and form (`src/components/auth/form/forgot-password.tsx`)

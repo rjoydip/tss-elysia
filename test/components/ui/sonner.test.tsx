@@ -6,7 +6,7 @@
 import { describe, expect, it } from "bun:test";
 import { renderToString } from "react-dom/server";
 import { Toaster } from "../../../src/components/ui/sonner";
-import { ThemeProvider } from "../../../src/components/theme/provider";
+import { ThemeProvider } from "../../../src/context/theme-provider";
 
 describe("Toaster (sonner)", () => {
   it("should render without crashing", () => {

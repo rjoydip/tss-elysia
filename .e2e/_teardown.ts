@@ -21,7 +21,7 @@ const TEST_DOMAIN = "example.com";
  * Get database path based on environment.
  */
 function getDbPath(): string {
-  const _dbPath = ".artifacts/tss-elysia.db";
+  const _dbPath = ".artifacts/tsse-elysia.db";
 
   const dbPath =
     process.env.DATABASE_PATH && process.env.DATABASE_NAME

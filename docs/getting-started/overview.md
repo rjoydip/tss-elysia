@@ -27,7 +27,7 @@ A full-stack TypeScript application demonstrating modern web development with Ta
 ## Project Structure
 
 ```bash
-tss-elysia/
+tsse-elysia/
 ├── src/
 │   ├── routes/           # File-based routing
 │   │   ├── __root.tsx   # Root layout

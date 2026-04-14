@@ -29,6 +29,8 @@ export interface OtherServiceStatus {
   tooltip: string;
   latencyMs?: number | null;
   pools?: PoolStatusInfo[];
+  databaseType?: string;
+  backend?: string;
 }
 
 /**
@@ -148,6 +150,8 @@ const DatabaseHeartbeatResponseSchema = z.object({
   detail: z.string().optional(),
   timestamp: z.string().optional(),
   latencyMs: z.number().nullable().optional(),
+  databaseType: z.string().optional(),
+  backend: z.string().optional(),
   pools: z
     .array(
       z.object({
@@ -201,6 +205,10 @@ async function checkOtherStatusHealth(): Promise<OtherServiceStatus[]> {
           tooltip = `${payload.detail || "Database status"}\n\nPools: ${poolDetails}`;
         }
 
+        // Extract database type for Database service or backend for Redis
+        const databaseType = service.name === "Database" ? payload.databaseType : undefined;
+        const backend = service.name === "Redis" ? payload.backend : undefined;
+
         return {
           name: service.name,
           status: isHealthy ? ("operational" as const) : ("outage" as const),
@@ -213,6 +221,8 @@ async function checkOtherStatusHealth(): Promise<OtherServiceStatus[]> {
             healthy: p.healthy,
             latencyMs: p.latencyMs,
           })),
+          databaseType,
+          backend,
         };
       } catch {
         return {

@@ -1,46 +1,91 @@
-import { Link } from "@tanstack/react-router";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "~/components/ui/card";
-import { AuthLayout } from "../auth-layout";
+import { useEffect } from "react";
+import { useNavigate, Link } from "@tanstack/react-router";
+import { Logo } from "~/assets/logo";
+import { cn } from "~/lib/utils";
+import { useAuthStore } from "~/lib/stores/auth-store";
+import { AnimatedPageBackground } from "~/components/animated-page-background";
 import { SignUpForm } from "./components/sign-up-form";
+import { APP_NAME } from "~/config";
+import dashboardDark from "../sign-in/assets/dashboard-dark.png";
+import dashboardLight from "../sign-in/assets/dashboard-light.png";
 
 export function SignUp() {
+  const navigate = useNavigate();
+  const { auth } = useAuthStore();
+
+  useEffect(() => {
+    if (auth.accessToken && auth.user) {
+      navigate({ to: "/dashboard", replace: true });
+    }
+  }, [auth.accessToken, auth.user, navigate]);
+
+  if (auth.accessToken && auth.user) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
+
   return (
-    <AuthLayout>
-      <Card className="gap-4">
-        <CardHeader>
-          <CardTitle className="text-lg tracking-tight">Create an account</CardTitle>
-          <CardDescription>
-            Enter your email and password to create an account. <br />
-            Already have an account?{" "}
-            <Link to="/sign-in" className="underline underline-offset-4 hover:text-primary">
-              Sign In
-            </Link>
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <SignUpForm />
-        </CardContent>
-        <CardFooter>
-          <p className="px-8 text-center text-sm text-muted-foreground">
-            By creating an account, you agree to our{" "}
-            <a href="/terms" className="underline underline-offset-4 hover:text-primary">
-              Terms of Service
-            </a>{" "}
-            and{" "}
-            <a href="/privacy" className="underline underline-offset-4 hover:text-primary">
-              Privacy Policy
-            </a>
-            .
-          </p>
-        </CardFooter>
-      </Card>
-    </AuthLayout>
+    <>
+      <AnimatedPageBackground />
+      <div className="relative container grid h-svh flex-col items-center justify-center lg:max-w-none lg:grid-cols-2 lg:px-0">
+        <div className="lg:p-8">
+          <div className="mx-auto flex w-full flex-col justify-center space-y-2 py-8 sm:w-120 sm:p-8">
+            <div className="mb-4 flex items-center justify-center">
+              <Logo className="me-2" />
+              <h1 className="text-xl font-medium">{APP_NAME} Admin</h1>
+            </div>
+          </div>
+          <div className="mx-auto flex w-full max-w-sm flex-col justify-center space-y-2">
+            <div className="flex flex-col space-y-2 text-start">
+              <h2 className="text-lg font-semibold tracking-tight">Create an account</h2>
+              <p className="text-sm text-muted-foreground">
+                Enter your email and password to create an account. <br />
+                Already have an account?{" "}
+                <Link to="/sign-in" className="underline underline-offset-4 hover:text-primary">
+                  Sign In
+                </Link>
+              </p>
+            </div>
+            <SignUpForm />
+            <p className="px-8 text-center text-sm text-muted-foreground">
+              By creating an account, you agree to our{" "}
+              <a href="/terms" className="underline underline-offset-4 hover:text-primary">
+                Terms of Service
+              </a>{" "}
+              and{" "}
+              <a href="/privacy" className="underline underline-offset-4 hover:text-primary">
+                Privacy Policy
+              </a>
+              .
+            </p>
+          </div>
+        </div>
+
+        <div
+          className={cn(
+            "relative h-full overflow-hidden bg-muted max-lg:hidden",
+            "[&>img]:absolute [&>img]:top-[15%] [&>img]:left-20 [&>img]:h-full [&>img]:w-full [&>img]:object-cover [&>img]:object-top-left [&>img]:select-none",
+          )}
+        >
+          <img
+            src={dashboardLight}
+            className="dark:hidden"
+            width={1024}
+            height={1151}
+            alt="Shadcn-Admin"
+          />
+          <img
+            src={dashboardDark}
+            className="hidden dark:block"
+            width={1024}
+            height={1138}
+            alt="Shadcn-Admin"
+          />
+        </div>
+      </div>
+    </>
   );
 }

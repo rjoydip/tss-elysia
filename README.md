@@ -3,10 +3,10 @@ title: TSS Elysia
 description: A full-stack TypeScript application using TanStack Start, Elysia, React 19, and Bun
 ---
 
-## tss-elysia
+## tsse-elysia
 
-[![React Doctor](https://www.react.doctor/share/badge?p=tss-elysia&s=98&w=3&f=3)](https://www.react.doctor/share?p=tss-elysia&s=98&w=3&f=3)
-[![License](https://img.shields.io/github/license/rjoydip/tss-elysia)](https://github.com/rjoydip/tss-elysia/blob/main/LICENSE)
+[![React Doctor](https://www.react.doctor/share/badge?p=tsse-elysia&s=98&w=3&f=3)](https://www.react.doctor/share?p=tsse-elysia&s=98&w=3&f=3)
+[![License](https://img.shields.io/github/license/rjoydip/tsse-elysia)](https://github.com/rjoydip/tsse-elysia/blob/main/LICENSE)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.7-blue)](https://www.typescriptlang.org/)
 [![Bun](https://img.shields.io/badge/Bun-1.2+-green)](https://bun.sh)
 
@@ -204,6 +204,21 @@ src/
 │   ├── blog.tsx        # Blog routes
 │   ├── changelog.tsx   # Changelog routes
 │   ├── status.tsx      # Health monitoring dashboard
+│   ├── (auth)/         # Auth routes (sign-in, sign-up, OTP)
+│   │   ├── sign-in.tsx
+│   │   ├── sign-up.tsx
+│   │   └── otp.tsx
+│   ├── (errors)/       # Error pages (401, 403, 404, 500, 503)
+│   ├── _authenticated/ # Protected routes (wrapped with AuthGuard)
+│   │   ├── route.tsx   # Auth layout wrapper
+│   │   ├── dashboard/
+│   │   ├── tasks/
+│   │   ├── users/
+│   │   ├── chats/
+│   │   ├── apps/
+│   │   ├── help-center/
+│   │   ├── errors/
+│   │   └── settings/   # Settings sub-routes
 │   └── api/            # API routes
 │       ├── $.ts       # API catch-all route
 │       └── auth/      # Auth routes (Better Auth)

@@ -1,4 +1,5 @@
-import { Link } from "@tanstack/react-router";
+import { useEffect } from "react";
+import { useNavigate, Link } from "@tanstack/react-router";
 import {
   Card,
   CardContent,
@@ -7,10 +8,28 @@ import {
   CardHeader,
   CardTitle,
 } from "~/components/ui/card";
+import { useAuthStore } from "~/lib/stores/auth-store";
 import { AuthLayout } from "../auth-layout";
 import { OtpForm } from "./components/otp-form";
 
 export function Otp() {
+  const navigate = useNavigate();
+  const { auth } = useAuthStore();
+
+  useEffect(() => {
+    if (auth.accessToken && auth.user) {
+      navigate({ to: "/dashboard", replace: true });
+    }
+  }, [auth.accessToken, auth.user, navigate]);
+
+  if (auth.accessToken && auth.user) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
+
   return (
     <AuthLayout>
       <Card className="gap-4">

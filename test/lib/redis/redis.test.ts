@@ -10,120 +10,195 @@
 
 import { describe, test, expect, afterEach } from "bun:test";
 import {
-  getRedisClient,
-  getRedisStatus,
-  closeRedis,
-  ensureRedisConnection,
+  getStorage,
+  getStorageStatus,
+  closeStorage,
+  ensureStorageConnection,
+  validateStorageConnection,
+  StorageStatus,
 } from "../../../src/lib/redis";
 
-describe("Redis Client", () => {
+describe("Storage Client (getStorage)", () => {
   afterEach(() => {
-    // Clean up Redis state between tests
-    closeRedis();
+    closeStorage();
   });
 
-  test("getRedisClient returns a RedisClient or null", () => {
-    const client = getRedisClient();
-    // Returns RedisClient when REDIS_URL is configured, null otherwise
-    expect(client === null || typeof client === "object").toBe(true);
+  test("getStorage returns a Storage instance or null", () => {
+    const storage = getStorage();
+    expect(storage === null || typeof storage === "object").toBe(true);
   });
 
-  test("getRedisClient is idempotent (returns same instance)", () => {
-    const client1 = getRedisClient();
-    const client2 = getRedisClient();
-    // Singleton pattern — same reference on repeated calls
-    expect(client1).toBe(client2);
+  test("getStorage is idempotent (returns same instance)", () => {
+    const storage1 = getStorage();
+    const storage2 = getStorage();
+    expect(storage1).toBe(storage2);
+  });
+});
+
+describe("Storage Status (getStorageStatus)", () => {
+  afterEach(() => {
+    closeStorage();
   });
 
-  test("getRedisStatus returns a valid status object", async () => {
-    const status = await getRedisStatus();
+  test("getStorageStatus returns a valid status object", async () => {
+    const status = await getStorageStatus();
     expect(status).toHaveProperty("connected");
     expect(status).toHaveProperty("url");
+    expect(status).toHaveProperty("backend");
     expect(typeof status.connected).toBe("boolean");
     expect(typeof status.url).toBe("string");
+    expect(typeof status.backend).toBe("string");
   });
 
-  test("getRedisStatus includes error when not configured", async () => {
-    // When Redis is not running, status should include an error or "not configured"
-    const status = await getRedisStatus();
+  test("getStorageStatus includes backend type (redis, lru, or postgres)", async () => {
+    const status = await getStorageStatus();
+    expect(["redis", "lru", "postgres"]).toContain(status.backend);
+  });
+
+  test("getStorageStatus includes error when not configured", async () => {
+    const status = await getStorageStatus();
     if (!status.connected) {
       expect(typeof status.error === "string" || status.error === undefined).toBe(true);
     }
   });
 
-  test("closeRedis is safe to call multiple times", () => {
-    // Should not throw even when called without initialization
-    closeRedis();
-    closeRedis();
-    closeRedis();
-    expect(true).toBe(true);
-  });
-
-  test("closeRedis resets the singleton so next getRedisClient creates new instance", () => {
-    const client1 = getRedisClient();
-    closeRedis();
-    const client2 = getRedisClient();
-    // After close, a new client should be created (may differ if REDIS_URL is set)
-    if (client1 !== null && client2 !== null) {
-      expect(client1).not.toBe(client2);
+  test("getStorageStatus masks sensitive URL information", async () => {
+    const status = await getStorageStatus();
+    if (status.url !== "in-memory") {
+      expect(status.url).not.toContain("password");
+      expect(status.url).not.toContain("token");
     }
   });
 });
 
-describe("Redis Connection Validation", () => {
+describe("Storage Connection Validation", () => {
   afterEach(() => {
-    closeRedis();
+    closeStorage();
   });
 
-  test("ensureRedisConnection returns boolean based on Redis availability", async () => {
-    const result = await ensureRedisConnection();
-    // Returns true if connected, false if not available
+  test("ensureStorageConnection returns boolean based on storage availability", async () => {
+    const result = await ensureStorageConnection();
     expect(typeof result).toBe("boolean");
   });
 
-  test("ensureRedisConnection validates connection on first call", async () => {
-    const result = await ensureRedisConnection();
+  test("validateStorageConnection validates connection", async () => {
+    const result = await validateStorageConnection();
     expect(typeof result).toBe("boolean");
-  });
-
-  test("ensureRedisConnection caches result after first call", async () => {
-    const result1 = await ensureRedisConnection();
-    const result2 = await ensureRedisConnection();
-    // Should return same cached result
-    expect(result1).toBe(result2);
   });
 });
 
-describe("Redis Connection Failure Scenarios", () => {
+describe("Storage Close", () => {
   afterEach(() => {
-    closeRedis();
+    closeStorage();
   });
 
-  test("operations gracefully degrade when Redis unavailable", async () => {
-    // Get client - may be null if Redis not configured
-    const client = getRedisClient();
+  test("closeStorage is safe to call multiple times", () => {
+    closeStorage();
+    closeStorage();
+    closeStorage();
+    expect(true).toBe(true);
+  });
 
-    if (client === null) {
-      // Redis not configured - this is expected graceful degradation
+  test("closeStorage resets the singleton so next getStorage creates new instance", () => {
+    const storage1 = getStorage();
+    closeStorage();
+    const storage2 = getStorage();
+    if (storage1 !== null && storage2 !== null) {
+      expect(storage1).not.toBe(storage2);
+    }
+  });
+});
+
+describe("Storage Backend Detection", () => {
+  afterEach(() => {
+    closeStorage();
+  });
+
+  test("backend is determined by environment configuration", async () => {
+    const status = await getStorageStatus();
+    expect(status.backend).toBeDefined();
+    expect(typeof status.backend).toBe("string");
+  });
+
+  test("StorageStatus interface has correct shape", () => {
+    const status: StorageStatus = {
+      connected: true,
+      backend: "redis",
+      url: "redis://localhost:6379",
+    };
+    expect(status.connected).toBe(true);
+    expect(status.backend).toBe("redis");
+    expect(status.url).toBe("redis://localhost:6379");
+  });
+
+  test("StorageStatus can include optional error", async () => {
+    const status = await getStorageStatus();
+    if (!status.connected) {
+      expect(status.error === undefined || typeof status.error === "string").toBe(true);
+    }
+  });
+});
+
+describe("Storage Connection Failure Scenarios", () => {
+  afterEach(() => {
+    closeStorage();
+  });
+
+  test("operations gracefully degrade when storage unavailable", async () => {
+    const storage = getStorage();
+    if (storage === null) {
       expect(true).toBe(true);
     } else {
-      // If Redis configured but connection fails, operations should handle it
-      const status = await getRedisStatus();
+      const status = await getStorageStatus();
       expect(typeof status.connected).toBe("boolean");
     }
   });
 
-  test("getRedisStatus handles connection errors gracefully", async () => {
-    const status = await getRedisStatus();
-    // Should always return a valid status object, never throw
+  test("getStorageStatus handles connection errors gracefully", async () => {
+    const status = await getStorageStatus();
     expect(status).toHaveProperty("connected");
     expect(status).toHaveProperty("url");
+    expect(status).toHaveProperty("backend");
+  });
+});
+
+describe("Deprecated Aliases (Backward Compatibility)", () => {
+  afterEach(() => {
+    closeStorage();
   });
 
-  test("client returns null rather than throwing when not configured", () => {
-    // This test verifies graceful degradation - module should not throw
-    expect(() => {
-      getRedisClient();
-    }).not.toThrow();
+  test("getRedisClient returns storage or null", () => {
+    const { getRedisClient } = require("../../../src/lib/redis");
+    const client = getRedisClient();
+    expect(client === null || typeof client === "object").toBe(true);
+  });
+
+  test("getRedisStatus returns valid status", async () => {
+    const { getRedisStatus } = require("../../../src/lib/redis");
+    const status = await getRedisStatus();
+    expect(status).toHaveProperty("connected");
+    expect(status).toHaveProperty("url");
+    expect(status).toHaveProperty("backend");
+  });
+
+  test("ensureRedisConnection returns boolean", async () => {
+    const { ensureRedisConnection } = require("../../../src/lib/redis");
+    const result = await ensureRedisConnection();
+    expect(typeof result).toBe("boolean");
+  });
+
+  test("closeRedis is safe to call", () => {
+    const { closeRedis } = require("../../../src/lib/redis");
+    expect(() => closeRedis()).not.toThrow();
+  });
+
+  test("RedisStatus type alias works", () => {
+    const status = {
+      connected: true,
+      backend: "lru",
+      url: "in-memory",
+    };
+    expect(status.connected).toBe(true);
+    expect(status.backend).toBe("lru");
   });
 });

@@ -20,8 +20,8 @@ BETTER_AUTH_SECRET=your-32-char-secret-key
 # Optional - Auth base URL (defaults to http://localhost:3000/api/auth)
 BETTER_AUTH_URL=http://localhost:3000/api/auth
 
-DATABASE_PATH=tss-elysia.db
-DATABASE_NAME=tss-elysia.db
+DATABASE_PATH=tsse-elysia.db
+DATABASE_NAME=tsse-elysia.db
 ```
 
 ### Database Setup

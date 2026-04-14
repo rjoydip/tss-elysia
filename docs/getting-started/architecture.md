@@ -5,7 +5,7 @@ description: System architecture and design patterns
 
 ## Architecture
 
-This document describes the system architecture of the tss-elysia project.
+This document describes the system architecture of the tsse-elysia project.
 
 ## Overview
 

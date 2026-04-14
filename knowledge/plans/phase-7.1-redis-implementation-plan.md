@@ -2,7 +2,7 @@
 
 ## Overview
 
-Integrate Redis into the **tss-elysia** project using **Bun's native `RedisClient`** (built-in, zero dependencies). The `REDIS_URL` environment variable allows seamless switching between a local Docker Redis instance and a managed Upstash Redis.
+Integrate Redis into the **tsse-elysia** project using **Bun's native `RedisClient`** (built-in, zero dependencies). The `REDIS_URL` environment variable allows seamless switching between a local Docker Redis instance and a managed Upstash Redis.
 
 > [!IMPORTANT]
 > Bun's native Redis client (`import { RedisClient } from "bun"`) requires **no npm packages**. It uses Bun's built-in RESP protocol implementation for maximum performance.
@@ -55,7 +55,7 @@ Custom Redis configuration file that enables Pub/Sub, persistence, and sets memo
 
 ```conf
 # =============================================================================
-# Redis Configuration for tss-elysia
+# Redis Configuration for tsse-elysia
 # =============================================================================
 
 # Network
@@ -109,7 +109,7 @@ Add a `redis` service and wire it into both `app` and `dev` services.
 +  # ---------------------------------------------------------------------------
 +  redis:
 +    image: redis:7-alpine
-+    container_name: tss-elysia-redis
++    container_name: tsse-elysia-redis
 +    ports:
 +      - "6379:6379"
 +    volumes:
@@ -178,7 +178,7 @@ Add a `redis` service and wire it into both `app` and `dev` services.
 ```diff
  # Database Configuration
  DATABASE_PATH=.artifacts
- DATABASE_NAME=tss-elysia.db
+ DATABASE_NAME=tsse-elysia.db
 +
 +# Redis Configuration
 +# Local Docker: redis://localhost:6379
@@ -777,7 +777,7 @@ Add `REDIS_URL` to the environment variables documentation table in `AGENTS.md`:
  | Variable        | Default         | Description                     |
  | --------------- | --------------- | ------------------------------- |
  | `DATABASE_PATH` | `.artifacts`    | SQLite database path            |
- | `DATABASE_NAME` | `tss-elysia.db` | SQLite database name            |
+ | `DATABASE_NAME` | `tsse-elysia.db` | SQLite database name            |
  | `PORT`          | `3000`          | Server port                     |
  | `HOST`          | `localhost`     | Server host                     |
 +| `REDIS_URL`     | -               | Redis connection URL            |

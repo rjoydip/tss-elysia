@@ -9,7 +9,7 @@ import {
   getChangelogEntry,
   getLatestVersion,
   type ChangelogType,
-} from "../../src/lib/changelog/data";
+} from "../../src/features/landing/data/changelog/data";
 
 describe("changelogData", () => {
   it("should be a non-empty array", () => {

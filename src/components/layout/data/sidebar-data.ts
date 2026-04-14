@@ -1,23 +1,16 @@
 import {
-  Construction,
   LayoutDashboard,
   Monitor,
-  Bug,
   ListTodo,
-  FileX,
   HelpCircle,
-  Lock,
   Bell,
   Package,
   Palette,
-  ServerOff,
   Settings,
   Wrench,
   UserCog,
-  UserX,
   Users,
   MessagesSquare,
-  ShieldCheck,
   AudioWaveform,
   Command,
   GalleryVerticalEnd,
@@ -35,7 +28,7 @@ export const sidebarData: SidebarData = {
     {
       name: `${APP_NAME} Admin`,
       logo: Command,
-      plan: "Vite + ShadcnUI",
+      plan: "",
     },
     {
       name: "Acme Inc",
@@ -54,91 +47,29 @@ export const sidebarData: SidebarData = {
       items: [
         {
           title: "Dashboard",
-          url: "/",
+          url: "/dashboard",
           icon: LayoutDashboard,
         },
         {
           title: "Tasks",
-          url: "/tasks",
+          url: "/dashboard/tasks",
           icon: ListTodo,
         },
         {
           title: "Apps",
-          url: "/apps",
+          url: "/dashboard/apps",
           icon: Package,
         },
         {
           title: "Chats",
-          url: "/chats",
+          url: "/dashboard/chats",
           badge: "3",
           icon: MessagesSquare,
         },
         {
           title: "Users",
-          url: "/users",
+          url: "/dashboard/users",
           icon: Users,
-        },
-      ],
-    },
-    {
-      title: "Pages",
-      items: [
-        {
-          title: "Auth",
-          icon: ShieldCheck,
-          items: [
-            {
-              title: "Sign In",
-              url: "/sign-in",
-            },
-            {
-              title: "Sign In (2 Col)",
-              url: "/sign-in-2",
-            },
-            {
-              title: "Sign Up",
-              url: "/sign-up",
-            },
-            {
-              title: "Forgot Password",
-              url: "/forgot-password",
-            },
-            {
-              title: "OTP",
-              url: "/otp",
-            },
-          ],
-        },
-        {
-          title: "Errors",
-          icon: Bug,
-          items: [
-            {
-              title: "Unauthorized",
-              url: "/errors/unauthorized",
-              icon: Lock,
-            },
-            {
-              title: "Forbidden",
-              url: "/errors/forbidden",
-              icon: UserX,
-            },
-            {
-              title: "Not Found",
-              url: "/errors/not-found",
-              icon: FileX,
-            },
-            {
-              title: "Internal Server Error",
-              url: "/errors/internal-server-error",
-              icon: ServerOff,
-            },
-            {
-              title: "Maintenance Error",
-              url: "/errors/maintenance-error",
-              icon: Construction,
-            },
-          ],
         },
       ],
     },
@@ -151,27 +82,27 @@ export const sidebarData: SidebarData = {
           items: [
             {
               title: "Profile",
-              url: "/settings",
+              url: "/dashboard/settings",
               icon: UserCog,
             },
             {
               title: "Account",
-              url: "/settings/account",
+              url: "/dashboard/settings/account",
               icon: Wrench,
             },
             {
               title: "Appearance",
-              url: "/settings/appearance",
+              url: "/dashboard/settings/appearance",
               icon: Palette,
             },
             {
               title: "Notifications",
-              url: "/settings/notifications",
+              url: "/dashboard/settings/notifications",
               icon: Bell,
             },
             {
               title: "Display",
-              url: "/settings/display",
+              url: "/dashboard/settings/display",
               icon: Monitor,
             },
           ],

@@ -1,10 +1,14 @@
+/**
+ * Application Router Configuration
+ * Sets up TanStack Router with error handling and authentication.
+ */
+
 import { createRouter } from "@tanstack/react-router";
 import { toast } from "sonner";
-import { AxiosError } from "axios";
 import { QueryCache, QueryClient } from "@tanstack/react-query";
-import { handleServerError } from "~/lib/handle-server-error";
-import { useAuthStore } from "~/lib/stores/auth-store.ts";
-import { routeTree } from "./routeTree.gen.ts";
+import { useAuthStore } from "~/lib/stores/auth-store";
+import { routeTree } from "./routeTree.gen";
+import { getErrorMessage, getErrorStatus, isAuthError, isServerError } from "~/lib/errors";
 
 const router = createRouter({
   routeTree,
@@ -12,6 +16,25 @@ const router = createRouter({
   defaultPreloadStaleTime: 0,
   scrollRestoration: true,
 });
+
+function handleServerError(error: unknown) {
+  // eslint-disable-next-line no-console
+  console.log(error);
+
+  const status = getErrorStatus(error);
+  const message = getErrorMessage(error);
+
+  if (status === 204) {
+    toast.error("Content not found.");
+    return;
+  }
+
+  if (message) {
+    toast.error(message);
+  } else {
+    toast.error("Something went wrong!");
+  }
+}
 
 declare module "@tanstack/react-router" {
   interface Register {
@@ -33,7 +56,8 @@ export const queryClient = new QueryClient({
         if (failureCount >= 0 && import.meta.env.DEV) return false;
         if (failureCount > 3 && import.meta.env.PROD) return false;
 
-        return !(error instanceof AxiosError && [401, 403].includes(error.response?.status ?? 0));
+        const status = getErrorStatus(error);
+        return !status || ![401, 403].includes(status);
       },
       refetchOnWindowFocus: import.meta.env.PROD,
       staleTime: 10 * 1000, // 10s
@@ -42,33 +66,27 @@ export const queryClient = new QueryClient({
       onError: (error) => {
         handleServerError(error);
 
-        if (error instanceof AxiosError) {
-          if (error.response?.status === 304) {
-            toast.error("Content not modified!");
-          }
+        const status = getErrorStatus(error);
+        if (status === 304) {
+          toast.error("Content not modified!");
         }
       },
     },
   },
   queryCache: new QueryCache({
     onError: (error) => {
-      if (error instanceof AxiosError) {
-        if (error.response?.status === 401) {
-          toast.error("Session expired!");
-          useAuthStore.getState().auth.reset();
-          router.navigate({
-            to: "/account/login",
-            search: { redirect: `${router.history.location.href}` },
-          });
-        }
-        if (error.response?.status === 500) {
-          toast.error("Internal Server Error!");
-          if (import.meta.env.PROD) {
-            router.navigate({ to: "/" });
-          }
-        }
-        if (error.response?.status === 403) {
-          // router.navigate("/forbidden", { replace: true });
+      if (isAuthError(error)) {
+        toast.error("Session expired!");
+        useAuthStore.getState().auth.reset();
+        router.navigate({
+          to: "/sign-in",
+          search: { redirect: `${router.history.location.href}` },
+        });
+      }
+      if (isServerError(error)) {
+        toast.error("Internal Server Error!");
+        if (import.meta.env.PROD) {
+          router.navigate({ to: "/" });
         }
       }
     },

@@ -1,8 +1,9 @@
 import { z } from "zod";
 import { useForm } from "react-hook-form";
+import { useSession } from "~/lib/auth/client";
 import { CaretSortIcon, CheckIcon } from "@radix-ui/react-icons";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { showSubmittedData } from "~/lib/show-submitted-data";
+import { showSubmittedData } from "~/components/show-submitted-data";
 import { cn } from "~/lib/utils";
 import { Button } from "~/components/ui/button";
 import {
@@ -10,8 +11,8 @@ import {
   CommandEmpty,
   CommandGroup,
   CommandInput,
-  CommandItem,
   CommandList,
+  CommandItem,
 } from "~/components/ui/command";
 import {
   Form,
@@ -50,15 +51,19 @@ const accountFormSchema = z.object({
 
 type AccountFormValues = z.infer<typeof accountFormSchema>;
 
-// This can come from your database or API.
-const defaultValues: Partial<AccountFormValues> = {
-  name: "",
-};
-
 export function AccountForm() {
+  const { data: session } = useSession();
+
+  // Fetch user data from session and set as default values
+  const userDefaultValues: Partial<AccountFormValues> = {
+    name: session?.user?.name || "",
+    // Note: dob and language would need to come from user settings in database
+    // For now, we'll keep them empty and let the user fill them in
+  };
+
   const form = useForm<AccountFormValues>({
     resolver: zodResolver(accountFormSchema),
-    defaultValues,
+    defaultValues: userDefaultValues,
   });
 
   function onSubmit(data: AccountFormValues) {
@@ -109,7 +114,7 @@ export function AccountForm() {
                       variant="outline"
                       role="combobox"
                       className={cn(
-                        "w-[200px] justify-between",
+                        "w-50 justify-between",
                         !field.value && "text-muted-foreground",
                       )}
                     >
@@ -120,7 +125,7 @@ export function AccountForm() {
                     </Button>
                   </FormControl>
                 </PopoverTrigger>
-                <PopoverContent className="w-[200px] p-0">
+                <PopoverContent className="w-50 p-0">
                   <Command>
                     <CommandInput placeholder="Search language..." />
                     <CommandEmpty>No language found.</CommandEmpty>

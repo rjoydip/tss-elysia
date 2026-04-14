@@ -18,7 +18,7 @@ import { registerOrganizationTools } from "./tools/organizations";
 export function createMcpServer(): McpServer {
   const server = new McpServer(
     {
-      name: "tss-elysia",
+      name: "tsse-elysia",
       version: "1.0.0",
     },
     {
@@ -53,7 +53,7 @@ export function createMcpServer(): McpServer {
         {
           uri: "mcp://server/info",
           text: JSON.stringify({
-            name: "tss-elysia",
+            name: "tsse-elysia",
             version: "1.0.0",
             description: "MCP server for user, organization, and auth management",
             capabilities: ["tools", "resources", "logging"],

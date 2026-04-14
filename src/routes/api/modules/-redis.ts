@@ -37,6 +37,7 @@ export const redisRoutes = new Elysia({ name: "api.routes.redis", prefix: "/redi
         url: redisStatus.url,
         detail: redisStatus.error ?? "Redis heartbeat succeeded",
         timestamp: new Date().toISOString(),
+        backend: redisStatus.backend,
       }),
       {
         status: statusCode,

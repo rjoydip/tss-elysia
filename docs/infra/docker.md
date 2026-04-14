@@ -1,11 +1,11 @@
 ---
 title: Docker
-description: Docker setup for the tss-elysia application
+description: Docker setup for the tsse-elysia application
 ---
 
 ## Docker
 
-This document covers Docker setup for the tss-elysia application.
+This document covers Docker setup for the tsse-elysia application.
 
 ## What's New (v2.0)
 
@@ -36,8 +36,8 @@ export DOCKER_BUILDKIT=1
 docker-compose -f docker/docker-compose.yml up app --build
 
 # Or use docker directly
-docker build -f docker/Dockerfile -t tss-elysia .
-docker run -p 3000:3000 -e BETTER_AUTH_SECRET=your-secret-key-min-32chars tss-elysia
+docker build -f docker/Dockerfile -t tsse-elysia .
+docker run -p 3000:3000 -e BETTER_AUTH_SECRET=your-secret-key-min-32chars tsse-elysia
 ```
 
 ### Development
@@ -136,7 +136,7 @@ app:
     - NODE_ENV=production
     - BETTER_AUTH_SECRET=${BETTER_AUTH_SECRET}
     - DATABASE_PATH=.artifacts
-    - DATABASE_NAME=tss-elysia.db
+    - DATABASE_NAME=tsse-elysia.db
   volumes:
     - app-data:/app/.artifacts
   deploy:
@@ -183,7 +183,7 @@ dev:
 | `NODE_ENV`           | `production`                | Environment mode     |
 | `BETTER_AUTH_SECRET` | **Required** (min 32 chars) | Session secret       |
 | `DATABASE_PATH`      | `.artifacts`                | Database directory   |
-| `DATABASE_NAME`      | `tss-elysia.db`             | Database filename    |
+| `DATABASE_NAME`      | `tsse-elysia.db`            | Database filename    |
 | `REDIS_URL`          | `redis://redis:6379`        | Redis connection URL |
 
 ## Usage Examples
@@ -229,15 +229,15 @@ docker-compose -f docker/docker-compose.yml down -v
 
 ```bash
 # Build
-docker build -f docker/Dockerfile -t tss-elysia .
+docker build -f docker/Dockerfile -t tsse-elysia .
 
 # Run
 docker run -d \
-  --name tss-elysia \
+  --name tsse-elysia \
   -p 3000:3000 \
   -e BETTER_AUTH_SECRET=my-super-secret-key-32chars \
-  -v tss-elysia-data:/app/.artifacts \
-  tss-elysia
+  -v tsse-elysia-data:/app/.artifacts \
+  tsse-elysia
 ```
 
 ### Database Operations in Container
@@ -259,10 +259,10 @@ Production containers include health checks:
 
 ```bash
 # Check health status
-docker inspect --format='{{.State.Health.Status}}' tss-elysia-prod
+docker inspect --format='{{.State.Health.Status}}' tsse-elysia-prod
 
 # Manual health check
-docker exec tss-elysia-prod wget -q --spider http://localhost:3000/api/health
+docker exec tsse-elysia-prod wget -q --spider http://localhost:3000/api/health
 ```
 
 ### Redis Health
@@ -272,7 +272,7 @@ docker exec tss-elysia-prod wget -q --spider http://localhost:3000/api/health
 curl http://localhost:3000/api/redis/heartbeat
 
 # Direct Redis health check in Docker
-docker exec tss-elysia-redis redis-cli ping
+docker exec tsse-elysia-redis redis-cli ping
 ```
 
 ## Performance Optimization
@@ -320,7 +320,7 @@ deploy:
 1. Check BETTER_AUTH_SECRET is set:
 
    ```bash
-   docker logs tss-elysia-prod
+   docker logs tsse-elysia-prod
    ```
 
 2. Verify port is available:
@@ -332,7 +332,7 @@ deploy:
 3. Check health status:
 
    ```bash
-   docker inspect --format='{{.State.Health.Status}}' tss-elysia-prod
+   docker inspect --format='{{.State.Health.Status}}' tsse-elysia-prod
    ```
 
 ### Database Issues
@@ -340,14 +340,14 @@ deploy:
 1. Check volume is mounted:
 
    ```bash
-   docker volume ls | grep tss-elysia
-   docker inspect tss-elysia-prod | grep -A 10 Mounts
+   docker volume ls | grep tsse-elysia
+   docker inspect tsse-elysia-prod | grep -A 10 Mounts
    ```
 
 2. Check permissions:
 
    ```bash
-   docker exec tss-elysia-prod ls -la .artifacts/
+   docker exec tsse-elysia-prod ls -la .artifacts/
    ```
 
 ### Build Issues
@@ -375,7 +375,7 @@ deploy:
 2. Check memory usage:
 
    ```bash
-   docker stats tss-elysia-prod
+   docker stats tsse-elysia-prod
    ```
 
 3. Increase memory limit in docker-compose.yml
@@ -442,4 +442,4 @@ services:
 | v1 (old) | ~300MB+    | Single stage           |
 | v2 (new) | ~180MB     | Multi-stage, optimized |
 
-Run `docker images tss-elysia` to check your image size.
+Run `docker images tsse-elysia` to check your image size.

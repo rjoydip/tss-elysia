@@ -14,10 +14,11 @@ import { FontProvider } from "~/context/font-provider";
 import { ThemeProvider } from "~/context/theme-provider";
 import { queryClient } from "~/router";
 import appCss from "~/styles/app.css?url";
+import { SearchProvider } from "~/context/search-provider";
 
 export const Route = createRootRoute({
   head: () => ({
-    title: "tss-elysia",
+    title: "tsse-elysia",
     meta: [
       { charSet: "utf8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
@@ -39,25 +40,27 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <ThemeProvider>
           <FontProvider>
             <DirectionProvider>
-              <A11yer>
-                <html lang="en">
-                  <head>
-                    <HeadContent />
-                  </head>
-                  <body>
-                    <NavigationProgress />
-                    {children}
-                    <Toaster duration={5000} />
-                    {import.meta.env.MODE === "development" && (
-                      <>
-                        <ReactQueryDevtools buttonPosition="bottom-left" />
-                        <TanStackRouterDevtools position="bottom-right" />
-                      </>
-                    )}
-                    <Scripts />
-                  </body>
-                </html>
-              </A11yer>
+              <SearchProvider>
+                <A11yer>
+                  <html lang="en">
+                    <head>
+                      <HeadContent />
+                    </head>
+                    <body>
+                      <NavigationProgress />
+                      {children}
+                      <Toaster duration={5000} />
+                      {import.meta.env.MODE === "development" && (
+                        <>
+                          <ReactQueryDevtools buttonPosition="bottom-left" />
+                          <TanStackRouterDevtools position="bottom-right" />
+                        </>
+                      )}
+                      <Scripts />
+                    </body>
+                  </html>
+                </A11yer>
+              </SearchProvider>
             </DirectionProvider>
           </FontProvider>
         </ThemeProvider>

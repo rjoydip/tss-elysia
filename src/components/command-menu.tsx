@@ -20,6 +20,9 @@ export function CommandMenu() {
   const { setTheme } = useTheme();
   const { open, setOpen } = useSearch();
 
+  // Filter only landing related pages (Home, Documentation, Blog, Changelog, Status, Privacy, Terms)
+  const landingPagesGroup = sidebarData.navGroups.find((group) => group.title === "Landing Pages");
+
   const runCommand = React.useCallback(
     (command: () => unknown) => {
       setOpen(false);
@@ -34,9 +37,9 @@ export function CommandMenu() {
       <CommandList>
         <ScrollArea type="hover" className="h-72 pe-1">
           <CommandEmpty>No results found.</CommandEmpty>
-          {sidebarData.navGroups.map((group) => (
-            <CommandGroup key={group.title} heading={group.title}>
-              {group.items.map((navItem, i) => {
+          {landingPagesGroup && (
+            <CommandGroup key="page" heading="page">
+              {landingPagesGroup.items.map((navItem, i) => {
                 if (navItem.url)
                   return (
                     <CommandItem
@@ -53,6 +56,7 @@ export function CommandMenu() {
                     </CommandItem>
                   );
 
+                // Handle sub-items if they exist
                 return navItem.items?.map((subItem, i) => (
                   <CommandItem
                     key={`${navItem.title}-${subItem.url}-${i}`}
@@ -69,7 +73,7 @@ export function CommandMenu() {
                 ));
               })}
             </CommandGroup>
-          ))}
+          )}
           <CommandSeparator />
           <CommandGroup heading="Theme">
             <CommandItem onSelect={() => runCommand(() => setTheme("light"))}>

@@ -24,8 +24,8 @@ Thank you for your interest in contributing! This project uses [Changesets](http
 
 ```bash
 # Clone the repository
-git clone https://github.com/rjoydip/tss-elysia.git
-cd tss-elysia
+git clone https://github.com/rjoydip/tsse-elysia.git
+cd tsse-elysia
 
 # Install dependencies
 bun install
@@ -54,7 +54,7 @@ bun run dev
    ```
 
    Follow the prompts:
-   - Select the `tss-elysia` package
+   - Select the `tsse-elysia` package
    - Choose bump type: `patch`, `minor`, or `major`
    - Write a description of what changed
 
@@ -103,7 +103,7 @@ Each changeset is a markdown file in `.changeset/` with:
 
 ```markdown
 ---
-"tss-elysia": minor
+"tsse-elysia": minor
 ---
 
 Your description of the changes.
@@ -142,7 +142,7 @@ Interactive prompts:
 
 ```bash
 🦋 Select the package(s) you want to include in this changeset
-    ❯ ● tss-elysia (press <space> to select)
+    ❯ ● tsse-elysia (press <space> to select)
 
 🦋 What kind of change is this?
     ❯ ○ patch - fix: bug fixes
@@ -157,7 +157,7 @@ Creates file: `.changeset/funny-flowers-speak.md`
 
 ```markdown
 ---
-"tss-elysia": minor
+"tsse-elysia": minor
 ---
 
 Added pagination to user endpoints
@@ -393,7 +393,7 @@ This creates:
 
 ```markdown
 ---
-"tss-elysia": major
+"tsse-elysia": major
 ---
 
 BREAKING: Removed deprecated /api/old endpoint
@@ -461,8 +461,8 @@ git revert <commit-hash>
 
 ## Questions?
 
-- Open an [issue](https://github.com/rjoydip/tss-elysia/issues)
-- Check existing [discussions](https://github.com/rjoydip/tss-elysia/discussions)
+- Open an [issue](https://github.com/rjoydip/tsse-elysia/issues)
+- Check existing [discussions](https://github.com/rjoydip/tsse-elysia/discussions)
 
 ## License
 

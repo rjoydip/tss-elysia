@@ -103,17 +103,18 @@ bun run start    # Run production server
 ```bash
 src/
 ├── config/            # Central config (API name, rate limits, CORS, helmet)
-│   └── index.ts
+│   ├── index.ts
+│   └── docs.ts        # Documentation config (docMap, globKeyToDocPath, etc.)
 ├── hooks/             # Custom React hooks
 │   └── use-mobile.ts
 ├── lib/                # Library code
 │   ├── auth/          # Better Auth
 │   │   ├── index.ts   # Server auth instance
-│   │   ├── client.ts  # Client auth hooks and methods
-│   │   └── session.ts # Session utilities
+│   │   └── client.ts  # Client auth hooks and methods
 │   ├── db/           # Database (Drizzle + SQLite)
 │   │   ├── index.ts
-│   │   └── schema.ts
+│   │   ├── schema.ts
+│   │   └── heartbeat.ts
 │   ├── redis/        # Redis cache and Pub/Sub (Bun native)
 │   │   ├── index.ts   # Client singleton, health check
 │   │   └── pubsub.ts  # Typed channels and helpers
@@ -148,44 +149,61 @@ src/
 ├── routes/           # File-based routing
 │   ├── __root.tsx   # Root route
 │   ├── index.tsx    # Home route
+│   ├── (auth)/      # Auth routes (sign-in, sign-up, OTP)
+│   │   ├── sign-in.tsx
+│   │   ├── sign-up.tsx
+│   │   └── otp.tsx
+│   ├── (errors)/    # Error pages (401, 403, 404, 500, 503)
 │   ├── account/     # Account routes
 │   │   ├── login.tsx
 │   │   ├── register.tsx
 │   │   ├── forgot-password.tsx
 │   │   └── verify-email.tsx
-│   ├── profile.tsx  # Profile page
-│   ├── settings.tsx # Settings page
+│   ├── profile.tsx  # Profile page (wrapped with AuthGuard)
+│   ├── settings.tsx # Settings page (wrapped with AuthGuard)
 │   ├── docs.tsx     # Documentation layout
 │   ├── docs.$.tsx   # Documentation catch-all
 │   ├── blog.tsx     # Blog routes
 │   ├── changelog.tsx # Changelog routes
 │   ├── status.tsx   # Health monitoring dashboard
+│   ├── _authenticated/ # Protected routes (all wrapped with AuthGuard)
+│   │   ├── route.tsx   # Auth layout wrapper
+│   │   ├── dashboard/
+│   │   ├── tasks/
+│   │   ├── users/
+│   │   ├── chats/
+│   │   ├── apps/
+│   │   ├── help-center/
+│   │   ├── errors/
+│   │   └── settings/   # Settings sub-routes
 │   └── api/         # API routes
 │       ├── $.ts     # API catch-all
 │       ├── auth/    # Auth routes
-│       │   ├── $.ts
-│       │   └── modules/
 │       ├── mcp/    # MCP API routes
-│       │   ├── $.ts
-│       │   ├── keys.ts
-│       │   └── modules/
 │       └── modules/ # API modules
 ├── server.ts         # TanStack Start server entry
 ├── types/            # TypeScript type definitions
 │   └── subscription.ts
-├── app.css          # Global styles
+├── styles/
+│   └── app.css      # Global styles (Tailwind CSS v4)
+├── env.ts            # Type-safe environment configuration
+├── logger.ts         # Logger configuration
 ├── components/       # React components
 │   ├── ui/          # shadcn/ui components
 │   ├── auth/        # Auth components
+│   │   ├── form/    # Auth form components (login, register, forgot-password)
+│   │   ├── auth-guard.tsx  # Route protection component
+│   │   ├── branding.tsx
+│   │   └── footer.tsx
 │   ├── docs/        # Documentation components
 │   ├── profile/     # Profile components
 │   ├── settings/    # Settings components
-│   ├── background/  # Background components
-│   ├── header.tsx   # Common header
-│   ├── footer.tsx   # Common footer
-│   ├── branding.tsx # Branding component
-│   └── theme/       # Theme components
-└── router.tsx       # TanStack Router configuration
+│   ├── layout/      # Layout components (app-sidebar, header, etc.)
+│   ├── header.tsx  # Common header
+│   ├── footer.tsx  # Common footer
+│   ├── branding.tsx
+│   └── theme/      # Theme components
+└── utils.ts         # Utility functions
 ```
 
 ## Test Structure

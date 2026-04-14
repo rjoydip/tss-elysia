@@ -165,15 +165,15 @@ function buildPostgresConnectionString(): string {
 function getDatabaseName(): string {
   // Test environment always uses test database
   if (isTest || isCI) {
-    return "tss-elysia.db";
+    return "tsse-elysia.db";
   }
 
   // Use custom name if set, otherwise use environment-specific name
-  if (env.DATABASE_NAME && !env.DATABASE_NAME.includes("tss-elysia")) {
+  if (env.DATABASE_NAME && !env.DATABASE_NAME.includes("tsse-elysia")) {
     return env.DATABASE_NAME;
   }
 
-  return `tss-elysia.db`;
+  return `tsse-elysia.db`;
 }
 
 /**

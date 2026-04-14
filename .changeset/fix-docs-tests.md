@@ -1,5 +1,5 @@
 ---
-"tss-elysia": patch
+"tsse-elysia": patch
 ---
 
 Fix docs E2E tests, add frontmatter to docs, and add unit/E2E tests

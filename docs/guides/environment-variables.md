@@ -9,28 +9,28 @@ This project uses type-safe environment variables with isomorphic fetching, supp
 
 ## Server Configuration
 
-| Variable                 | Default         | Description                              |
-| ------------------------ | --------------- | ---------------------------------------- |
-| `HOST`                   | `localhost`     | Server host                              |
-| `PORT`                   | `3000`          | Server port                              |
-| `VITE_API_URL`           | Dynamic         | Client API URL for Eden Treaty           |
-| `DATABASE_PATH`          | `.artifacts`    | SQLite database file path                |
-| `DATABASE_NAME`          | `tss-elysia.db` | SQLite database file name                |
-| `DATABASE_URL`           | -               | Database connection URL (future use)     |
-| `BETTER_AUTH_SECRET`     | Auto-generated  | Authentication secret for session tokens |
-| `WS_ENABLED`             | -               | Enables/disables websocket transport     |
-| `WS_HEARTBEAT_INTERVAL`  | -               | Websocket heartbeat interval             |
-| `WS_MAX_MESSAGE_SIZE`    | -               | Max websocket message size               |
-| `WS_RATE_LIMIT_MESSAGES` | -               | Websocket messages allowed per window    |
-| `WS_RATE_LIMIT_WINDOW`   | -               | Websocket rate-limit window (ms)         |
-| `REDIS_URL`              | -               | Redis connection URL (Docker or Upstash) |
+| Variable                 | Default          | Description                              |
+| ------------------------ | ---------------- | ---------------------------------------- |
+| `HOST`                   | `localhost`      | Server host                              |
+| `PORT`                   | `3000`           | Server port                              |
+| `VITE_API_URL`           | Dynamic          | Client API URL for Eden Treaty           |
+| `DATABASE_PATH`          | `.artifacts`     | SQLite database file path                |
+| `DATABASE_NAME`          | `tsse-elysia.db` | SQLite database file name                |
+| `DATABASE_URL`           | -                | Database connection URL (future use)     |
+| `BETTER_AUTH_SECRET`     | Auto-generated   | Authentication secret for session tokens |
+| `WS_ENABLED`             | -                | Enables/disables websocket transport     |
+| `WS_HEARTBEAT_INTERVAL`  | -                | Websocket heartbeat interval             |
+| `WS_MAX_MESSAGE_SIZE`    | -                | Max websocket message size               |
+| `WS_RATE_LIMIT_MESSAGES` | -                | Websocket messages allowed per window    |
+| `WS_RATE_LIMIT_WINDOW`   | -                | Websocket rate-limit window (ms)         |
+| `REDIS_URL`              | -                | Redis connection URL (Docker or Upstash) |
 
 ## Database Configuration
 
-| Variable        | Default         | Description                  |
-| --------------- | --------------- | ---------------------------- |
-| `DATABASE_PATH` | `.artifacts`    | Path to SQLite database file |
-| `DATABASE_NAME` | `tss-elysia.db` | Path to SQLite database name |
+| Variable        | Default          | Description                  |
+| --------------- | ---------------- | ---------------------------- |
+| `DATABASE_PATH` | `.artifacts`     | Path to SQLite database file |
+| `DATABASE_NAME` | `tsse-elysia.db` | Path to SQLite database name |
 
 The database path can be customized via environment variables:
 
@@ -108,7 +108,7 @@ export const env = await _createEnv({
     BETTER_AUTH_SECRET: _getAuthSecret(),
     DATABASE_URL: _getEnv("DATABASE_URL", ""),
     DATABASE_PATH: _getEnv("DATABASE_PATH", ".artifacts"),
-    DATABASE_NAME: _getEnv("DATABASE_NAME", "tss-elysia.db"),
+    DATABASE_NAME: _getEnv("DATABASE_NAME", "tsse-elysia.db"),
     PORT: parseInt(_getEnv("PORT", "3000"), 10),
   }),
 });
@@ -120,7 +120,7 @@ The database path is configurable via `DATABASE_NAME`:
 
 ```bash
 # Default location
-DATABASE_PATH=.artifacts DATABASE_NAME=tss-elysia.db bun run db:migrate
+DATABASE_PATH=.artifacts DATABASE_NAME=tsse-elysia.db bun run db:migrate
 
 # Custom location
 DATABASE_PATH=.artifacts DATABASE_NAME=production.db bun run db:migrate
@@ -132,8 +132,8 @@ DATABASE_NAME=:memory: bun run seed
 After setting `DATABASE_NAME`, run migrations and seed:
 
 ```bash
-DATABASE_PATH=.artifacts DATABASE_NAME=tss-elysia.db bun run db:migrate
-DATABASE_PATH=.artifacts DATABASE_NAME=tss-elysia.db bun run db:seed
+DATABASE_PATH=.artifacts DATABASE_NAME=tsse-elysia.db bun run db:migrate
+DATABASE_PATH=.artifacts DATABASE_NAME=tsse-elysia.db bun run db:seed
 ```
 
 ### Client Environment Variables

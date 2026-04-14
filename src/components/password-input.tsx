@@ -24,7 +24,7 @@ export function PasswordInput({ className, disabled, ref, ...props }: PasswordIn
         size="icon"
         variant="ghost"
         disabled={disabled}
-        className="absolute end-1 top-1/2 h-6 w-6 -translate-y-1/2 rounded-md text-muted-foreground"
+        className="absolute inset-e-1 top-1/2 h-6 w-6 -translate-y-1/2 rounded-md text-muted-foreground"
         onClick={() => setShowPassword((prev) => !prev)}
       >
         {showPassword ? <Eye size={18} /> : <EyeOff size={18} />}

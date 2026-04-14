@@ -7,7 +7,7 @@ const sqliteDbUrl =
     ? `${process.env.DATABASE_PATH}/${process.env.DATABASE_NAME}`
     : process.env.DATABASE_NAME && !process.env.DATABASE_PATH
       ? `.artifacts/${process.env.DATABASE_NAME}`
-      : ".artifacts/tss-elysia.db";
+      : ".artifacts/tsse-elysia.db";
 
 const postgresUrl =
   process.env.POSTGRES_URL ||

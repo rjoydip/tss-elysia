@@ -1,6 +1,6 @@
 # Project Roadmap
 
-This document outlines the high-level roadmap and progress for the **tss-elysia** project. It is based on the comprehensive [PLAN.md](../../knowledge/PLAN.md) and tracks the evolution of the platform from initial setup to enterprise-ready status.
+This document outlines the high-level roadmap and progress for the **tsse-elysia** project. It is based on the comprehensive [PLAN.md](../../knowledge/PLAN.md) and tracks the evolution of the platform from initial setup to enterprise-ready status.
 
 ## Status Overview
 

@@ -189,7 +189,7 @@ bun run db:reset
 1. Check BETTER_AUTH_SECRET is set:
 
    ```bash
-   docker logs tss-elysia
+   docker logs tsse-elysia
    ```
 
 2. Verify port availability:
@@ -201,7 +201,7 @@ bun run db:reset
 3. Check volume permissions:
 
    ```bash
-   docker exec tss-elysia ls -la /app/.artifacts
+   docker exec tsse-elysia ls -la /app/.artifacts
    ```
 
 ---

@@ -242,10 +242,122 @@ describe("status store", () => {
     const databaseStatus = statusStore.state.otherServiceStatuses.find(
       (service) => service.name === "Database",
     );
-    // Overall status is "healthy" at top level, so it's operational even with one unhealthy replica
     expect(databaseStatus?.status).toBe("operational");
     expect(databaseStatus?.pools).toHaveLength(3);
     expect(databaseStatus?.tooltip).toContain("primary: healthy (5ms)");
     expect(databaseStatus?.tooltip).toContain("replica-2: unhealthy");
+  });
+
+  it("should include databaseType in Database service response", async () => {
+    vi.spyOn(globalThis, "fetch").mockImplementation((input) => {
+      const requestUrl = String(input);
+      if (requestUrl.includes("/api/database/heartbeat")) {
+        return Promise.resolve(
+          new Response(
+            JSON.stringify({
+              status: "healthy",
+              detail: "SQLite heartbeat query succeeded",
+              timestamp: new Date().toISOString(),
+              databaseType: "sqlite",
+              latencyMs: 5,
+              pools: [{ name: "sqlite", role: "primary", healthy: true, latencyMs: 5 }],
+            }),
+            { status: 200 },
+          ),
+        );
+      }
+      return Promise.resolve(new Response(JSON.stringify({ status: "healthy" }), { status: 200 }));
+    });
+
+    await checkStatusHealth();
+
+    const databaseStatus = statusStore.state.otherServiceStatuses.find(
+      (service) => service.name === "Database",
+    );
+    expect(databaseStatus?.databaseType).toBe("sqlite");
+  });
+
+  it("should include backend in Redis service response", async () => {
+    vi.spyOn(globalThis, "fetch").mockImplementation((input) => {
+      const requestUrl = String(input);
+      if (requestUrl.includes("/api/redis/heartbeat")) {
+        return Promise.resolve(
+          new Response(
+            JSON.stringify({
+              status: "healthy",
+              connected: true,
+              backend: "redis",
+              detail: "Redis heartbeat succeeded",
+              timestamp: new Date().toISOString(),
+            }),
+            { status: 200 },
+          ),
+        );
+      }
+      return Promise.resolve(new Response(JSON.stringify({ status: "healthy" }), { status: 200 }));
+    });
+
+    await checkStatusHealth();
+
+    const redisStatus = statusStore.state.otherServiceStatuses.find(
+      (service) => service.name === "Redis",
+    );
+    expect(redisStatus?.backend).toBe("redis");
+    expect(redisStatus?.status).toBe("operational");
+  });
+
+  it("should handle Redis LRU backend type", async () => {
+    vi.spyOn(globalThis, "fetch").mockImplementation((input) => {
+      const requestUrl = String(input);
+      if (requestUrl.includes("/api/redis/heartbeat")) {
+        return Promise.resolve(
+          new Response(
+            JSON.stringify({
+              status: "healthy",
+              connected: true,
+              backend: "lru",
+              detail: "LRU cache heartbeat succeeded",
+              timestamp: new Date().toISOString(),
+            }),
+            { status: 200 },
+          ),
+        );
+      }
+      return Promise.resolve(new Response(JSON.stringify({ status: "healthy" }), { status: 200 }));
+    });
+
+    await checkStatusHealth();
+
+    const redisStatus = statusStore.state.otherServiceStatuses.find(
+      (service) => service.name === "Redis",
+    );
+    expect(redisStatus?.backend).toBe("lru");
+  });
+
+  it("should include latencyMs in other services", async () => {
+    vi.spyOn(globalThis, "fetch").mockImplementation((input) => {
+      const requestUrl = String(input);
+      if (requestUrl.includes("/api/database/heartbeat")) {
+        return Promise.resolve(
+          new Response(
+            JSON.stringify({
+              status: "healthy",
+              detail: "Database heartbeat succeeded",
+              timestamp: new Date().toISOString(),
+              latencyMs: 15,
+            }),
+            { status: 200 },
+          ),
+        );
+      }
+      return Promise.resolve(new Response(JSON.stringify({ status: "healthy" }), { status: 200 }));
+    });
+
+    await checkStatusHealth();
+
+    const databaseStatus = statusStore.state.otherServiceStatuses.find(
+      (service) => service.name === "Database",
+    );
+    expect(databaseStatus?.latencyMs).toBe(15);
   });
 });

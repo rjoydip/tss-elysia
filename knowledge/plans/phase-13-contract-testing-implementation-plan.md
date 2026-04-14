@@ -14,24 +14,24 @@ This plan outlines the steps to introduce contract testing using Pact to ensure 
 
 ### [Contract Testing]
 
-#### [NEW] [pact.test.ts](file:///c:/Users/rjoydip/codebase/tss-elysia/test/contract/auth.pact.test.ts)
+#### [NEW] [pact.test.ts](file:///c:/Users/rjoydip/codebase/tsse-elysia/test/contract/auth.pact.test.ts)
 
 - Implement consumer-side tests for `GET /api/auth/get-session` and `POST /api/auth/login`.
 - Generate pact files in `pacts/`.
 
-#### [NEW] [pact.verify.ts](file:///c:/Users/rjoydip/codebase/tss-elysia/test/contract/provider.verify.ts)
+#### [NEW] [pact.verify.ts](file:///c:/Users/rjoydip/codebase/tsse-elysia/test/contract/provider.verify.ts)
 
 - Implement provider-side verification using the Pact Verifier.
 - Set up state handlers for "authenticated session" and "user exists".
 
 ### [Planning & Documentation]
 
-#### [MODIFY] [PLAN.md](file:///c:/Users/rjoydip/codebase/tss-elysia/knowledge/PLAN.md)
+#### [MODIFY] [PLAN.md](file:///c:/Users/rjoydip/codebase/tsse-elysia/knowledge/PLAN.md)
 
 - Add Phase 13: Contract Testing.
 - Update goals and tasks to include Pact integration.
 
-#### [NEW] [roadmap.md](file:///c:/Users/rjoydip/codebase/tss-elysia/docs/guides/roadmap.md)
+#### [NEW] [roadmap.md](file:///c:/Users/rjoydip/codebase/tsse-elysia/docs/guides/roadmap.md)
 
 - Create a high-level roadmap based on the updated `PLAN.md`.
 - Include visual progress indicators (e.g., status badges or emoji).

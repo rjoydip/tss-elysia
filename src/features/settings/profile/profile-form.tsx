@@ -1,8 +1,9 @@
 import { z } from "zod";
 import { useFieldArray, useForm } from "react-hook-form";
+import { useSession } from "~/lib/auth/client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Link } from "@tanstack/react-router";
-import { showSubmittedData } from "~/lib/show-submitted-data";
+import { showSubmittedData } from "~/components/show-submitted-data";
 import { cn } from "~/lib/utils";
 import { Button } from "~/components/ui/button";
 import {
@@ -44,16 +45,20 @@ const profileFormSchema = z.object({
 
 type ProfileFormValues = z.infer<typeof profileFormSchema>;
 
-// This can come from your database or API.
-const defaultValues: Partial<ProfileFormValues> = {
-  bio: "I own a computer.",
-  urls: [{ value: "https://shadcn.com" }, { value: "http://twitter.com/shadcn" }],
-};
-
 export function ProfileForm() {
+  const { data: session } = useSession();
+
+  // Fetch user data from session and set as default values
+  const userDefaultValues: Partial<ProfileFormValues> = {
+    username: session?.user?.name || "",
+    email: session?.user?.email || "",
+    bio: "I own a computer.", // Keep existing default for bio
+    urls: [{ value: "https://shadcn.com" }, { value: "http://twitter.com/shadcn" }], // Keep existing defaults
+  };
+
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(profileFormSchema),
-    defaultValues,
+    defaultValues: userDefaultValues,
     mode: "onChange",
   });
 

@@ -1,4 +1,5 @@
 import { useLayout } from "~/context/layout-provider";
+import { useSession } from "~/lib/auth/client";
 import {
   Sidebar,
   SidebarContent,
@@ -6,22 +7,31 @@ import {
   SidebarHeader,
   SidebarRail,
 } from "~/components/ui/sidebar";
-// import { AppTitle } from './app-title'
+// import { AppTitle } from "./app-title";
 import { sidebarData } from "./data/sidebar-data";
 import { NavGroup } from "./nav-group";
-import { NavUser } from "./nav-user";
+import { NavUser, type NavUserProps } from "./nav-user";
 import { TeamSwitcher } from "./team-switcher";
 
 export function AppSidebar() {
   const { collapsible, variant } = useLayout();
+  const { data: session } = useSession();
+
+  // Get user data from session or fallback to sidebarData
+  const userData: NavUserProps = {
+    name: session?.user?.name || sidebarData.user.name,
+    email: session?.user?.email || sidebarData.user.email,
+    image: session?.user?.image || sidebarData.user.avatar,
+  };
+
   return (
     <Sidebar collapsible={collapsible} variant={variant}>
       <SidebarHeader>
         <TeamSwitcher teams={sidebarData.teams} />
 
         {/* Replace <TeamSwitch /> with the following <AppTitle />
-         /* if you want to use the normal app title instead of TeamSwitch dropdown */}
-        {/* <AppTitle /> */}
+        /* if you want to use the normal app title instead of TeamSwitch dropdown */}
+        {/*<AppTitle />*/}
       </SidebarHeader>
       <SidebarContent>
         {sidebarData.navGroups.map((props) => (
@@ -29,7 +39,7 @@ export function AppSidebar() {
         ))}
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={sidebarData.user} />
+        <NavUser user={userData} />
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>

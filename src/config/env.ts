@@ -172,7 +172,7 @@ const _getEnv = (key: string, defaultValue: string = ""): string => {
  */
 const _BASE_URL = `http://localhost:${PORT}`;
 const _DEFAULT_DB_PATH = ".artifacts";
-const _DEFAULT_DB_NAME = "tss-elysia.db";
+const _DEFAULT_DB_NAME = "tsse-elysia.db";
 
 /**
  * Retrieves and validates the Better Auth secret key.

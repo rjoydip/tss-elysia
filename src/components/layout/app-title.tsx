@@ -8,6 +8,7 @@ import {
   useSidebar,
 } from "~/components/ui/sidebar";
 import { Button } from "../ui/button";
+import { APP_NAME } from "~/config";
 
 export function AppTitle() {
   const { setOpenMobile } = useSidebar();
@@ -25,7 +26,7 @@ export function AppTitle() {
               onClick={() => setOpenMobile(false)}
               className="grid flex-1 text-start text-sm leading-tight"
             >
-              <span className="truncate font-bold">Shadcn-Admin</span>
+              <span className="truncate font-bold">{APP_NAME}-Admin</span>
               <span className="truncate text-xs">Vite + ShadcnUI</span>
             </Link>
             <ToggleSidebar />

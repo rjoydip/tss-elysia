@@ -8,7 +8,7 @@ import { E2E_BASE_URL } from "../_config";
 
 test.describe("Settings Page", () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto(`${E2E_BASE_URL}/settings`);
+    await page.goto(`${E2E_BASE_URL}/dashboard/settings`);
   });
 
   test("should load settings page without crashing", async ({ page }) => {
@@ -34,7 +34,7 @@ test.describe("Settings Page", () => {
 
 test.describe("Settings Page - Navigation", () => {
   test("should navigate to login when not authenticated", async ({ page }) => {
-    await page.goto(`${E2E_BASE_URL}/settings`);
+    await page.goto(`${E2E_BASE_URL}/dashboard/settings`);
     await expect(page.locator("main")).toBeVisible();
   });
 });

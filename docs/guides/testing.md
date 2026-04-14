@@ -262,12 +262,12 @@ docker-scan:
         context: .
         file: docker/Dockerfile
         load: true
-        tags: tss-elysia:${{ github.sha }}
+        tags: tsse-elysia:${{ github.sha }}
 
     - name: Run Trivy vulnerability scanner
       uses: aquasecurity/trivy-action@master
       with:
-        image-ref: "tss-elysia:${{ github.sha }}"
+        image-ref: "tsse-elysia:${{ github.sha }}"
         severity: "CRITICAL,HIGH"
         exit-code: "1"
         ignore-unfixed: true

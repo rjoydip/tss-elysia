@@ -1,11 +1,11 @@
 ---
 title: Guides
-description: Practical guides for working with the tss-elysia stack
+description: Practical guides for working with the tsse-elysia stack
 ---
 
 ## Guides
 
-Practical guides for working with the tss-elysia stack.
+Practical guides for working with the tsse-elysia stack.
 
 ## Available Guides
 

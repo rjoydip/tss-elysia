@@ -55,7 +55,7 @@ async function removeSQLiteDatabase(dbPath: string) {
 
 async function main() {
   const dbType = process.env.DATABASE_TYPE || "sqlite";
-  const _dbPath = ".artifacts/tss-elysia.db";
+  const _dbPath = ".artifacts/tsse-elysia.db";
 
   const dbPath =
     process.env.DATABASE_PATH && process.env.DATABASE_NAME

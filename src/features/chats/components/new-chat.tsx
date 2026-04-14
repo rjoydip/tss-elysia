@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Check, X } from "lucide-react";
-import { showSubmittedData } from "~/lib/show-submitted-data";
+import { showSubmittedData } from "~/components/show-submitted-data";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import {

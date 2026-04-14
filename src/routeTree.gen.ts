@@ -9,86 +9,41 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as TermsRouteImport } from './routes/terms'
-import { Route as StatusRouteImport } from './routes/status'
-import { Route as SettingsRouteImport } from './routes/settings'
-import { Route as ProfileRouteImport } from './routes/profile'
-import { Route as PrivacyRouteImport } from './routes/privacy'
-import { Route as DocsRouteImport } from './routes/docs'
-import { Route as ChangelogRouteImport } from './routes/changelog'
-import { Route as BlogRouteImport } from './routes/blog'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as DocsIndexRouteImport } from './routes/docs/index'
-import { Route as DocsSplatRouteImport } from './routes/docs.$'
 import { Route as ApiSplatRouteImport } from './routes/api/$'
-import { Route as AccountVerifyEmailRouteImport } from './routes/account/verify-email'
-import { Route as AccountRegisterRouteImport } from './routes/account/register'
-import { Route as AccountLoginRouteImport } from './routes/account/login'
-import { Route as AccountForgotPasswordRouteImport } from './routes/account/forgot-password'
+import { Route as landingTermsRouteImport } from './routes/(landing)/terms'
+import { Route as landingStatusRouteImport } from './routes/(landing)/status'
+import { Route as landingPrivacyRouteImport } from './routes/(landing)/privacy'
+import { Route as landingDocsRouteImport } from './routes/(landing)/docs'
+import { Route as landingChangelogRouteImport } from './routes/(landing)/changelog'
+import { Route as landingBlogRouteImport } from './routes/(landing)/blog'
 import { Route as errors503RouteImport } from './routes/(errors)/503'
 import { Route as errors500RouteImport } from './routes/(errors)/500'
 import { Route as errors404RouteImport } from './routes/(errors)/404'
 import { Route as errors403RouteImport } from './routes/(errors)/403'
 import { Route as errors401RouteImport } from './routes/(errors)/401'
+import { Route as authVerifyEmailRouteImport } from './routes/(auth)/verify-email'
 import { Route as authSignUpRouteImport } from './routes/(auth)/sign-up'
 import { Route as authSignInRouteImport } from './routes/(auth)/sign-in'
 import { Route as authOtpRouteImport } from './routes/(auth)/otp'
 import { Route as authForgotPasswordRouteImport } from './routes/(auth)/forgot-password'
-import { Route as AuthenticatedSettingsRouteRouteImport } from './routes/_authenticated/settings/route'
-import { Route as AuthenticatedUsersIndexRouteImport } from './routes/_authenticated/users/index'
-import { Route as AuthenticatedTasksIndexRouteImport } from './routes/_authenticated/tasks/index'
-import { Route as AuthenticatedSettingsIndexRouteImport } from './routes/_authenticated/settings/index'
 import { Route as AuthenticatedHelpCenterIndexRouteImport } from './routes/_authenticated/help-center/index'
 import { Route as AuthenticatedDashboardIndexRouteImport } from './routes/_authenticated/dashboard/index'
-import { Route as AuthenticatedChatsIndexRouteImport } from './routes/_authenticated/chats/index'
-import { Route as AuthenticatedAppsIndexRouteImport } from './routes/_authenticated/apps/index'
-import { Route as AuthenticatedSettingsNotificationsRouteImport } from './routes/_authenticated/settings/notifications'
-import { Route as AuthenticatedSettingsDisplayRouteImport } from './routes/_authenticated/settings/display'
-import { Route as AuthenticatedSettingsAppearanceRouteImport } from './routes/_authenticated/settings/appearance'
-import { Route as AuthenticatedSettingsAccountRouteImport } from './routes/_authenticated/settings/account'
+import { Route as landingDocsIndexRouteImport } from './routes/(landing)/docs/index'
 import { Route as AuthenticatedErrorsErrorRouteImport } from './routes/_authenticated/errors/$error'
+import { Route as landingDocsSplatRouteImport } from './routes/(landing)/docs.$'
+import { Route as AuthenticatedDashboardSettingsRouteRouteImport } from './routes/_authenticated/dashboard/settings/route'
+import { Route as AuthenticatedDashboardUsersIndexRouteImport } from './routes/_authenticated/dashboard/users/index'
+import { Route as AuthenticatedDashboardTasksIndexRouteImport } from './routes/_authenticated/dashboard/tasks/index'
+import { Route as AuthenticatedDashboardSettingsIndexRouteImport } from './routes/_authenticated/dashboard/settings/index'
+import { Route as AuthenticatedDashboardChatsIndexRouteImport } from './routes/_authenticated/dashboard/chats/index'
+import { Route as AuthenticatedDashboardAppsIndexRouteImport } from './routes/_authenticated/dashboard/apps/index'
+import { Route as AuthenticatedDashboardSettingsNotificationsRouteImport } from './routes/_authenticated/dashboard/settings/notifications'
+import { Route as AuthenticatedDashboardSettingsDisplayRouteImport } from './routes/_authenticated/dashboard/settings/display'
+import { Route as AuthenticatedDashboardSettingsAppearanceRouteImport } from './routes/_authenticated/dashboard/settings/appearance'
+import { Route as AuthenticatedDashboardSettingsAccountRouteImport } from './routes/_authenticated/dashboard/settings/account'
 
-const TermsRoute = TermsRouteImport.update({
-  id: '/terms',
-  path: '/terms',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const StatusRoute = StatusRouteImport.update({
-  id: '/status',
-  path: '/status',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SettingsRoute = SettingsRouteImport.update({
-  id: '/settings',
-  path: '/settings',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ProfileRoute = ProfileRouteImport.update({
-  id: '/profile',
-  path: '/profile',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PrivacyRoute = PrivacyRouteImport.update({
-  id: '/privacy',
-  path: '/privacy',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DocsRoute = DocsRouteImport.update({
-  id: '/docs',
-  path: '/docs',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ChangelogRoute = ChangelogRouteImport.update({
-  id: '/changelog',
-  path: '/changelog',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const BlogRoute = BlogRouteImport.update({
-  id: '/blog',
-  path: '/blog',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
   id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
@@ -98,39 +53,39 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const DocsIndexRoute = DocsIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => DocsRoute,
-} as any)
-const DocsSplatRoute = DocsSplatRouteImport.update({
-  id: '/$',
-  path: '/$',
-  getParentRoute: () => DocsRoute,
-} as any)
 const ApiSplatRoute = ApiSplatRouteImport.update({
   id: '/api/$',
   path: '/api/$',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AccountVerifyEmailRoute = AccountVerifyEmailRouteImport.update({
-  id: '/account/verify-email',
-  path: '/account/verify-email',
+const landingTermsRoute = landingTermsRouteImport.update({
+  id: '/(landing)/terms',
+  path: '/terms',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AccountRegisterRoute = AccountRegisterRouteImport.update({
-  id: '/account/register',
-  path: '/account/register',
+const landingStatusRoute = landingStatusRouteImport.update({
+  id: '/(landing)/status',
+  path: '/status',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AccountLoginRoute = AccountLoginRouteImport.update({
-  id: '/account/login',
-  path: '/account/login',
+const landingPrivacyRoute = landingPrivacyRouteImport.update({
+  id: '/(landing)/privacy',
+  path: '/privacy',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AccountForgotPasswordRoute = AccountForgotPasswordRouteImport.update({
-  id: '/account/forgot-password',
-  path: '/account/forgot-password',
+const landingDocsRoute = landingDocsRouteImport.update({
+  id: '/(landing)/docs',
+  path: '/docs',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const landingChangelogRoute = landingChangelogRouteImport.update({
+  id: '/(landing)/changelog',
+  path: '/changelog',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const landingBlogRoute = landingBlogRouteImport.update({
+  id: '/(landing)/blog',
+  path: '/blog',
   getParentRoute: () => rootRouteImport,
 } as any)
 const errors503Route = errors503RouteImport.update({
@@ -158,6 +113,11 @@ const errors401Route = errors401RouteImport.update({
   path: '/401',
   getParentRoute: () => rootRouteImport,
 } as any)
+const authVerifyEmailRoute = authVerifyEmailRouteImport.update({
+  id: '/(auth)/verify-email',
+  path: '/verify-email',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const authSignUpRoute = authSignUpRouteImport.update({
   id: '/(auth)/sign-up',
   path: '/sign-up',
@@ -178,28 +138,6 @@ const authForgotPasswordRoute = authForgotPasswordRouteImport.update({
   path: '/forgot-password',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthenticatedSettingsRouteRoute =
-  AuthenticatedSettingsRouteRouteImport.update({
-    id: '/settings',
-    path: '/settings',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedUsersIndexRoute = AuthenticatedUsersIndexRouteImport.update({
-  id: '/users/',
-  path: '/users/',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
-const AuthenticatedTasksIndexRoute = AuthenticatedTasksIndexRouteImport.update({
-  id: '/tasks/',
-  path: '/tasks/',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
-const AuthenticatedSettingsIndexRoute =
-  AuthenticatedSettingsIndexRouteImport.update({
-    id: '/',
-    path: '/',
-    getParentRoute: () => AuthenticatedSettingsRouteRoute,
-  } as any)
 const AuthenticatedHelpCenterIndexRoute =
   AuthenticatedHelpCenterIndexRouteImport.update({
     id: '/help-center/',
@@ -212,370 +150,319 @@ const AuthenticatedDashboardIndexRoute =
     path: '/dashboard/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
-const AuthenticatedChatsIndexRoute = AuthenticatedChatsIndexRouteImport.update({
-  id: '/chats/',
-  path: '/chats/',
-  getParentRoute: () => AuthenticatedRouteRoute,
+const landingDocsIndexRoute = landingDocsIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => landingDocsRoute,
 } as any)
-const AuthenticatedAppsIndexRoute = AuthenticatedAppsIndexRouteImport.update({
-  id: '/apps/',
-  path: '/apps/',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
-const AuthenticatedSettingsNotificationsRoute =
-  AuthenticatedSettingsNotificationsRouteImport.update({
-    id: '/notifications',
-    path: '/notifications',
-    getParentRoute: () => AuthenticatedSettingsRouteRoute,
-  } as any)
-const AuthenticatedSettingsDisplayRoute =
-  AuthenticatedSettingsDisplayRouteImport.update({
-    id: '/display',
-    path: '/display',
-    getParentRoute: () => AuthenticatedSettingsRouteRoute,
-  } as any)
-const AuthenticatedSettingsAppearanceRoute =
-  AuthenticatedSettingsAppearanceRouteImport.update({
-    id: '/appearance',
-    path: '/appearance',
-    getParentRoute: () => AuthenticatedSettingsRouteRoute,
-  } as any)
-const AuthenticatedSettingsAccountRoute =
-  AuthenticatedSettingsAccountRouteImport.update({
-    id: '/account',
-    path: '/account',
-    getParentRoute: () => AuthenticatedSettingsRouteRoute,
-  } as any)
 const AuthenticatedErrorsErrorRoute =
   AuthenticatedErrorsErrorRouteImport.update({
     id: '/errors/$error',
     path: '/errors/$error',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const landingDocsSplatRoute = landingDocsSplatRouteImport.update({
+  id: '/$',
+  path: '/$',
+  getParentRoute: () => landingDocsRoute,
+} as any)
+const AuthenticatedDashboardSettingsRouteRoute =
+  AuthenticatedDashboardSettingsRouteRouteImport.update({
+    id: '/dashboard/settings',
+    path: '/dashboard/settings',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedDashboardUsersIndexRoute =
+  AuthenticatedDashboardUsersIndexRouteImport.update({
+    id: '/dashboard/users/',
+    path: '/dashboard/users/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedDashboardTasksIndexRoute =
+  AuthenticatedDashboardTasksIndexRouteImport.update({
+    id: '/dashboard/tasks/',
+    path: '/dashboard/tasks/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedDashboardSettingsIndexRoute =
+  AuthenticatedDashboardSettingsIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedDashboardSettingsRouteRoute,
+  } as any)
+const AuthenticatedDashboardChatsIndexRoute =
+  AuthenticatedDashboardChatsIndexRouteImport.update({
+    id: '/dashboard/chats/',
+    path: '/dashboard/chats/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedDashboardAppsIndexRoute =
+  AuthenticatedDashboardAppsIndexRouteImport.update({
+    id: '/dashboard/apps/',
+    path: '/dashboard/apps/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedDashboardSettingsNotificationsRoute =
+  AuthenticatedDashboardSettingsNotificationsRouteImport.update({
+    id: '/notifications',
+    path: '/notifications',
+    getParentRoute: () => AuthenticatedDashboardSettingsRouteRoute,
+  } as any)
+const AuthenticatedDashboardSettingsDisplayRoute =
+  AuthenticatedDashboardSettingsDisplayRouteImport.update({
+    id: '/display',
+    path: '/display',
+    getParentRoute: () => AuthenticatedDashboardSettingsRouteRoute,
+  } as any)
+const AuthenticatedDashboardSettingsAppearanceRoute =
+  AuthenticatedDashboardSettingsAppearanceRouteImport.update({
+    id: '/appearance',
+    path: '/appearance',
+    getParentRoute: () => AuthenticatedDashboardSettingsRouteRoute,
+  } as any)
+const AuthenticatedDashboardSettingsAccountRoute =
+  AuthenticatedDashboardSettingsAccountRouteImport.update({
+    id: '/account',
+    path: '/account',
+    getParentRoute: () => AuthenticatedDashboardSettingsRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/blog': typeof BlogRoute
-  '/changelog': typeof ChangelogRoute
-  '/docs': typeof DocsRouteWithChildren
-  '/privacy': typeof PrivacyRoute
-  '/profile': typeof ProfileRoute
-  '/settings': typeof AuthenticatedSettingsRouteRouteWithChildren
-  '/status': typeof StatusRoute
-  '/terms': typeof TermsRoute
   '/forgot-password': typeof authForgotPasswordRoute
   '/otp': typeof authOtpRoute
   '/sign-in': typeof authSignInRoute
   '/sign-up': typeof authSignUpRoute
+  '/verify-email': typeof authVerifyEmailRoute
   '/401': typeof errors401Route
   '/403': typeof errors403Route
   '/404': typeof errors404Route
   '/500': typeof errors500Route
   '/503': typeof errors503Route
-  '/account/forgot-password': typeof AccountForgotPasswordRoute
-  '/account/login': typeof AccountLoginRoute
-  '/account/register': typeof AccountRegisterRoute
-  '/account/verify-email': typeof AccountVerifyEmailRoute
+  '/blog': typeof landingBlogRoute
+  '/changelog': typeof landingChangelogRoute
+  '/docs': typeof landingDocsRouteWithChildren
+  '/privacy': typeof landingPrivacyRoute
+  '/status': typeof landingStatusRoute
+  '/terms': typeof landingTermsRoute
   '/api/$': typeof ApiSplatRoute
-  '/docs/$': typeof DocsSplatRoute
-  '/docs/': typeof DocsIndexRoute
+  '/dashboard/settings': typeof AuthenticatedDashboardSettingsRouteRouteWithChildren
+  '/docs/$': typeof landingDocsSplatRoute
   '/errors/$error': typeof AuthenticatedErrorsErrorRoute
-  '/settings/account': typeof AuthenticatedSettingsAccountRoute
-  '/settings/appearance': typeof AuthenticatedSettingsAppearanceRoute
-  '/settings/display': typeof AuthenticatedSettingsDisplayRoute
-  '/settings/notifications': typeof AuthenticatedSettingsNotificationsRoute
-  '/apps/': typeof AuthenticatedAppsIndexRoute
-  '/chats/': typeof AuthenticatedChatsIndexRoute
+  '/docs/': typeof landingDocsIndexRoute
   '/dashboard/': typeof AuthenticatedDashboardIndexRoute
   '/help-center/': typeof AuthenticatedHelpCenterIndexRoute
-  '/settings/': typeof AuthenticatedSettingsIndexRoute
-  '/tasks/': typeof AuthenticatedTasksIndexRoute
-  '/users/': typeof AuthenticatedUsersIndexRoute
+  '/dashboard/settings/account': typeof AuthenticatedDashboardSettingsAccountRoute
+  '/dashboard/settings/appearance': typeof AuthenticatedDashboardSettingsAppearanceRoute
+  '/dashboard/settings/display': typeof AuthenticatedDashboardSettingsDisplayRoute
+  '/dashboard/settings/notifications': typeof AuthenticatedDashboardSettingsNotificationsRoute
+  '/dashboard/apps/': typeof AuthenticatedDashboardAppsIndexRoute
+  '/dashboard/chats/': typeof AuthenticatedDashboardChatsIndexRoute
+  '/dashboard/settings/': typeof AuthenticatedDashboardSettingsIndexRoute
+  '/dashboard/tasks/': typeof AuthenticatedDashboardTasksIndexRoute
+  '/dashboard/users/': typeof AuthenticatedDashboardUsersIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/blog': typeof BlogRoute
-  '/changelog': typeof ChangelogRoute
-  '/privacy': typeof PrivacyRoute
-  '/profile': typeof ProfileRoute
-  '/settings': typeof AuthenticatedSettingsIndexRoute
-  '/status': typeof StatusRoute
-  '/terms': typeof TermsRoute
   '/forgot-password': typeof authForgotPasswordRoute
   '/otp': typeof authOtpRoute
   '/sign-in': typeof authSignInRoute
   '/sign-up': typeof authSignUpRoute
+  '/verify-email': typeof authVerifyEmailRoute
   '/401': typeof errors401Route
   '/403': typeof errors403Route
   '/404': typeof errors404Route
   '/500': typeof errors500Route
   '/503': typeof errors503Route
-  '/account/forgot-password': typeof AccountForgotPasswordRoute
-  '/account/login': typeof AccountLoginRoute
-  '/account/register': typeof AccountRegisterRoute
-  '/account/verify-email': typeof AccountVerifyEmailRoute
+  '/blog': typeof landingBlogRoute
+  '/changelog': typeof landingChangelogRoute
+  '/privacy': typeof landingPrivacyRoute
+  '/status': typeof landingStatusRoute
+  '/terms': typeof landingTermsRoute
   '/api/$': typeof ApiSplatRoute
-  '/docs/$': typeof DocsSplatRoute
-  '/docs': typeof DocsIndexRoute
+  '/docs/$': typeof landingDocsSplatRoute
   '/errors/$error': typeof AuthenticatedErrorsErrorRoute
-  '/settings/account': typeof AuthenticatedSettingsAccountRoute
-  '/settings/appearance': typeof AuthenticatedSettingsAppearanceRoute
-  '/settings/display': typeof AuthenticatedSettingsDisplayRoute
-  '/settings/notifications': typeof AuthenticatedSettingsNotificationsRoute
-  '/apps': typeof AuthenticatedAppsIndexRoute
-  '/chats': typeof AuthenticatedChatsIndexRoute
+  '/docs': typeof landingDocsIndexRoute
   '/dashboard': typeof AuthenticatedDashboardIndexRoute
   '/help-center': typeof AuthenticatedHelpCenterIndexRoute
-  '/tasks': typeof AuthenticatedTasksIndexRoute
-  '/users': typeof AuthenticatedUsersIndexRoute
+  '/dashboard/settings/account': typeof AuthenticatedDashboardSettingsAccountRoute
+  '/dashboard/settings/appearance': typeof AuthenticatedDashboardSettingsAppearanceRoute
+  '/dashboard/settings/display': typeof AuthenticatedDashboardSettingsDisplayRoute
+  '/dashboard/settings/notifications': typeof AuthenticatedDashboardSettingsNotificationsRoute
+  '/dashboard/apps': typeof AuthenticatedDashboardAppsIndexRoute
+  '/dashboard/chats': typeof AuthenticatedDashboardChatsIndexRoute
+  '/dashboard/settings': typeof AuthenticatedDashboardSettingsIndexRoute
+  '/dashboard/tasks': typeof AuthenticatedDashboardTasksIndexRoute
+  '/dashboard/users': typeof AuthenticatedDashboardUsersIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
-  '/blog': typeof BlogRoute
-  '/changelog': typeof ChangelogRoute
-  '/docs': typeof DocsRouteWithChildren
-  '/privacy': typeof PrivacyRoute
-  '/profile': typeof ProfileRoute
-  '/settings': typeof SettingsRoute
-  '/status': typeof StatusRoute
-  '/terms': typeof TermsRoute
-  '/_authenticated/settings': typeof AuthenticatedSettingsRouteRouteWithChildren
   '/(auth)/forgot-password': typeof authForgotPasswordRoute
   '/(auth)/otp': typeof authOtpRoute
   '/(auth)/sign-in': typeof authSignInRoute
   '/(auth)/sign-up': typeof authSignUpRoute
+  '/(auth)/verify-email': typeof authVerifyEmailRoute
   '/(errors)/401': typeof errors401Route
   '/(errors)/403': typeof errors403Route
   '/(errors)/404': typeof errors404Route
   '/(errors)/500': typeof errors500Route
   '/(errors)/503': typeof errors503Route
-  '/account/forgot-password': typeof AccountForgotPasswordRoute
-  '/account/login': typeof AccountLoginRoute
-  '/account/register': typeof AccountRegisterRoute
-  '/account/verify-email': typeof AccountVerifyEmailRoute
+  '/(landing)/blog': typeof landingBlogRoute
+  '/(landing)/changelog': typeof landingChangelogRoute
+  '/(landing)/docs': typeof landingDocsRouteWithChildren
+  '/(landing)/privacy': typeof landingPrivacyRoute
+  '/(landing)/status': typeof landingStatusRoute
+  '/(landing)/terms': typeof landingTermsRoute
   '/api/$': typeof ApiSplatRoute
-  '/docs/$': typeof DocsSplatRoute
-  '/docs/': typeof DocsIndexRoute
+  '/_authenticated/dashboard/settings': typeof AuthenticatedDashboardSettingsRouteRouteWithChildren
+  '/(landing)/docs/$': typeof landingDocsSplatRoute
   '/_authenticated/errors/$error': typeof AuthenticatedErrorsErrorRoute
-  '/_authenticated/settings/account': typeof AuthenticatedSettingsAccountRoute
-  '/_authenticated/settings/appearance': typeof AuthenticatedSettingsAppearanceRoute
-  '/_authenticated/settings/display': typeof AuthenticatedSettingsDisplayRoute
-  '/_authenticated/settings/notifications': typeof AuthenticatedSettingsNotificationsRoute
-  '/_authenticated/apps/': typeof AuthenticatedAppsIndexRoute
-  '/_authenticated/chats/': typeof AuthenticatedChatsIndexRoute
+  '/(landing)/docs/': typeof landingDocsIndexRoute
   '/_authenticated/dashboard/': typeof AuthenticatedDashboardIndexRoute
   '/_authenticated/help-center/': typeof AuthenticatedHelpCenterIndexRoute
-  '/_authenticated/settings/': typeof AuthenticatedSettingsIndexRoute
-  '/_authenticated/tasks/': typeof AuthenticatedTasksIndexRoute
-  '/_authenticated/users/': typeof AuthenticatedUsersIndexRoute
+  '/_authenticated/dashboard/settings/account': typeof AuthenticatedDashboardSettingsAccountRoute
+  '/_authenticated/dashboard/settings/appearance': typeof AuthenticatedDashboardSettingsAppearanceRoute
+  '/_authenticated/dashboard/settings/display': typeof AuthenticatedDashboardSettingsDisplayRoute
+  '/_authenticated/dashboard/settings/notifications': typeof AuthenticatedDashboardSettingsNotificationsRoute
+  '/_authenticated/dashboard/apps/': typeof AuthenticatedDashboardAppsIndexRoute
+  '/_authenticated/dashboard/chats/': typeof AuthenticatedDashboardChatsIndexRoute
+  '/_authenticated/dashboard/settings/': typeof AuthenticatedDashboardSettingsIndexRoute
+  '/_authenticated/dashboard/tasks/': typeof AuthenticatedDashboardTasksIndexRoute
+  '/_authenticated/dashboard/users/': typeof AuthenticatedDashboardUsersIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/blog'
-    | '/changelog'
-    | '/docs'
-    | '/privacy'
-    | '/profile'
-    | '/settings'
-    | '/status'
-    | '/terms'
     | '/forgot-password'
     | '/otp'
     | '/sign-in'
     | '/sign-up'
+    | '/verify-email'
     | '/401'
     | '/403'
     | '/404'
     | '/500'
     | '/503'
-    | '/account/forgot-password'
-    | '/account/login'
-    | '/account/register'
-    | '/account/verify-email'
+    | '/blog'
+    | '/changelog'
+    | '/docs'
+    | '/privacy'
+    | '/status'
+    | '/terms'
     | '/api/$'
+    | '/dashboard/settings'
     | '/docs/$'
-    | '/docs/'
     | '/errors/$error'
-    | '/settings/account'
-    | '/settings/appearance'
-    | '/settings/display'
-    | '/settings/notifications'
-    | '/apps/'
-    | '/chats/'
+    | '/docs/'
     | '/dashboard/'
     | '/help-center/'
-    | '/settings/'
-    | '/tasks/'
-    | '/users/'
+    | '/dashboard/settings/account'
+    | '/dashboard/settings/appearance'
+    | '/dashboard/settings/display'
+    | '/dashboard/settings/notifications'
+    | '/dashboard/apps/'
+    | '/dashboard/chats/'
+    | '/dashboard/settings/'
+    | '/dashboard/tasks/'
+    | '/dashboard/users/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/blog'
-    | '/changelog'
-    | '/privacy'
-    | '/profile'
-    | '/settings'
-    | '/status'
-    | '/terms'
     | '/forgot-password'
     | '/otp'
     | '/sign-in'
     | '/sign-up'
+    | '/verify-email'
     | '/401'
     | '/403'
     | '/404'
     | '/500'
     | '/503'
-    | '/account/forgot-password'
-    | '/account/login'
-    | '/account/register'
-    | '/account/verify-email'
+    | '/blog'
+    | '/changelog'
+    | '/privacy'
+    | '/status'
+    | '/terms'
     | '/api/$'
     | '/docs/$'
-    | '/docs'
     | '/errors/$error'
-    | '/settings/account'
-    | '/settings/appearance'
-    | '/settings/display'
-    | '/settings/notifications'
-    | '/apps'
-    | '/chats'
+    | '/docs'
     | '/dashboard'
     | '/help-center'
-    | '/tasks'
-    | '/users'
+    | '/dashboard/settings/account'
+    | '/dashboard/settings/appearance'
+    | '/dashboard/settings/display'
+    | '/dashboard/settings/notifications'
+    | '/dashboard/apps'
+    | '/dashboard/chats'
+    | '/dashboard/settings'
+    | '/dashboard/tasks'
+    | '/dashboard/users'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
-    | '/blog'
-    | '/changelog'
-    | '/docs'
-    | '/privacy'
-    | '/profile'
-    | '/settings'
-    | '/status'
-    | '/terms'
-    | '/_authenticated/settings'
     | '/(auth)/forgot-password'
     | '/(auth)/otp'
     | '/(auth)/sign-in'
     | '/(auth)/sign-up'
+    | '/(auth)/verify-email'
     | '/(errors)/401'
     | '/(errors)/403'
     | '/(errors)/404'
     | '/(errors)/500'
     | '/(errors)/503'
-    | '/account/forgot-password'
-    | '/account/login'
-    | '/account/register'
-    | '/account/verify-email'
+    | '/(landing)/blog'
+    | '/(landing)/changelog'
+    | '/(landing)/docs'
+    | '/(landing)/privacy'
+    | '/(landing)/status'
+    | '/(landing)/terms'
     | '/api/$'
-    | '/docs/$'
-    | '/docs/'
+    | '/_authenticated/dashboard/settings'
+    | '/(landing)/docs/$'
     | '/_authenticated/errors/$error'
-    | '/_authenticated/settings/account'
-    | '/_authenticated/settings/appearance'
-    | '/_authenticated/settings/display'
-    | '/_authenticated/settings/notifications'
-    | '/_authenticated/apps/'
-    | '/_authenticated/chats/'
+    | '/(landing)/docs/'
     | '/_authenticated/dashboard/'
     | '/_authenticated/help-center/'
-    | '/_authenticated/settings/'
-    | '/_authenticated/tasks/'
-    | '/_authenticated/users/'
+    | '/_authenticated/dashboard/settings/account'
+    | '/_authenticated/dashboard/settings/appearance'
+    | '/_authenticated/dashboard/settings/display'
+    | '/_authenticated/dashboard/settings/notifications'
+    | '/_authenticated/dashboard/apps/'
+    | '/_authenticated/dashboard/chats/'
+    | '/_authenticated/dashboard/settings/'
+    | '/_authenticated/dashboard/tasks/'
+    | '/_authenticated/dashboard/users/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
-  BlogRoute: typeof BlogRoute
-  ChangelogRoute: typeof ChangelogRoute
-  DocsRoute: typeof DocsRouteWithChildren
-  PrivacyRoute: typeof PrivacyRoute
-  ProfileRoute: typeof ProfileRoute
-  SettingsRoute: typeof SettingsRoute
-  StatusRoute: typeof StatusRoute
-  TermsRoute: typeof TermsRoute
   authForgotPasswordRoute: typeof authForgotPasswordRoute
   authOtpRoute: typeof authOtpRoute
   authSignInRoute: typeof authSignInRoute
   authSignUpRoute: typeof authSignUpRoute
+  authVerifyEmailRoute: typeof authVerifyEmailRoute
   errors401Route: typeof errors401Route
   errors403Route: typeof errors403Route
   errors404Route: typeof errors404Route
   errors500Route: typeof errors500Route
   errors503Route: typeof errors503Route
-  AccountForgotPasswordRoute: typeof AccountForgotPasswordRoute
-  AccountLoginRoute: typeof AccountLoginRoute
-  AccountRegisterRoute: typeof AccountRegisterRoute
-  AccountVerifyEmailRoute: typeof AccountVerifyEmailRoute
+  landingBlogRoute: typeof landingBlogRoute
+  landingChangelogRoute: typeof landingChangelogRoute
+  landingDocsRoute: typeof landingDocsRouteWithChildren
+  landingPrivacyRoute: typeof landingPrivacyRoute
+  landingStatusRoute: typeof landingStatusRoute
+  landingTermsRoute: typeof landingTermsRoute
   ApiSplatRoute: typeof ApiSplatRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/terms': {
-      id: '/terms'
-      path: '/terms'
-      fullPath: '/terms'
-      preLoaderRoute: typeof TermsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/status': {
-      id: '/status'
-      path: '/status'
-      fullPath: '/status'
-      preLoaderRoute: typeof StatusRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/settings': {
-      id: '/settings'
-      path: '/settings'
-      fullPath: '/settings'
-      preLoaderRoute: typeof SettingsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/profile': {
-      id: '/profile'
-      path: '/profile'
-      fullPath: '/profile'
-      preLoaderRoute: typeof ProfileRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/privacy': {
-      id: '/privacy'
-      path: '/privacy'
-      fullPath: '/privacy'
-      preLoaderRoute: typeof PrivacyRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/docs': {
-      id: '/docs'
-      path: '/docs'
-      fullPath: '/docs'
-      preLoaderRoute: typeof DocsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/changelog': {
-      id: '/changelog'
-      path: '/changelog'
-      fullPath: '/changelog'
-      preLoaderRoute: typeof ChangelogRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/blog': {
-      id: '/blog'
-      path: '/blog'
-      fullPath: '/blog'
-      preLoaderRoute: typeof BlogRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/_authenticated': {
       id: '/_authenticated'
       path: ''
@@ -590,20 +477,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/docs/': {
-      id: '/docs/'
-      path: '/'
-      fullPath: '/docs/'
-      preLoaderRoute: typeof DocsIndexRouteImport
-      parentRoute: typeof DocsRoute
-    }
-    '/docs/$': {
-      id: '/docs/$'
-      path: '/$'
-      fullPath: '/docs/$'
-      preLoaderRoute: typeof DocsSplatRouteImport
-      parentRoute: typeof DocsRoute
-    }
     '/api/$': {
       id: '/api/$'
       path: '/api/$'
@@ -611,32 +484,46 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiSplatRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/account/verify-email': {
-      id: '/account/verify-email'
-      path: '/account/verify-email'
-      fullPath: '/account/verify-email'
-      preLoaderRoute: typeof AccountVerifyEmailRouteImport
+    '/(landing)/terms': {
+      id: '/(landing)/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof landingTermsRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/account/register': {
-      id: '/account/register'
-      path: '/account/register'
-      fullPath: '/account/register'
-      preLoaderRoute: typeof AccountRegisterRouteImport
+    '/(landing)/status': {
+      id: '/(landing)/status'
+      path: '/status'
+      fullPath: '/status'
+      preLoaderRoute: typeof landingStatusRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/account/login': {
-      id: '/account/login'
-      path: '/account/login'
-      fullPath: '/account/login'
-      preLoaderRoute: typeof AccountLoginRouteImport
+    '/(landing)/privacy': {
+      id: '/(landing)/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof landingPrivacyRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/account/forgot-password': {
-      id: '/account/forgot-password'
-      path: '/account/forgot-password'
-      fullPath: '/account/forgot-password'
-      preLoaderRoute: typeof AccountForgotPasswordRouteImport
+    '/(landing)/docs': {
+      id: '/(landing)/docs'
+      path: '/docs'
+      fullPath: '/docs'
+      preLoaderRoute: typeof landingDocsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/(landing)/changelog': {
+      id: '/(landing)/changelog'
+      path: '/changelog'
+      fullPath: '/changelog'
+      preLoaderRoute: typeof landingChangelogRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/(landing)/blog': {
+      id: '/(landing)/blog'
+      path: '/blog'
+      fullPath: '/blog'
+      preLoaderRoute: typeof landingBlogRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/(errors)/503': {
@@ -674,6 +561,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof errors401RouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/(auth)/verify-email': {
+      id: '/(auth)/verify-email'
+      path: '/verify-email'
+      fullPath: '/verify-email'
+      preLoaderRoute: typeof authVerifyEmailRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/(auth)/sign-up': {
       id: '/(auth)/sign-up'
       path: '/sign-up'
@@ -702,34 +596,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof authForgotPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_authenticated/settings': {
-      id: '/_authenticated/settings'
-      path: '/settings'
-      fullPath: '/settings'
-      preLoaderRoute: typeof AuthenticatedSettingsRouteRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/users/': {
-      id: '/_authenticated/users/'
-      path: '/users'
-      fullPath: '/users/'
-      preLoaderRoute: typeof AuthenticatedUsersIndexRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/tasks/': {
-      id: '/_authenticated/tasks/'
-      path: '/tasks'
-      fullPath: '/tasks/'
-      preLoaderRoute: typeof AuthenticatedTasksIndexRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/settings/': {
-      id: '/_authenticated/settings/'
-      path: '/'
-      fullPath: '/settings/'
-      preLoaderRoute: typeof AuthenticatedSettingsIndexRouteImport
-      parentRoute: typeof AuthenticatedSettingsRouteRoute
-    }
     '/_authenticated/help-center/': {
       id: '/_authenticated/help-center/'
       path: '/help-center'
@@ -744,47 +610,12 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/chats/': {
-      id: '/_authenticated/chats/'
-      path: '/chats'
-      fullPath: '/chats/'
-      preLoaderRoute: typeof AuthenticatedChatsIndexRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/apps/': {
-      id: '/_authenticated/apps/'
-      path: '/apps'
-      fullPath: '/apps/'
-      preLoaderRoute: typeof AuthenticatedAppsIndexRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/settings/notifications': {
-      id: '/_authenticated/settings/notifications'
-      path: '/notifications'
-      fullPath: '/settings/notifications'
-      preLoaderRoute: typeof AuthenticatedSettingsNotificationsRouteImport
-      parentRoute: typeof AuthenticatedSettingsRouteRoute
-    }
-    '/_authenticated/settings/display': {
-      id: '/_authenticated/settings/display'
-      path: '/display'
-      fullPath: '/settings/display'
-      preLoaderRoute: typeof AuthenticatedSettingsDisplayRouteImport
-      parentRoute: typeof AuthenticatedSettingsRouteRoute
-    }
-    '/_authenticated/settings/appearance': {
-      id: '/_authenticated/settings/appearance'
-      path: '/appearance'
-      fullPath: '/settings/appearance'
-      preLoaderRoute: typeof AuthenticatedSettingsAppearanceRouteImport
-      parentRoute: typeof AuthenticatedSettingsRouteRoute
-    }
-    '/_authenticated/settings/account': {
-      id: '/_authenticated/settings/account'
-      path: '/account'
-      fullPath: '/settings/account'
-      preLoaderRoute: typeof AuthenticatedSettingsAccountRouteImport
-      parentRoute: typeof AuthenticatedSettingsRouteRoute
+    '/(landing)/docs/': {
+      id: '/(landing)/docs/'
+      path: '/'
+      fullPath: '/docs/'
+      preLoaderRoute: typeof landingDocsIndexRouteImport
+      parentRoute: typeof landingDocsRoute
     }
     '/_authenticated/errors/$error': {
       id: '/_authenticated/errors/$error'
@@ -793,93 +624,172 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedErrorsErrorRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/(landing)/docs/$': {
+      id: '/(landing)/docs/$'
+      path: '/$'
+      fullPath: '/docs/$'
+      preLoaderRoute: typeof landingDocsSplatRouteImport
+      parentRoute: typeof landingDocsRoute
+    }
+    '/_authenticated/dashboard/settings': {
+      id: '/_authenticated/dashboard/settings'
+      path: '/dashboard/settings'
+      fullPath: '/dashboard/settings'
+      preLoaderRoute: typeof AuthenticatedDashboardSettingsRouteRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/dashboard/users/': {
+      id: '/_authenticated/dashboard/users/'
+      path: '/dashboard/users'
+      fullPath: '/dashboard/users/'
+      preLoaderRoute: typeof AuthenticatedDashboardUsersIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/dashboard/tasks/': {
+      id: '/_authenticated/dashboard/tasks/'
+      path: '/dashboard/tasks'
+      fullPath: '/dashboard/tasks/'
+      preLoaderRoute: typeof AuthenticatedDashboardTasksIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/dashboard/settings/': {
+      id: '/_authenticated/dashboard/settings/'
+      path: '/'
+      fullPath: '/dashboard/settings/'
+      preLoaderRoute: typeof AuthenticatedDashboardSettingsIndexRouteImport
+      parentRoute: typeof AuthenticatedDashboardSettingsRouteRoute
+    }
+    '/_authenticated/dashboard/chats/': {
+      id: '/_authenticated/dashboard/chats/'
+      path: '/dashboard/chats'
+      fullPath: '/dashboard/chats/'
+      preLoaderRoute: typeof AuthenticatedDashboardChatsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/dashboard/apps/': {
+      id: '/_authenticated/dashboard/apps/'
+      path: '/dashboard/apps'
+      fullPath: '/dashboard/apps/'
+      preLoaderRoute: typeof AuthenticatedDashboardAppsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/dashboard/settings/notifications': {
+      id: '/_authenticated/dashboard/settings/notifications'
+      path: '/notifications'
+      fullPath: '/dashboard/settings/notifications'
+      preLoaderRoute: typeof AuthenticatedDashboardSettingsNotificationsRouteImport
+      parentRoute: typeof AuthenticatedDashboardSettingsRouteRoute
+    }
+    '/_authenticated/dashboard/settings/display': {
+      id: '/_authenticated/dashboard/settings/display'
+      path: '/display'
+      fullPath: '/dashboard/settings/display'
+      preLoaderRoute: typeof AuthenticatedDashboardSettingsDisplayRouteImport
+      parentRoute: typeof AuthenticatedDashboardSettingsRouteRoute
+    }
+    '/_authenticated/dashboard/settings/appearance': {
+      id: '/_authenticated/dashboard/settings/appearance'
+      path: '/appearance'
+      fullPath: '/dashboard/settings/appearance'
+      preLoaderRoute: typeof AuthenticatedDashboardSettingsAppearanceRouteImport
+      parentRoute: typeof AuthenticatedDashboardSettingsRouteRoute
+    }
+    '/_authenticated/dashboard/settings/account': {
+      id: '/_authenticated/dashboard/settings/account'
+      path: '/account'
+      fullPath: '/dashboard/settings/account'
+      preLoaderRoute: typeof AuthenticatedDashboardSettingsAccountRouteImport
+      parentRoute: typeof AuthenticatedDashboardSettingsRouteRoute
+    }
   }
 }
 
-interface AuthenticatedSettingsRouteRouteChildren {
-  AuthenticatedSettingsAccountRoute: typeof AuthenticatedSettingsAccountRoute
-  AuthenticatedSettingsAppearanceRoute: typeof AuthenticatedSettingsAppearanceRoute
-  AuthenticatedSettingsDisplayRoute: typeof AuthenticatedSettingsDisplayRoute
-  AuthenticatedSettingsNotificationsRoute: typeof AuthenticatedSettingsNotificationsRoute
-  AuthenticatedSettingsIndexRoute: typeof AuthenticatedSettingsIndexRoute
+interface AuthenticatedDashboardSettingsRouteRouteChildren {
+  AuthenticatedDashboardSettingsAccountRoute: typeof AuthenticatedDashboardSettingsAccountRoute
+  AuthenticatedDashboardSettingsAppearanceRoute: typeof AuthenticatedDashboardSettingsAppearanceRoute
+  AuthenticatedDashboardSettingsDisplayRoute: typeof AuthenticatedDashboardSettingsDisplayRoute
+  AuthenticatedDashboardSettingsNotificationsRoute: typeof AuthenticatedDashboardSettingsNotificationsRoute
+  AuthenticatedDashboardSettingsIndexRoute: typeof AuthenticatedDashboardSettingsIndexRoute
 }
 
-const AuthenticatedSettingsRouteRouteChildren: AuthenticatedSettingsRouteRouteChildren =
+const AuthenticatedDashboardSettingsRouteRouteChildren: AuthenticatedDashboardSettingsRouteRouteChildren =
   {
-    AuthenticatedSettingsAccountRoute: AuthenticatedSettingsAccountRoute,
-    AuthenticatedSettingsAppearanceRoute: AuthenticatedSettingsAppearanceRoute,
-    AuthenticatedSettingsDisplayRoute: AuthenticatedSettingsDisplayRoute,
-    AuthenticatedSettingsNotificationsRoute:
-      AuthenticatedSettingsNotificationsRoute,
-    AuthenticatedSettingsIndexRoute: AuthenticatedSettingsIndexRoute,
+    AuthenticatedDashboardSettingsAccountRoute:
+      AuthenticatedDashboardSettingsAccountRoute,
+    AuthenticatedDashboardSettingsAppearanceRoute:
+      AuthenticatedDashboardSettingsAppearanceRoute,
+    AuthenticatedDashboardSettingsDisplayRoute:
+      AuthenticatedDashboardSettingsDisplayRoute,
+    AuthenticatedDashboardSettingsNotificationsRoute:
+      AuthenticatedDashboardSettingsNotificationsRoute,
+    AuthenticatedDashboardSettingsIndexRoute:
+      AuthenticatedDashboardSettingsIndexRoute,
   }
 
-const AuthenticatedSettingsRouteRouteWithChildren =
-  AuthenticatedSettingsRouteRoute._addFileChildren(
-    AuthenticatedSettingsRouteRouteChildren,
+const AuthenticatedDashboardSettingsRouteRouteWithChildren =
+  AuthenticatedDashboardSettingsRouteRoute._addFileChildren(
+    AuthenticatedDashboardSettingsRouteRouteChildren,
   )
 
 interface AuthenticatedRouteRouteChildren {
-  AuthenticatedSettingsRouteRoute: typeof AuthenticatedSettingsRouteRouteWithChildren
+  AuthenticatedDashboardSettingsRouteRoute: typeof AuthenticatedDashboardSettingsRouteRouteWithChildren
   AuthenticatedErrorsErrorRoute: typeof AuthenticatedErrorsErrorRoute
-  AuthenticatedAppsIndexRoute: typeof AuthenticatedAppsIndexRoute
-  AuthenticatedChatsIndexRoute: typeof AuthenticatedChatsIndexRoute
   AuthenticatedDashboardIndexRoute: typeof AuthenticatedDashboardIndexRoute
   AuthenticatedHelpCenterIndexRoute: typeof AuthenticatedHelpCenterIndexRoute
-  AuthenticatedTasksIndexRoute: typeof AuthenticatedTasksIndexRoute
-  AuthenticatedUsersIndexRoute: typeof AuthenticatedUsersIndexRoute
+  AuthenticatedDashboardAppsIndexRoute: typeof AuthenticatedDashboardAppsIndexRoute
+  AuthenticatedDashboardChatsIndexRoute: typeof AuthenticatedDashboardChatsIndexRoute
+  AuthenticatedDashboardTasksIndexRoute: typeof AuthenticatedDashboardTasksIndexRoute
+  AuthenticatedDashboardUsersIndexRoute: typeof AuthenticatedDashboardUsersIndexRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
-  AuthenticatedSettingsRouteRoute: AuthenticatedSettingsRouteRouteWithChildren,
+  AuthenticatedDashboardSettingsRouteRoute:
+    AuthenticatedDashboardSettingsRouteRouteWithChildren,
   AuthenticatedErrorsErrorRoute: AuthenticatedErrorsErrorRoute,
-  AuthenticatedAppsIndexRoute: AuthenticatedAppsIndexRoute,
-  AuthenticatedChatsIndexRoute: AuthenticatedChatsIndexRoute,
   AuthenticatedDashboardIndexRoute: AuthenticatedDashboardIndexRoute,
   AuthenticatedHelpCenterIndexRoute: AuthenticatedHelpCenterIndexRoute,
-  AuthenticatedTasksIndexRoute: AuthenticatedTasksIndexRoute,
-  AuthenticatedUsersIndexRoute: AuthenticatedUsersIndexRoute,
+  AuthenticatedDashboardAppsIndexRoute: AuthenticatedDashboardAppsIndexRoute,
+  AuthenticatedDashboardChatsIndexRoute: AuthenticatedDashboardChatsIndexRoute,
+  AuthenticatedDashboardTasksIndexRoute: AuthenticatedDashboardTasksIndexRoute,
+  AuthenticatedDashboardUsersIndexRoute: AuthenticatedDashboardUsersIndexRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
   AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
 
-interface DocsRouteChildren {
-  DocsSplatRoute: typeof DocsSplatRoute
-  DocsIndexRoute: typeof DocsIndexRoute
+interface landingDocsRouteChildren {
+  landingDocsSplatRoute: typeof landingDocsSplatRoute
+  landingDocsIndexRoute: typeof landingDocsIndexRoute
 }
 
-const DocsRouteChildren: DocsRouteChildren = {
-  DocsSplatRoute: DocsSplatRoute,
-  DocsIndexRoute: DocsIndexRoute,
+const landingDocsRouteChildren: landingDocsRouteChildren = {
+  landingDocsSplatRoute: landingDocsSplatRoute,
+  landingDocsIndexRoute: landingDocsIndexRoute,
 }
 
-const DocsRouteWithChildren = DocsRoute._addFileChildren(DocsRouteChildren)
+const landingDocsRouteWithChildren = landingDocsRoute._addFileChildren(
+  landingDocsRouteChildren,
+)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
-  BlogRoute: BlogRoute,
-  ChangelogRoute: ChangelogRoute,
-  DocsRoute: DocsRouteWithChildren,
-  PrivacyRoute: PrivacyRoute,
-  ProfileRoute: ProfileRoute,
-  SettingsRoute: SettingsRoute,
-  StatusRoute: StatusRoute,
-  TermsRoute: TermsRoute,
   authForgotPasswordRoute: authForgotPasswordRoute,
   authOtpRoute: authOtpRoute,
   authSignInRoute: authSignInRoute,
   authSignUpRoute: authSignUpRoute,
+  authVerifyEmailRoute: authVerifyEmailRoute,
   errors401Route: errors401Route,
   errors403Route: errors403Route,
   errors404Route: errors404Route,
   errors500Route: errors500Route,
   errors503Route: errors503Route,
-  AccountForgotPasswordRoute: AccountForgotPasswordRoute,
-  AccountLoginRoute: AccountLoginRoute,
-  AccountRegisterRoute: AccountRegisterRoute,
-  AccountVerifyEmailRoute: AccountVerifyEmailRoute,
+  landingBlogRoute: landingBlogRoute,
+  landingChangelogRoute: landingChangelogRoute,
+  landingDocsRoute: landingDocsRouteWithChildren,
+  landingPrivacyRoute: landingPrivacyRoute,
+  landingStatusRoute: landingStatusRoute,
+  landingTermsRoute: landingTermsRoute,
   ApiSplatRoute: ApiSplatRoute,
 }
 export const routeTree = rootRouteImport

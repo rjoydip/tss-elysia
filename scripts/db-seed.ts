@@ -225,7 +225,7 @@ function resolveDatabasePath(): string {
     return `.artifacts/${process.env.DATABASE_NAME}`;
   }
 
-  return ".artifacts/tss-elysia.db";
+  return ".artifacts/tsse-elysia.db";
 }
 
 /**

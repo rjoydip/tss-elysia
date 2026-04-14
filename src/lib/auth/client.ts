@@ -78,9 +78,10 @@ export async function signUpWithEmail(name: string, email: string, password: str
      * Better Auth may throw for non-2xx responses depending on transport/runtime.
      * Normalize to `{ data, error }` so UI can always show feedback.
      */
+    const err = error instanceof Error ? error : new Error(String(error));
     return {
       data: null,
-      error,
+      error: err,
     };
   }
 }

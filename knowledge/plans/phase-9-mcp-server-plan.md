@@ -93,7 +93,7 @@ import { randomUUID } from "node:crypto";
 
 const server = new McpServer(
   {
-    name: "tss-elysia",
+    name: "tsse-elysia",
     version: "1.0.0",
   },
   {

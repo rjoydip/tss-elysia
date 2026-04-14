@@ -10,7 +10,11 @@ import {
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
 
-export function ThemeSwitch() {
+interface ThemeSwitchProps {
+  className?: string;
+}
+
+export function ThemeSwitch({ className }: ThemeSwitchProps) {
   const { theme, setTheme } = useTheme();
 
   /* Update theme-color meta tag
@@ -24,9 +28,9 @@ export function ThemeSwitch() {
   return (
     <DropdownMenu modal={false}>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon" className="scale-95 rounded-full">
-          <Sun className="size-[1.2rem] scale-100 rotate-0 transition-all dark:scale-0 dark:-rotate-90" />
-          <Moon className="absolute size-[1.2rem] scale-0 rotate-90 transition-all dark:scale-100 dark:rotate-0" />
+        <Button variant="ghost" size="icon" className={cn("scale-100 rounded-full", className)}>
+          <Sun className="size-[1.2rem] text-primary scale-100 rotate-0 transition-all dark:scale-0 dark:-rotate-90" />
+          <Moon className="absolute size-[1.2rem] text-primary scale-0 rotate-90 transition-all dark:scale-100 dark:rotate-0" />
           <span className="sr-only">Toggle theme</span>
         </Button>
       </DropdownMenuTrigger>
