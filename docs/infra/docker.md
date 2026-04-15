@@ -176,15 +176,16 @@ dev:
 
 ## Environment Variables
 
-| Variable             | Default                     | Description          |
-| -------------------- | --------------------------- | -------------------- |
-| `HOST`               | `0.0.0.0`                   | Server host          |
-| `PORT`               | `3000`                      | Server port          |
-| `NODE_ENV`           | `production`                | Environment mode     |
-| `BETTER_AUTH_SECRET` | **Required** (min 32 chars) | Session secret       |
-| `DATABASE_PATH`      | `.artifacts`                | Database directory   |
-| `DATABASE_NAME`      | `tsse-elysia.db`            | Database filename    |
-| `REDIS_URL`          | `redis://redis:6379`        | Redis connection URL |
+| Variable             | Default                     | Description                                |
+| -------------------- | --------------------------- | ------------------------------------------ |
+| `HOST`               | `0.0.0.0`                   | Server host                                |
+| `PORT`               | `3000`                      | Server port                                |
+| `NODE_ENV`           | `production`                | Environment mode                           |
+| `BETTER_AUTH_SECRET` | **Required** (min 32 chars) | Session secret                             |
+| `DATABASE_PATH`      | `.artifacts`                | Database directory                         |
+| `DATABASE_NAME`      | `tsse-elysia.db`            | Database filename                          |
+| `DATABASE_TYPE`      | `sqlite`                    | Database type (`sqlite` or `postgres`)     |
+| `REDIS_URL`          | `redis://redis:6379`        | Redis connection URL (for cache & pub/sub) |
 
 ## Usage Examples
 

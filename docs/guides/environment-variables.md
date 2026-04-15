@@ -9,28 +9,107 @@ This project uses type-safe environment variables with isomorphic fetching, supp
 
 ## Server Configuration
 
-| Variable                 | Default          | Description                              |
-| ------------------------ | ---------------- | ---------------------------------------- |
-| `HOST`                   | `localhost`      | Server host                              |
-| `PORT`                   | `3000`           | Server port                              |
-| `VITE_API_URL`           | Dynamic          | Client API URL for Eden Treaty           |
-| `DATABASE_PATH`          | `.artifacts`     | SQLite database file path                |
-| `DATABASE_NAME`          | `tsse-elysia.db` | SQLite database file name                |
-| `DATABASE_URL`           | -                | Database connection URL (future use)     |
-| `BETTER_AUTH_SECRET`     | Auto-generated   | Authentication secret for session tokens |
-| `WS_ENABLED`             | -                | Enables/disables websocket transport     |
-| `WS_HEARTBEAT_INTERVAL`  | -                | Websocket heartbeat interval             |
-| `WS_MAX_MESSAGE_SIZE`    | -                | Max websocket message size               |
-| `WS_RATE_LIMIT_MESSAGES` | -                | Websocket messages allowed per window    |
-| `WS_RATE_LIMIT_WINDOW`   | -                | Websocket rate-limit window (ms)         |
-| `REDIS_URL`              | -                | Redis connection URL (Docker or Upstash) |
+| Variable                 | Default          | Description                                    |
+| ------------------------ | ---------------- | ---------------------------------------------- |
+| `HOST`                   | `localhost`      | Server host                                    |
+| `PORT`                   | `3000`           | Server port                                    |
+| `VITE_API_URL`           | Dynamic          | Client API URL for Eden Treaty                 |
+| `DATABASE_PATH`          | `.artifacts`     | SQLite database file path                      |
+| `DATABASE_NAME`          | `tsse-elysia.db` | SQLite database file name                      |
+| `DATABASE_TYPE`          | `sqlite`         | Database type: `sqlite` or `postgres`          |
+| `DATABASE_URL`           | -                | Database connection URL                        |
+| `POSTGRES_URL`           | -                | PostgreSQL connection URL (when type=postgres) |
+| `BETTER_AUTH_SECRET`     | Auto-generated   | Authentication secret for session tokens       |
+| `WS_ENABLED`             | -                | Enables/disables websocket transport           |
+| `WS_HEARTBEAT_INTERVAL`  | -                | Websocket heartbeat interval                   |
+| `WS_MAX_MESSAGE_SIZE`    | -                | Max websocket message size                     |
+| `WS_RATE_LIMIT_MESSAGES` | -                | Websocket messages allowed per window          |
+| `WS_RATE_LIMIT_WINDOW`   | -                | Websocket rate-limit window (ms)               |
+| `REDIS_URL`              | -                | Redis connection URL for cache & pub/sub       |
 
 ## Database Configuration
 
-| Variable        | Default          | Description                  |
-| --------------- | ---------------- | ---------------------------- |
-| `DATABASE_PATH` | `.artifacts`     | Path to SQLite database file |
-| `DATABASE_NAME` | `tsse-elysia.db` | Path to SQLite database name |
+| Variable        | Default          | Description                            |
+| --------------- | ---------------- | -------------------------------------- |
+| `DATABASE_PATH` | `.artifacts`     | Path to SQLite database file           |
+| `DATABASE_NAME` | `tsse-elysia.db` | Path to SQLite database name           |
+| `DATABASE_TYPE` | `sqlite`         | Database type (`sqlite` or `postgres`) |
+
+The database path can be customized via environment variables:
+
+### SQLite (Default)
+
+```bash
+# Default configuration
+DATABASE_TYPE=sqlite bun run dev
+
+# Use custom database location
+DATABASE_NAME=./custom/path/database.db bun run dev
+
+# Use in-memory database for testing
+DATABASE_NAME=:memory: bun run dev
+```
+
+### PostgreSQL
+
+```bash
+# Using POSTGRES_URL
+DATABASE_TYPE=postgres POSTGRES_URL=postgresql://user:pass@localhost:5432/db bun run dev
+
+# Using individual connection parameters
+DATABASE_TYPE=postgres POSTGRES_USER=user POSTGRES_PASSWORD=pass POSTGRES_DB=db POSTGRES_HOST=localhost POSTGRES_PORT=5432 bun run dev
+```
+
+### PostgreSQL with Replicas
+
+```bash
+# Set replica URLs as JSON array
+DATABASE_TYPE=postgres POSTGRES_URL=postgresql://user:pass@localhost:5432/db POSTGRES_REPLICAS='["postgresql://user:pass@replica1:5432/db","postgresql://user:pass@replica2:5432/db"]' bun run dev
+```
+
+## Cache & Storage Configuration
+
+The application uses **Unstorage** for a unified cache layer with multiple backend support:
+
+| Backend    | Trigger                  | Use Case                     |
+| ---------- | ------------------------ | ---------------------------- |
+| LRU Cache  | Default (SQLite mode)    | Development, single-instance |
+| Redis      | `REDIS_URL` set          | Production, multi-instance   |
+| PostgreSQL | `DATABASE_TYPE=postgres` | Production without Redis     |
+
+### Cache Environment Variables
+
+| Variable    | Description                                          |
+| ----------- | ---------------------------------------------------- |
+| `REDIS_URL` | Redis connection URL (enables Redis cache & Pub/Sub) |
+
+### Cache Backend Priority
+
+```
+1. Redis (if REDIS_URL is set)
+   - Best for: Production with multiple instances
+   - Supports: Cache + Pub/Sub
+
+2. PostgreSQL (if DATABASE_TYPE=postgres)
+   - Best for: Production without Redis
+   - Supports: Cache only (no Pub/Sub)
+
+3. LRU Cache (default)
+   - Best for: Development, single-instance
+   - Supports: Cache only (no Pub/Sub)
+```
+
+### Pub/Sub Requirements
+
+> **Note**: Pub/Sub is **Redis-only** and requires `REDIS_URL` to be set. Other backends (PostgreSQL, LRU Cache) do not support Pub/Sub functionality.
+
+```bash
+# Enable Pub/Sub (requires Redis)
+REDIS_URL=redis://localhost:6379 bun run dev
+
+# For Upstash (serverless Redis)
+REDIS_URL=rediss://default:xxx@xxx.upstash.io:6379 bun run dev
+```
 
 The database path can be customized via environment variables:
 

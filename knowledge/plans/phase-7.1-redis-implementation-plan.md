@@ -1,5 +1,8 @@
 # Redis Implementation Plan — Bun Native Client
 
+> [!NOTE]
+> This plan describes the initial Redis implementation. The architecture has since evolved to use **Unstorage** for a unified storage layer with multiple backend support. See `src/lib/redis/index.ts` and `src/lib/cache/index.ts` for the current implementation.
+
 ## Overview
 
 Integrate Redis into the **tsse-elysia** project using **Bun's native `RedisClient`** (built-in, zero dependencies). The `REDIS_URL` environment variable allows seamless switching between a local Docker Redis instance and a managed Upstash Redis.

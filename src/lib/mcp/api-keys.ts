@@ -3,7 +3,8 @@
  * Handles key generation, hashing, validation, and management.
  */
 
-import { randomBytes, createHash } from "node:crypto";
+import { randomBytes, createHash } from "crypto";
+import { randomUUID } from "uncrypto";
 import { db } from "~/lib/db";
 import { mcpApiKeys, type McpApiKey } from "~/lib/db/schema";
 import { eq, and, desc } from "drizzle-orm";
@@ -91,7 +92,7 @@ export async function createApiKey(options: {
   const [record] = await db
     .insert(mcpApiKeys)
     .values({
-      id: crypto.randomUUID(),
+      id: randomUUID(),
       name: options.name,
       keyHash,
       userId: options.userId,
@@ -230,7 +231,9 @@ export async function updateApiKey(
     .update(mcpApiKeys)
     .set({
       ...(updates.name && { name: updates.name }),
-      ...(updates.permissions && { permissions: JSON.stringify(updates.permissions) }),
+      ...(updates.permissions && {
+        permissions: JSON.stringify(updates.permissions),
+      }),
       ...(updates.rateLimit !== undefined && { rateLimit: updates.rateLimit }),
       ...(updates.rateLimitDuration !== undefined && {
         rateLimitDuration: updates.rateLimitDuration,

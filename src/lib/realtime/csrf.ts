@@ -3,6 +3,7 @@
  * Prevents cross-site WebSocket hijacking attacks.
  */
 
+import { getRandomValues } from "uncrypto";
 import { logger } from "~/lib/logger";
 
 /**
@@ -34,7 +35,7 @@ export const defaultCsrfConfig: CsrfConfig = {
  */
 export function generateCsrfToken(length: number = 32): string {
   const buffer = new Uint8Array(length);
-  crypto.getRandomValues(buffer);
+  getRandomValues(buffer);
   return Array.from(buffer, (byte) => byte.toString(16).padStart(2, "0")).join("");
 }
 

@@ -11,18 +11,19 @@ A full-stack TypeScript application demonstrating modern web development with Ta
 
 ## Technology Stack
 
-| Category     | Technology                              |
-| ------------ | --------------------------------------- |
-| Framework    | TanStack Start                          |
-| Server       | Elysia                                  |
-| Runtime      | Bun                                     |
-| UI           | React 19                                |
-| Styling      | Tailwind CSS v4                         |
-| Cache/PubSub | Redis / Upstash (Bun native)            |
-| Validation   | Zod v4                                  |
-| Testing      | Bun (unit), Playwright (E2E), k6 (load) |
-| Linting      | oxlint                                  |
-| Formatting   | oxfmt                                   |
+| Category   | Technology                              |
+| ---------- | --------------------------------------- |
+| Framework  | TanStack Start                          |
+| Server     | Elysia                                  |
+| Runtime    | Bun                                     |
+| UI         | React 19                                |
+| Styling    | Tailwind CSS v4                         |
+| Cache      | Unstorage (Redis/PostgreSQL/LRU)        |
+| Pub/Sub    | Redis-only (Bun native `RedisClient`)   |
+| Validation | Zod v4                                  |
+| Testing    | Bun (unit), Playwright (E2E), k6 (load) |
+| Linting    | oxlint                                  |
+| Formatting | oxfmt                                   |
 
 ## Project Structure
 

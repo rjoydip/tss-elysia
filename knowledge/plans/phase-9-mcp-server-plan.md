@@ -89,7 +89,7 @@ Functions:
 
 ```typescript
 import { McpServer } from "@modelcontextprotocol/server";
-import { randomUUID } from "node:crypto";
+import { randomUUID } from "uncrypto";
 
 const server = new McpServer(
   {

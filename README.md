@@ -106,11 +106,16 @@ Detailed documentation available in `docs/`:
 - **Server**: Elysia
 - **Runtime**: Bun
 - **UI**: React 19 + TypeScript
-- **Form**: Tanstack Form
+- **Form**: TanStack Form
+- **Table**: TanStack Table v8
 - **State Management**: TanStack Store
-- **Function Execution Timing**: Tanstack Pacer
+- **Function Execution Timing**: TanStack Pacer
 - **Styling**: Tailwind CSS v4
-- **Cache/Pub-Sub**: Redis / Upstash (Bun native `RedisClient`)
+- **Cache**: Unstorage with multi-backend support
+  - Redis (when `REDIS_URL` is set)
+  - PostgreSQL (when `DATABASE_TYPE=postgres`)
+  - LRU Cache (default for SQLite)
+- **Pub/Sub**: Redis-only (Bun native `RedisClient`) - requires `REDIS_URL`
 
 ## Project Structure
 
@@ -141,6 +146,13 @@ src/
 │   │   ├── tabs.tsx
 │   │   ├── tooltip.tsx
 │   │   └── markdown.tsx # Markdown renderer with Shiki
+│   ├── data-table/    # TanStack Table components
+│   │   ├── index.ts         # Exports
+│   │   ├── pagination.tsx   # Pagination controls
+│   │   ├── column-header.tsx # Sortable column headers
+│   │   ├── toolbar.tsx      # Table toolbar with filters
+│   │   ├── bulk-actions.tsx # Bulk operation toolbar
+│   │   └── view-options.tsx  # Column visibility toggle
 │   ├── auth/          # Auth components
 │   │   ├── form/       # Auth form components
 │   │   │   ├── login.tsx
@@ -151,6 +163,10 @@ src/
 │   │   └── footer.tsx       # Common footer
 │   ├── docs/           # Documentation components
 │   │   └── sidebar.tsx  # Docs sidebar
+│   ├── layout/        # Layout components
+│   │   ├── app-sidebar.tsx
+│   │   ├── header.tsx
+│   │   └── main.tsx
 │   ├── profile/        # Profile components
 │   │   └── profile-page.tsx
 │   ├── settings/      # Settings components
@@ -168,19 +184,51 @@ src/
 │       ├── provider.tsx
 │       ├── toggle.tsx
 │       └── context.tsx
+├── features/          # Feature modules with data, components, and pages
+│   ├── dashboard/     # Dashboard feature
+│   │   ├── index.tsx            # Dashboard page
+│   │   └── components/
+│   │       ├── overview.tsx     # Stats overview
+│   │       ├── recent-sales.tsx # Recent sales
+│   │       └── analytics.tsx    # Analytics charts
+│   ├── users/        # User management feature
+│   │   ├── index.tsx            # Users page
+│   │   ├── data/
+│   │   │   ├── schema.ts        # Zod schema types
+│   │   │   └── users.ts         # Mock data
+│   │   └── components/
+│   │       ├── users-table.tsx
+│   │       ├── users-columns.tsx
+│   │       ├── users-dialogs.tsx
+│   │       └── ...
+│   ├── tasks/        # Task management feature
+│   │   ├── index.tsx            # Tasks page
+│   │   ├── data/
+│   │   │   ├── schema.ts        # Zod schema types
+│   │   │   └── tasks.ts         # Mock data
+│   │   └── components/
+│   │       ├── tasks-table.tsx
+│   │       ├── tasks-columns.tsx
+│   │       ├── tasks-dialogs.tsx
+│   │       └── ...
+│   └── ...
 ├── env.ts             # Isomorphic env fetching with type-safe validation
 ├── lib/               # Library code
 │   ├── auth/          # Authentication (Better Auth)
 │   │   ├── index.ts   # Server auth instance
 │   │   └── client.ts  # Client auth hooks and methods
-│   ├── db/            # Database (Drizzle + SQLite)
+│   ├── cache/         # Cache layer (Unstorage-backed)
+│   │   └── index.ts   # Cache with multi-backend support
+│   ├── db/            # Database (Drizzle + SQLite/PostgreSQL)
 │   │   ├── index.ts
 │   │   ├── schema.ts
 │   │   └── heartbeat.ts
-│   ├── redis/         # Redis cache and Pub/Sub (Bun native)
-│   │   ├── index.ts   # Redis client singleton, health check
-│   │   └── pubsub.ts  # Typed Pub/Sub channels and helpers
+│   ├── redis/         # Storage & Pub/Sub (Unstorage + Bun native)
+│   │   ├── index.ts   # Unstorage with Redis/Postgres/LRU backends
+│   │   └── pubsub.ts  # Redis Pub/Sub (requires REDIS_URL)
 │   └── utils.ts       # Utility functions (cn, etc.)
+├── hooks/             # Custom React hooks
+│   └── use-table-url-state.ts  # URL state for data tables
 ├── logger.ts          # Logger configuration
 ├── middlewares/       # Middleware implementations
 │   ├── cors.ts        # CORS headers
@@ -211,11 +259,11 @@ src/
 │   ├── (errors)/       # Error pages (401, 403, 404, 500, 503)
 │   ├── _authenticated/ # Protected routes (wrapped with AuthGuard)
 │   │   ├── route.tsx   # Auth layout wrapper
-│   │   ├── dashboard/
-│   │   ├── tasks/
-│   │   ├── users/
-│   │   ├── chats/
-│   │   ├── apps/
+│   │   ├── dashboard/  # Dashboard routes
+│   │   ├── tasks/      # Tasks routes
+│   │   ├── users/      # Users routes
+│   │   ├── chats/      # Chats routes
+│   │   ├── apps/       # Apps routes
 │   │   ├── help-center/
 │   │   ├── errors/
 │   │   └── settings/   # Settings sub-routes

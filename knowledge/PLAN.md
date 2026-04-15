@@ -161,14 +161,60 @@ Complete the authentication system with additional security features, set up use
 
 #### Dashboards & User Management
 
-- [ ] Create user dashboard route `/dashboard`
-- [ ] Create admin dashboard route `/admin`
-- [ ] Implement user profile management UI
-- [ ] Add admin user list with pagination
-- [ ] Implement user CRUD operations (create, read, update, delete)
-- [ ] Add role-based access control UI
-- [ ] Create organization settings page
-- [ ] Add audit log viewer for admins
+- [x] Create user dashboard route `/dashboard`
+- [x] Create admin dashboard route `/admin`
+- [x] Implement user profile management UI
+- [x] Add admin user list with pagination
+- [x] Implement user CRUD operations (create, read, update, delete)
+- [x] Add role-based access control UI
+- [x] Create organization settings page
+- [x] Add audit log viewer for admins
+
+#### Phase 5.2: User Management Dashboard (Completed)
+
+> **Detailed Plan**: See [phase-5.2-user-management-dashboard.md](./plans/phase-5.2-user-management-dashboard.md) for comprehensive implementation details
+
+- [x] Create data table components (`src/components/data-table/`)
+  - [x] `pagination.tsx` - Pagination controls
+  - [x] `column-header.tsx` - Sortable column headers
+  - [x] `toolbar.tsx` - Table toolbar with filters
+  - [x] `bulk-actions.tsx` - Bulk operation toolbar
+  - [x] `view-options.tsx` - Column visibility toggle
+- [x] Create users feature module (`src/features/users/`)
+  - [x] `index.tsx` - Users page with data table
+  - [x] `data/schema.ts` - User type definitions (Zod)
+  - [x] `data/users.ts` - Mock user data
+  - [x] `components/users-table.tsx` - TanStack Table integration
+  - [x] `components/users-columns.tsx` - Column definitions
+  - [x] `components/users-dialogs.tsx` - CRUD dialogs
+  - [x] `components/users-invite-dialog.tsx` - Invite user dialog
+  - [x] `components/users-delete-dialog.tsx` - Delete confirmation
+  - [x] `components/users-multi-delete-dialog.tsx` - Bulk delete
+  - [x] `components/users-action-dialog.tsx` - User action menu
+  - [x] `components/users-provider.tsx` - React context provider
+  - [x] `components/users-primary-buttons.tsx` - Action buttons
+  - [x] `components/users-bulk-actions.tsx` - Bulk action toolbar
+  - [x] `components/users-row-actions.tsx` - Row action menu
+- [x] Create tasks feature module (`src/features/tasks/`)
+  - [x] `index.tsx` - Tasks page with data table
+  - [x] `data/schema.ts` - Task type definitions
+  - [x] `data/tasks.ts` - Mock task data
+  - [x] `components/tasks-table.tsx` - TanStack Table integration
+  - [x] `components/tasks-columns.tsx` - Column definitions
+  - [x] `components/tasks-dialogs.tsx` - CRUD dialogs
+  - [x] `components/tasks-mutate-drawer.tsx` - Create/edit drawer
+  - [x] `components/tasks-import-dialog.tsx` - CSV import
+  - [x] `components/tasks-multi-delete-dialog.tsx` - Bulk delete
+  - [x] `components/tasks-provider.tsx` - React context provider
+  - [x] `components/tasks-primary-buttons.tsx` - Action buttons
+  - [x] `components/tasks-bulk-actions.tsx` - Bulk action toolbar
+  - [x] `components/tasks-row-actions.tsx` - Row action menu
+- [x] Create dashboard feature module (`src/features/dashboard/`)
+  - [x] `index.tsx` - Dashboard with analytics overview
+  - [x] `components/overview.tsx` - Chart visualization
+  - [x] `components/recent-sales.tsx` - Recent sales list
+  - [x] `components/analytics.tsx` - Analytics tab content
+  - [x] `components/overview.tsx` - Dashboard stats cards
 
 #### Enterprise SASS Features
 
@@ -222,14 +268,16 @@ Complete the authentication system with additional security features, set up use
 - [ ] Add environment-specific configs (dev, staging, prod)
 - [ ] Configure horizontal scaling support
 - [ ] Set up database connection pooling
-- [x] Add Redis for caching/sessions
+- [x] Add cache layer with multi-backend support (Unstorage)
   - [x] Configure Redis 7 Alpine in docker-compose with persistence and health check
   - [x] Create custom `redis.conf` with Pub/Sub, AOF, and memory limits
-  - [x] Create Redis client module (`src/lib/redis/index.ts`) with Bun native `RedisClient`
-  - [x] Create Pub/Sub helper module (`src/lib/redis/pubsub.ts`) with typed channels
-  - [x] Add `REDIS_URL` environment variable (Docker + Upstash compatible)
-  - [x] Create Redis heartbeat route (`src/routes/api/modules/-redis.ts`)
-  - [x] Integrate Redis health check into status dashboard
+  - [x] Create Unstorage backend (`src/lib/redis/index.ts`) with Redis/Postgres/LRU backends
+  - [x] Create cache module (`src/lib/cache/index.ts`) with Unstorage backing
+  - [x] Create Pub/Sub helper module (`src/lib/redis/pubsub.ts`) with typed channels (Redis-only)
+  - [x] Add `REDIS_URL` environment variable for cache & Pub/Sub
+  - [x] Add `DATABASE_TYPE` environment variable (`sqlite` or `postgres`)
+  - [x] Create storage status route (`src/routes/api/modules/-redis.ts`)
+  - [x] Integrate storage health check into status dashboard
   - [x] Add Redis logger (`src/lib/logger.ts`)
   - [x] Add unit tests (`test/lib/redis/redis.test.ts`, `test/lib/redis/pubsub.test.ts`)
   - [x] Add E2E test (`.e2e/api/redis-health.spec.ts`)
@@ -470,6 +518,53 @@ Complete the authentication system with additional security features, set up use
   - [x] Scan for malware with Trivy
   - [x] Configure fail-on-critical for security gates
 
+#### Phase 5.2: User Management Dashboard (Completed)
+
+- [x] Create data table components (`src/components/data-table/`)
+  - [x] `pagination.tsx` - Pagination controls
+  - [x] `column-header.tsx` - Sortable column headers
+  - [x] `toolbar.tsx` - Table toolbar with filters
+  - [x] `bulk-actions.tsx` - Bulk operation toolbar
+  - [x] `view-options.tsx` - Column visibility toggle
+- [x] Create users feature module (`src/features/users/`)
+  - [x] `index.tsx` - Users page with data table
+  - [x] `data/schema.ts` - User type definitions (Zod)
+  - [x] `data/users.ts` - Mock user data
+  - [x] `components/users-table.tsx` - TanStack Table integration
+  - [x] `components/users-columns.tsx` - Column definitions
+  - [x] `components/users-dialogs.tsx` - CRUD dialogs
+  - [x] `components/users-invite-dialog.tsx` - Invite user dialog
+  - [x] `components/users-delete-dialog.tsx` - Delete confirmation
+  - [x] `components/users-multi-delete-dialog.tsx` - Bulk delete
+  - [x] `components/users-action-dialog.tsx` - User action menu
+  - [x] `components/users-provider.tsx` - React context provider
+  - [x] `components/users-primary-buttons.tsx` - Action buttons
+  - [x] `components/users-bulk-actions.tsx` - Bulk action toolbar
+  - [x] `components/users-row-actions.tsx` - Row action menu
+- [x] Create tasks feature module (`src/features/tasks/`)
+  - [x] `index.tsx` - Tasks page with data table
+  - [x] `data/schema.ts` - Task type definitions
+  - [x] `data/tasks.ts` - Mock task data
+  - [x] `components/tasks-table.tsx` - TanStack Table integration
+  - [x] `components/tasks-columns.tsx` - Column definitions
+  - [x] `components/tasks-dialogs.tsx` - CRUD dialogs
+  - [x] `components/tasks-mutate-drawer.tsx` - Create/edit drawer
+  - [x] `components/tasks-import-dialog.tsx` - CSV import
+  - [x] `components/tasks-multi-delete-dialog.tsx` - Bulk delete
+  - [x] `components/tasks-provider.tsx` - React context provider
+  - [x] `components/tasks-primary-buttons.tsx` - Action buttons
+  - [x] `components/tasks-bulk-actions.tsx` - Bulk action toolbar
+  - [x] `components/tasks-row-actions.tsx` - Row action menu
+- [x] Create dashboard feature module (`src/features/dashboard/`)
+  - [x] `index.tsx` - Dashboard with analytics overview
+  - [x] `components/overview.tsx` - Chart visualization
+  - [x] `components/recent-sales.tsx` - Recent sales list
+  - [x] `components/analytics.tsx` - Analytics tab content
+- [x] Add `use-table-url-state.ts` hook for URL-based table state management
+- [x] Add unit tests for data table components
+- [x] Add E2E tests for user management dashboard
+- [x] Update README.md with new feature structure
+
 ---
 
 ## Notes
@@ -502,6 +597,7 @@ Complete the authentication system with additional security features, set up use
 - [TanStack Form Documentation](https://tanstack.com/form/latest/docs/overview)
 - [TanStack Query Documentation](https://tanstack.com/query/latest/docs/overview)
 - [TanStack Router Documentation](https://tanstack.com/router/latest/docs/overview)
+- [TanStack Table Documentation](https://tanstack.com/table/latest/docs/framework/react/examples/basic)
 - [Preact Documentation](https://preactjs.com/)
 - [shadcn/ui Documentation](https://ui.shadcn.com/)
 - [sonner Toast Documentation](https://sonner.emilkowal.dev/)
