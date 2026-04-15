@@ -3,6 +3,7 @@
  * Handles notification fan-out, unread counts, and notification categories.
  */
 
+import { randomUUID } from "uncrypto";
 import { connectionStore } from "./connection-store";
 import { logger } from "~/lib/logger";
 
@@ -57,7 +58,7 @@ class NotificationServiceImpl {
     notification: Omit<Notification, "id" | "createdAt" | "read">,
     ttlMs: number = this.DEFAULT_TTL,
   ): Notification {
-    const id = crypto.randomUUID();
+    const id = randomUUID();
     const now = Date.now();
 
     const fullNotification: Notification = {

@@ -4,6 +4,7 @@
  */
 
 import type { ServerWebSocket } from "bun";
+import { randomUUID } from "uncrypto";
 import { logger } from "~/lib/logger";
 
 /**
@@ -59,7 +60,7 @@ class ConnectionStoreImpl {
     userId: string | null = null,
     metadata: Partial<ConnectionMetadata> = {},
   ): string {
-    const connectionId = crypto.randomUUID();
+    const connectionId = randomUUID();
 
     const connection: WebSocketConnection = {
       socket,

@@ -12,6 +12,7 @@
  */
 
 import { t, getSchemaValidator, type TSchema } from "elysia";
+import { randomUUID } from "uncrypto";
 import { isBun, isNode, isProduction, PORT } from ".";
 import { logger } from "../lib/logger";
 
@@ -192,7 +193,7 @@ function _getAuthSecret(): string {
     logger.warn(
       "BETTER_AUTH_SECRET not set, using random value (sessions will be invalidated on restart)",
     );
-    return crypto.randomUUID();
+    return randomUUID();
   }
   return secret;
 }

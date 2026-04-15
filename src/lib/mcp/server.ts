@@ -5,7 +5,7 @@
  */
 
 import { McpServer, ResourceTemplate } from "@modelcontextprotocol/server";
-import { randomUUID } from "node:crypto";
+import { randomUUID } from "uncrypto";
 import { logger } from "~/lib/logger";
 import { registerAuthTools } from "./tools/auth";
 import { registerUserTools } from "./tools/users";
@@ -80,7 +80,10 @@ export function createMcpServer(): McpServer {
       contents: [
         {
           uri: uri.href,
-          text: JSON.stringify({ userId, message: "Use get-user tool to fetch details" }),
+          text: JSON.stringify({
+            userId,
+            message: "Use get-user tool to fetch details",
+          }),
         },
       ],
     }),
@@ -102,7 +105,10 @@ export function createMcpServer(): McpServer {
       contents: [
         {
           uri: uri.href,
-          text: JSON.stringify({ organizationId, message: "Use get-organization tool" }),
+          text: JSON.stringify({
+            organizationId,
+            message: "Use get-organization tool",
+          }),
         },
       ],
     }),

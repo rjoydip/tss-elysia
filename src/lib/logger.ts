@@ -1,11 +1,13 @@
 /**
  * Centralized logging system for the application.
  * Provides structured logging with multiple levels, context support, and environment-aware filtering.
+ * Built on top of Consola for elegant console output.
  *
  * @module logger
  */
 
-import { isProduction, isTest } from "../config";
+import { createConsola } from "consola";
+import { isProduction } from "../config";
 
 /**
  * Log levels in priority order (lowest to highest).
@@ -38,6 +40,18 @@ export interface LoggerOptions {
 }
 
 /**
+ * Map custom LogLevel to Consola level numbers.
+ * Consola uses: fatal=0, error=1, warn=2, log=3, info=3, success=3, ready=3, start=3, debug=4, trace=5
+ */
+const LOG_LEVEL_MAP: Record<LogLevel, number> = {
+  fatal: 0,
+  error: 1,
+  warn: 2,
+  info: 3,
+  debug: 4,
+};
+
+/**
  * Production minimum log level - reduces noise in production.
  */
 const DEFAULT_MIN_LEVEL: LogLevel = "info";
@@ -45,6 +59,7 @@ const DEFAULT_MIN_LEVEL: LogLevel = "info";
 /**
  * Creates a centralized logging system with structured output.
  * Supports multiple log levels, context, and error tracking.
+ * Built on top of Consola for elegant output with fallback support.
  *
  * @param options - Logger configuration
  * @returns Logger object with methods for each level
@@ -55,56 +70,49 @@ const DEFAULT_MIN_LEVEL: LogLevel = "info";
  * logger.warn("Memory usage high", { usage: "80%" });
  * logger.error("Database failed", new Error("connection refused"));
  */
-export function createLogger(options: LoggerOptions = {}) {
+export function createLogger(options: LoggerOptions = {}): Readonly<{
+  debug: (message: string, context?: Record<string, unknown>) => void;
+  info: (message: string, context?: Record<string, unknown>) => void;
+  warn: (message: string, context?: Record<string, unknown>) => void;
+  error: (message: string, error?: Error) => void;
+  fatal: (message: string, error?: Error) => void;
+}> {
   const { minLevel = DEFAULT_MIN_LEVEL, prefix = "" } = options;
 
   /**
-   * Log level priority for filtering.
+   * Create consola instance with configured options.
    */
-  const levelPriority: Record<LogLevel, number> = {
-    fatal: 0,
-    error: 1,
-    warn: 2,
-    info: 3,
-    debug: 4,
-  };
+  const consolaInstance = createConsola({
+    level: LOG_LEVEL_MAP[minLevel],
+    formatOptions: {
+      date: true,
+      colors: !isProduction,
+      compact: isProduction,
+    },
+  });
 
   /**
-   * Check if a level should be logged based on minLevel setting.
+   * Add prefix tag if provided.
+   */
+  const logger = prefix ? consolaInstance.withTag(prefix) : consolaInstance;
+
+  /**
+   * Determines if the given log level should be logged based on minLevel setting.
    */
   const shouldLog = (level: LogLevel): boolean => {
-    return levelPriority[level] <= levelPriority[minLevel];
+    return LOG_LEVEL_MAP[level] <= LOG_LEVEL_MAP[minLevel];
   };
 
   /**
-   * Format a log entry with timestamp and metadata.
-   */
-  const formatEntry = (
-    level: LogLevel,
-    message: string,
-    context?: Record<string, unknown>,
-  ): string => {
-    const timestamp = new Date().toISOString();
-    const levelStr = level.toUpperCase().padEnd(5);
-    const prefixStr = prefix ? `[${prefix}] ` : "";
-
-    let output = `${timestamp} [${levelStr}] ${prefixStr}${message}`;
-
-    if (context && Object.keys(context).length > 0) {
-      output += ` ${JSON.stringify(context)}`;
-    }
-
-    return output;
-  };
-
-  /**
-   * Core logging function.
+   * Core logging function that handles both context and error objects.
    */
   const log = (level: LogLevel, message: string, data?: Record<string, unknown> | Error) => {
-    if (!shouldLog(level) || isTest) return;
+    if (!shouldLog(level)) {
+      return;
+    }
 
-    let context: Record<string, unknown> | undefined;
     let error: Error | undefined;
+    let context: Record<string, unknown> | undefined;
 
     if (data instanceof Error) {
       error = data;
@@ -112,40 +120,59 @@ export function createLogger(options: LoggerOptions = {}) {
       context = data;
     }
 
-    const formatted = formatEntry(level, message, context);
-
-    switch (level) {
-      case "fatal":
-      case "error":
-        console.error(formatted);
-        if (error?.stack) {
-          console.error(error.stack);
-        }
-        break;
-      case "warn":
-        console.warn(formatted);
-        break;
-      case "debug":
-        // Only log debug messages in non-production environments
-        if (!isProduction) {
-          console.debug(formatted);
-        }
-        break;
-      default:
-        console.log(formatted);
+    if (error) {
+      switch (level) {
+        case "fatal":
+          logger.fatal({ message, error });
+          break;
+        case "error":
+          logger.error({ message, error });
+          break;
+        default:
+          logger.error({ message, cause: error });
+      }
+    } else if (context && Object.keys(context).length > 0) {
+      switch (level) {
+        case "fatal":
+          logger.fatal(message, context);
+          break;
+        case "error":
+          logger.error(message, context);
+          break;
+        case "warn":
+          logger.warn(message, context);
+          break;
+        case "debug":
+          logger.debug(message, context);
+          break;
+        default:
+          logger.info(message, context);
+      }
+    } else {
+      switch (level) {
+        case "fatal":
+          logger.fatal(message);
+          break;
+        case "error":
+          logger.error(message);
+          break;
+        case "warn":
+          logger.warn(message);
+          break;
+        case "debug":
+          logger.debug(message);
+          break;
+        default:
+          logger.info(message);
+      }
     }
   };
 
   return {
-    /** Log debug level messages (development only) */
     debug: (message: string, context?: Record<string, unknown>) => log("debug", message, context),
-    /** Log info level messages */
     info: (message: string, context?: Record<string, unknown>) => log("info", message, context),
-    /** Log warning level messages */
     warn: (message: string, context?: Record<string, unknown>) => log("warn", message, context),
-    /** Log error level messages */
     error: (message: string, error?: Error) => log("error", message, error),
-    /** Log fatal level messages */
     fatal: (message: string, error?: Error) => log("fatal", message, error),
   };
 }
