@@ -27,18 +27,18 @@ This document lists all available npm scripts in `package.json`.
 
 ## Testing
 
-| Script             | Command                                          | Description                      |
-| ------------------ | ------------------------------------------------ | -------------------------------- |
-| `test:unit`        | `bun test`                                       | Run unit tests                   |
-| `test:watch`       | `bun test --watch`                               | Run tests in watch mode          |
-| `test:coverage`    | `bun test --coverage`                            | Run tests with coverage report   |
-| `test:e2e`         | `playwright test`                                | Run end-to-end tests             |
-| `test:e2e:ui`      | `bun playwright test --ui`                       | Run E2E tests with Playwright UI |
-| `test:e2e:headed`  | `bun playwright test --headed`                   | Run E2E tests in headed mode     |
-| `test:e2e:report`  | `bun playwright show-report`                     | Show Playwright test report      |
-| `test:load`        | `./.artifacts/k6 run ./.k6/smoke-test.js`  | Run load smoke test              |
-| `test:load:api`    | `./.artifacts/k6 run ./.k6/api-test.js`    | Run API load test                |
-| `test:load:stress` | `./.artifacts/k6 run ./.k6/stress-test.js` | Run stress test                  |
+| Script             | Command                          | Description                      |
+| ------------------ | -------------------------------- | -------------------------------- |
+| `test:unit`        | `bun test`                       | Run unit tests                   |
+| `test:watch`       | `bun test --watch`               | Run tests in watch mode          |
+| `test:coverage`    | `bun test --coverage`            | Run tests with coverage report   |
+| `test:e2e`         | `playwright test`                | Run end-to-end tests             |
+| `test:e2e:ui`      | `bun playwright test --ui`       | Run E2E tests with Playwright UI |
+| `test:e2e:headed`  | `bun playwright test --headed`   | Run E2E tests in headed mode     |
+| `test:e2e:report`  | `bun playwright show-report`     | Show Playwright test report      |
+| `test:load`        | `bunx k6 run .k6/smoke-test.js`  | Run load smoke test              |
+| `test:load:api`    | `bunx k6 run .k6/api-test.js`    | Run API load test                |
+| `test:load:stress` | `bunx k6 run .k6/stress-test.js` | Run stress test                  |
 
 ---
 
@@ -122,4 +122,4 @@ bun run preview
 - Most scripts use `bun` as the runtime
 - E2E tests require the dev server to be running (or use `preview`)
 - Database scripts assume `DATABASE_URL` is configured in `.env`
-- Load tests require `k6` binary in `.artifacts/`
+- Load tests use `bunx k6` (runs k6 via bunx)
