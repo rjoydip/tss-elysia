@@ -6,7 +6,7 @@
 import { describe, it, expect, beforeEach } from "bun:test";
 import {
   memoryRateLimitStore,
-  redisRateLimitStore,
+  storageRateLimitStore,
   getRateLimitStore,
   checkRateLimit,
   resetRateLimit,
@@ -126,14 +126,14 @@ describe("cleanupRateLimitStore", () => {
   });
 });
 
-describe("redisRateLimitStore", () => {
+describe("storageRateLimitStore", () => {
   beforeEach(async () => {
-    await redisRateLimitStore.reset("test");
+    await storageRateLimitStore.reset("test");
   });
 
   describe("when Redis unavailable", () => {
     it("should fallback to memory store", async () => {
-      const result = await redisRateLimitStore.check("test", 5, 60_000);
+      const result = await storageRateLimitStore.check("test", 5, 60_000);
       expect(result.allowed).toBe(true);
     });
   });
