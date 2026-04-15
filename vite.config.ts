@@ -38,5 +38,6 @@ export default defineConfig(() => ({
   preview: {
     host,
     port,
+    allowedHosts: ["*.trycloudflare.com"],
   },
 }));

@@ -4,6 +4,7 @@
  * Uses in-memory storage for now - can be extended to use database.
  */
 
+import { randomUUID } from "uncrypto";
 import { connectionStore } from "./connection-store";
 import { logger } from "~/lib/logger";
 
@@ -80,7 +81,7 @@ class ChatServiceImpl {
       throw new Error(`Message exceeds maximum length of ${this.MAX_MESSAGE_LENGTH}`);
     }
 
-    const id = crypto.randomUUID();
+    const id = randomUUID();
     const now = Date.now();
 
     const message: ChatMessage = {
