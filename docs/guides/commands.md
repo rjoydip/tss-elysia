@@ -36,9 +36,9 @@ This document lists all available npm scripts in `package.json`.
 | `test:e2e:ui`      | `bun playwright test --ui`                       | Run E2E tests with Playwright UI |
 | `test:e2e:headed`  | `bun playwright test --headed`                   | Run E2E tests in headed mode     |
 | `test:e2e:report`  | `bun playwright show-report`                     | Show Playwright test report      |
-| `test:load`        | `.artifacts/k6 run .artifacts/k6/smoke-test.js`  | Run load smoke test              |
-| `test:load:api`    | `.artifacts/k6 run .artifacts/k6/api-test.js`    | Run API load test                |
-| `test:load:stress` | `.artifacts/k6 run .artifacts/k6/stress-test.js` | Run stress test                  |
+| `test:load`        | `./.artifacts/k6 run ./.k6/smoke-test.js`  | Run load smoke test              |
+| `test:load:api`    | `./.artifacts/k6 run ./.k6/api-test.js`    | Run API load test                |
+| `test:load:stress` | `./.artifacts/k6 run ./.k6/stress-test.js` | Run stress test                  |
 
 ---
 
