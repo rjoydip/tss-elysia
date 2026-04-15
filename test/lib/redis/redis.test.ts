@@ -132,10 +132,10 @@ describe("Storage Backend Detection", () => {
     expect(pubSubSupported).toBe(backend === "redis");
   });
 
-  test("isPubSubSupported is consistent with getPubSubStatus", () => {
+  test("isPubSubSupported is consistent with getPubSubStatus crossInstance", () => {
     const { getPubSubStatus } = require("../../../src/lib/redis/pubsub");
     const pubSubStatus = getPubSubStatus();
-    expect(pubSubStatus.supported).toBe(isPubSubSupported());
+    expect(pubSubStatus.crossInstance).toBe(isPubSubSupported());
   });
 });
 

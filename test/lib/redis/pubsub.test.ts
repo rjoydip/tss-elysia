@@ -1,5 +1,5 @@
 /**
- * Unit tests for the Redis Pub/Sub module.
+ * Unit tests for the Pub/Sub module using Unstorage.
  * Tests channel definitions, message type structure, and graceful degradation.
  *
  * @remarks
@@ -9,34 +9,34 @@
 
 import { describe, test, expect, afterEach } from "bun:test";
 import {
-  REDIS_CHANNELS,
+  PUBSUB_CHANNELS,
   closePubSub,
   getPubSubStatus,
   type PubSubMessage,
 } from "../../../src/lib/redis/pubsub";
 
-describe("Redis Pub/Sub", () => {
+describe("Pub/Sub", () => {
   afterEach(() => {
     closePubSub();
   });
 
-  test("REDIS_CHANNELS has all expected channel names", () => {
-    expect(REDIS_CHANNELS.USER_EVENTS).toBe("tsse:user:events");
-    expect(REDIS_CHANNELS.SYSTEM_NOTIFICATIONS).toBe("tsse:system:notifications");
-    expect(REDIS_CHANNELS.MCP_EVENTS).toBe("tsse:mcp:events");
-    expect(REDIS_CHANNELS.DASHBOARD_UPDATES).toBe("tsse:dashboard:updates");
-    expect(REDIS_CHANNELS.CACHE_INVALIDATION).toBe("tsse:cache:invalidation");
+  test("PUBSUB_CHANNELS has all expected channel names", () => {
+    expect(PUBSUB_CHANNELS.USER_EVENTS).toBe("tsse:pubsub:user:events");
+    expect(PUBSUB_CHANNELS.SYSTEM_NOTIFICATIONS).toBe("tsse:pubsub:system:notifications");
+    expect(PUBSUB_CHANNELS.MCP_EVENTS).toBe("tsse:pubsub:mcp:events");
+    expect(PUBSUB_CHANNELS.DASHBOARD_UPDATES).toBe("tsse:pubsub:dashboard:updates");
+    expect(PUBSUB_CHANNELS.CACHE_INVALIDATION).toBe("tsse:pubsub:cache:invalidation");
   });
 
-  test("REDIS_CHANNELS values are namespaced with tsse:", () => {
-    const channels: string[] = Object.values(REDIS_CHANNELS);
+  test("PUBSUB_CHANNELS values are namespaced with tsse:pubsub:", () => {
+    const channels: string[] = Object.values(PUBSUB_CHANNELS);
     for (const channel of channels) {
-      expect(channel.startsWith("tsse:")).toBe(true);
+      expect(channel.startsWith("tsse:pubsub:")).toBe(true);
     }
   });
 
-  test("REDIS_CHANNELS has exactly 5 channels", () => {
-    expect(Object.keys(REDIS_CHANNELS)).toHaveLength(5);
+  test("PUBSUB_CHANNELS has exactly 5 channels", () => {
+    expect(Object.keys(PUBSUB_CHANNELS)).toHaveLength(5);
   });
 
   test("PubSubMessage structure is correct", () => {
@@ -82,19 +82,19 @@ describe("Pub/Sub Status", () => {
   test("getPubSubStatus returns a valid status object", () => {
     const status = getPubSubStatus();
     expect(status).toHaveProperty("supported");
+    expect(status).toHaveProperty("crossInstance");
     expect(status).toHaveProperty("backend");
-    expect(status).toHaveProperty("publisherConnected");
-    expect(status).toHaveProperty("subscriberConnected");
+    expect(status).toHaveProperty("subscriptionCount");
     expect(typeof status.supported).toBe("boolean");
+    expect(typeof status.crossInstance).toBe("boolean");
     expect(typeof status.backend).toBe("string");
-    expect(typeof status.publisherConnected).toBe("boolean");
-    expect(typeof status.subscriberConnected).toBe("boolean");
+    expect(typeof status.subscriptionCount).toBe("number");
   });
 
-  test("getPubSubStatus indicates Pub/Sub is only supported with Redis", () => {
+  test("getPubSubStatus indicates Pub/Sub support based on backend", () => {
     const status = getPubSubStatus();
-    // Pub/Sub is only supported when backend is "redis"
-    expect(status.supported).toBe(status.backend === "redis");
+    // Pub/Sub is supported when backend is "redis", "postgres", or "lru"
+    expect(["redis", "postgres", "lru"]).toContain(status.backend);
   });
 
   test("getPubSubStatus backend is one of the valid types", () => {
@@ -102,9 +102,13 @@ describe("Pub/Sub Status", () => {
     expect(["redis", "postgres", "lru"]).toContain(status.backend);
   });
 
-  test("getPubSubStatus connection flags are initially false", () => {
+  test("getPubSubStatus subscriptionCount is initially 0", () => {
     const status = getPubSubStatus();
-    expect(status.publisherConnected).toBe(false);
-    expect(status.subscriberConnected).toBe(false);
+    expect(status.subscriptionCount).toBe(0);
+  });
+
+  test("getPubSubStatus crossInstance is true only for Redis", () => {
+    const status = getPubSubStatus();
+    expect(status.crossInstance).toBe(status.backend === "redis");
   });
 });

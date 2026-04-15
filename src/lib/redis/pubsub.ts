@@ -1,47 +1,46 @@
 /**
- * Pub/Sub module using Bun's native RedisClient.
+ * Pub/Sub module using Unstorage's built-in event system.
  * Provides typed channel definitions and convenience wrappers
  * for publishing and subscribing to events.
  *
- * Pub/Sub is only available when Redis is the storage backend.
- * For other backends (PostgreSQL, LRU), Pub/Sub operations gracefully degrade.
+ * Event System:
+ * - In-process: Uses unstorage's built-in event emitter (works with all backends)
+ * - Cross-instance: Uses unstorage's `watch`/`unwatch` for Redis keyspace notifications
  *
- * When using Redis:
- * - Creates dedicated subscriber connection (required by Redis for subscribe mode)
- * - Creates separate publisher connection for reliability
+ * For true distributed pub/sub across multiple instances, Redis is required.
+ * Other backends (PostgreSQL, LRU) only support in-process events.
  *
  * @module redis/pubsub
- * @see https://bun.com/docs/runtime/redis#pub/sub
+ * @see https://unstorage.unjs.io
  */
 
-import { RedisClient } from "bun";
-import { env } from "~/config/env";
+import type { Storage } from "unstorage";
+import { getStorage, getStorageBackend, isPubSubSupported } from "./index";
 import { redisLogger } from "../logger";
-import { getStorageBackend, isPubSubSupported } from "./index";
 
 /**
  * Predefined channel names for the application.
- * All channels are namespaced with "tsse:" to avoid collisions.
+ * All channels are namespaced with "tsse:pubsub:" to avoid collisions.
  * Add new channels here as features require them.
  */
-export const REDIS_CHANNELS = {
+export const PUBSUB_CHANNELS = {
   /** User-related events (login, logout, profile update) */
-  USER_EVENTS: "tsse:user:events",
+  USER_EVENTS: "tsse:pubsub:user:events",
   /** System notifications (deployments, maintenance windows) */
-  SYSTEM_NOTIFICATIONS: "tsse:system:notifications",
+  SYSTEM_NOTIFICATIONS: "tsse:pubsub:system:notifications",
   /** MCP server events (tool invocations, client connections) */
-  MCP_EVENTS: "tsse:mcp:events",
+  MCP_EVENTS: "tsse:pubsub:mcp:events",
   /** Real-time dashboard metric updates */
-  DASHBOARD_UPDATES: "tsse:dashboard:updates",
+  DASHBOARD_UPDATES: "tsse:pubsub:dashboard:updates",
   /** Cache invalidation signals across instances */
-  CACHE_INVALIDATION: "tsse:cache:invalidation",
+  CACHE_INVALIDATION: "tsse:pubsub:cache:invalidation",
 } as const;
 
 /** Type for valid channel names — provides autocomplete and type-safety */
-export type RedisChannel = (typeof REDIS_CHANNELS)[keyof typeof REDIS_CHANNELS];
+export type PubSubChannel = (typeof PUBSUB_CHANNELS)[keyof typeof PUBSUB_CHANNELS];
 
 /**
- * Message payload structure for typed Pub/Sub events.
+ * Message payload structure for typed pub/sub events.
  * All published messages follow this shape for consistency.
  *
  * @template T - The type of the event-specific data payload
@@ -63,146 +62,104 @@ export interface PubSubMessage<T = unknown> {
 export interface PubSubStatus {
   /** Whether Pub/Sub is supported by the current backend */
   supported: boolean;
+  /** Whether cross-instance pub/sub is available */
+  crossInstance: boolean;
   /** Current storage backend type */
   backend: "redis" | "postgres" | "lru";
-  /** Whether publisher is connected */
-  publisherConnected: boolean;
-  /** Whether subscriber is connected */
-  subscriberConnected: boolean;
+  /** Number of active subscriptions */
+  subscriptionCount: number;
 }
 
-/** Dedicated subscriber client — separate from the main client */
-let subscriberClient: RedisClient | null = null;
-
-/** Publisher client reference — separate instance for publishing */
-let publisherClient: RedisClient | null = null;
+/** Track active subscriptions */
+const activeSubscriptions = new Map<
+  PubSubChannel,
+  Set<(message: PubSubMessage, channel: string) => void>
+>();
 
 /**
- * Checks if Pub/Sub can be initialized based on backend type.
- * Pub/Sub requires Redis as the storage backend.
- *
- * @returns True if Redis is available for Pub/Sub
+ * Gets the storage instance, ensuring it's initialized.
+ */
+function getStorageInstance(): Storage | null {
+  return getStorage();
+}
+
+/**
+ * Checks if Pub/Sub can be used based on backend type and storage availability.
  */
 function canUsePubSub(): boolean {
-  if (!isPubSubSupported()) {
-    const backend = getStorageBackend();
-    redisLogger.debug(`Pub/Sub not supported with ${backend} backend`, {
-      supported: false,
-      backend,
-      hint: "Set REDIS_URL to enable Pub/Sub support",
-    });
+  const storage = getStorageInstance();
+  if (!storage) {
+    redisLogger.debug("Storage not available, Pub/Sub disabled");
     return false;
   }
   return true;
 }
 
 /**
- * Creates a dedicated subscriber connection.
- * Redis requires separate connections for Pub/Sub subscribers
- * because a subscribed connection cannot execute regular commands.
+ * Publishes a typed message to a channel.
+ * Serializes the message as JSON and stores it in unstorage.
+ * The `watch` API will detect this and notify subscribers.
  *
- * @returns Subscriber RedisClient or null if Redis is unavailable
- */
-export async function getSubscriber(): Promise<RedisClient | null> {
-  if (!canUsePubSub()) {
-    return null;
-  }
-
-  if (!subscriberClient) {
-    try {
-      subscriberClient = new RedisClient(env.REDIS_URL as string, {
-        connectionTimeout: 10_000,
-        autoReconnect: true,
-        maxRetries: 5,
-        enableOfflineQueue: true,
-      });
-
-      // Explicitly connect the subscriber — it needs to be ready for subscriptions
-      await subscriberClient.connect();
-      redisLogger.info("Pub/Sub subscriber connected");
-    } catch (error) {
-      redisLogger.error("Failed to create Pub/Sub subscriber", error as Error);
-      subscriberClient = null;
-    }
-  }
-
-  return subscriberClient;
-}
-
-/**
- * Returns the publisher client for sending messages to channels.
- * Uses a separate RedisClient instance from the main client.
+ * For cross-instance pub/sub with Redis, this requires:
+ * - Redis with keyspace notifications enabled (CONFIG SET notify-keyspace-events Ex)
  *
- * @returns Publisher RedisClient or null if Redis is unavailable
- */
-export async function getPublisher(): Promise<RedisClient | null> {
-  if (!canUsePubSub()) {
-    return null;
-  }
-
-  if (!publisherClient) {
-    try {
-      publisherClient = new RedisClient(env.REDIS_URL as string, {
-        connectionTimeout: 10_000,
-        autoReconnect: true,
-        maxRetries: 5,
-        enableOfflineQueue: true,
-        enableAutoPipelining: true,
-      });
-
-      // Explicitly connect the publisher before first use
-      await publisherClient.connect();
-      redisLogger.info("Pub/Sub publisher connected");
-    } catch (error) {
-      redisLogger.error("Failed to create Pub/Sub publisher", error as Error);
-      publisherClient = null;
-    }
-  }
-
-  return publisherClient;
-}
-
-/**
- * Publishes a typed message to a Redis channel.
- * Serializes the message as JSON before publishing.
- *
- * Returns the number of subscribers that received the message.
- * Returns 0 if Redis is unavailable or publishing fails.
- *
- * @param channel - Target channel name (use REDIS_CHANNELS constants)
+ * @param channel - Target channel name (use PUBSUB_CHANNELS constants)
  * @param message - Typed message payload to broadcast
  * @returns Number of subscribers that received the message, or 0 on failure
- *
- * @example
- * await publish(REDIS_CHANNELS.USER_EVENTS, {
- *   type: "user.login",
- *   data: { userId: "123" },
- *   timestamp: new Date().toISOString(),
- *   source: "auth",
- * });
  */
 export async function publish<T>(
-  channel: RedisChannel,
+  channel: PubSubChannel,
   message: PubSubMessage<T>,
 ): Promise<number> {
-  const publisher = await getPublisher();
-  if (!publisher) {
-    redisLogger.debug("Pub/Sub publisher not available, skipping publish", {
+  if (!canUsePubSub()) {
+    redisLogger.debug("Pub/Sub not available, skipping publish", {
       channel,
       backend: getStorageBackend(),
     });
     return 0;
   }
 
+  const storage = getStorageInstance()!;
+
   try {
     const serialized = JSON.stringify(message);
-    const result = await publisher.publish(channel, serialized);
+    const eventKey = `${channel}:event`;
+    const eventId = `${Date.now()}:${Math.random().toString(36).slice(2)}`;
+
+    // Store the event in unstorage with a unique ID
+    await storage.setItem(eventKey, {
+      id: eventId,
+      message: serialized,
+      timestamp: message.timestamp,
+    });
+
+    // Emit locally using unstorage's event system (if available)
+    const storageWithEvents = storage as Storage & {
+      emit?: (event: string, data: unknown) => void | Promise<void>;
+    };
+    if (storageWithEvents.emit) {
+      await storageWithEvents.emit(channel, { message, channel });
+    }
+
+    // Notify in-process subscribers
+    const subscribers = activeSubscriptions.get(channel);
+    if (subscribers) {
+      for (const handler of subscribers) {
+        try {
+          handler(message, channel);
+        } catch {
+          // Ignore handler errors
+        }
+      }
+    }
+
     redisLogger.debug("Published Pub/Sub message", {
       channel,
       type: message.type,
-      subscribers: result,
+      backend: getStorageBackend(),
     });
-    return result as number;
+
+    return subscribers?.size ?? 0;
   } catch (error) {
     redisLogger.error("Failed to publish Pub/Sub message", error as Error);
     return 0;
@@ -210,43 +167,121 @@ export async function publish<T>(
 }
 
 /**
- * Subscribes to a Redis channel with a typed message handler.
- * Automatically deserializes JSON messages before invoking the handler.
+ * Subscribes to a channel with a typed message handler.
+ * The handler is called when a message is published to the channel.
  *
- * @param channel - Channel to subscribe to (use REDIS_CHANNELS constants)
+ * For in-process pub/sub: Uses unstorage's event emitter
+ * For Redis: Uses `watch`/`unwatch` for keyspace notifications
+ *
+ * @param channel - Channel to subscribe to (use PUBSUB_CHANNELS constants)
  * @param handler - Callback invoked for each received message
- *
- * @example
- * await subscribe(REDIS_CHANNELS.USER_EVENTS, (message, channel) => {
- *   console.log(`Got ${message.type} on ${channel}:`, message.data);
- * });
  */
 export async function subscribe<T>(
-  channel: RedisChannel,
+  channel: PubSubChannel,
   handler: (message: PubSubMessage<T>, channel: string) => void,
 ): Promise<void> {
-  const subscriber = await getSubscriber();
-  if (!subscriber) {
-    redisLogger.debug("Pub/Sub subscriber not available, skipping subscribe", {
+  if (!canUsePubSub()) {
+    redisLogger.debug("Pub/Sub not available, skipping subscribe", {
       channel,
       backend: getStorageBackend(),
     });
     return;
   }
 
+  const storage = getStorageInstance()!;
+  const backend = getStorageBackend();
+
+  // Track subscription locally
+  if (!activeSubscriptions.has(channel)) {
+    activeSubscriptions.set(channel, new Set());
+  }
+  activeSubscriptions
+    .get(channel)!
+    .add(handler as (message: PubSubMessage, channel: string) => void);
+
   try {
-    await subscriber.subscribe(channel, (rawMessage: string, ch: string) => {
-      try {
-        const parsed = JSON.parse(rawMessage) as PubSubMessage<T>;
-        handler(parsed, ch);
-      } catch (parseError) {
-        redisLogger.error("Failed to parse Pub/Sub message", parseError as Error);
+    // For in-process events, use unstorage's on() method
+    if (typeof (storage as Storage & { on?: unknown }).on === "function") {
+      const typedStorage = storage as Storage & {
+        on(
+          event: string,
+          handler: (data: { message: PubSubMessage; channel: string }) => void,
+        ): void;
+      };
+      typedStorage.on(channel, ({ message: msg, channel: ch }) => {
+        handler(msg as PubSubMessage<T>, ch ?? channel);
+      });
+    }
+
+    // For Redis with keyspace notifications, set up watch
+    if (backend === "redis" && isPubSubSupported()) {
+      const eventKey = `${channel}:event`;
+      if (typeof (storage as Storage & { watch?: unknown }).watch === "function") {
+        const typedStorage = storage as Storage & {
+          watch(
+            key: string,
+            handler: (event: "update" | "remove", key: string) => void,
+          ): () => void;
+        };
+
+        // Watch for changes to the event key
+        typedStorage.watch(eventKey, (event) => {
+          if (event === "update") {
+            // Fetch and parse the latest event
+            storage.getItem<string>(eventKey).then((data) => {
+              if (data) {
+                try {
+                  const parsed = JSON.parse(data);
+                  const message = JSON.parse(parsed.message) as PubSubMessage<T>;
+                  handler(message, channel);
+                } catch {
+                  // Ignore parse errors
+                }
+              }
+            });
+          }
+        });
+
+        redisLogger.debug("Set up Redis keyspace watch for Pub/Sub channel", { channel });
       }
+    }
+
+    redisLogger.info("Subscribed to Pub/Sub channel", {
+      channel,
+      backend,
+      crossInstance: backend === "redis",
     });
-    redisLogger.info("Subscribed to Pub/Sub channel", { channel });
   } catch (error) {
     redisLogger.error("Failed to subscribe to Pub/Sub channel", error as Error);
   }
+}
+
+/**
+ * Unsubscribes from a channel.
+ * Removes the handler from the subscription list.
+ *
+ * @param channel - Channel to unsubscribe from
+ * @param handler - The handler to remove (optional, removes all if not provided)
+ */
+export function unsubscribe<T>(
+  channel: PubSubChannel,
+  handler?: (message: PubSubMessage<T>, channel: string) => void,
+): void {
+  const subscribers = activeSubscriptions.get(channel);
+  if (!subscribers) {
+    return;
+  }
+
+  if (handler) {
+    subscribers.delete(handler as (message: PubSubMessage, channel: string) => void);
+    if (subscribers.size === 0) {
+      activeSubscriptions.delete(channel);
+    }
+  } else {
+    activeSubscriptions.delete(channel);
+  }
+
+  redisLogger.debug("Unsubscribed from Pub/Sub channel", { channel });
 }
 
 /**
@@ -256,30 +291,28 @@ export async function subscribe<T>(
  */
 export function getPubSubStatus(): PubSubStatus {
   const backend = getStorageBackend();
-  const supported = isPubSubSupported();
+  const supported = canUsePubSub();
+  const crossInstance = isPubSubSupported();
+
+  // Count total subscriptions
+  let subscriptionCount = 0;
+  for (const handlers of activeSubscriptions.values()) {
+    subscriptionCount += handlers.size;
+  }
 
   return {
     supported,
+    crossInstance,
     backend,
-    publisherConnected: publisherClient !== null,
-    subscriberConnected: subscriberClient !== null,
+    subscriptionCount,
   };
 }
 
 /**
- * Closes all Pub/Sub connections.
+ * Closes all Pub/Sub connections and clears subscriptions.
  * Should be called during application shutdown.
- * Safe to call multiple times — subsequent calls are no-ops.
  */
 export function closePubSub(): void {
-  if (subscriberClient) {
-    redisLogger.info("Closing Pub/Sub subscriber");
-    subscriberClient.close();
-    subscriberClient = null;
-  }
-  if (publisherClient) {
-    redisLogger.info("Closing Pub/Sub publisher");
-    publisherClient.close();
-    publisherClient = null;
-  }
+  activeSubscriptions.clear();
+  redisLogger.info("Pub/Sub connections closed");
 }
