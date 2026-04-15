@@ -7,10 +7,19 @@
  * Integration tests that verify actual pub/sub messaging require a Redis instance.
  */
 
-import { describe, test, expect } from "bun:test";
-import { REDIS_CHANNELS, closePubSub, type PubSubMessage } from "../../../src/lib/redis/pubsub";
+import { describe, test, expect, afterEach } from "bun:test";
+import {
+  REDIS_CHANNELS,
+  closePubSub,
+  getPubSubStatus,
+  type PubSubMessage,
+} from "../../../src/lib/redis/pubsub";
 
 describe("Redis Pub/Sub", () => {
+  afterEach(() => {
+    closePubSub();
+  });
+
   test("REDIS_CHANNELS has all expected channel names", () => {
     expect(REDIS_CHANNELS.USER_EVENTS).toBe("tsse:user:events");
     expect(REDIS_CHANNELS.SYSTEM_NOTIFICATIONS).toBe("tsse:system:notifications");
@@ -62,5 +71,40 @@ describe("Redis Pub/Sub", () => {
     closePubSub();
     closePubSub();
     expect(true).toBe(true);
+  });
+});
+
+describe("Pub/Sub Status", () => {
+  afterEach(() => {
+    closePubSub();
+  });
+
+  test("getPubSubStatus returns a valid status object", () => {
+    const status = getPubSubStatus();
+    expect(status).toHaveProperty("supported");
+    expect(status).toHaveProperty("backend");
+    expect(status).toHaveProperty("publisherConnected");
+    expect(status).toHaveProperty("subscriberConnected");
+    expect(typeof status.supported).toBe("boolean");
+    expect(typeof status.backend).toBe("string");
+    expect(typeof status.publisherConnected).toBe("boolean");
+    expect(typeof status.subscriberConnected).toBe("boolean");
+  });
+
+  test("getPubSubStatus indicates Pub/Sub is only supported with Redis", () => {
+    const status = getPubSubStatus();
+    // Pub/Sub is only supported when backend is "redis"
+    expect(status.supported).toBe(status.backend === "redis");
+  });
+
+  test("getPubSubStatus backend is one of the valid types", () => {
+    const status = getPubSubStatus();
+    expect(["redis", "postgres", "lru"]).toContain(status.backend);
+  });
+
+  test("getPubSubStatus connection flags are initially false", () => {
+    const status = getPubSubStatus();
+    expect(status.publisherConnected).toBe(false);
+    expect(status.subscriberConnected).toBe(false);
   });
 });

@@ -275,6 +275,29 @@ export function closeStorage(): void {
 }
 
 /**
+ * Returns the current storage backend type.
+ * Use this to check if Pub/Sub is available (only Redis supports it).
+ *
+ * @returns Backend type: "redis", "postgres", or "lru"
+ */
+export function getStorageBackend(): "redis" | "postgres" | "lru" {
+  if (!initialized) {
+    getStorage();
+  }
+  return backendType ?? "lru";
+}
+
+/**
+ * Checks if Pub/Sub is supported by the current storage backend.
+ * Currently, only Redis supports Pub/Sub.
+ *
+ * @returns True if Pub/Sub is available
+ */
+export function isPubSubSupported(): boolean {
+  return getStorageBackend() === "redis";
+}
+
+/**
  * @deprecated Use getStorage() instead. Kept for backward compatibility.
  * Returns the Redis client singleton.
  *

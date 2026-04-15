@@ -15,7 +15,8 @@ import {
   closeStorage,
   ensureStorageConnection,
   validateStorageConnection,
-  StorageStatus,
+  getStorageBackend,
+  isPubSubSupported,
 } from "../../../src/lib/redis";
 
 describe("Storage Client (getStorage)", () => {
@@ -114,28 +115,27 @@ describe("Storage Backend Detection", () => {
     closeStorage();
   });
 
-  test("backend is determined by environment configuration", async () => {
-    const status = await getStorageStatus();
-    expect(status.backend).toBeDefined();
-    expect(typeof status.backend).toBe("string");
+  test("getStorageBackend returns current backend type", () => {
+    const backend = getStorageBackend();
+    expect(["redis", "postgres", "lru"]).toContain(backend);
   });
 
-  test("StorageStatus interface has correct shape", () => {
-    const status: StorageStatus = {
-      connected: true,
-      backend: "redis",
-      url: "redis://localhost:6379",
-    };
-    expect(status.connected).toBe(true);
-    expect(status.backend).toBe("redis");
-    expect(status.url).toBe("redis://localhost:6379");
+  test("getStorageBackend is consistent with getStorageStatus", async () => {
+    const backend = getStorageBackend();
+    const status = await getStorageStatus();
+    expect(status.backend).toBe(backend);
   });
 
-  test("StorageStatus can include optional error", async () => {
-    const status = await getStorageStatus();
-    if (!status.connected) {
-      expect(status.error === undefined || typeof status.error === "string").toBe(true);
-    }
+  test("isPubSubSupported returns true only for Redis backend", () => {
+    const backend = getStorageBackend();
+    const pubSubSupported = isPubSubSupported();
+    expect(pubSubSupported).toBe(backend === "redis");
+  });
+
+  test("isPubSubSupported is consistent with getPubSubStatus", () => {
+    const { getPubSubStatus } = require("../../../src/lib/redis/pubsub");
+    const pubSubStatus = getPubSubStatus();
+    expect(pubSubStatus.supported).toBe(isPubSubSupported());
   });
 });
 

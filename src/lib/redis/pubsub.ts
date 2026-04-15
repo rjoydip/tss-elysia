@@ -1,11 +1,14 @@
 /**
- * Redis Pub/Sub helpers using Bun's native RedisClient.
+ * Pub/Sub module using Bun's native RedisClient.
  * Provides typed channel definitions and convenience wrappers
  * for publishing and subscribing to events.
  *
- * Pub/Sub requires a dedicated subscriber connection because
- * Redis connections in subscribe mode cannot execute regular commands.
- * The publisher reuses a separate client instance.
+ * Pub/Sub is only available when Redis is the storage backend.
+ * For other backends (PostgreSQL, LRU), Pub/Sub operations gracefully degrade.
+ *
+ * When using Redis:
+ * - Creates dedicated subscriber connection (required by Redis for subscribe mode)
+ * - Creates separate publisher connection for reliability
  *
  * @module redis/pubsub
  * @see https://bun.com/docs/runtime/redis#pub/sub
@@ -14,6 +17,7 @@
 import { RedisClient } from "bun";
 import { env } from "~/config/env";
 import { redisLogger } from "../logger";
+import { getStorageBackend, isPubSubSupported } from "./index";
 
 /**
  * Predefined channel names for the application.
@@ -53,11 +57,44 @@ export interface PubSubMessage<T = unknown> {
   source?: string;
 }
 
+/**
+ * Pub/Sub connection status for health checks.
+ */
+export interface PubSubStatus {
+  /** Whether Pub/Sub is supported by the current backend */
+  supported: boolean;
+  /** Current storage backend type */
+  backend: "redis" | "postgres" | "lru";
+  /** Whether publisher is connected */
+  publisherConnected: boolean;
+  /** Whether subscriber is connected */
+  subscriberConnected: boolean;
+}
+
 /** Dedicated subscriber client — separate from the main client */
 let subscriberClient: RedisClient | null = null;
 
 /** Publisher client reference — separate instance for publishing */
 let publisherClient: RedisClient | null = null;
+
+/**
+ * Checks if Pub/Sub can be initialized based on backend type.
+ * Pub/Sub requires Redis as the storage backend.
+ *
+ * @returns True if Redis is available for Pub/Sub
+ */
+function canUsePubSub(): boolean {
+  if (!isPubSubSupported()) {
+    const backend = getStorageBackend();
+    redisLogger.debug(`Pub/Sub not supported with ${backend} backend`, {
+      supported: false,
+      backend,
+      hint: "Set REDIS_URL to enable Pub/Sub support",
+    });
+    return false;
+  }
+  return true;
+}
 
 /**
  * Creates a dedicated subscriber connection.
@@ -67,8 +104,7 @@ let publisherClient: RedisClient | null = null;
  * @returns Subscriber RedisClient or null if Redis is unavailable
  */
 export async function getSubscriber(): Promise<RedisClient | null> {
-  if (!env.REDIS_URL) {
-    redisLogger.debug("REDIS_URL not configured, Pub/Sub disabled");
+  if (!canUsePubSub()) {
     return null;
   }
 
@@ -85,7 +121,7 @@ export async function getSubscriber(): Promise<RedisClient | null> {
       await subscriberClient.connect();
       redisLogger.info("Pub/Sub subscriber connected");
     } catch (error) {
-      redisLogger.error("Failed to create subscriber", error as Error);
+      redisLogger.error("Failed to create Pub/Sub subscriber", error as Error);
       subscriberClient = null;
     }
   }
@@ -100,7 +136,7 @@ export async function getSubscriber(): Promise<RedisClient | null> {
  * @returns Publisher RedisClient or null if Redis is unavailable
  */
 export async function getPublisher(): Promise<RedisClient | null> {
-  if (!env.REDIS_URL) {
+  if (!canUsePubSub()) {
     return null;
   }
 
@@ -118,7 +154,7 @@ export async function getPublisher(): Promise<RedisClient | null> {
       await publisherClient.connect();
       redisLogger.info("Pub/Sub publisher connected");
     } catch (error) {
-      redisLogger.error("Failed to create publisher", error as Error);
+      redisLogger.error("Failed to create Pub/Sub publisher", error as Error);
       publisherClient = null;
     }
   }
@@ -151,8 +187,9 @@ export async function publish<T>(
 ): Promise<number> {
   const publisher = await getPublisher();
   if (!publisher) {
-    redisLogger.debug("Publisher not available, skipping publish", {
+    redisLogger.debug("Pub/Sub publisher not available, skipping publish", {
       channel,
+      backend: getStorageBackend(),
     });
     return 0;
   }
@@ -160,14 +197,14 @@ export async function publish<T>(
   try {
     const serialized = JSON.stringify(message);
     const result = await publisher.publish(channel, serialized);
-    redisLogger.debug("Published message", {
+    redisLogger.debug("Published Pub/Sub message", {
       channel,
       type: message.type,
       subscribers: result,
     });
     return result as number;
   } catch (error) {
-    redisLogger.error("Failed to publish message", error as Error);
+    redisLogger.error("Failed to publish Pub/Sub message", error as Error);
     return 0;
   }
 }
@@ -190,8 +227,9 @@ export async function subscribe<T>(
 ): Promise<void> {
   const subscriber = await getSubscriber();
   if (!subscriber) {
-    redisLogger.debug("Subscriber not available, skipping subscribe", {
+    redisLogger.debug("Pub/Sub subscriber not available, skipping subscribe", {
       channel,
+      backend: getStorageBackend(),
     });
     return;
   }
@@ -205,10 +243,27 @@ export async function subscribe<T>(
         redisLogger.error("Failed to parse Pub/Sub message", parseError as Error);
       }
     });
-    redisLogger.info("Subscribed to channel", { channel });
+    redisLogger.info("Subscribed to Pub/Sub channel", { channel });
   } catch (error) {
-    redisLogger.error("Failed to subscribe to channel", error as Error);
+    redisLogger.error("Failed to subscribe to Pub/Sub channel", error as Error);
   }
+}
+
+/**
+ * Gets the Pub/Sub status for health checks.
+ *
+ * @returns Pub/Sub status object
+ */
+export function getPubSubStatus(): PubSubStatus {
+  const backend = getStorageBackend();
+  const supported = isPubSubSupported();
+
+  return {
+    supported,
+    backend,
+    publisherConnected: publisherClient !== null,
+    subscriberConnected: subscriberClient !== null,
+  };
 }
 
 /**
