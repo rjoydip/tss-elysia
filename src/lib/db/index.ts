@@ -288,6 +288,8 @@ export function getDatabasePoolConfigs(): DatabasePoolConfig[] {
  * @returns The initialized Drizzle ORM instance
  */
 export function initializeDatabase() {
+  if (db) return db; // Return existing instance if already initialized
+
   const dbType = getDatabaseType();
 
   // Initialize only in server-side context
