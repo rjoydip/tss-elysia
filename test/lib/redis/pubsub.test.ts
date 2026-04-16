@@ -171,7 +171,8 @@ describe("Pub/Sub Subscribe", () => {
 
   test("subscribe does not throw without storage", async () => {
     // Even if storage is unavailable, subscribe should not throw
-    await expect(subscribe(PUBSUB_CHANNELS.USER_EVENTS, () => {})).resolves.not.toThrow();
+    // It should resolve without error
+    await expect(subscribe(PUBSUB_CHANNELS.USER_EVENTS, () => {})).resolves.toBeUndefined();
   });
 });
 
@@ -291,7 +292,7 @@ describe("Pub/Sub Publish", () => {
   });
 
   test("publish handler receives correct message data", async () => {
-    let receivedMessage: PubSubMessage<{ userId: string }> | null = null;
+    let receivedMessage: PubSubMessage | null = null;
 
     await subscribe(PUBSUB_CHANNELS.USER_EVENTS, (msg) => {
       receivedMessage = msg;
@@ -308,7 +309,7 @@ describe("Pub/Sub Publish", () => {
 
     expect(receivedMessage).not.toBeNull();
     expect(receivedMessage?.type).toBe("user.login");
-    expect(receivedMessage?.data.userId).toBe("test-123");
+    expect((receivedMessage?.data as { userId: string })?.userId).toBe("test-123");
     expect(receivedMessage?.source).toBe("auth");
   });
 
@@ -330,7 +331,9 @@ describe("Pub/Sub Publish", () => {
       timestamp: new Date().toISOString(),
     };
 
-    await expect(publish(PUBSUB_CHANNELS.USER_EVENTS, message)).resolves.not.toThrow();
+    // Should resolve with a number (0 if no subscribers, or subscriber count)
+    const result = await publish(PUBSUB_CHANNELS.USER_EVENTS, message);
+    expect(typeof result).toBe("number");
   });
 });
 
