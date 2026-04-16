@@ -28,7 +28,7 @@ async function removePostgresDatabase() {
       FROM pg_stat_activity
       WHERE datname = $1 AND pid <> pg_backend_pid()
     `,
-      [database]
+      [database],
     );
 
     // Drop the database
@@ -55,8 +55,7 @@ async function removeSQLiteDatabase(dbPath: string) {
 
 async function main() {
   const dbType = process.env.DATABASE_TYPE || "sqlite";
-  const sqliteDbUrl =
-    process.env.SQLITE_URL || "file:.artifacts/tsse-elysia.db";
+  const sqliteDbUrl = process.env.SQLITE_URL || "file:.artifacts/tsse-elysia.db";
 
   const dbPath = sqliteDbUrl.replace(/^file:/, "");
 

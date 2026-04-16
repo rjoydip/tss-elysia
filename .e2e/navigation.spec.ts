@@ -6,18 +6,14 @@ import { test, expect } from "@playwright/test";
 import { E2E_BASE_URL } from "./config";
 
 function uniqueEmail(prefix = "test") {
-  return `${prefix}-${Date.now()}-${Math.random()
-    .toString(36)
-    .slice(2)}@example.com`;
+  return `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2)}@example.com`;
 }
 
 test.describe("Header Navigation", () => {
   test("should navigate to Docs from landing page", async ({ page }) => {
     await page.goto("/");
     await page.waitForLoadState("load");
-    await expect(
-      page.locator("header nav a[href='/docs']").first()
-    ).toBeVisible({
+    await expect(page.locator("header nav a[href='/docs']").first()).toBeVisible({
       timeout: 15000,
     });
     await page.locator("header nav a[href='/docs']").first().click();
@@ -72,19 +68,13 @@ test.describe("Authenticated UI Visibility", () => {
   // we check visibility after auth or on auth-specific pages if they exist.
   // Note: True authenticated E2E requires state setup.
 
-  test("should hide marketing elements when authenticated", async ({
-    page,
-    request,
-  }) => {
+  test("should hide marketing elements when authenticated", async ({ page, request }) => {
     // 1. Create user via API first
     const email = uniqueEmail("authtest");
-    const signUpResponse = await request.post(
-      `${E2E_BASE_URL}/api/auth/sign-up/email`,
-      {
-        headers: { Origin: E2E_BASE_URL },
-        data: { email, password: "TestPassword123!", name: "Test User" },
-      }
-    );
+    const signUpResponse = await request.post(`${E2E_BASE_URL}/api/auth/sign-up/email`, {
+      headers: { Origin: E2E_BASE_URL },
+      data: { email, password: "TestPassword123!", name: "Test User" },
+    });
 
     if (signUpResponse.status() >= 400) {
       test.skip(`Sign-up API failed with status ${signUpResponse.status()}, skipping auth test`, () => {});
@@ -98,13 +88,10 @@ test.describe("Authenticated UI Visibility", () => {
     }
 
     // 2. Use the sign-in API to get proper session cookies
-    const signInResponse = await request.post(
-      `${E2E_BASE_URL}/api/auth/sign-in/email`,
-      {
-        headers: { Origin: E2E_BASE_URL },
-        data: { email, password: "TestPassword123!" },
-      }
-    );
+    const signInResponse = await request.post(`${E2E_BASE_URL}/api/auth/sign-in/email`, {
+      headers: { Origin: E2E_BASE_URL },
+      data: { email, password: "TestPassword123!" },
+    });
 
     if (signInResponse.status() >= 400) {
       test.skip(`Sign-in API failed with status ${signInResponse.status()}, skipping auth test`, () => {});
@@ -132,17 +119,11 @@ test.describe("Authenticated UI Visibility", () => {
     // 5. Verify header marketing links are hidden
     await expect(page.locator("header nav a[href='/docs']")).not.toBeVisible();
     await expect(page.locator("header nav a[href='/blog']")).not.toBeVisible();
-    await expect(
-      page.locator("header nav a[href='/changelog']")
-    ).not.toBeVisible();
+    await expect(page.locator("header nav a[href='/changelog']")).not.toBeVisible();
 
     // 6. Verify GitHub and Theme Toggle are hidden
-    await expect(
-      page.locator("header a[aria-label='GitHub']")
-    ).not.toBeVisible();
-    await expect(
-      page.locator("header button:has-text('Toggle theme')")
-    ).not.toBeVisible();
+    await expect(page.locator("header a[aria-label='GitHub']")).not.toBeVisible();
+    await expect(page.locator("header button:has-text('Toggle theme')")).not.toBeVisible();
 
     // 7. Verify Footer is hidden
     await expect(page.locator("footer.py-4")).not.toBeVisible();

@@ -12,9 +12,7 @@ test.describe("Form Integration", () => {
 
     const emailInput = page.locator("main").getByPlaceholder("Email");
     const passwordInput = page.locator("main").getByPlaceholder("Password");
-    const submitButton = page
-      .locator("main")
-      .getByRole("button", { name: /sign in/i });
+    const submitButton = page.locator("main").getByRole("button", { name: /sign in/i });
 
     await expect(emailInput).toBeVisible();
     await expect(passwordInput).toBeVisible();
@@ -29,10 +27,7 @@ test.describe("Form Integration", () => {
 
     await page.waitForTimeout(500);
 
-    const requirements = page
-      .locator("main")
-      .getByText("At least", { exact: false })
-      .first();
+    const requirements = page.locator("main").getByText("At least", { exact: false }).first();
     if ((await requirements.count()) > 0) {
       await expect(requirements.first()).toBeVisible();
     }

@@ -14,9 +14,7 @@ const sqliteUrl = process.env.SQLITE_URL || "file:.artifacts/tsse-elysia.db";
 export default async function globalSetup() {
   console.log("[E2E Setup] Setting up database...");
 
-  const dbPath = sqliteUrl.startsWith("file:")
-    ? sqliteUrl.replace("file:", "")
-    : sqliteUrl;
+  const dbPath = sqliteUrl.startsWith("file:") ? sqliteUrl.replace("file:", "") : sqliteUrl;
 
   const fullPath = resolve(dbPath);
   const dirPath = resolve(dbPath, "..");

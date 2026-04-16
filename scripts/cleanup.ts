@@ -65,11 +65,7 @@ if (FULL_RESET) {
 }
 
 logger.section("TSS Elysia Cleanup");
-logger.info(
-  `Mode: ${
-    DRY_RUN ? "DRY RUN (no changes)" : FULL_RESET ? "FULL RESET" : "Standard"
-  }`
-);
+logger.info(`Mode: ${DRY_RUN ? "DRY RUN (no changes)" : FULL_RESET ? "FULL RESET" : "Standard"}`);
 
 if (KEEP_DB) {
   logger.warn("Database files will be preserved");
@@ -95,9 +91,7 @@ for (const dir of dirsToClean) {
       // If there are preserve patterns, handle selectively
       if (preservePatterns.length > 0) {
         await cleanDirPreserving(dir.path, preservePatterns);
-        logger.success(
-          `✓ ${dir.name}: cleaned (preserved ${preservePatterns.join(", ")})`
-        );
+        logger.success(`✓ ${dir.name}: cleaned (preserved ${preservePatterns.join(", ")})`);
       } else {
         rmSync(dir.path, { recursive: true, force: true });
         logger.success(`✓ ${dir.name}: removed (${formatSize(size)})`);
@@ -119,9 +113,7 @@ if (DRY_RUN) {
   logger.info(`🗂️  Directories removed: ${deletedCount}`);
 
   if (FULL_RESET) {
-    logger.warn(
-      "Full reset complete. Run 'bun install' to reinstall dependencies."
-    );
+    logger.warn("Full reset complete. Run 'bun install' to reinstall dependencies.");
   } else {
     logger.info("Next steps:");
     logger.list("Run 'bun run dev' to start fresh");
@@ -154,10 +146,7 @@ function getDirSize(dirPath: string, preservePatterns: string[] = []): number {
 /**
  * Cleans directory but preserves files matching patterns.
  */
-async function cleanDirPreserving(
-  dirPath: string,
-  preservePatterns: string[]
-): Promise<void> {
+async function cleanDirPreserving(dirPath: string, preservePatterns: string[]): Promise<void> {
   const entries = readdirSync(dirPath);
   for (const entry of entries) {
     const fullPath = join(dirPath, entry);

@@ -20,9 +20,7 @@ test.describe("Login Page", () => {
   });
 
   test("should display sign up link", async ({ page }) => {
-    await expect(
-      page.locator("main").getByRole("link", { name: /sign up/i })
-    ).toBeVisible();
+    await expect(page.locator("main").getByRole("link", { name: /sign up/i })).toBeVisible();
   });
 
   test("should have email input", async ({ page }) => {
@@ -34,40 +32,28 @@ test.describe("Login Page", () => {
   });
 
   test("should have sign in button", async ({ page }) => {
-    await expect(
-      page.locator("main").getByRole("button", { name: /sign in/i })
-    ).toBeVisible();
+    await expect(page.locator("main").getByRole("button", { name: /sign in/i })).toBeVisible();
   });
 
   test("should have forgot password link", async ({ page }) => {
-    await expect(
-      page.locator("main").getByText(/forgot password/i)
-    ).toBeVisible();
+    await expect(page.locator("main").getByText(/forgot password/i)).toBeVisible();
   });
 
   test("should display OAuth buttons", async ({ page }) => {
     await expect(
-      page
-        .locator("main")
-        .getByRole("button", { name: /continue with github/i })
+      page.locator("main").getByRole("button", { name: /continue with github/i }),
     ).toBeVisible();
     await expect(
-      page
-        .locator("main")
-        .getByRole("button", { name: /continue with google/i })
+      page.locator("main").getByRole("button", { name: /continue with google/i }),
     ).toBeVisible();
   });
 
   test("should display divider with 'Or'", async ({ page }) => {
-    await expect(
-      page.locator("main").getByText("Or", { exact: true })
-    ).toBeVisible();
+    await expect(page.locator("main").getByText("Or", { exact: true })).toBeVisible();
   });
 
   // Skipped - navigation timing issue with TanStack Router
-  test("should navigate to register page on sign up link click", async ({
-    page,
-  }) => {}); // oxlint-disable-line no-unused-vars
+  test("should navigate to register page on sign up link click", async ({ page }) => {}); // oxlint-disable-line no-unused-vars
 });
 
 test.describe("Register Page", () => {
@@ -81,15 +67,11 @@ test.describe("Register Page", () => {
   });
 
   test("should display create account message", async ({ page }) => {
-    await expect(
-      page.locator("main").getByText("Create your account")
-    ).toBeVisible();
+    await expect(page.locator("main").getByText("Create your account")).toBeVisible();
   });
 
   test("should display sign in link", async ({ page }) => {
-    await expect(
-      page.locator("main").getByRole("link", { name: /sign in/i })
-    ).toBeVisible();
+    await expect(page.locator("main").getByRole("link", { name: /sign in/i })).toBeVisible();
   });
 
   test("should have name input", async ({ page }) => {
@@ -105,31 +87,19 @@ test.describe("Register Page", () => {
   });
 
   test("should have create account button", async ({ page }) => {
-    await expect(
-      page.getByRole("button", { name: /create account/i })
-    ).toBeVisible();
+    await expect(page.getByRole("button", { name: /create account/i })).toBeVisible();
   });
 
   test("should display OAuth buttons", async ({ page }) => {
-    await expect(
-      page.getByRole("button", { name: /continue with github/i })
-    ).toBeVisible();
-    await expect(
-      page.getByRole("button", { name: /continue with google/i })
-    ).toBeVisible();
+    await expect(page.getByRole("button", { name: /continue with github/i })).toBeVisible();
+    await expect(page.getByRole("button", { name: /continue with google/i })).toBeVisible();
   });
 
   // Skipped - flaky due to timing
-  test("should display password requirements after typing", async ({
-    page,
-  }) => {}); // oxlint-disable-line no-unused-vars
+  test("should display password requirements after typing", async ({ page }) => {}); // oxlint-disable-line no-unused-vars
 
-  test("should navigate to login page on sign in link click", async ({
-    page,
-  }) => {
-    const signInLink = page
-      .locator("main")
-      .getByRole("link", { name: /sign in/i });
+  test("should navigate to login page on sign in link click", async ({ page }) => {
+    const signInLink = page.locator("main").getByRole("link", { name: /sign in/i });
     // Guard against occasional client-side navigation flake by validating destination intent.
     await expect(signInLink).toHaveAttribute("href", "/account/login");
     await signInLink.click();
@@ -143,17 +113,13 @@ test.describe("Register Page", () => {
 });
 
 test.describe("Branding Component (Desktop)", () => {
-  test("should display branding on login page (lg screen)", async ({
-    page,
-  }) => {
+  test("should display branding on login page (lg screen)", async ({ page }) => {
     await page.setViewportSize({ width: 1280, height: 720 });
     await page.goto(`${E2E_BASE_URL}/account/login`);
     await expect(page.getByText(/build faster/i)).toBeVisible();
   });
 
-  test("should display branding on register page (lg screen)", async ({
-    page,
-  }) => {
+  test("should display branding on register page (lg screen)", async ({ page }) => {
     await page.setViewportSize({ width: 1280, height: 720 });
     await page.goto(`${E2E_BASE_URL}/account/register`);
     await expect(page.getByText(/build faster/i)).toBeVisible();
@@ -170,14 +136,8 @@ test.describe("Form Validation", () => {
   test("should show error for empty name on submit", async ({ page }) => {
     await page.goto(`${E2E_BASE_URL}/account/register`);
     // Skip name field
-    await page
-      .locator("main")
-      .getByPlaceholder("Email")
-      .fill("test@example.com");
-    await page
-      .locator("main")
-      .getByPlaceholder("Password")
-      .fill("Password123!");
+    await page.locator("main").getByPlaceholder("Email").fill("test@example.com");
+    await page.locator("main").getByPlaceholder("Password").fill("Password123!");
     // Click create
     await page
       .locator("main")
@@ -191,9 +151,7 @@ test.describe("Form Validation", () => {
   });
 
   // Skipped - password strength behavior differs from test expectations
-  test("should display password requirements for weak password", async ({
-    page,
-  }) => {}); // oxlint-disable-line no-unused-vars
+  test("should display password requirements for weak password", async ({ page }) => {}); // oxlint-disable-line no-unused-vars
   test("should display weak password indicator", async ({ page }) => {}); // oxlint-disable-line no-unused-vars
   test("should display strong password indicator", async ({ page }) => {}); // oxlint-disable-line no-unused-vars
 });
@@ -203,16 +161,12 @@ test.describe("Forgot Password Page", () => {
     await page.goto(`${E2E_BASE_URL}/account/forgot-password`);
   });
 
-  test("should load forgot password page without crashing", async ({
-    page,
-  }) => {
+  test("should load forgot password page without crashing", async ({ page }) => {
     await expect(page.locator("main")).toBeVisible();
   });
 
   test("should display forgot password heading", async ({ page }) => {
-    await expect(
-      page.locator("main").getByText("Forgot password?")
-    ).toBeVisible();
+    await expect(page.locator("main").getByText("Forgot password?")).toBeVisible();
   });
 
   test("should have email input", async ({ page }) => {
@@ -221,22 +175,16 @@ test.describe("Forgot Password Page", () => {
 
   test("should have send reset link button", async ({ page }) => {
     await expect(
-      page.locator("main").getByRole("button", { name: /send reset link/i })
+      page.locator("main").getByRole("button", { name: /send reset link/i }),
     ).toBeVisible();
   });
 
   test("should have sign in link", async ({ page }) => {
-    await expect(
-      page.locator("main").getByRole("link", { name: /sign in/i })
-    ).toBeVisible();
+    await expect(page.locator("main").getByRole("link", { name: /sign in/i })).toBeVisible();
   });
 
-  test("should navigate to login page on sign in link click", async ({
-    page,
-  }) => {
-    const signInLink = page
-      .locator("main")
-      .getByRole("link", { name: /sign in/i });
+  test("should navigate to login page on sign in link click", async ({ page }) => {
+    const signInLink = page.locator("main").getByRole("link", { name: /sign in/i });
     await expect(signInLink).toHaveAttribute("href", "/account/login");
     await signInLink.click();
     await page.waitForTimeout(500);
@@ -254,27 +202,19 @@ test.describe("Forgot Password Page", () => {
 
   test("should hide branding on mobile", async ({ page }) => {
     await page.setViewportSize({ width: 375, height: 667 });
-    await expect(
-      page.locator("main").getByText(/build faster/i)
-    ).not.toBeVisible();
+    await expect(page.locator("main").getByText(/build faster/i)).not.toBeVisible();
   });
 });
 
 test.describe("Email Verification Page", () => {
-  test("should display verification failed when no token is provided", async ({
-    page,
-  }) => {
+  test("should display verification failed when no token is provided", async ({ page }) => {
     await page.goto(`${E2E_BASE_URL}/account/verify-email`);
 
     // Assert the deterministic final state - wait for transition from loading to error
-    await expect(
-      page.locator("main").getByText("Verification Failed")
-    ).toBeVisible({
+    await expect(page.locator("main").getByText("Verification Failed")).toBeVisible({
       timeout: 10000,
     });
-    await expect(
-      page.locator("main").getByText("No verification token provided")
-    ).toBeVisible();
+    await expect(page.locator("main").getByText("No verification token provided")).toBeVisible();
   });
 
   test("should display header", async ({ page }) => {

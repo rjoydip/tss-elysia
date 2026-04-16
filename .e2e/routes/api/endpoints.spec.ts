@@ -84,9 +84,7 @@ test.describe("Auth Health Endpoint", () => {
     expect(body.name).toBe("Auth");
   });
 
-  test("should return JSON content type for auth health", async ({
-    request,
-  }) => {
+  test("should return JSON content type for auth health", async ({ request }) => {
     const response = await request.get("/api/auth/health");
     expect(response.headers()["content-type"]).toContain("application/json");
   });
@@ -105,16 +103,12 @@ test.describe("API Error Handling", () => {
     expect(response.status()).toBeGreaterThanOrEqual(400);
   });
 
-  test("should return error for deeply nested API route", async ({
-    request,
-  }) => {
+  test("should return error for deeply nested API route", async ({ request }) => {
     const response = await request.get("/api/some/nested/path");
     expect(response.status()).toBeGreaterThanOrEqual(400);
   });
 
-  test("should return error for unknown top-level route", async ({
-    request,
-  }) => {
+  test("should return error for unknown top-level route", async ({ request }) => {
     const response = await request.get("/nonexistent");
     expect(response.status()).toBeGreaterThanOrEqual(400);
   });
@@ -146,7 +140,7 @@ test.describe("API Error Handling", () => {
 test.describe("API Rate Limiting", () => {
   test("should handle multiple rapid requests", async ({ request }) => {
     const responses = await Promise.all(
-      Array.from({ length: 10 }, () => request.get("/api/health"))
+      Array.from({ length: 10 }, () => request.get("/api/health")),
     );
     // All should succeed under rate limit
     for (const response of responses) {
