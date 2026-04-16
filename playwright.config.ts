@@ -9,7 +9,7 @@
 
 import { defineConfig, devices } from "@playwright/test";
 import { isCI } from "std-env";
-import { E2E_BASE_URL, E2E_HOST, E2E_PORT } from "./.e2e/_config";
+import { E2E_BASE_URL, E2E_HOST, E2E_PORT } from "./.e2e/config";
 
 export default defineConfig({
   testDir: "./.e2e",
@@ -36,7 +36,7 @@ export default defineConfig({
     : {
         command:
           process.platform === "win32"
-            ? `set NODE_ENV=test&& bun run preview --host=${E2E_HOST} --port=${E2E_PORT}`
+            ? `set NODE_ENV=test && bun run preview --host=${E2E_HOST} --port=${E2E_PORT}`
             : `NODE_ENV=test bun run preview --host=${E2E_HOST} --port=${E2E_PORT}`,
         url: E2E_BASE_URL,
         reuseExistingServer: !isCI,

@@ -4,7 +4,7 @@
  */
 
 import { test, expect } from "@playwright/test";
-import { E2E_BASE_URL } from "../_config";
+import { E2E_BASE_URL } from "../config";
 
 test.describe("Button Component", () => {
   test.beforeEach(async ({ page }) => {
@@ -12,13 +12,17 @@ test.describe("Button Component", () => {
   });
 
   test("should render default button", async ({ page }) => {
-    const button = page.locator("main").getByRole("button", { name: /sign in/i });
+    const button = page
+      .locator("main")
+      .getByRole("button", { name: /sign in/i });
     await expect(button).toBeVisible();
     await expect(button).toHaveClass(/bg-primary/);
   });
 
   test("should render outline button variant", async ({ page }) => {
-    const button = page.locator("main").getByRole("button", { name: /continue with github/i });
+    const button = page
+      .locator("main")
+      .getByRole("button", { name: /continue with github/i });
     await expect(button).toBeVisible();
     await expect(button).toHaveClass(/border/);
   });

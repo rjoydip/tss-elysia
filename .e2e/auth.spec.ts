@@ -3,17 +3,19 @@
  */
 
 import { test, expect, type APIRequestContext } from "@playwright/test";
-import { E2E_BASE_URL } from "./_config";
+import { E2E_BASE_URL } from "./config";
 
 function uniqueEmail(prefix = "test") {
-  return `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2)}@example.com`;
+  return `${prefix}-${Date.now()}-${Math.random()
+    .toString(36)
+    .slice(2)}@example.com`;
 }
 
 async function signUp(
   request: APIRequestContext,
   email: string,
   password = "TestPassword123!",
-  name = "Test User",
+  name = "Test User"
 ) {
   return request.post("/api/auth/sign-up/email", {
     headers: { Origin: E2E_BASE_URL },
@@ -21,7 +23,11 @@ async function signUp(
   });
 }
 
-async function signIn(request: APIRequestContext, email: string, password = "TestPassword123!") {
+async function signIn(
+  request: APIRequestContext,
+  email: string,
+  password = "TestPassword123!"
+) {
   return request.post("/api/auth/sign-in/email", {
     headers: { Origin: E2E_BASE_URL },
     data: { email, password },
@@ -132,7 +138,9 @@ test.describe("Sign In", () => {
     expect(response.status()).toBeGreaterThanOrEqual(400);
   });
 
-  test("should return JSON error body on failed sign-in", async ({ request }) => {
+  test("should return JSON error body on failed sign-in", async ({
+    request,
+  }) => {
     const response = await signIn(request, "nobody@example.com");
     expect(response.status()).toBe(401);
     const body = await response.json();

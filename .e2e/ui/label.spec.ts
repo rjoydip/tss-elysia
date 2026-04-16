@@ -4,7 +4,7 @@
  */
 
 import { test, expect } from "@playwright/test";
-import { E2E_BASE_URL } from "../_config";
+import { E2E_BASE_URL } from "../config";
 
 test.describe("Label Component", () => {
   test("should render label on login page", async ({ page }) => {

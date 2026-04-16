@@ -3,7 +3,7 @@
  */
 
 import { test, expect } from "@playwright/test";
-import { E2E_BASE_URL } from "./_config";
+import { E2E_BASE_URL } from "./config";
 
 test.describe("Mobile Behavior", () => {
   test.describe("Sidebar Mobile", () => {
@@ -23,7 +23,9 @@ test.describe("Mobile Behavior", () => {
       await page.waitForLoadState("load");
       // On mobile, sidebar may not be visible until triggered
       // Just verify the page loaded without error
-      await expect(page.getByRole("heading", { name: "Getting Started" })).toBeVisible();
+      await expect(
+        page.getByRole("heading", { name: "Getting Started" })
+      ).toBeVisible();
     });
 
     test("should toggle sidebar on mobile viewport", async ({ page }) => {
@@ -36,13 +38,17 @@ test.describe("Mobile Behavior", () => {
       await expect(trigger).toBeVisible();
     });
 
-    test("should display sidebar content on desktop viewport", async ({ page }) => {
+    test("should display sidebar content on desktop viewport", async ({
+      page,
+    }) => {
       await page.setViewportSize({ width: 1280, height: 800 });
       await page.reload();
       await page.waitForLoadState("load");
       const sidebar = page.locator('[data-sidebar="sidebar"]');
       await expect(sidebar).toBeVisible();
-      const sections = page.getByRole("button", { name: /Getting Started|Authentication|API/ });
+      const sections = page.getByRole("button", {
+        name: /Getting Started|Authentication|API/,
+      });
       await expect(sections.first()).toBeVisible();
     });
   });
@@ -78,14 +84,18 @@ test.describe("Mobile Behavior", () => {
       await page.setViewportSize({ width: 1280, height: 800 });
       await page.goto(`${E2E_BASE_URL}/docs`);
       await page.waitForLoadState("load");
-      await expect(page.getByRole("heading", { name: "Getting Started" })).toBeVisible();
+      await expect(
+        page.getByRole("heading", { name: "Getting Started" })
+      ).toBeVisible();
     });
 
     test("should render docs on mobile", async ({ page }) => {
       await page.setViewportSize({ width: 375, height: 667 });
       await page.goto(`${E2E_BASE_URL}/docs`);
       await page.waitForLoadState("load");
-      await expect(page.getByRole("heading", { name: "Getting Started" })).toBeVisible();
+      await expect(
+        page.getByRole("heading", { name: "Getting Started" })
+      ).toBeVisible();
     });
 
     test("should have collapsible sidebar on mobile", async ({ page }) => {

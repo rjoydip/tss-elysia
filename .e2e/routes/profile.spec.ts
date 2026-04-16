@@ -4,7 +4,7 @@
  */
 
 import { test, expect } from "@playwright/test";
-import { E2E_BASE_URL } from "../_config";
+import { E2E_BASE_URL } from "../config";
 
 test.describe("Profile Page", () => {
   test.beforeEach(async ({ page }) => {
@@ -15,7 +15,9 @@ test.describe("Profile Page", () => {
     await expect(page.locator("main")).toBeVisible();
   });
 
-  test("should show authentication checking state initially", async ({ page }) => {
+  test("should show authentication checking state initially", async ({
+    page,
+  }) => {
     await expect(page.getByText(/checking authentication/i)).toBeVisible();
   });
 

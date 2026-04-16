@@ -4,25 +4,33 @@
  */
 
 import { test, expect } from "@playwright/test";
-import { E2E_BASE_URL } from "../_config";
+import { E2E_BASE_URL } from "../config";
 
 test.describe("CORS Middleware", () => {
-  test("should include Access-Control-Allow-Origin header", async ({ request }) => {
+  test("should include Access-Control-Allow-Origin header", async ({
+    request,
+  }) => {
     const response = await request.get("/api/health");
     expect(response.headers()["access-control-allow-origin"]).toBeDefined();
   });
 
-  test("should include Access-Control-Allow-Methods header", async ({ request }) => {
+  test("should include Access-Control-Allow-Methods header", async ({
+    request,
+  }) => {
     const response = await request.get("/api/health");
     expect(response.headers()["access-control-allow-methods"]).toBeDefined();
   });
 
-  test("should include Access-Control-Allow-Headers header", async ({ request }) => {
+  test("should include Access-Control-Allow-Headers header", async ({
+    request,
+  }) => {
     const response = await request.get("/api/health");
     expect(response.headers()["access-control-allow-headers"]).toBeDefined();
   });
 
-  test("should include Access-Control-Expose-Headers header", async ({ request }) => {
+  test("should include Access-Control-Expose-Headers header", async ({
+    request,
+  }) => {
     const response = await request.get("/api/health");
     expect(response.headers()["access-control-expose-headers"]).toBeDefined();
   });

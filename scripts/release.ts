@@ -13,9 +13,9 @@
  *   bun run scripts/release.ts --skip-tag    # Skip git tagging
  */
 
-import { existsSync, readdirSync, readFileSync } from "node:fs";
-import { join, dirname } from "node:path";
-import { fileURLToPath } from "node:url";
+import { existsSync, readdirSync, readFileSync } from "fs";
+import { join, dirname } from "path";
+import { fileURLToPath } from "url";
 import { scriptLogger as logger } from "../src/lib/logger";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -29,7 +29,11 @@ const SKIP_PUSH = process.argv.includes("--skip-push");
 /**
  * Executes a shell command and returns the result.
  */
-async function exec(command: string, args: string[], options?: { cwd?: string }) {
+async function exec(
+  command: string,
+  args: string[],
+  options?: { cwd?: string }
+) {
   const process_ = Bun.spawn([command, ...args], {
     cwd: options?.cwd ?? rootDir,
   });
@@ -41,7 +45,9 @@ async function exec(command: string, args: string[], options?: { cwd?: string })
  * Gets current version from package.json.
  */
 function getCurrentVersion(): string {
-  const packageJson = JSON.parse(readFileSync(join(rootDir, "package.json"), "utf-8"));
+  const packageJson = JSON.parse(
+    readFileSync(join(rootDir, "package.json"), "utf-8")
+  );
   return packageJson.version;
 }
 
@@ -155,7 +161,13 @@ async function createTag(version: string): Promise<boolean> {
   code = await exec("git", ["commit", "-m", `chore: release v${version}`]);
   if (code !== 0) return false;
 
-  code = await exec("git", ["tag", "-a", `v${version}`, "-m", `Release v${version}`]);
+  code = await exec("git", [
+    "tag",
+    "-a",
+    `v${version}`,
+    "-m",
+    `Release v${version}`,
+  ]);
   if (code !== 0) return false;
 
   logger.success(`Created tag v${version}`);
@@ -215,7 +227,9 @@ async function getReleaseNotes(): Promise<string> {
   }
 
   const content = readFileSync(changelogPath, "utf-8");
-  const match = content.match(/##\s+\[?([\d.]+)\]?\s+-\s+([\d-]+)\n([\s\S]*?)(?=##\s|$)/);
+  const match = content.match(
+    /##\s+\[?([\d.]+)\]?\s+-\s+([\d-]+)\n([\s\S]*?)(?=##\s|$)/
+  );
   if (match) {
     return match[3].trim();
   }

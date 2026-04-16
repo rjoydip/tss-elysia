@@ -4,7 +4,7 @@
  */
 
 import { test, expect } from "@playwright/test";
-import { E2E_BASE_URL } from "../_config";
+import { E2E_BASE_URL } from "../config";
 
 test.describe("Form Integration", () => {
   test("should render form with inputs and buttons", async ({ page }) => {
@@ -12,7 +12,9 @@ test.describe("Form Integration", () => {
 
     const emailInput = page.locator("main").getByPlaceholder("Email");
     const passwordInput = page.locator("main").getByPlaceholder("Password");
-    const submitButton = page.locator("main").getByRole("button", { name: /sign in/i });
+    const submitButton = page
+      .locator("main")
+      .getByRole("button", { name: /sign in/i });
 
     await expect(emailInput).toBeVisible();
     await expect(passwordInput).toBeVisible();
@@ -27,7 +29,10 @@ test.describe("Form Integration", () => {
 
     await page.waitForTimeout(500);
 
-    const requirements = page.locator("main").getByText("At least", { exact: false }).first();
+    const requirements = page
+      .locator("main")
+      .getByText("At least", { exact: false })
+      .first();
     if ((await requirements.count()) > 0) {
       await expect(requirements.first()).toBeVisible();
     }

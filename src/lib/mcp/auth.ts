@@ -5,9 +5,13 @@
  * Includes rate limiting per API key.
  */
 
-import { AsyncLocalStorage } from "node:async_hooks";
+import { AsyncLocalStorage } from "async_hooks";
 import type { McpApiKey } from "~/lib/db/schema";
-import { checkRateLimit, cleanupRateLimitStoreOnRequest, type RateLimitResult } from "./rate-limit";
+import {
+  checkRateLimit,
+  cleanupRateLimitStoreOnRequest,
+  type RateLimitResult,
+} from "./rate-limit";
 
 /**
  * AsyncLocalStorage for storing API key context per-request.
@@ -58,7 +62,7 @@ export function runWithApiKey<T>(apiKey: McpApiKey, fn: () => T): T {
 export function runWithContext<T>(
   apiKey: McpApiKey,
   rateLimitResult: RateLimitResult,
-  fn: () => T,
+  fn: () => T
 ): T {
   return apiKeyStorage.run(apiKey, () => {
     return rateLimitStorage.run(rateLimitResult, fn);
@@ -81,7 +85,7 @@ export function clearApiKeyContext(): void {
  * @returns Validated API key with rate limit info, or null if invalid/rate limited
  */
 export async function validateMcpAuth(
-  authHeader: string | null,
+  authHeader: string | null
 ): Promise<{ apiKey: McpApiKey; rateLimit: RateLimitResult } | null> {
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
     return null;
@@ -123,7 +127,9 @@ export async function validateMcpAuth(
  * @param rateLimit - Rate limit result
  * @returns Response with 429 status and headers
  */
-export function createRateLimitedResponse(rateLimit: RateLimitResult): Response {
+export function createRateLimitedResponse(
+  rateLimit: RateLimitResult
+): Response {
   const body = JSON.stringify({
     error: "Rate limit exceeded",
     limit: rateLimit.limit,
@@ -141,7 +147,10 @@ export function createRateLimitedResponse(rateLimit: RateLimitResult): Response 
   // Add rate limit headers
   response.headers.set("X-RateLimit-Limit", String(rateLimit.limit));
   response.headers.set("X-RateLimit-Remaining", "0");
-  response.headers.set("X-RateLimit-Reset", String(Math.ceil(rateLimit.resetAt / 1000)));
+  response.headers.set(
+    "X-RateLimit-Reset",
+    String(Math.ceil(rateLimit.resetAt / 1000))
+  );
 
   return response;
 }

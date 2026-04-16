@@ -49,7 +49,7 @@ If warnings persist, increase the limit or consider:
 ### LibSQL/Node SQLite Module Issues
 
 ```txt
-Module "libsql" or "node:sqlite" has been externalized for browser compatibility
+Module "libsql" has been externalized for browser compatibility
 ```
 
 **Cause**: The database driver (`@libsql/client`) is server-only but Vite tries to bundle it for the browser.
