@@ -261,7 +261,7 @@ changes
 ### Run Tests
 
 ```bash
-bun test               # Run all tests
+bun test:unit          # Run all unit tests
 bun test:watch         # Watch mode for development
 bun test:coverage      # With coverage report
 ```

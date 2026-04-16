@@ -11,8 +11,8 @@ import { AppTitle } from "./app-title";
 import { sidebarData } from "./data/sidebar-data";
 import { NavGroup } from "./nav-group";
 import { NavUser, type NavUserProps } from "./nav-user";
-// TODO(rjoydip): Uncomment when multi-team support is needed
-// import { TeamSwitcher } from "./team-switcher";
+import { env } from "~/config/env";
+import { TeamSwitcher } from "./team-switcher";
 
 export function AppSidebar() {
   const { collapsible, variant } = useLayout();
@@ -28,8 +28,7 @@ export function AppSidebar() {
   return (
     <Sidebar collapsible={collapsible} variant={variant}>
       <SidebarHeader>
-        {/* TODO(rjoydip): Uncomment <TeamSwitcher /> when multi-team support is enabled
-        {/*<TeamSwitcher teams={sidebarData.teams} />*/}
+        {env.featureMultiTeam && <TeamSwitcher teams={sidebarData.teams} />}
         <AppTitle />
       </SidebarHeader>
       <SidebarContent>

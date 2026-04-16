@@ -87,6 +87,21 @@ describe("Auth Store", () => {
       authActions.setUser(expiredUser);
       expect(authStore.get().user?.exp).toBeLessThan(Date.now());
     });
+
+    it("should handle Unicode characters in email and name", () => {
+      const unicodeUser = {
+        accountNo: "99999",
+        email: "tëst@ünïcödé.com",
+        name: "Üsër Námé",
+        role: ["user"],
+        exp: Date.now() + 3600000,
+      };
+
+      authActions.setUser(unicodeUser);
+      expect(authStore.get().user?.email).toBe("tëst@ünïcödé.com");
+      expect(authStore.get().user?.name).toBe("Üsër Námé");
+      expect(authStore.get().user?.role).toEqual(["user"]);
+    });
   });
 });
 

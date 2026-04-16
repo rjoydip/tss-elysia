@@ -199,6 +199,7 @@ function _getAuthSecret(): string {
 export const env = await _createEnv({
   client: {
     VITE_API_URL: t.String(),
+    FEATURE_MULTI_TEAM: t.Boolean(),
   },
   server: {
     API_URL: t.String(),
@@ -263,6 +264,7 @@ export const env = await _createEnv({
     WS_MAX_MESSAGE_SIZE: parseInt(_getEnv("WS_MAX_MESSAGE_SIZE", ""), 10) || undefined,
     WS_RATE_LIMIT_MESSAGES: parseInt(_getEnv("WS_RATE_LIMIT_MESSAGES", ""), 10) || undefined,
     WS_RATE_LIMIT_WINDOW: parseInt(_getEnv("WS_RATE_LIMIT_WINDOW", ""), 10) || undefined,
+    FEATURE_MULTI_TEAM: _getEnv("FEATURE_MULTI_TEAM", "false") === "true",
   }),
 });
 

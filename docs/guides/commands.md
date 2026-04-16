@@ -29,9 +29,9 @@ This document lists all available npm scripts in `package.json`.
 
 | Script             | Command                          | Description                      |
 | ------------------ | -------------------------------- | -------------------------------- |
-| `test:unit`        | `bun test`                       | Run unit tests                   |
-| `test:watch`       | `bun test --watch`               | Run tests in watch mode          |
-| `test:coverage`    | `bun test --coverage`            | Run tests with coverage report   |
+| `test:unit`        | `bun test:unit`                       | Run unit tests                   |
+| `test:watch`       | `bun test:unit --watch`               | Run tests in watch mode          |
+| `test:coverage`    | `bun test:unit --coverage`            | Run tests with coverage report   |
 | `test:e2e`         | `playwright test`                | Run end-to-end tests             |
 | `test:e2e:ui`      | `bun playwright test --ui`       | Run E2E tests with Playwright UI |
 | `test:e2e:headed`  | `bun playwright test --headed`   | Run E2E tests in headed mode     |

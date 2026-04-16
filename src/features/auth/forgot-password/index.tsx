@@ -40,21 +40,15 @@ export function ForgotPassword() {
           </div>
           <div className="mx-auto flex w-full max-w-sm flex-col justify-center space-y-2">
             <div className="flex flex-col space-y-2 text-start">
-              <h2 className="text-lg font-semibold tracking-tight">
-                Forgot Password
-              </h2>
+              <h2 className="text-lg font-semibold tracking-tight">Forgot Password</h2>
               <p className="text-sm text-muted-foreground">
-                Enter your registered email and we will send you a link to reset
-                your password.
+                Enter your registered email and we will send you a link to reset your password.
               </p>
             </div>
             <ForgotPasswordForm />
             <p className="mx-auto px-8 text-center text-sm text-balance text-muted-foreground">
               Don't have an account?{" "}
-              <Link
-                to="/sign-up"
-                className="underline underline-offset-4 hover:text-primary"
-              >
+              <Link to="/sign-up" className="underline underline-offset-4 hover:text-primary">
                 Sign up
               </Link>
               .
@@ -65,7 +59,7 @@ export function ForgotPassword() {
         <div
           className={cn(
             "relative h-full overflow-hidden bg-muted max-lg:hidden",
-            "[&>img]:absolute [&>img]:top-[15%] [&>img]:left-20 [&>img]:h-full [&>img]:w-full [&>img]:object-cover [&>img]:object-top-left [&>img]:select-none"
+            "[&>img]:absolute [&>img]:top-[15%] [&>img]:left-20 [&>img]:h-full [&>img]:w-full [&>img]:object-cover [&>img]:object-top-left [&>img]:select-none",
           )}
         >
           <img

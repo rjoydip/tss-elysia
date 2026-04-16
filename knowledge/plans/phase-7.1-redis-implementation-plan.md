@@ -823,7 +823,7 @@ bun run lint:fix
 bun run typecheck
 
 # Unit tests
-bun test
+bun test:unit
 
 # E2E tests (requires Redis running)
 bun run test:e2e
