@@ -70,11 +70,15 @@ const extractLoginErrorMessage = (error: unknown): string => {
   return "Failed to sign in";
 };
 
-interface UserAuthFormProps extends React.HTMLAttributes<HTMLFormElement> {
+interface SignInFormProps extends React.HTMLAttributes<HTMLFormElement> {
   redirectTo?: string;
 }
 
-export function UserAuthForm({ className, redirectTo, ...props }: UserAuthFormProps) {
+export function SignInForm({
+  className,
+  redirectTo,
+  ...props
+}: SignInFormProps) {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
@@ -154,6 +158,15 @@ export function UserAuthForm({ className, redirectTo, ...props }: UserAuthFormPr
             </FormItem>
           )}
         />
+        <div className="flex items-center justify-between text-sm">
+          <span className="text-muted-foreground">Do not have an account?</span>
+          <Link
+            to="/sign-up"
+            className="text-sm font-medium text-muted-foreground hover:opacity-75"
+          >
+            Sign up
+          </Link>
+        </div>
         <Button type="submit" className="mt-2" disabled={isLoading}>
           {isLoading ? <Loader2 className="animate-spin" /> : <LogIn />}
           Sign in
@@ -164,7 +177,9 @@ export function UserAuthForm({ className, redirectTo, ...props }: UserAuthFormPr
             <span className="w-full border-t" />
           </div>
           <div className="relative flex justify-center text-xs uppercase">
-            <span className="bg-background px-2 text-muted-foreground">Or continue with</span>
+            <span className="bg-background px-2 text-muted-foreground">
+              Or continue with
+            </span>
           </div>
         </div>
 

@@ -2,10 +2,9 @@
  * Test cleanup utilities for database cleanup after tests.
  * Uses Node.js SQLite driver to avoid bun: protocol issues in Playwright teardown.
  */
-import Database from "better-sqlite3";
 import { eq, like } from "drizzle-orm";
-import { drizzle } from "drizzle-orm/better-sqlite3";
 import * as schema from "../src/lib/db/schema";
+import { createSQLiteConnection } from "../src/lib/db";
 
 /**
  * Prefix used to identify test users/emails.
@@ -18,40 +17,13 @@ const TEST_PREFIX = "test-";
 const TEST_DOMAIN = "example.com";
 
 /**
- * Get database path based on environment.
- */
-function getDbPath(): string {
-  const _dbPath = ".artifacts/tsse-elysia.db";
-
-  const dbPath =
-    process.env.DATABASE_PATH && process.env.DATABASE_NAME
-      ? `${process.env.DATABASE_PATH}/${process.env.DATABASE_NAME}`
-      : process.env.DATABASE_NAME && !process.env.DATABASE_PATH
-        ? `.artifacts/${process.env.DATABASE_NAME}`
-        : process.env.NODE_ENV === "test"
-          ? _dbPath
-          : _dbPath;
-
-  return dbPath;
-}
-
-/**
- * Create a Drizzle instance using better-sqlite3.
- */
-function createDbConnection() {
-  const dbPath = getDbPath();
-  const sqlite = new Database(dbPath);
-  return drizzle(sqlite, { schema });
-}
-
-/**
  * Cleanup a specific test user by email.
  * Deletes all related data in the correct order (respects foreign keys).
  *
  * @param email - Email of the user to clean up
  */
 export async function cleanupTestUser(email: string): Promise<void> {
-  const db = createDbConnection();
+  const { db } = createSQLiteConnection();
   try {
     const users = await db
       .select()
@@ -84,7 +56,7 @@ export async function cleanupTestUser(email: string): Promise<void> {
  * Used for E2E teardown.
  */
 export async function cleanupAllTestData(): Promise<void> {
-  const db = createDbConnection();
+  const { db } = createSQLiteConnection();
   try {
     const testUsers = await db
       .select()

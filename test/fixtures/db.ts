@@ -1,6 +1,7 @@
 import { faker } from "@faker-js/faker";
-import { drizzle } from "drizzle-orm/bun-sqlite";
-import { Database } from "bun:sqlite";
+
+import { createClient } from "@libsql/client";
+import { drizzle } from "drizzle-orm/libsql";
 import * as schema from "../../src/lib/db/schema";
 import type { SubscriptionTier } from "../../src/types/subscription";
 
@@ -82,10 +83,12 @@ const CREATE_TABLES_SQL = `
 
 export { CREATE_TABLES_SQL };
 
-export function createTestDatabase(): ReturnType<typeof drizzle> {
-  const sqlite = new Database(TEST_DB_PATH);
-  sqlite.exec(CREATE_TABLES_SQL);
-  return drizzle(sqlite, { schema });
+export function createTestDatabase() {
+  const client = createClient({
+    url: TEST_DB_PATH,
+  });
+  client.execute(CREATE_TABLES_SQL);
+  return drizzle(client, { schema });
 }
 
 export function cleanupTestDatabase() {

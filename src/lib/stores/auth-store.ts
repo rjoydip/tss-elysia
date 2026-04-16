@@ -32,8 +32,30 @@ interface AuthState {
   accessToken: string;
 }
 
+/**
+ * Base64 encoding/decoding utilities for cookie storage.
+ * NOTE: This provides encoding only (not encryption) for data storage/transmission.
+ * The actual security is handled by the cookie's HttpOnly/Secure flags configured
+ * server-side. Do NOT rely on base64 encoding for data protection.
+ */
+function safeAtob(input: string): string {
+  try {
+    return atob(input);
+  } catch {
+    return "";
+  }
+}
+
+function safeBtoa(input: string): string {
+  try {
+    return btoa(input);
+  } catch {
+    return btoa(unescape(encodeURIComponent(input)));
+  }
+}
+
 const cookieState = getCookie(ACCESS_TOKEN);
-const initToken = cookieState ? JSON.parse(atob(cookieState)) : "";
+const initToken = cookieState ? JSON.parse(safeAtob(cookieState)) : "";
 
 let initUser: AuthUser | null = null;
 if (cookieState) {
@@ -66,8 +88,8 @@ export const authActions = {
     }));
   },
   setAccessToken: (accessToken: string) => {
-    const encrypted = btoa(JSON.stringify(accessToken));
-    setCookie(ACCESS_TOKEN, encrypted);
+    const encoded = safeBtoa(JSON.stringify(accessToken));
+    setCookie(ACCESS_TOKEN, encoded);
     authStore.setState((state) => ({ ...state, accessToken }));
   },
   resetAccessToken: () => {

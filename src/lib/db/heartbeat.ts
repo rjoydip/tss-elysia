@@ -4,6 +4,7 @@
  */
 
 import { getDatabasePools, getDatabasePoolConfigs, type DatabaseType } from "./index";
+import type { Client } from "@libsql/client";
 
 /**
  * Individual pool status for heartbeat response.
@@ -37,10 +38,12 @@ export async function getDatabaseHeartbeat(): Promise<DatabaseHeartbeat> {
   const pools = getDatabasePools();
 
   try {
-    // Check SQLite heartbeat
-    if (pools.sqlite) {
-      const result = pools.sqlite.query("SELECT 1 AS ok").get() as { ok?: number } | null;
-      if (!result || result.ok !== 1) {
+    // Check SQLite heartbeat using libSQL client
+    const sqliteClient = pools.sqlite as Client | undefined;
+    if (sqliteClient) {
+      const result = await sqliteClient.execute({ sql: "SELECT 1 AS ok", args: [] });
+      const row = result.rows?.[0] as { ok?: number } | undefined;
+      if (!row || row.ok !== 1) {
         return {
           status: "unhealthy",
           latencyMs: null,
@@ -96,10 +99,11 @@ export async function getDatabaseHeartbeat(): Promise<DatabaseHeartbeat> {
     try {
       const primaryStart = Date.now();
       const primaryResult = await pgPrimary.query("SELECT 1 AS ok");
+      const pRows = primaryResult.rows as Array<{ ok?: number }>;
       poolHealthResults.push({
         name: "primary",
         role: "primary",
-        healthy: primaryResult.rows[0]?.ok === 1,
+        healthy: pRows[0]?.ok === 1,
         latencyMs: Date.now() - primaryStart,
       });
     } catch (error) {
@@ -120,10 +124,11 @@ export async function getDatabaseHeartbeat(): Promise<DatabaseHeartbeat> {
       try {
         const replicaStart = Date.now();
         const replicaResult = await replica.query("SELECT 1 AS ok");
+        const rRows = replicaResult.rows as Array<{ ok?: number }>;
         poolHealthResults.push({
           name: config?.name || `replica-${i + 1}`,
           role: "replica",
-          healthy: replicaResult.rows[0]?.ok === 1,
+          healthy: rRows[0]?.ok === 1,
           latencyMs: Date.now() - replicaStart,
         });
       } catch (error) {

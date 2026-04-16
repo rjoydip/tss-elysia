@@ -182,6 +182,9 @@ Add a `redis` service and wire it into both `app` and `dev` services.
  # Database Configuration
  DATABASE_PATH=.artifacts
  DATABASE_NAME=tsse-elysia.db
+ # Database Configuration
+ DATABASE_PATH=.artifacts
+ DATABASE_NAME=tsse-elysia.db
 +
 +# Redis Configuration
 +# Local Docker: redis://localhost:6379

@@ -26,7 +26,7 @@
 import { existsSync, rmSync, readdirSync, statSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
-import { logger } from "./_logger";
+import { scriptLogger as logger } from "../src/lib/logger";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const rootDir = join(__dirname, "..");
@@ -58,7 +58,10 @@ if (!KEEP_DB) {
 }
 
 if (FULL_RESET) {
-  dirsToClean.push({ path: join(rootDir, "node_modules"), name: "Node modules" });
+  dirsToClean.push({
+    path: join(rootDir, "node_modules"),
+    name: "Node modules",
+  });
 }
 
 logger.section("TSS Elysia Cleanup");

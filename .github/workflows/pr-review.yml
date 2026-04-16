@@ -26,6 +26,21 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           persist-credentials: true
+      - name: Remove existing review comments
+        if: ${{ !github.event.pull_request.merged }}
+        run: |
+          # Find and delete existing comments from this workflow (opencode-review workflow)
+          COMMENTS=$(gh api \
+            --paginate \
+            repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/comments \
+            --jq '.[] | select(.user.login == "github-actions[bot]" and (.body | contains("## Review Guidelines"))) | .id')
+
+          for ID in $COMMENTS; do
+            echo "Deleting existing review comment: $ID"
+            gh api --method DELETE repos/${{ github.repository }}/pulls/comments/$ID
+          done
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Configure Git
         run: |
           git config --global user.email "${{ vars.GH_USER_EMAIL || 'github-actions[bot]@users.noreply.github.com' }}"

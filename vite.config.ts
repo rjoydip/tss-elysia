@@ -11,7 +11,6 @@ export default defineConfig(() => ({
   plugins: [tanstackStart(), viteReact(), tailwindcss()],
   ssr: {
     noExternal: ["drizzle-orm"],
-    external: ["bun"],
   },
   environments: {
     ssr: {

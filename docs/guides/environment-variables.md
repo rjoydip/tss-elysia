@@ -9,45 +9,44 @@ This project uses type-safe environment variables with isomorphic fetching, supp
 
 ## Server Configuration
 
-| Variable                 | Default          | Description                                    |
-| ------------------------ | ---------------- | ---------------------------------------------- |
-| `HOST`                   | `localhost`      | Server host                                    |
-| `PORT`                   | `3000`           | Server port                                    |
-| `VITE_API_URL`           | Dynamic          | Client API URL for Eden Treaty                 |
-| `DATABASE_PATH`          | `.artifacts`     | SQLite database file path                      |
-| `DATABASE_NAME`          | `tsse-elysia.db` | SQLite database file name                      |
-| `DATABASE_TYPE`          | `sqlite`         | Database type: `sqlite` or `postgres`          |
-| `DATABASE_URL`           | -                | Database connection URL                        |
-| `POSTGRES_URL`           | -                | PostgreSQL connection URL (when type=postgres) |
-| `BETTER_AUTH_SECRET`     | Auto-generated   | Authentication secret for session tokens       |
-| `WS_ENABLED`             | -                | Enables/disables websocket transport           |
-| `WS_HEARTBEAT_INTERVAL`  | -                | Websocket heartbeat interval                   |
-| `WS_MAX_MESSAGE_SIZE`    | -                | Max websocket message size                     |
-| `WS_RATE_LIMIT_MESSAGES` | -                | Websocket messages allowed per window          |
-| `WS_RATE_LIMIT_WINDOW`   | -                | Websocket rate-limit window (ms)               |
-| `REDIS_URL`              | -                | Redis connection URL for cache & pub/sub       |
+| Variable                 | Default        | Description                                    |
+| ------------------------ | -------------- | ---------------------------------------------- |
+| `HOST`                   | `localhost`    | Server host                                    |
+| `PORT`                   | `3000`         | Server port                                    |
+| `VITE_API_URL`           | Dynamic        | Client API URL for Eden Treaty                 |
+| `DATABASE_TYPE`          | `sqlite`       | Database type: `sqlite` or `postgres`          |
+| `DATABASE_URL`           | -              | Database connection URL                        |
+| `POSTGRES_URL`           | -              | PostgreSQL connection URL (when type=postgres) |
+| `BETTER_AUTH_SECRET`     | Auto-generated | Authentication secret for session tokens       |
+| `WS_ENABLED`             | -              | Enables/disables websocket transport           |
+| `WS_HEARTBEAT_INTERVAL`  | -              | Websocket heartbeat interval                   |
+| `WS_MAX_MESSAGE_SIZE`    | -              | Max websocket message size                     |
+| `WS_RATE_LIMIT_MESSAGES` | -              | Websocket messages allowed per window          |
+| `WS_RATE_LIMIT_WINDOW`   | -              | Websocket rate-limit window (ms)               |
+| `REDIS_URL`              | -              | Redis connection URL for cache & pub/sub       |
 
 ## Database Configuration
 
-| Variable        | Default          | Description                            |
-| --------------- | ---------------- | -------------------------------------- |
-| `DATABASE_PATH` | `.artifacts`     | Path to SQLite database file           |
-| `DATABASE_NAME` | `tsse-elysia.db` | Path to SQLite database name           |
-| `DATABASE_TYPE` | `sqlite`         | Database type (`sqlite` or `postgres`) |
+| Variable            | Default  | Description                                    |
+| ------------------- | -------- | ---------------------------------------------- |
+| `DATABASE_TYPE`     | `sqlite` | Database type (`sqlite` or `postgres`)         |
+| `SQLITE_URL`        | -        | LibSQL connection URL (Turso, file path, etc.) |
+| `SQLITE_AUTH_TOKEN` | -        | Auth token for Turso/remote databases          |
 
-The database path can be customized via environment variables:
+The database configuration supports multiple backends:
 
-### SQLite (Default)
+### SQLite (Default - LibSQL)
 
 ```bash
 # Default configuration
 DATABASE_TYPE=sqlite bun run dev
 
-# Use custom database location
-DATABASE_NAME=./custom/path/database.db bun run dev
+# Use Turso remote database
+SQLITE_URL=libsql://your-database.turso.io
+SQLITE_AUTH_TOKEN=your-auth-token
 
-# Use in-memory database for testing
-DATABASE_NAME=:memory: bun run dev
+# Use local file-based database
+SQLITE_URL=file:./path/to/database.db
 ```
 
 ### PostgreSQL
@@ -115,10 +114,10 @@ The database path can be customized via environment variables:
 
 ```bash
 # Use custom database location
-DATABASE_NAME=./custom/path/database.db bun run dev
+SQLITE_URL=file:./custom/path/database.db bun run dev
 
 # Use in-memory database for testing
-DATABASE_NAME=:memory: bun run dev
+SQLITE_URL=:memory: bun run dev
 ```
 
 ## E2E Testing Configuration
@@ -187,7 +186,6 @@ export const env = await _createEnv({
     BETTER_AUTH_SECRET: _getAuthSecret(),
     DATABASE_URL: _getEnv("DATABASE_URL", ""),
     DATABASE_PATH: _getEnv("DATABASE_PATH", ".artifacts"),
-    DATABASE_NAME: _getEnv("DATABASE_NAME", "tsse-elysia.db"),
     PORT: parseInt(_getEnv("PORT", "3000"), 10),
   }),
 });
@@ -195,24 +193,24 @@ export const env = await _createEnv({
 
 ### Database Setup
 
-The database path is configurable via `DATABASE_NAME`:
+The database is configured via `SQLITE_URL`:
 
 ```bash
-# Default location
-DATABASE_PATH=.artifacts DATABASE_NAME=tsse-elysia.db bun run db:migrate
+# Default location (file-based)
+SQLITE_URL=file:.artifacts/tsse-elysia.db bun run db:migrate
 
 # Custom location
-DATABASE_PATH=.artifacts DATABASE_NAME=production.db bun run db:migrate
+SQLITE_URL=file:./custom/path/database.db bun run db:migrate
 
 # In-memory (for testing)
-DATABASE_NAME=:memory: bun run seed
+SQLITE_URL=:memory: bun run seed
 ```
 
-After setting `DATABASE_NAME`, run migrations and seed:
+After setting `SQLITE_URL`, run migrations and seed:
 
 ```bash
-DATABASE_PATH=.artifacts DATABASE_NAME=tsse-elysia.db bun run db:migrate
-DATABASE_PATH=.artifacts DATABASE_NAME=tsse-elysia.db bun run db:seed
+bun run db:migrate
+bun run db:seed
 ```
 
 ### Client Environment Variables

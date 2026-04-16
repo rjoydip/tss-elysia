@@ -16,9 +16,16 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
     "paths": {
-      "~/*": ["./src/*"],
-      "*": ["./*"]
+      "~/*": ["./src/*"]
     }
   },
-  "include": ["src", "playwright.config.ts", "drizzle.config.ts", "vite.config.ts"]
+  "include": [
+    ".e2e",
+    "src",
+    "scripts",
+    "playwright.config.ts",
+    "drizzle.config.ts",
+    "vite.config.ts"
+  ],
+  "exclude": ["*.d.ts"]
 }

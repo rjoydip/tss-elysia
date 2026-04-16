@@ -30,7 +30,10 @@ const formSchema = z.object({
   }),
 });
 
-export function ForgotPasswordForm({ className, ...props }: React.HTMLAttributes<HTMLFormElement>) {
+export function ForgotPasswordForm({
+  className,
+  ...props
+}: React.HTMLAttributes<HTMLFormElement>) {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
 

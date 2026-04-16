@@ -11,6 +11,7 @@ import { AppTitle } from "./app-title";
 import { sidebarData } from "./data/sidebar-data";
 import { NavGroup } from "./nav-group";
 import { NavUser, type NavUserProps } from "./nav-user";
+// TODO(rjoydip): Uncomment when multi-team support is needed
 // import { TeamSwitcher } from "./team-switcher";
 
 export function AppSidebar() {
@@ -27,9 +28,8 @@ export function AppSidebar() {
   return (
     <Sidebar collapsible={collapsible} variant={variant}>
       <SidebarHeader>
+        {/* TODO(rjoydip): Uncomment <TeamSwitcher /> when multi-team support is enabled
         {/*<TeamSwitcher teams={sidebarData.teams} />*/}
-        {/* Replace <TeamSwitch /> with the following <AppTitle />
-        /* if you want to use the normal app title instead of TeamSwitch dropdown */}
         <AppTitle />
       </SidebarHeader>
       <SidebarContent>

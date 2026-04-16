@@ -172,8 +172,6 @@ const _getEnv = (key: string, defaultValue: string = ""): string => {
  * These are used when environment variables are not explicitly set.
  */
 const _BASE_URL = `http://localhost:${PORT}`;
-const _DEFAULT_DB_PATH = ".artifacts";
-const _DEFAULT_DB_NAME = "tsse-elysia.db";
 
 /**
  * Retrieves and validates the Better Auth secret key.
@@ -201,15 +199,15 @@ function _getAuthSecret(): string {
 export const env = await _createEnv({
   client: {
     VITE_API_URL: t.String(),
-    DATABASE_NAME: t.String(),
   },
   server: {
     API_URL: t.String(),
     BETTER_AUTH_URL: t.String(),
     BETTER_AUTH_SECRET: t.String(),
     DATABASE_URL: t.String(),
-    DATABASE_PATH: t.String(),
     DATABASE_TYPE: t.Union([t.Literal("sqlite"), t.Literal("postgres")]),
+    SQLITE_URL: t.Optional(t.String()),
+    SQLITE_AUTH_TOKEN: t.Optional(t.String()),
     POSTGRES_USER: t.Optional(t.String()),
     POSTGRES_PASSWORD: t.Optional(t.String()),
     POSTGRES_DB: t.Optional(t.String()),
@@ -231,9 +229,9 @@ export const env = await _createEnv({
     BETTER_AUTH_URL: _getEnv("BETTER_AUTH_URL", `${_BASE_URL}/api/auth`),
     BETTER_AUTH_SECRET: _getAuthSecret(),
     DATABASE_URL: _getEnv("DATABASE_URL", ""),
-    DATABASE_PATH: _getEnv("DATABASE_PATH", _DEFAULT_DB_PATH),
-    DATABASE_NAME: _getEnv("DATABASE_NAME", _DEFAULT_DB_NAME),
     DATABASE_TYPE: _getEnv("DATABASE_TYPE", "sqlite") as "sqlite" | "postgres",
+    SQLITE_URL: _getEnv("SQLITE_URL", "") || undefined,
+    SQLITE_AUTH_TOKEN: _getEnv("SQLITE_AUTH_TOKEN", "") || undefined,
     POSTGRES_USER: _getEnv("POSTGRES_USER", "") || undefined,
     POSTGRES_PASSWORD: _getEnv("POSTGRES_PASSWORD", "") || undefined,
     POSTGRES_DB: _getEnv("POSTGRES_DB", "") || undefined,

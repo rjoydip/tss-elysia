@@ -16,7 +16,7 @@
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
-import { logger } from "./_logger";
+import { scriptLogger as logger } from "../src/lib/logger";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const rootDir = join(__dirname, "..");

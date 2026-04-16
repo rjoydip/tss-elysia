@@ -26,6 +26,14 @@ export interface NavUserProps {
   image: string;
 }
 
+/**
+ * Navigation user component with dual-mode data source support.
+ *
+ * - When `user` prop is provided: Uses passed user data (e.g., from session fallback)
+ * - When `user` prop is omitted: Falls back to session user from useSession hook
+ *
+ * @param user - Optional user data. If not provided, session user is used.
+ */
 export function NavUser({ user }: { user?: NavUserProps }) {
   const { data: session } = useSession();
   const { isMobile } = useSidebar();

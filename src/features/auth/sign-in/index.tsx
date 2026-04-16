@@ -6,7 +6,7 @@ import { useAuthStore } from "~/lib/stores/auth-store";
 import { AnimatedPageBackground } from "~/components/animated-page-background";
 import dashboardDark from "./assets/dashboard-dark.png";
 import dashboardLight from "./assets/dashboard-light.png";
-import { UserAuthForm } from "./components/user-auth-form";
+import { SignInForm } from "./components/sign-in-form";
 import { APP_NAME } from "~/config";
 
 export function SignIn() {
@@ -47,14 +47,20 @@ export function SignIn() {
                 Enter your email and password below to log into your account
               </p>
             </div>
-            <UserAuthForm />
+            <SignInForm />
             <p className="px-8 text-center text-sm text-muted-foreground">
               By clicking sign in, you agree to our{" "}
-              <a href="/terms" className="underline underline-offset-4 hover:text-primary">
+              <a
+                href="/terms"
+                className="underline underline-offset-4 hover:text-primary"
+              >
                 Terms of Service
               </a>{" "}
               and{" "}
-              <a href="/privacy" className="underline underline-offset-4 hover:text-primary">
+              <a
+                href="/privacy"
+                className="underline underline-offset-4 hover:text-primary"
+              >
                 Privacy Policy
               </a>
               .
@@ -65,7 +71,7 @@ export function SignIn() {
         <div
           className={cn(
             "relative h-full overflow-hidden bg-muted max-lg:hidden",
-            "[&>img]:absolute [&>img]:top-[15%] [&>img]:left-20 [&>img]:h-full [&>img]:w-full [&>img]:object-cover [&>img]:object-top-left [&>img]:select-none",
+            "[&>img]:absolute [&>img]:top-[15%] [&>img]:left-20 [&>img]:h-full [&>img]:w-full [&>img]:object-cover [&>img]:object-top-left [&>img]:select-none"
           )}
         >
           <img

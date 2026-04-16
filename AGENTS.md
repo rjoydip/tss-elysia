@@ -171,8 +171,8 @@ Database configuration is managed via environment variables:
 
 ```bash
 # .env file
-DATABASE_PATH=.artifacts
-DATABASE_NAME=tsse-elysia.db
+DATABASE_TYPE=sqlite
+SQLITE_URL=file:.artifacts/tsse-elysia.db
 BETTER_AUTH_SECRET=your-secret-key
 GITHUB_TOKEN=ghp_xxx  # For GitHub MCP integration
 REDIS_URL=redis://localhost:6379  # Or rediss://...@....upstash.io:6379
@@ -180,14 +180,14 @@ REDIS_URL=redis://localhost:6379  # Or rediss://...@....upstash.io:6379
 
 ### Key Variables
 
-| Variable        | Default          | Description                     |
-| --------------- | ---------------- | ------------------------------- |
-| `DATABASE_PATH` | `.artifacts`     | SQLite database path            |
-| `DATABASE_NAME` | `tsse-elysia.db` | SQLite database name            |
-| `PORT`          | `3000`           | Server port                     |
-| `HOST`          | `localhost`      | Server host                     |
-| `REDIS_URL`     | -                | Redis connection URL            |
-| `GITHUB_TOKEN`  | -                | GitHub token for MCP (optional) |
+| Variable        | Default                          | Description                         |
+| --------------- | -------------------------------- | ----------------------------------- |
+| `DATABASE_TYPE` | `sqlite`                         | Database type (`sqlite`/`postgres`) |
+| `SQLITE_URL`    | `file:.artifacts/tsse-elysia.db` | SQLite database URL                 |
+| `PORT`          | `3000`                           | Server port                         |
+| `HOST`          | `localhost`                      | Server host                         |
+| `REDIS_URL`     | -                                | Redis connection URL                |
+| `GITHUB_TOKEN`  | -                                | GitHub token for MCP (optional)     |
 
 ## MCP Tools
 

@@ -78,7 +78,7 @@ Drizzle ORM provides excellent type safety for your database operations. Let's e
 First, configure your database connection:
 
 \`\`\`typescript
-import { drizzle } from 'drizzle-orm/better-sqlite3';
+import { drizzle } from 'drizzle-orm/libsql';
 import * as schema from './schema';
 
 const db = drizzle(client, { schema });
