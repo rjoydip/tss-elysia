@@ -28,7 +28,7 @@ export function AppSidebar() {
   return (
     <Sidebar collapsible={collapsible} variant={variant}>
       <SidebarHeader>
-        {env.featureMultiTeam && <TeamSwitcher teams={sidebarData.teams} />}
+        {env.FEATURE_MULTI_TEAM && <TeamSwitcher teams={sidebarData.teams} />}
         <AppTitle />
       </SidebarHeader>
       <SidebarContent>

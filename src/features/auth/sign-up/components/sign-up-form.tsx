@@ -169,7 +169,11 @@ export function SignUpForm({ className, ...props }: React.HTMLAttributes<HTMLFor
     setIsLoading(true);
 
     try {
-      const result = await signUpWithEmail(data.name, data.email, encodePassword(data.password));
+      const result = await signUpWithEmail(
+        data.name,
+        data.email,
+        await encodePassword(data.password),
+      );
 
       if (result.error) {
         const errorMessage = getRegisterErrorMessage(extractRegisterErrorMessage(result.error));

@@ -175,7 +175,6 @@ export const env = await _createEnv({
     BETTER_AUTH_URL: t.String(),
     BETTER_AUTH_SECRET: t.String(),
     DATABASE_URL: t.String(),
-    DATABASE_PATH: t.String(),
     PORT: t.Number(),
     REDIS_URL: t.Optional(t.String()),
   },
@@ -185,7 +184,6 @@ export const env = await _createEnv({
     BETTER_AUTH_URL: _getEnv("BETTER_AUTH_URL", "http://localhost:3000/api/auth"),
     BETTER_AUTH_SECRET: _getAuthSecret(),
     DATABASE_URL: _getEnv("DATABASE_URL", ""),
-    DATABASE_PATH: _getEnv("DATABASE_PATH", ".artifacts"),
     PORT: parseInt(_getEnv("PORT", "3000"), 10),
   }),
 });

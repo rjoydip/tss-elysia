@@ -1,24 +1,27 @@
 import { describe, expect, it, beforeEach } from "bun:test";
 import { createClient } from "@libsql/client";
 import { drizzle } from "drizzle-orm/libsql";
+import { eq } from "drizzle-orm";
 import { faker } from "@faker-js/faker";
 import * as schema from "../../src/lib/db/schema";
 
 const TEST_DB_PATH = ":memory:";
 
-function createTestDatabase() {
+async function createTestDatabase() {
   const client = createClient({ url: TEST_DB_PATH });
-  client.execute({
-    sql: `
-      CREATE TABLE IF NOT EXISTS "user" ("id" text PRIMARY KEY, "name" text, "email" text NOT NULL UNIQUE, "emailVerified" integer NOT NULL DEFAULT 0, "image" text, "createdAt" integer NOT NULL, "updatedAt" integer NOT NULL, "subscriptionTier" text NOT NULL DEFAULT 'free', "subscriptionId" text, "subscriptionStatus" text, "subscriptionExpiresAt" integer);
-      CREATE TABLE IF NOT EXISTS "session" ("id" text PRIMARY KEY, "expiresAt" integer NOT NULL, "token" text NOT NULL UNIQUE, "createdAt" integer NOT NULL, "updatedAt" integer NOT NULL, "ipAddress" text, "userAgent" text, "userId" text NOT NULL REFERENCES "user"("id") ON DELETE CASCADE);
-      CREATE TABLE IF NOT EXISTS "account" ("id" text PRIMARY KEY, "accountId" text NOT NULL, "providerId" text NOT NULL, "userId" text NOT NULL REFERENCES "user"("id") ON DELETE CASCADE, "accessToken" text, "refreshToken" text, "idToken" text, "accessTokenExpiresAt" integer, "refreshTokenExpiresAt" integer, "scope" text, "password" text, "createdAt" integer NOT NULL, "updatedAt" integer NOT NULL);
-      CREATE TABLE IF NOT EXISTS "verification" ("id" text PRIMARY KEY, "identifier" text NOT NULL, "value" text NOT NULL, "expiresAt" integer NOT NULL, "createdAt" integer, "updatedAt" integer);
-      CREATE TABLE IF NOT EXISTS "subscription_plan" ("id" text PRIMARY KEY, "name" text NOT NULL, "description" text, "price" integer NOT NULL, "currency" text NOT NULL DEFAULT 'USD', "interval" text NOT NULL, "intervalCount" integer NOT NULL DEFAULT 1, "features" text, "rateLimit" integer NOT NULL, "rateLimitDuration" integer NOT NULL DEFAULT 60000, "createdAt" integer NOT NULL, "updatedAt" integer NOT NULL);
-      CREATE TABLE IF NOT EXISTS "subscription" ("id" text PRIMARY KEY, "userId" text NOT NULL REFERENCES "user"("id") ON DELETE CASCADE, "planId" text NOT NULL REFERENCES "subscription_plan"("id") ON DELETE CASCADE, "status" text NOT NULL DEFAULT 'active', "currentPeriodStart" integer NOT NULL, "currentPeriodEnd" integer NOT NULL, "cancelAtPeriodEnd" integer NOT NULL DEFAULT 0, "createdAt" integer NOT NULL, "updatedAt" integer NOT NULL);
-    `,
-    args: [],
-  });
+  const tables = [
+    `CREATE TABLE IF NOT EXISTS "user" ("id" text PRIMARY KEY, "name" text, "email" text NOT NULL UNIQUE, "emailVerified" integer NOT NULL DEFAULT 0, "image" text, "createdAt" integer NOT NULL, "updatedAt" integer NOT NULL, "subscriptionTier" text NOT NULL DEFAULT 'free', "subscriptionId" text, "subscriptionStatus" text, "subscriptionExpiresAt" integer)`,
+    `CREATE TABLE IF NOT EXISTS "session" ("id" text PRIMARY KEY, "expiresAt" integer NOT NULL, "token" text NOT NULL UNIQUE, "createdAt" integer NOT NULL, "updatedAt" integer NOT NULL, "ipAddress" text, "userAgent" text, "userId" text NOT NULL REFERENCES "user"("id") ON DELETE CASCADE)`,
+    `CREATE TABLE IF NOT EXISTS "account" ("id" text PRIMARY KEY, "accountId" text NOT NULL, "providerId" text NOT NULL, "userId" text NOT NULL REFERENCES "user"("id") ON DELETE CASCADE, "accessToken" text, "refreshToken" text, "idToken" text, "accessTokenExpiresAt" integer, "refreshTokenExpiresAt" integer, "scope" text, "password" text, "createdAt" integer NOT NULL, "updatedAt" integer NOT NULL)`,
+    `CREATE TABLE IF NOT EXISTS "verification" ("id" text PRIMARY KEY, "identifier" text NOT NULL, "value" text NOT NULL, "expiresAt" integer NOT NULL, "createdAt" integer, "updatedAt" integer)`,
+    `CREATE TABLE IF NOT EXISTS "subscription_plan" ("id" text PRIMARY KEY, "name" text NOT NULL, "description" text, "price" integer NOT NULL, "currency" text NOT NULL DEFAULT 'USD', "interval" text NOT NULL, "intervalCount" integer NOT NULL DEFAULT 1, "features" text, "rateLimit" integer NOT NULL, "rateLimitDuration" integer NOT NULL DEFAULT 60000, "createdAt" integer NOT NULL, "updatedAt" integer NOT NULL)`,
+    `CREATE TABLE IF NOT EXISTS "subscription" ("id" text PRIMARY KEY, "userId" text NOT NULL REFERENCES "user"("id") ON DELETE CASCADE, "planId" text NOT NULL REFERENCES "subscription_plan"("id") ON DELETE CASCADE, "status" text NOT NULL DEFAULT 'active', "currentPeriodStart" integer NOT NULL, "currentPeriodEnd" integer NOT NULL, "cancelAtPeriodEnd" integer NOT NULL DEFAULT 0, "createdAt" integer NOT NULL, "updatedAt" integer NOT NULL)`,
+  ];
+
+  for (const sql of tables) {
+    await client.execute({ sql, args: [] });
+  }
+
   return drizzle(client, { schema });
 }
 
@@ -26,8 +29,8 @@ describe("Database Operations", () => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let db: any;
 
-  beforeEach(() => {
-    db = createTestDatabase();
+  beforeEach(async () => {
+    db = await createTestDatabase();
   });
 
   describe("Users CRUD", () => {
@@ -42,9 +45,8 @@ describe("Database Operations", () => {
         name,
         email,
         emailVerified: false,
-        createdAt: now,
-        updatedAt: now,
-        subscriptionTier: "free",
+        createdAt: new Date(now),
+        updatedAt: new Date(now),
       });
 
       const result = await db.select().from(schema.users);
@@ -64,8 +66,8 @@ describe("Database Operations", () => {
         name,
         email,
         emailVerified: false,
-        createdAt: now,
-        updatedAt: now,
+        createdAt: new Date(now),
+        updatedAt: new Date(now),
         subscriptionTier: "free",
       });
 
@@ -85,15 +87,12 @@ describe("Database Operations", () => {
         name,
         email,
         emailVerified: false,
-        createdAt: now,
-        updatedAt: now,
+        createdAt: new Date(now),
+        updatedAt: new Date(now),
         subscriptionTier: "free",
       });
 
-      await db.delete(schema.users).where(
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        schema.users.id as any,
-      );
+      await db.delete(schema.users).where(eq(schema.users.id, userId));
 
       const result = await db.select().from(schema.users);
 
@@ -118,8 +117,8 @@ describe("Database Operations", () => {
           intervalCount: 1,
           rateLimit: 100,
           rateLimitDuration: 60_000,
-          createdAt: now,
-          updatedAt: now,
+          createdAt: new Date(now),
+          updatedAt: new Date(now),
         },
         {
           id: "contributor",
@@ -131,8 +130,8 @@ describe("Database Operations", () => {
           intervalCount: 1,
           rateLimit: 1000,
           rateLimitDuration: 60_000,
-          createdAt: now,
-          updatedAt: now,
+          createdAt: new Date(now),
+          updatedAt: new Date(now),
         },
       ]);
 
@@ -156,15 +155,14 @@ describe("Database Operations", () => {
         intervalCount: 1,
         rateLimit: 10_000,
         rateLimitDuration: 60_000,
-        createdAt: now,
-        updatedAt: now,
+        createdAt: new Date(now),
+        updatedAt: new Date(now),
       });
 
       const result = await db
         .select()
         .from(schema.subscriptionPlans)
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        .where(schema.subscriptionPlans.id as any);
+        .where(eq(schema.subscriptionPlans.id, "enterprise"));
 
       expect(result[0]?.name).toBe("Enterprise");
       expect(result[0]?.rateLimit).toBe(10_000);
@@ -184,8 +182,8 @@ describe("Database Operations", () => {
         name: "Test User",
         email: "test@test.com",
         emailVerified: false,
-        createdAt: now,
-        updatedAt: now,
+        createdAt: new Date(now),
+        updatedAt: new Date(now),
         subscriptionTier: "contributor",
       });
 
@@ -199,8 +197,8 @@ describe("Database Operations", () => {
         intervalCount: 1,
         rateLimit: 1000,
         rateLimitDuration: 60_000,
-        createdAt: now,
-        updatedAt: now,
+        createdAt: new Date(now),
+        updatedAt: new Date(now),
       });
 
       await dbAny.insert(schema.subscriptions).values({
@@ -208,18 +206,17 @@ describe("Database Operations", () => {
         userId,
         planId: "contributor",
         status: "active",
-        currentPeriodStart: now,
-        currentPeriodEnd: now + 30 * 24 * 60 * 60 * 1000,
+        currentPeriodStart: new Date(now),
+        currentPeriodEnd: new Date(now + 30 * 24 * 60 * 60 * 1000),
         cancelAtPeriodEnd: false,
-        createdAt: now,
-        updatedAt: now,
+        createdAt: new Date(now),
+        updatedAt: new Date(now),
       });
 
       const result = await db
         .select()
         .from(schema.subscriptions)
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        .where(schema.subscriptions.userId as any);
+        .where(eq(schema.subscriptions.userId, userId));
 
       expect(result[0]?.status).toBe("active");
       expect(result[0]?.planId).toBe("contributor");

@@ -180,11 +180,7 @@ Add a `redis` service and wire it into both `app` and `dev` services.
 
 ```diff
  # Database Configuration
- DATABASE_PATH=.artifacts
- DATABASE_NAME=tsse-elysia.db
- # Database Configuration
- DATABASE_PATH=.artifacts
- DATABASE_NAME=tsse-elysia.db
+ DATABASE_URL=file:.artifacts/tsse-elysia.db
 +
 +# Redis Configuration
 +# Local Docker: redis://localhost:6379
@@ -209,7 +205,6 @@ Add `REDIS_URL` to the server env schema. It should be **optional** so the app c
      BETTER_AUTH_URL: t.String(),
      BETTER_AUTH_SECRET: t.String(),
      DATABASE_URL: t.String(),
-     DATABASE_PATH: t.String(),
      PORT: t.Number(),
 +    REDIS_URL: t.Optional(t.String()),
      WS_ENABLED: t.Optional(t.Boolean()),
@@ -782,8 +777,7 @@ Add `REDIS_URL` to the environment variables documentation table in `AGENTS.md`:
 ```diff
  | Variable        | Default         | Description                     |
  | --------------- | --------------- | ------------------------------- |
- | `DATABASE_PATH` | `.artifacts`    | SQLite database path            |
- | `DATABASE_NAME` | `tsse-elysia.db` | SQLite database name            |
+ | `DATABASE_URL` | `file:.artifacts/tsse-elysia.db`    | SQLite database url            |
  | `PORT`          | `3000`          | Server port                     |
  | `HOST`          | `localhost`     | Server host                     |
 +| `REDIS_URL`     | -               | Redis connection URL            |

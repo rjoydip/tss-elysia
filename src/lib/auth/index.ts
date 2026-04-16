@@ -30,9 +30,7 @@ import { decodePassword } from "~/lib/utils/encryption";
 export function createAuth() {
   // Ensure database is available - auth requires server-side execution
   if (!db) {
-    throw new Error(
-      "Database not initialized - this module can only be used on the server"
-    );
+    throw new Error("Database not initialized - this module can only be used on the server");
   }
 
   // Argon2id hashing options for secure password storage
@@ -76,11 +74,11 @@ export function createAuth() {
           if (!input) {
             throw new Error("Password cannot be empty");
           }
-          const decoded = decodePassword(input);
+          const decoded = await decodePassword(input);
           return await hash(decoded, hashOpts);
         },
         verify: async ({ password, hash }) => {
-          const decoded = decodePassword(password);
+          const decoded = await decodePassword(password);
           return await verify(hash, decoded, hashOpts);
         },
       },
@@ -157,7 +155,7 @@ export const auth = new Proxy(
       const authInstance = getAuth();
       return authInstance[prop as keyof typeof authInstance];
     },
-  }
+  },
 );
 
 // Type exports for use in route handlers and API responses
@@ -171,9 +169,7 @@ export type User = typeof auth.$Infer.Session.user;
  * @param _userId - User ID to look up (currently unused)
  * @returns Subscription tier based on user's plan
  */
-export async function getUserSubscriptionTier(
-  _userId: string
-): Promise<SubscriptionTier> {
+export async function getUserSubscriptionTier(_userId: string): Promise<SubscriptionTier> {
   // TODO: Implement tier lookup from database
   // Would query subscriptions table to get actual tier
   return "free";

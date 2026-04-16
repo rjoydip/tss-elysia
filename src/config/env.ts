@@ -199,6 +199,7 @@ function _getAuthSecret(): string {
 export const env = await _createEnv({
   client: {
     VITE_API_URL: t.String(),
+    VITE_PASS_ENCRYPTION_KEY: t.String(),
     FEATURE_MULTI_TEAM: t.Boolean(),
   },
   server: {
@@ -226,6 +227,10 @@ export const env = await _createEnv({
   },
   runtimeEnv: () => ({
     VITE_API_URL: _getEnv("VITE_API_URL", ""),
+    VITE_PASS_ENCRYPTION_KEY: _getEnv(
+      "VITE_PASS_ENCRYPTION_KEY",
+      "default-pass-key-replace-me-in-prod",
+    ),
     API_URL: _getEnv("API_URL", `${_BASE_URL}/api`),
     BETTER_AUTH_URL: _getEnv("BETTER_AUTH_URL", `${_BASE_URL}/api/auth`),
     BETTER_AUTH_SECRET: _getAuthSecret(),

@@ -118,8 +118,8 @@ export async function updateUserProfile(data: { name?: string; image?: string })
  */
 export async function changePassword(currentPassword: string, newPassword: string) {
   return authClient.changePassword({
-    currentPassword: encodePassword(currentPassword),
-    newPassword: encodePassword(newPassword),
+    currentPassword: await encodePassword(currentPassword),
+    newPassword: await encodePassword(newPassword),
   });
 }
 
@@ -225,7 +225,7 @@ export async function resetPassword(newPassword: string, token: string) {
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ newPassword: encodePassword(newPassword), token }),
+    body: JSON.stringify({ newPassword: await encodePassword(newPassword), token }),
   });
 
   if (!response.ok) {

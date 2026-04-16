@@ -91,7 +91,7 @@ export function SignInForm({ className, redirectTo, ...props }: SignInFormProps)
     setIsLoading(true);
 
     try {
-      const result = await signInWithEmail(data.email, encodePassword(data.password));
+      const result = await signInWithEmail(data.email, await encodePassword(data.password));
 
       if (result.error) {
         toast.error(extractLoginErrorMessage(result.error));
