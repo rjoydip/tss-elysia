@@ -16,33 +16,40 @@ import { mcpCoreRoutes } from "./mcp/modules/-core";
 import { authCoreRoutes } from "./auth/modules/-core";
 
 /**
- * Main API application instance.
+ * Main API application instance factory.
+ * Allows creating isolated instances for testing to avoid shared state race conditions.
+ */
+export const createApiRoutes = () =>
+  new Elysia({
+    name: "root.api",
+    prefix: API_PREFIX,
+  })
+    // Apply composed middleware (CORS, Helmet, Rate Limit, OpenTelemetry)
+    .use(
+      composedMiddleware({
+        OPENAPI_NAME: APP_NAME,
+      }),
+    )
+    // Request tracing for performance monitoring
+    .trace(traceFn)
+    // Centralized error handling
+    .onError(errorFn)
+    // Mount realtime websocket plugin so /api/ws and /api/ws/health are reachable.
+    .use(websocketPlugin)
+    /**
+     * Compose modular route groups so endpoint ownership is explicit and maintainable.
+     */
+    .use(coreRoutes)
+    .use(authCoreRoutes)
+    .use(mcpCoreRoutes);
+
+/**
+ * Main API application instance (singleton).
  * Prefix: /api (configurable via API_PREFIX)
  * Includes all security middleware, tracing, and error handling.
  * Includes WebSocket endpoint registration for real-time features.
  */
-export const apiRoutes = new Elysia({
-  name: "root.api",
-  prefix: API_PREFIX,
-})
-  // Apply composed middleware (CORS, Helmet, Rate Limit, OpenTelemetry)
-  .use(
-    composedMiddleware({
-      OPENAPI_NAME: APP_NAME,
-    }),
-  )
-  // Request tracing for performance monitoring
-  .trace(traceFn)
-  // Centralized error handling
-  .onError(errorFn)
-  // Mount realtime websocket plugin so /api/ws and /api/ws/health are reachable.
-  .use(websocketPlugin)
-  /**
-   * Compose modular route groups so endpoint ownership is explicit and maintainable.
-   */
-  .use(coreRoutes)
-  .use(authCoreRoutes)
-  .use(mcpCoreRoutes);
+export const apiRoutes = createApiRoutes();
 
 /**
  * Request handler wrapper for TanStack Start integration.

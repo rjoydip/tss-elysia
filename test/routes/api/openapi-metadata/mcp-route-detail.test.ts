@@ -1,5 +1,7 @@
 import { describe, expect, it } from "bun:test";
-import { apiRoutes } from "../../../../src/routes/api/$";
+import { createApiRoutes } from "../../../../src/routes/api/$";
+
+const apiRoutes = createApiRoutes();
 
 describe("MCP API route OpenAPI detail (hooks.detail)", () => {
   it("marks MCP key mutations with bearer security in OpenAPI detail", () => {

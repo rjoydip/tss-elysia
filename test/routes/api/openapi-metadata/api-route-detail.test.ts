@@ -7,7 +7,9 @@
  */
 
 import { describe, expect, it } from "bun:test";
-import { apiRoutes } from "../../../../src/routes/api/$";
+import { createApiRoutes } from "../../../../src/routes/api/$";
+
+const apiRoutes = createApiRoutes();
 
 /** HTTP methods we treat as normal API operations for OpenAPI checks. */
 const DOCUMENTED_METHODS = new Set(["GET", "POST", "PUT", "DELETE", "PATCH", "ALL"]);
