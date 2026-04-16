@@ -5,6 +5,7 @@
  */
 
 import { createAuthClient } from "better-auth/react";
+import { encodePassword } from "~/lib/utils/encryption";
 
 /**
  * Auth client instance configured for the application.
@@ -117,8 +118,8 @@ export async function updateUserProfile(data: { name?: string; image?: string })
  */
 export async function changePassword(currentPassword: string, newPassword: string) {
   return authClient.changePassword({
-    currentPassword,
-    newPassword,
+    currentPassword: encodePassword(currentPassword),
+    newPassword: encodePassword(newPassword),
   });
 }
 
@@ -224,7 +225,7 @@ export async function resetPassword(newPassword: string, token: string) {
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ newPassword, token }),
+    body: JSON.stringify({ newPassword: encodePassword(newPassword), token }),
   });
 
   if (!response.ok) {

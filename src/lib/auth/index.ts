@@ -12,8 +12,9 @@ import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { db, schema, getDatabaseType } from "~/lib/db";
 import { env } from "~/config/env";
 import type { SubscriptionTier } from "~/types/subscription";
-import { isBun, isTest, sessionConfig } from "~/config";
+import { isTest, sessionConfig } from "~/config";
 import { logger } from "~/lib/logger";
+import { decodePassword } from "~/lib/utils/encryption";
 
 /**
  * Creates and configures the Better Auth instance.
@@ -29,7 +30,9 @@ import { logger } from "~/lib/logger";
 export function createAuth() {
   // Ensure database is available - auth requires server-side execution
   if (!db) {
-    throw new Error("Database not initialized - this module can only be used on the server");
+    throw new Error(
+      "Database not initialized - this module can only be used on the server"
+    );
   }
 
   // Argon2id hashing options for secure password storage
@@ -73,12 +76,13 @@ export function createAuth() {
           if (!input) {
             throw new Error("Password cannot be empty");
           }
-          return isBun ? await Bun.password.hash(input) : await hash(input, hashOpts);
+          const decoded = decodePassword(input);
+          return await hash(decoded, hashOpts);
         },
-        verify: async ({ password, hash }) =>
-          isBun
-            ? await Bun.password.verify(password, hash)
-            : await verify(hash, password, hashOpts),
+        verify: async ({ password, hash }) => {
+          const decoded = decodePassword(password);
+          return await verify(hash, decoded, hashOpts);
+        },
       },
     },
 
@@ -153,7 +157,7 @@ export const auth = new Proxy(
       const authInstance = getAuth();
       return authInstance[prop as keyof typeof authInstance];
     },
-  },
+  }
 );
 
 // Type exports for use in route handlers and API responses
@@ -167,7 +171,9 @@ export type User = typeof auth.$Infer.Session.user;
  * @param _userId - User ID to look up (currently unused)
  * @returns Subscription tier based on user's plan
  */
-export async function getUserSubscriptionTier(_userId: string): Promise<SubscriptionTier> {
+export async function getUserSubscriptionTier(
+  _userId: string
+): Promise<SubscriptionTier> {
   // TODO: Implement tier lookup from database
   // Would query subscriptions table to get actual tier
   return "free";

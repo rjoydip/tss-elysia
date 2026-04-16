@@ -15,6 +15,7 @@ import { IconFacebook, IconGithub } from "~/assets/brand-icons";
 import { signUpWithEmail } from "~/lib/auth/client";
 import { authActions } from "~/lib/stores/auth-store";
 import { cn } from "~/lib/utils";
+import { encodePassword } from "~/lib/utils/encryption";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { PasswordInput } from "~/components/password-input";
@@ -168,7 +169,7 @@ export function SignUpForm({ className, ...props }: React.HTMLAttributes<HTMLFor
     setIsLoading(true);
 
     try {
-      const result = await signUpWithEmail(data.name, data.email, data.password);
+      const result = await signUpWithEmail(data.name, data.email, encodePassword(data.password));
 
       if (result.error) {
         const errorMessage = getRegisterErrorMessage(extractRegisterErrorMessage(result.error));
