@@ -4,13 +4,15 @@
  */
 
 import { type ElysiaConfig } from "elysia";
-import { version as pkgVersion } from "../../package.json" with { type: "json" };
+import { readPackageSync } from "read-pkg";
+
+const { version } = readPackageSync();
 
 /**
  * Application version from package.json.
  * Automatically synced with the root package.json version.
  */
-export const APP_VERSION = pkgVersion;
+export const APP_VERSION = version;
 
 /**
  * API route prefix - defaults to /api.
@@ -57,7 +59,8 @@ export const PORT = parseInt(import.meta.env.PORT || "3000", 10);
  *   // Browser-specific code (window, document available)
  * }
  */
-export const isBrowser = typeof window !== "undefined" && window.document !== undefined;
+export const isBrowser =
+  typeof window !== "undefined" && window.document !== undefined;
 
 /**
  * Runtime environment detection - checks if code runs on server.
@@ -79,7 +82,8 @@ export const isBun = typeof Bun !== "undefined";
  * Runtime detection - checks if Node.js runtime is available.
  * Fallback for environments without Bun (production, other runtimes).
  */
-export const isNode = typeof process !== "undefined" && !!process.versions?.node;
+export const isNode =
+  typeof process !== "undefined" && !!process.versions?.node;
 
 /**
  * Production environment detection.
@@ -92,14 +96,14 @@ export const isNode = typeof process !== "undefined" && !!process.versions?.node
 export const isProduction = isBun
   ? Bun.env.NODE_ENV === "production"
   : isNode
-    ? process.env.NODE_ENV === "production"
-    : false;
+  ? process.env.NODE_ENV === "production"
+  : false;
 
 export const isTest = isBun
   ? Bun.env.NODE_ENV === "test"
   : isNode
-    ? process.env.NODE_ENV === "test"
-    : false;
+  ? process.env.NODE_ENV === "test"
+  : false;
 
 /**
  * CI environment detection.
@@ -114,8 +118,8 @@ export const isCI = isNode ? process.env.CI === "true" : false;
 export const isDev = isBun
   ? Bun.env.NODE_ENV === "development"
   : isNode
-    ? process.env.NODE_ENV === "development"
-    : false;
+  ? process.env.NODE_ENV === "development"
+  : false;
 
 /**
  * Staging environment detection.
@@ -124,8 +128,8 @@ export const isDev = isBun
 export const isStage = isBun
   ? Bun.env.NODE_ENV === "stage"
   : isNode
-    ? process.env.NODE_ENV === "stage"
-    : false;
+  ? process.env.NODE_ENV === "stage"
+  : false;
 
 /**
  * QA environment detection.
@@ -134,8 +138,8 @@ export const isStage = isBun
 export const isQA = isBun
   ? Bun.env.NODE_ENV === "qa"
   : isNode
-    ? process.env.NODE_ENV === "qa"
-    : false;
+  ? process.env.NODE_ENV === "qa"
+  : false;
 
 /**
  * Allowed HTTP methods for authentication endpoints.

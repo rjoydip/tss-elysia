@@ -92,7 +92,7 @@ function formatName(slug: string): string {
  * Scan all markdown files in /docs and build the sidebar config.
  * In Vite: import.meta.glob is replaced at build time with eager imports.
  * In Bun tests: falls back to filesystem scanning via createRequire.
- * Using createRequire avoids Vite transforming bare `require()` calls.
+ * Using createRequire avoids Vite attempting to bundle "fs".
  */
 function scanDocModules(): Record<string, string> {
   try {
@@ -105,7 +105,8 @@ function scanDocModules(): Record<string, string> {
     }) as Record<string, string>;
   } catch {
     // Bun test fallback: use createRequire so Vite doesn't attempt to bundle "fs"
-    const { createRequire } = require("module") as typeof import("module");
+    // eslint-disable-next-line @typescript-eslint/no-implied-eval
+    const createRequire = new Function("return require")("createRequire");
     const nodeRequire = createRequire(import.meta.url);
     const { readdirSync, readFileSync } = nodeRequire("fs") as typeof import("fs");
     const { join } = nodeRequire("path") as typeof import("path");

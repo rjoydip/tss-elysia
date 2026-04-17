@@ -8,7 +8,7 @@ import { E2E_BASE_URL } from "../config";
 
 test.describe("Login Page", () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto(`${E2E_BASE_URL}/account/login`);
+    await page.goto(`${E2E_BASE_URL}/sign-in`);
   });
 
   test("should load login page without crashing", async ({ page }) => {
@@ -20,7 +20,9 @@ test.describe("Login Page", () => {
   });
 
   test("should display sign up link", async ({ page }) => {
-    await expect(page.locator("main").getByRole("link", { name: /sign up/i })).toBeVisible();
+    await expect(
+      page.locator("main").getByRole("link", { name: /sign up/i })
+    ).toBeVisible();
   });
 
   test("should have email input", async ({ page }) => {
@@ -32,33 +34,45 @@ test.describe("Login Page", () => {
   });
 
   test("should have sign in button", async ({ page }) => {
-    await expect(page.locator("main").getByRole("button", { name: /sign in/i })).toBeVisible();
+    await expect(
+      page.locator("main").getByRole("button", { name: /sign in/i })
+    ).toBeVisible();
   });
 
   test("should have forgot password link", async ({ page }) => {
-    await expect(page.locator("main").getByText(/forgot password/i)).toBeVisible();
+    await expect(
+      page.locator("main").getByText(/forgot password/i)
+    ).toBeVisible();
   });
 
   test("should display OAuth buttons", async ({ page }) => {
     await expect(
-      page.locator("main").getByRole("button", { name: /continue with github/i }),
+      page
+        .locator("main")
+        .getByRole("button", { name: /continue with github/i })
     ).toBeVisible();
     await expect(
-      page.locator("main").getByRole("button", { name: /continue with google/i }),
+      page
+        .locator("main")
+        .getByRole("button", { name: /continue with google/i })
     ).toBeVisible();
   });
 
   test("should display divider with 'Or'", async ({ page }) => {
-    await expect(page.locator("main").getByText("Or", { exact: true })).toBeVisible();
+    await expect(
+      page.locator("main").getByText("Or", { exact: true })
+    ).toBeVisible();
   });
 
   // Skipped - navigation timing issue with TanStack Router
-  test("should navigate to register page on sign up link click", async ({ page }) => {}); // oxlint-disable-line no-unused-vars
+  test("should navigate to register page on sign up link click", async ({
+    page,
+  }) => {}); // oxlint-disable-line no-unused-vars
 });
 
 test.describe("Register Page", () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto(`${E2E_BASE_URL}/account/register`);
+    await page.goto(`${E2E_BASE_URL}/sign-up`);
   });
 
   test("should load register page without crashing", async ({ page }) => {
@@ -67,11 +81,15 @@ test.describe("Register Page", () => {
   });
 
   test("should display create account message", async ({ page }) => {
-    await expect(page.locator("main").getByText("Create your account")).toBeVisible();
+    await expect(
+      page.locator("main").getByText("Create your account")
+    ).toBeVisible();
   });
 
   test("should display sign in link", async ({ page }) => {
-    await expect(page.locator("main").getByRole("link", { name: /sign in/i })).toBeVisible();
+    await expect(
+      page.locator("main").getByRole("link", { name: /sign in/i })
+    ).toBeVisible();
   });
 
   test("should have name input", async ({ page }) => {
@@ -87,57 +105,79 @@ test.describe("Register Page", () => {
   });
 
   test("should have create account button", async ({ page }) => {
-    await expect(page.getByRole("button", { name: /create account/i })).toBeVisible();
+    await expect(
+      page.getByRole("button", { name: /create account/i })
+    ).toBeVisible();
   });
 
   test("should display OAuth buttons", async ({ page }) => {
-    await expect(page.getByRole("button", { name: /continue with github/i })).toBeVisible();
-    await expect(page.getByRole("button", { name: /continue with google/i })).toBeVisible();
+    await expect(
+      page.getByRole("button", { name: /continue with github/i })
+    ).toBeVisible();
+    await expect(
+      page.getByRole("button", { name: /continue with google/i })
+    ).toBeVisible();
   });
 
   // Skipped - flaky due to timing
-  test("should display password requirements after typing", async ({ page }) => {}); // oxlint-disable-line no-unused-vars
+  test("should display password requirements after typing", async ({
+    page,
+  }) => {}); // oxlint-disable-line no-unused-vars
 
-  test("should navigate to login page on sign in link click", async ({ page }) => {
-    const signInLink = page.locator("main").getByRole("link", { name: /sign in/i });
+  test("should navigate to login page on sign in link click", async ({
+    page,
+  }) => {
+    const signInLink = page
+      .locator("main")
+      .getByRole("link", { name: /sign in/i });
     // Guard against occasional client-side navigation flake by validating destination intent.
-    await expect(signInLink).toHaveAttribute("href", "/account/login");
+    await expect(signInLink).toHaveAttribute("href", "/sign-in");
     await signInLink.click();
     await page.waitForTimeout(500);
-    if (!page.url().includes("/account/login")) {
+    if (!page.url().includes("/sign-in")) {
       await expect(signInLink).toBeVisible();
       return;
     }
-    await expect(page).toHaveURL(/.*\/account\/login/);
+    await expect(page).toHaveURL(/.*\/sign-in/);
   });
 });
 
 test.describe("Branding Component (Desktop)", () => {
-  test("should display branding on login page (lg screen)", async ({ page }) => {
+  test("should display branding on login page (lg screen)", async ({
+    page,
+  }) => {
     await page.setViewportSize({ width: 1280, height: 720 });
-    await page.goto(`${E2E_BASE_URL}/account/login`);
+    await page.goto(`${E2E_BASE_URL}/sign-in`);
     await expect(page.getByText(/build faster/i)).toBeVisible();
   });
 
-  test("should display branding on register page (lg screen)", async ({ page }) => {
+  test("should display branding on register page (lg screen)", async ({
+    page,
+  }) => {
     await page.setViewportSize({ width: 1280, height: 720 });
-    await page.goto(`${E2E_BASE_URL}/account/register`);
+    await page.goto(`${E2E_BASE_URL}/sign-up`);
     await expect(page.getByText(/build faster/i)).toBeVisible();
   });
 
   test("should hide branding on mobile", async ({ page }) => {
     await page.setViewportSize({ width: 375, height: 667 });
-    await page.goto(`${E2E_BASE_URL}/account/login`);
+    await page.goto(`${E2E_BASE_URL}/sign-in`);
     await expect(page.getByText(/build faster/i)).not.toBeVisible();
   });
 });
 
 test.describe("Form Validation", () => {
   test("should show error for empty name on submit", async ({ page }) => {
-    await page.goto(`${E2E_BASE_URL}/account/register`);
+    await page.goto(`${E2E_BASE_URL}/sign-up`);
     // Skip name field
-    await page.locator("main").getByPlaceholder("Email").fill("test@example.com");
-    await page.locator("main").getByPlaceholder("Password").fill("Password123!");
+    await page
+      .locator("main")
+      .getByPlaceholder("Email")
+      .fill("test@example.com");
+    await page
+      .locator("main")
+      .getByPlaceholder("Password")
+      .fill("Password123!");
     // Click create
     await page
       .locator("main")
@@ -147,26 +187,32 @@ test.describe("Form Validation", () => {
     await page.waitForTimeout(1000);
     // Check for error or no navigation (form didn't submit)
     const url = page.url();
-    expect(url).toContain("/account/register");
+    expect(url).toContain("/sign-up");
   });
 
   // Skipped - password strength behavior differs from test expectations
-  test("should display password requirements for weak password", async ({ page }) => {}); // oxlint-disable-line no-unused-vars
+  test("should display password requirements for weak password", async ({
+    page,
+  }) => {}); // oxlint-disable-line no-unused-vars
   test("should display weak password indicator", async ({ page }) => {}); // oxlint-disable-line no-unused-vars
   test("should display strong password indicator", async ({ page }) => {}); // oxlint-disable-line no-unused-vars
 });
 
 test.describe("Forgot Password Page", () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto(`${E2E_BASE_URL}/account/forgot-password`);
+    await page.goto(`${E2E_BASE_URL}/forgot-password`);
   });
 
-  test("should load forgot password page without crashing", async ({ page }) => {
+  test("should load forgot password page without crashing", async ({
+    page,
+  }) => {
     await expect(page.locator("main")).toBeVisible();
   });
 
   test("should display forgot password heading", async ({ page }) => {
-    await expect(page.locator("main").getByText("Forgot password?")).toBeVisible();
+    await expect(
+      page.locator("main").getByText("Forgot password?")
+    ).toBeVisible();
   });
 
   test("should have email input", async ({ page }) => {
@@ -175,17 +221,23 @@ test.describe("Forgot Password Page", () => {
 
   test("should have send reset link button", async ({ page }) => {
     await expect(
-      page.locator("main").getByRole("button", { name: /send reset link/i }),
+      page.locator("main").getByRole("button", { name: /send reset link/i })
     ).toBeVisible();
   });
 
   test("should have sign in link", async ({ page }) => {
-    await expect(page.locator("main").getByRole("link", { name: /sign in/i })).toBeVisible();
+    await expect(
+      page.locator("main").getByRole("link", { name: /sign in/i })
+    ).toBeVisible();
   });
 
-  test("should navigate to login page on sign in link click", async ({ page }) => {
-    const signInLink = page.locator("main").getByRole("link", { name: /sign in/i });
-    await expect(signInLink).toHaveAttribute("href", "/account/login");
+  test("should navigate to login page on sign in link click", async ({
+    page,
+  }) => {
+    const signInLink = page
+      .locator("main")
+      .getByRole("link", { name: /sign in/i });
+    await expect(signInLink).toHaveAttribute("href", "/sign-in");
     await signInLink.click();
     await page.waitForTimeout(500);
     if (!page.url().includes("/account/login")) {
@@ -202,28 +254,36 @@ test.describe("Forgot Password Page", () => {
 
   test("should hide branding on mobile", async ({ page }) => {
     await page.setViewportSize({ width: 375, height: 667 });
-    await expect(page.locator("main").getByText(/build faster/i)).not.toBeVisible();
+    await expect(
+      page.locator("main").getByText(/build faster/i)
+    ).not.toBeVisible();
   });
 });
 
 test.describe("Email Verification Page", () => {
-  test("should display verification failed when no token is provided", async ({ page }) => {
-    await page.goto(`${E2E_BASE_URL}/account/verify-email`);
+  test("should display verification failed when no token is provided", async ({
+    page,
+  }) => {
+    await page.goto(`${E2E_BASE_URL}/verify-email`);
 
     // Assert the deterministic final state - wait for transition from loading to error
-    await expect(page.locator("main").getByText("Verification Failed")).toBeVisible({
+    await expect(
+      page.locator("main").getByText("Verification Failed")
+    ).toBeVisible({
       timeout: 10000,
     });
-    await expect(page.locator("main").getByText("No verification token provided")).toBeVisible();
+    await expect(
+      page.locator("main").getByText("No verification token provided")
+    ).toBeVisible();
   });
 
   test("should display header", async ({ page }) => {
-    await page.goto(`${E2E_BASE_URL}/account/verify-email`);
+    await page.goto(`${E2E_BASE_URL}/verify-email`);
     await expect(page.locator("header")).toBeVisible();
   });
 
   test("should display footer", async ({ page }) => {
-    await page.goto(`${E2E_BASE_URL}/account/verify-email`);
+    await page.goto(`${E2E_BASE_URL}/verify-email`);
     await expect(page.locator("footer.py-4")).toBeVisible();
   });
 });
