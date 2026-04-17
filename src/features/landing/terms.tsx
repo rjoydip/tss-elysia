@@ -93,7 +93,7 @@ export function TermsPage() {
             <section className="pt-8 border-t border-border">
               <p className="text-sm text-muted-foreground">
                 If you have any questions about these Terms, please contact us at
-                support@tsse-elysia.com.
+                supportt-sse-elysia@com.
               </p>
             </section>
           </div>

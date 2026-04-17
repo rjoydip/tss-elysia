@@ -4,7 +4,8 @@
  *
  * SQLite Configuration:
  * - If SQLITE_URL is set, use it (supports Turso, file paths, etc.)
- * - Otherwise use in-memory database (`:memory:`)
+ * - If POSTGRES_URL is set, use it (Superbase, file paths, etc.)
+ * - Otherwise use sqlite database (`fallback`)
  *
  * PostgreSQL Configuration:
  * - Used in production when POSTGRES_URL is available

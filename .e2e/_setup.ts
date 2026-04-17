@@ -7,8 +7,6 @@ import { existsSync, mkdirSync } from "fs";
 import { resolve } from "path";
 import { execSync } from "child_process";
 
-console.log(">>>>>", process.env.NODE_ENV);
-
 const sqliteUrl = process.env.SQLITE_URL || "file:.artifacts/tsse-elysia.db";
 
 export default async function globalSetup() {
