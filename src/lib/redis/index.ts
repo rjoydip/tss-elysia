@@ -87,7 +87,7 @@ function getBackendConfig(): {
 
   // Priority 2: PostgreSQL is configured
   if (env.DATABASE_TYPE === "postgres") {
-    const postgresUrl = env.POSTGRES_URL || env.DATABASE_URL;
+    const postgresUrl = env.POSTGRES_URL;
     if (postgresUrl) {
       return { backend: "postgres", url: postgresUrl };
     }
@@ -129,7 +129,7 @@ function createStorageInstance(): Storage | null {
       case "postgres": {
         const db0 = createDatabase(
           postgresql({
-            url: env.POSTGRES_URL || env.DATABASE_URL,
+            url: env.POSTGRES_URL,
           }),
         );
         storageInstance = createStorage({

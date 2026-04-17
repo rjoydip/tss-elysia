@@ -121,5 +121,5 @@ bun run preview
 
 - Most scripts use `bun` as the runtime
 - E2E tests require the dev server to be running (or use `preview`)
-- Database scripts assume `DATABASE_URL` is configured in `.env`
+- Database scripts assume `SQLITE_URL` is configured in `.env`
 - Load tests use `bunx k6` (runs k6 via bunx)

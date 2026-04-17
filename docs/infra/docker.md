@@ -421,7 +421,7 @@ services:
       context: ..
       dockerfile: docker/Dockerfile
     environment:
-      - DATABASE_URL=postgresql://user:pass@db:5432/tss
+      - POSTGRES_URL=postgresql://user:pass@db:5432/tss
     depends_on:
       - db
 

@@ -152,7 +152,7 @@ services:
       - NODE_ENV=production
       # Required: Generate a secure secret (min 32 chars)
       - AUTH_SECRET=${AUTH_SECRET:?AUTH_SECRET is required}
-      - DATABASE_URL=file:.artifacts/tsse-elysia.db
+      - SQLITE_URL=file:.artifacts/tsse-elysia.db
       # PostgreSQL primary connection
       - POSTGRES_URL=postgresql://${POSTGRES_USER:-tsse}:${POSTGRES_PASSWORD:-tsse_password}@postgres-primary:5432/${POSTGRES_DB:-tsse_dev}
       # PostgreSQL read replicas (JSON array format)
@@ -209,7 +209,7 @@ services:
       - NODE_ENV=development
       # Dev secret (auto-generated if not provided)
       - AUTH_SECRET=${AUTH_SECRET:-dev-secret-min-32-chars-here}
-      - DATABASE_URL=file:.artifacts/tsse-elysia.db
+      - SQLITE_URL=file:.artifacts/tsse-elysia.db
       # PostgreSQL primary connection
       - POSTGRES_URL=postgresql://${POSTGRES_USER:-tsse}:${POSTGRES_PASSWORD:-tsse_password}@postgres-primary:5432/${POSTGRES_DB:-tsse_dev}
       # PostgreSQL read replicas (JSON array format)

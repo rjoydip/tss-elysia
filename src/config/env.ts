@@ -5,7 +5,7 @@
  *
  * @example
  * // Server-side: full access to all variables
- * const dbUrl = env.DATABASE_URL;
+ * const dbUrl = env.SQLITE_URL;
  *
  * // Client-side: only client vars accessible
  * const apiUrl = env.VITE_API_URL;
@@ -206,7 +206,6 @@ export const env = await _createEnv({
     API_URL: t.String(),
     BETTER_AUTH_URL: t.String(),
     BETTER_AUTH_SECRET: t.String(),
-    DATABASE_URL: t.String(),
     DATABASE_TYPE: t.Union([t.Literal("sqlite"), t.Literal("postgres")]),
     SQLITE_URL: t.Optional(t.String()),
     SQLITE_AUTH_TOKEN: t.Optional(t.String()),
@@ -234,7 +233,6 @@ export const env = await _createEnv({
     API_URL: _getEnv("API_URL", `${_BASE_URL}/api`),
     BETTER_AUTH_URL: _getEnv("BETTER_AUTH_URL", `${_BASE_URL}/api/auth`),
     BETTER_AUTH_SECRET: _getAuthSecret(),
-    DATABASE_URL: _getEnv("DATABASE_URL", ""),
     DATABASE_TYPE: _getEnv("DATABASE_TYPE", "sqlite") as "sqlite" | "postgres",
     SQLITE_URL: _getEnv("SQLITE_URL", "") || undefined,
     SQLITE_AUTH_TOKEN: _getEnv("SQLITE_AUTH_TOKEN", "") || undefined,

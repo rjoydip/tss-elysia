@@ -15,7 +15,7 @@ This project uses type-safe environment variables with isomorphic fetching, supp
 | `PORT`                   | `3000`         | Server port                                    |
 | `VITE_API_URL`           | Dynamic        | Client API URL for Eden Treaty                 |
 | `DATABASE_TYPE`          | `sqlite`       | Database type: `sqlite` or `postgres`          |
-| `DATABASE_URL`           | -              | Database connection URL                        |
+| `SQLITE_URL`             | -              | Database SQLite connection URL                 |
 | `POSTGRES_URL`           | -              | PostgreSQL connection URL (when type=postgres) |
 | `BETTER_AUTH_SECRET`     | Auto-generated | Authentication secret for session tokens       |
 | `WS_ENABLED`             | -              | Enables/disables websocket transport           |
@@ -174,7 +174,7 @@ export const env = await _createEnv({
     API_URL: t.String(), // Server-only vars
     BETTER_AUTH_URL: t.String(),
     BETTER_AUTH_SECRET: t.String(),
-    DATABASE_URL: t.String(),
+    SQLITE_URL: t.String(),
     PORT: t.Number(),
     REDIS_URL: t.Optional(t.String()),
   },
@@ -183,7 +183,7 @@ export const env = await _createEnv({
     API_URL: _getEnv("API_URL", "http://localhost:3000/api"),
     BETTER_AUTH_URL: _getEnv("BETTER_AUTH_URL", "http://localhost:3000/api/auth"),
     BETTER_AUTH_SECRET: _getAuthSecret(),
-    DATABASE_URL: _getEnv("DATABASE_URL", ""),
+    SQLITE_URL: _getEnv("SQLITE_URL", ""),
     PORT: parseInt(_getEnv("PORT", "3000"), 10),
   }),
 });
@@ -345,6 +345,6 @@ Environment variables are validated at runtime using Elysia's type system:
 
 ## Security
 
-- Server-only variables (`BETTER_AUTH_SECRET`, `DATABASE_URL`) are protected from client access
+- Server-only variables (`BETTER_AUTH_SECRET`, `POSTGRES_URL`) are protected from client access
 - Accessing server variables from the browser throws an error
 - The env module uses a Proxy to enforce these boundaries
