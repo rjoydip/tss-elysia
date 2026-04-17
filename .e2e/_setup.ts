@@ -36,6 +36,4 @@ export default async function globalSetup() {
 
   console.log(`[E2E Setup] Database ready at: ${fullPath}`);
   console.log("[E2E Setup] Setup complete");
-
-  process.exit(1);
 }

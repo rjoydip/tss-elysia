@@ -4,7 +4,7 @@
  */
 
 import { type ElysiaConfig } from "elysia";
-import { version as pkgVersion } from "../../package.json";
+import { version as pkgVersion } from "../../package.json" with { type: "json" };
 
 /**
  * Application version from package.json.
