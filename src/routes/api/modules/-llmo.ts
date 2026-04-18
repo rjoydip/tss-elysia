@@ -10,8 +10,6 @@ import { blogPosts, getBlogPost } from "~/features/landing/data/blog/data";
 import { changelogData, getLatestVersion } from "~/features/landing/data/changelog/data";
 import { APP_NAME, API_PREFIX, GITHUB_REPO_URL } from "~/config";
 
-const BASE_URL = GITHUB_REPO_URL;
-
 const docsData = [
   { slug: "getting-started", title: "Getting Started", category: "Guide" },
   {
@@ -110,7 +108,7 @@ function handleBlog({ request }: { request: Request }) {
     itemListElement: posts.map((post, index) => ({
       "@type": "ListItem",
       position: index + 1,
-      url: `${BASE_URL}/blog/${post.slug}`,
+      url: `${API_PREFIX}/blog/${post.slug}`,
       name: post.title,
       description: post.excerpt,
     })),
@@ -151,7 +149,7 @@ function handleDocs({ request }: { request: Request }) {
     itemListElement: docsData.map((doc, index) => ({
       "@type": "ListItem",
       position: index + 1,
-      url: `${BASE_URL}/docs/${doc.slug}`,
+      url: `${API_PREFIX}/docs/${doc.slug}`,
       name: doc.title,
     })),
   });
@@ -264,7 +262,7 @@ TSS Elysia is a modern full-stack framework powered by Elysia, TanStack Start, a
 
 ## Documentation
 
-- Getting Started: https://github.com/anomalyco/tsse-elysia
+- Getting Started: ${GITHUB_REPO_URL}
 - API: /api/* routes
 
 ## Content Types
@@ -290,7 +288,7 @@ function handleServerInfo() {
     name: APP_NAME,
     applicationCategory: "DeveloperApplication",
     operatingSystem: "Windows, macOS, Linux",
-    url: "https://github.com/anomalyco/tsse-elysia",
+    url: GITHUB_REPO_URL,
     provider: {
       "@type": "Organization",
       name: "tsse-elysia",
@@ -312,15 +310,39 @@ function handleCapabilities() {
     "@type": "ItemList",
     numberOfItems: 10,
     itemListElement: [
-      { name: "blog", description: "Blog posts API", url: `${API_PREFIX}/blog` },
-      { name: "docs", description: "Documentation API", url: `${API_PREFIX}/docs` },
-      { name: "changelog", description: "Changelog API", url: `${API_PREFIX}/changelog` },
+      {
+        name: "blog",
+        description: "Blog posts API",
+        url: `${API_PREFIX}/blog`,
+      },
+      {
+        name: "docs",
+        description: "Documentation API",
+        url: `${API_PREFIX}/docs`,
+      },
+      {
+        name: "changelog",
+        description: "Changelog API",
+        url: `${API_PREFIX}/changelog`,
+      },
       { name: "faq", description: "FAQ API", url: `${API_PREFIX}/faq` },
       { name: "mcp", description: "MCP tools API", url: "/api/mcp" },
       { name: "auth", description: "Authentication API", url: "/api/auth" },
-      { name: "database", description: "Database health API", url: `${API_PREFIX}/database` },
-      { name: "realtime", description: "Realtime/WebSocket API", url: `${API_PREFIX}/realtime` },
-      { name: "redis", description: "Redis health API", url: `${API_PREFIX}/redis` },
+      {
+        name: "database",
+        description: "Database health API",
+        url: `${API_PREFIX}/database`,
+      },
+      {
+        name: "realtime",
+        description: "Realtime/WebSocket API",
+        url: `${API_PREFIX}/realtime`,
+      },
+      {
+        name: "redis",
+        description: "Redis health API",
+        url: `${API_PREFIX}/redis`,
+      },
       { name: "status", description: "Service status", url: "/status" },
     ],
   });

@@ -18,7 +18,7 @@ describe("Root Route JSON-LD", () => {
       "@type": "WebApplication",
       name: "tsse-elysia",
       description: "A modern full-stack framework powered by Elysia, TanStack Start, and React",
-      url: "https://github.com/anomalyco/tsse-elysia",
+      url: "https://github.com/rjoydip/tsse-elysia",
       applicationCategory: "DeveloperApplication",
       operatingSystem: "Windows, macOS, Linux",
       offers: {

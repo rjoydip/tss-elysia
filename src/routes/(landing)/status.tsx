@@ -29,7 +29,7 @@ export const Route = createFileRoute("/(landing)/status")({
           isPartOf: {
             "@type": "WebSite",
             name: APP_NAME,
-            url: "https://github.com/anomalyco/tsse-elysia",
+            url: "https://github.com/rjoydip/tsse-elysia",
           },
           mainEntity: {
             "@type": "ItemList",
