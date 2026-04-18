@@ -18,7 +18,6 @@ env:
   SQLITE_URL: "file:.artifacts/tsse-elysia.db"
   E2E_HOST: "localhost"
   E2E_PORT: "4173"
-  BETTER_AUTH_SECRET: "test-secret-min-32-chars-for-ci"
 
 jobs:
   quality:

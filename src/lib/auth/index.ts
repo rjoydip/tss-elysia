@@ -110,7 +110,7 @@ export function createAuth() {
     // Error handler for auth API failures
     onAPIError: {
       onError: (error: unknown) => {
-        logger.error(`Auth API error: ${error}`);
+        logger.error(`Auth API error`, error as Error);
       },
     },
 

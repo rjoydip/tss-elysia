@@ -151,13 +151,27 @@ If any step fails, the release is aborted.
 
 ### Configuration
 
-The following GitHub variables and secrets are required for CI/CD workflows:
+The following GitHub secrets and variables are required for CI/CD workflows:
 
-| Variable        | Description                       | Example Value                                  |
-| --------------- | --------------------------------- | ---------------------------------------------- |
-| `GH_USER_EMAIL` | Git user email for git operations | `github-actions[bot]@users.noreply.github.com` |
-| `GH_USER_NAME`  | Git user name for git operations  | `github-actions[bot]`                          |
+### Secrets
 
-Required secrets:
+| Secrets              | Description                       | Example Value                                  |
+| -------------------- | --------------------------------- | ---------------------------------------------- |
+| `GH_USER_EMAIL`      | Git user email for git operations | `github-actions[bot]@users.noreply.github.com` |
+| `GH_USER_NAME`       | Git user name for git operations  | `github-actions[bot]`                          |
+| `GH_TOKEN`           | GitHub token for API access       | `ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx`       |
+| `BETTER_AUTH_SECRET` | Secret for Better Auth            | `your-secret-key-here`                         |
 
-- `GITHUB_TOKEN` - GitHub token for workflow operations
+### Variables
+
+| Variables        | Description                      | Example Value           |
+| ---------------- | -------------------------------- | ----------------------- |
+| `OPENCODE_MODEL` | Model identifier for Opencode AI | `nemotron-3-super-free` |
+
+Required configuration:
+
+- `GH_TOKEN` - GitHub token for workflow operations
+- `GH_USER_EMAIL` - GitHub user email for git operations
+- `GH_USER_NAME` - GitHub user name for git operations
+- `BETTER_AUTH_SECRET` - Secret for Better Auth authentication
+- `OPENCODE_MODEL` - Model identifier for Opencode AI (required for GitHub Actions workflows)

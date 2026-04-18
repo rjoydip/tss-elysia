@@ -15,6 +15,7 @@ import { ThemeProvider } from "~/context/theme-provider";
 import { queryClient } from "~/router";
 import appCss from "~/styles/app.css?url";
 import { SearchProvider } from "~/context/search-provider";
+import { GITHUB_REPO_URL } from "~/config";
 
 export const Route = createRootRoute({
   head: () => ({
@@ -22,10 +23,44 @@ export const Route = createRootRoute({
     meta: [
       { charSet: "utf8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
+      {
+        name: "description",
+        content:
+          "tsse-elysia - A modern full-stack framework powered by Elysia, TanStack Start, and React",
+      },
+      {
+        name: "author",
+        content: "tsse-elysia Team",
+      },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
       { rel: "icon", type: "image/svg+xml", href: "/favicon.svg" },
+      { rel: "alternate", href: "/api/llms.txt", type: "text/plain", title: "LLM Documentation" },
+    ],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "WebApplication",
+          name: "tsse-elysia",
+          description: "A modern full-stack framework powered by Elysia, TanStack Start, and React",
+          url: GITHUB_REPO_URL,
+          applicationCategory: "DeveloperApplication",
+          operatingSystem: "Windows, macOS, Linux",
+          offers: {
+            "@type": "Offer",
+            price: "0",
+            priceCurrency: "USD",
+          },
+          author: {
+            "@type": "Organization",
+            name: "tsse-elysia",
+            url: GITHUB_REPO_URL,
+          },
+        }),
+      },
     ],
   }),
   errorComponent: GeneralError,

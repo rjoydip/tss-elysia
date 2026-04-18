@@ -37,9 +37,13 @@ export const AUTH_PREFIX = "/auth/*";
 /**
  * GitHub repository URL for the project.
  * Used in the footer and documentation links.
- * Should be updated to point to the actual repository when available.
+ * Can be overridden via GITHUB_REPO_URL environment variable.
+ * @see https://tanstack.com/start/latest/docs/framework/react/guide/llmo
  */
-export const GITHUB_REPO_URL = "https://github.com/rjoydip/tsse-elysia";
+export const GITHUB_REPO_URL = getEnvVar(
+  "GITHUB_REPO_URL",
+  "https://github.com/rjoydip/tsse-elysia",
+);
 
 /**
  * Application name for display and OpenAPI documentation.

@@ -180,7 +180,7 @@ Database configuration is managed via environment variables:
 DATABASE_TYPE=sqlite
 SQLITE_URL=file:.artifacts/tsse-elysia.db
 BETTER_AUTH_SECRET=your-secret-key
-GITHUB_TOKEN=ghp_xxx  # For GitHub MCP integration
+GH_TOKEN=ghp_xxx  # For GitHub MCP integration
 REDIS_URL=redis://localhost:6379  # Or rediss://...@....upstash.io:6379
 ```
 
@@ -193,7 +193,7 @@ REDIS_URL=redis://localhost:6379  # Or rediss://...@....upstash.io:6379
 | `PORT`          | `3000`                           | Server port                         |
 | `HOST`          | `localhost`                      | Server host                         |
 | `REDIS_URL`     | -                                | Redis connection URL                |
-| `GITHUB_TOKEN`  | -                                | GitHub token for MCP (optional)     |
+| `GH_TOKEN`      | -                                | GitHub token for MCP (optional)     |
 
 ## MCP Tools
 
@@ -205,6 +205,29 @@ This project includes MCP (Model Context Protocol) servers for enhanced capabili
 | `sqlite`     | Database queries                | Database must exist |
 
 ---
+
+## Documentation & Preview
+
+### Previewing Markdown Files
+
+To preview markdown documentation before committing changes:
+
+```bash
+# Preview any markdown file with Bun (requires package.json to have dependencies)
+bun ./path/to/file.md
+
+# Example: Preview this guidelines file
+bun ./AGENTS.md
+
+# Example: Preview documentation
+bun ./docs/guides/overview.md
+```
+
+This command uses Bun's built-in markdown rendering capabilities to display the content in your terminal, making it easy to verify formatting and content before committing.
+
+---
+
+## Release Process Guidelines
 
 ## Release Process Guidelines
 

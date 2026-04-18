@@ -6,6 +6,7 @@
 import { createStore, useStore } from "@tanstack/react-store";
 import { statusPageConfig } from "~/config";
 import { z } from "zod";
+import { logger } from "../logger";
 
 /**
  * Health card status model used by the status page.
@@ -199,7 +200,9 @@ async function checkOtherStatusHealth(): Promise<OtherServiceStatus[]> {
           const poolDetails = payload.pools
             .map(
               (p) =>
-                `${p.name}: ${p.healthy ? "healthy" : "unhealthy"}${p.latencyMs != null ? ` (${p.latencyMs}ms)` : ""}`,
+                `${p.name}: ${p.healthy ? "healthy" : "unhealthy"}${
+                  p.latencyMs != null ? ` (${p.latencyMs}ms)` : ""
+                }`,
             )
             .join(", ");
           tooltip = `${payload.detail || "Database status"}\n\nPools: ${poolDetails}`;
@@ -317,7 +320,7 @@ export function refreshStatusHealth(now = Date.now()): boolean {
   }
   statusStore.setState((prev) => ({ ...prev, lastManualRefreshAt: now }));
   checkStatusHealth().catch((error) => {
-    console.error("Manual status refresh failed:", error);
+    logger.error("Manual status refresh failed", error);
   });
   return true;
 }

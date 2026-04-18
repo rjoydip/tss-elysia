@@ -58,7 +58,7 @@ export async function encodePassword(str: string): Promise<string> {
 
     return `${ivHex}.${dataHex}`;
   } catch (e) {
-    logger.error(`Encryption failed: ${e}`);
+    logger.error(`Encryption failed`, e as Error);
     return str; // Fallback to plain text if encryption fails
   }
 }
@@ -89,7 +89,7 @@ export async function decodePassword(str: string): Promise<string> {
     return dec.decode(decrypted);
   } catch (e) {
     // If decoding fails, return original string (might not be encoded or different key)
-    logger.error(`Encryption failed: ${e}`);
+    logger.error(`Encryption failed`, e as Error);
     return str;
   }
 }

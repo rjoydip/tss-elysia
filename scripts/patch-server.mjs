@@ -5,6 +5,7 @@
 
 import { readFileSync, writeFileSync } from "fs";
 import { join } from "path";
+import { logger } from "../src/lib/logger";
 
 const serverPath = join(process.cwd(), "dist/server/server.js");
 
@@ -26,9 +27,9 @@ const newCode = `if (routerInstance.state.redirect) return routerInstance.state.
 if (content.includes(oldCode)) {
   const patched = content.replace(oldCode, newCode);
   writeFileSync(serverPath, patched);
-  console.log("✅ Patched serverSsr.dehydrate successfully");
+  logger.log("✅ Patched serverSsr.dehydrate successfully");
 } else if (content.includes("routerInstance.serverSsr?.dehydrate")) {
-  console.log("✅ Already patched");
+  logger.log("✅ Already patched");
 } else {
-  console.log("⚠️ Pattern not found - may already be fixed or different version");
+  logger.log("⚠️ Pattern not found - may already be fixed or different version");
 }
