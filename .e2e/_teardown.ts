@@ -3,8 +3,9 @@
  * Uses Node.js SQLite driver to avoid bun: protocol issues in Playwright teardown.
  */
 import { eq, like } from "drizzle-orm";
+import { createClient } from "@libsql/client";
+import { drizzle } from "drizzle-orm/libsql";
 import * as schema from "../src/lib/db/schema";
-import { createSQLiteConnection } from "../src/lib/db";
 
 /**
  * Prefix used to identify test users/emails.
@@ -17,13 +18,28 @@ const TEST_PREFIX = "test-";
 const TEST_DOMAIN = "example.com";
 
 /**
+ * Database URL from environment or default file path.
+ */
+const sqliteUrl = process.env.SQLITE_URL || "file:.artifacts/tsse-elysia.db";
+
+/**
+ * Creates a connection to the SQLite database.
+ */
+function createDbConnection() {
+  const client = createClient({
+    url: sqliteUrl,
+  });
+  return drizzle(client, { schema });
+}
+
+/**
  * Cleanup a specific test user by email.
  * Deletes all related data in the correct order (respects foreign keys).
  *
  * @param email - Email of the user to clean up
  */
 export async function cleanupTestUser(email: string): Promise<void> {
-  const { db } = createSQLiteConnection();
+  const db = createDbConnection();
   try {
     const users = await db
       .select()
@@ -56,7 +72,7 @@ export async function cleanupTestUser(email: string): Promise<void> {
  * Used for E2E teardown.
  */
 export async function cleanupAllTestData(): Promise<void> {
-  const { db } = createSQLiteConnection();
+  const db = createDbConnection();
   try {
     const testUsers = await db
       .select()

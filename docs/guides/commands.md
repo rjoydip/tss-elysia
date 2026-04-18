@@ -65,7 +65,7 @@ This document lists all available npm scripts in `package.json`.
 | `lint`         | `oxlint . --format=github`                        | Lint code               |
 | `lint:ci`      | `bun run lint && bun run fmt:check && actions-up` | CI linting pipeline     |
 | `lint:fix`     | `oxlint . --fix && oxfmt .`                       | Auto-fix linting issues |
-| `typecheck`    | `tsgo --noEmit`                                   | Type check TypeScript   |
+| `typecheck`    | `tsc --noEmit`                                    | Type check TypeScript   |
 | `react:doctor` | `react-doctor . -y`                               | Run React Doctor        |
 
 ---

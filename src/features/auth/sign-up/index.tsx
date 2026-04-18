@@ -75,14 +75,14 @@ export function SignUp() {
             className="dark:hidden"
             width={1024}
             height={1151}
-            alt="Shadcn-Admin"
+            alt="TSSE-Admin"
           />
           <img
             src={dashboardDark}
             className="hidden dark:block"
             width={1024}
             height={1138}
-            alt="Shadcn-Admin"
+            alt="TSSE-Admin"
           />
         </div>
       </div>

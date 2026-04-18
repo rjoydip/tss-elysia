@@ -3,7 +3,7 @@
  */
 
 import { test, expect, type APIRequestContext } from "@playwright/test";
-import { E2E_BASE_URL } from "./config";
+import { E2E_BASE_URL } from "../config";
 
 function uniqueEmail(prefix = "test") {
   return `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2)}@example.com`;

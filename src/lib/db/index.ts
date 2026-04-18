@@ -105,17 +105,9 @@ export function getDatabaseType(): DatabaseType {
 }
 
 /**
- * Gets the SQLite auth token if configured.
- *
- * @returns Optional auth token for Turso or other remote databases
- */
-function getSQLiteAuthToken(): string | undefined {
-  return env.SQLITE_AUTH_TOKEN;
-}
-
-/**
  * Creates a SQLite database connection using LibSQL client.
  * Supports file-based, in-memory, and Turso/remote databases.
+ * Falls back to in-memory database if SQLITE_URL is not set.
  *
  * @returns SQLite database client and Drizzle ORM
  */
@@ -123,8 +115,8 @@ export function createSQLiteConnection(): {
   sqliteClient: Client;
   db: typeof db;
 } {
-  const url = env.SQLITE_URL;
-  const authToken = getSQLiteAuthToken();
+  const url = env.SQLITE_URL || ":memory:";
+  const authToken = env.SQLITE_AUTH_TOKEN;
 
   // Use LibSQL client for SQLite
   sqliteClient = createClient({

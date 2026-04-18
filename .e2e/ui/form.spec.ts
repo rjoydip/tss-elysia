@@ -8,11 +8,11 @@ import { E2E_BASE_URL } from "../config";
 
 test.describe("Form Integration", () => {
   test("should render form with inputs and buttons", async ({ page }) => {
-    await page.goto(`${E2E_BASE_URL}/account/login`);
+    await page.goto(`${E2E_BASE_URL}/sign-in`);
 
-    const emailInput = page.locator("main").getByPlaceholder("Email");
-    const passwordInput = page.locator("main").getByPlaceholder("Password");
-    const submitButton = page.locator("main").getByRole("button", { name: /sign in/i });
+    const emailInput = page.getByPlaceholder("name@example.com");
+    const passwordInput = page.getByPlaceholder("********");
+    const submitButton = page.getByRole("button", { name: /sign in/i });
 
     await expect(emailInput).toBeVisible();
     await expect(passwordInput).toBeVisible();
@@ -20,9 +20,9 @@ test.describe("Form Integration", () => {
   });
 
   test("should show password requirements after typing", async ({ page }) => {
-    await page.goto(`${E2E_BASE_URL}/account/register`);
+    await page.goto(`${E2E_BASE_URL}/sign-up`);
 
-    const passwordInput = page.locator("main").getByPlaceholder("Password");
+    const passwordInput = page.getByLabel("Password").first();
     await passwordInput.fill("test");
 
     await page.waitForTimeout(500);
