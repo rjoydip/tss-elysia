@@ -9,7 +9,7 @@ import { describe, it, expect } from "bun:test";
 import { blogPosts } from "../../src/features/landing/data/blog/data";
 import { changelogData } from "../../src/features/landing/data/changelog/data";
 
-const BASE_URL = "https://github.com/anomalyco/tsse-elysia";
+const BASE_URL = "https://github.com/rjoydip/tsse-elysia";
 
 interface JsonLdSchema {
   "@context": string;
@@ -116,7 +116,6 @@ describe("LLMO Docs API", () => {
         "@context": "https://schema.org",
         "@type": "TechArticle",
         headline: doc.title,
-        description: doc.description,
         about: {
           "@type": "Thing",
           name: doc.category,
@@ -254,7 +253,7 @@ describe("LLMO WebApplication Schema", () => {
       "@type": "WebApplication",
       name: "tsse-elysia",
       description: "A modern full-stack framework powered by Elysia, TanStack Start, and React",
-      url: "https://github.com/anomalyco/tsse-elysia",
+      url: "https://github.com/rjoydip/tsse-elysia",
       applicationCategory: "DeveloperApplication",
       operatingSystem: "Windows, macOS, Linux",
       offers: {
@@ -279,7 +278,7 @@ describe("LLMO SoftwareApplication Schema", () => {
       name: "tsse-elysia",
       applicationCategory: "DeveloperApplication",
       operatingSystem: "Windows, macOS, Linux",
-      url: "https://github.com/anomalyco/tsse-elysia",
+      url: "https://github.com/rjoydip/tsse-elysia",
       provider: {
         "@type": "Organization",
         name: "tsse-elysia",
@@ -457,7 +456,7 @@ TSS Elysia is a modern full-stack framework powered by Elysia, TanStack Start, a
 
 ## Documentation
 
-- Getting Started: https://github.com/anomalyco/tsse-elysia
+- Getting Started: https://github.com/rjoydip/tsse-elysia
 
 ## Content Types
 
