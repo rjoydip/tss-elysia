@@ -7,6 +7,7 @@
 
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import { APP_NAME } from "~/config";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";
 import { Header } from "~/components/layout/landing/header";
@@ -18,6 +19,24 @@ import { Footer } from "~/components/layout/landing/footer";
  */
 export const Route = createFileRoute("/(auth)/verify-email")({
   component: VerifyEmail,
+  head: () => ({
+    meta: [
+      { name: "robots", content: "noindex, nofollow" },
+      { name: "description", content: `Verify your ${APP_NAME} email` },
+    ],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "WebPage",
+          name: `Email Verification - ${APP_NAME}`,
+          description: "Verify your email address",
+          isPartOf: { "@type": "WebSite", name: APP_NAME },
+        }),
+      },
+    ],
+  }),
 });
 
 /**

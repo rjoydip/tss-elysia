@@ -218,8 +218,9 @@ Client-side variables must be prefixed with `VITE_`:
 ```typescript
 // Access in client code
 import { env } from "~/_env";
+import { logger } from "./logger";
 
-console.log(env.VITE_API_URL); // Available in browser
+logger.log(env.VITE_API_URL); // Available in browser
 // env.BETTER_AUTH_SECRET would throw - server-only
 ```
 
@@ -256,9 +257,10 @@ Server-only variables are protected from client access:
 ```typescript
 // Server-side code has full access
 import { env } from "~/_env";
+import { logger } from "./logger";
 
-console.log(env.API_URL); // Available on server
-console.log(env.BETTER_AUTH_SECRET); // Available on server
+logger.log(env.API_URL); // Available on server
+logger.log(env.BETTER_AUTH_SECRET); // Available on server
 ```
 
 ## Runtime Detection

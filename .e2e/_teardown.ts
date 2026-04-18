@@ -6,6 +6,7 @@ import { eq, like } from "drizzle-orm";
 import { createClient } from "@libsql/client";
 import { drizzle } from "drizzle-orm/libsql";
 import * as schema from "../src/lib/db/schema";
+import { logger } from "../src/lib/logger";
 
 /**
  * Prefix used to identify test users/emails.
@@ -48,7 +49,7 @@ export async function cleanupTestUser(email: string): Promise<void> {
       .limit(1);
 
     if (users.length === 0) {
-      console.log(`[E2E Cleanup] User ${email} not found, skipping`);
+      logger.log(`[E2E Cleanup] User ${email} not found, skipping`);
       return;
     }
 
@@ -61,9 +62,9 @@ export async function cleanupTestUser(email: string): Promise<void> {
     await db.delete(schema.mcpApiKeys).where(eq(schema.mcpApiKeys.userId, user.id));
     await db.delete(schema.users).where(eq(schema.users.id, user.id));
 
-    console.log(`[E2E Cleanup] Successfully deleted user: ${email}`);
+    logger.log(`[E2E Cleanup] Successfully deleted user: ${email}`);
   } catch (error) {
-    console.warn(`[E2E Cleanup] Failed to clean up user ${email}:`, error);
+    logger.warn(`[E2E Cleanup] Failed to clean up user ${email}`, error);
   }
 }
 
@@ -80,11 +81,11 @@ export async function cleanupAllTestData(): Promise<void> {
       .where(like(schema.users.email, `${TEST_PREFIX}%`));
 
     if (testUsers.length === 0) {
-      console.log("[E2E Cleanup] No test users found to clean up");
+      logger.log("[E2E Cleanup] No test users found to clean up");
       return;
     }
 
-    console.log(`[E2E Cleanup] Found ${testUsers.length} test users to clean up`);
+    logger.log(`[E2E Cleanup] Found ${testUsers.length} test users to clean up`);
 
     for (const user of testUsers) {
       try {
@@ -96,15 +97,15 @@ export async function cleanupAllTestData(): Promise<void> {
         await db.delete(schema.subscriptions).where(eq(schema.subscriptions.userId, user.id));
         await db.delete(schema.mcpApiKeys).where(eq(schema.mcpApiKeys.userId, user.id));
         await db.delete(schema.users).where(eq(schema.users.id, user.id));
-        console.log(`[E2E Cleanup] Deleted user: ${user.email}`);
+        logger.log(`[E2E Cleanup] Deleted user: ${user.email}`);
       } catch (error) {
-        console.warn(`[E2E Cleanup] Failed to delete user ${user.email}:`, error);
+        logger.warn(`[E2E Cleanup] Failed to delete user ${user.email}`, error);
       }
     }
 
-    console.log("[E2E Cleanup] All test data cleaned up successfully");
+    logger.log("[E2E Cleanup] All test data cleaned up successfully");
   } catch (error) {
-    console.error("[E2E Cleanup] Failed to clean up test data:", error);
+    logger.error("[E2E Cleanup] Failed to clean up test data:", error);
   }
 }
 
@@ -123,12 +124,12 @@ export function isTestEmail(email: string): boolean {
 }
 
 export default async function Teardown() {
-  console.log("[Teardown] Starting cleanup...");
+  logger.log("[Teardown] Starting cleanup...");
 
   try {
     await cleanupAllTestData();
-    console.log("[Teardown] Cleanup completed successfully");
+    logger.log("[Teardown] Cleanup completed successfully");
   } catch (error) {
-    console.error("[Teardown] Cleanup failed:", error);
+    logger.error("[Teardown] Cleanup failed", error);
   }
 }

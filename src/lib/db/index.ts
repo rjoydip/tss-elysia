@@ -22,6 +22,7 @@ import { drizzle as drizzlePg } from "drizzle-orm/node-postgres";
 import * as schema from "./schema";
 import { env } from "~/config/env";
 import { isCI, isDev, isStage, isQA, isProduction } from "~/config";
+import { logger } from "../logger";
 
 /**
  * Database type based on environment configuration.
@@ -127,7 +128,7 @@ export function createSQLiteConnection(): {
     schema,
   });
 
-  console.log(`[DB] Using SQLite: ${url === ":memory:" ? "in-memory" : url}`);
+  logger.log(`[DB] Using SQLite: ${url === ":memory:" ? "in-memory" : url}`);
 
   return { sqliteClient, db };
 }
@@ -286,13 +287,13 @@ export function initializeDatabase() {
 
   // Initialize only in server-side context
   if (typeof window !== "undefined") {
-    console.warn("Database initialization skipped: client-side context");
+    logger.warn("Database initialization skipped: client-side context");
     return db;
   }
 
   switch (dbType) {
     case "postgres":
-      console.log("[DB] Using PostgreSQL");
+      logger.log("[DB] Using PostgreSQL");
       createPostgresConnection();
       break;
     case "sqlite":

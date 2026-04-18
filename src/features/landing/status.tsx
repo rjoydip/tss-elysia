@@ -30,6 +30,7 @@ import {
   statusServices,
   useStatusState,
 } from "~/lib/stores/status";
+import { logger } from "~/lib/logger";
 
 interface PoolStatusInfo {
   name: string;
@@ -56,7 +57,7 @@ export function HealthDashboard() {
 
   useEffect(() => {
     checkStatusHealth().catch((error) => {
-      console.error("Initial status refresh failed:", error);
+      logger.error("Initial status refresh failed:", error);
     });
   }, []);
 

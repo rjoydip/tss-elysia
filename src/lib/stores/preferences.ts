@@ -6,6 +6,7 @@
 
 import { createStore, useStore } from "@tanstack/react-store";
 import { isBrowser } from "~/config";
+import { logger } from "../logger";
 
 /**
  * User preferences interface defining all configurable settings.
@@ -72,7 +73,7 @@ export function loadPreferences(): UserPreferences {
       }
     }
   } catch (error) {
-    console.error("Failed to load preferences from storage:", error);
+    logger.error(`Failed to load preferences from storage`, error as Error);
   }
   return defaultPreferences;
 }
@@ -90,7 +91,7 @@ export function savePreferences(preferences: UserPreferences): void {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(preferences));
   } catch (error) {
-    console.error("Failed to save preferences to storage:", error);
+    logger.error(`Failed to save preferences to storage`, error as Error);
   }
 }
 

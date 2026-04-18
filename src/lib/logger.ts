@@ -72,6 +72,7 @@ const DEFAULT_MIN_LEVEL: LogLevel = "info";
  */
 export function createLogger(options: LoggerOptions = {}): Readonly<{
   debug: (message: string, context?: Record<string, unknown>) => void;
+  log: (message: string, context?: Record<string, unknown>) => void;
   info: (message: string, context?: Record<string, unknown>) => void;
   warn: (message: string, context?: Record<string, unknown>) => void;
   error: (message: string, error?: Error) => void;
@@ -123,13 +124,14 @@ export function createLogger(options: LoggerOptions = {}): Readonly<{
     if (error) {
       switch (level) {
         case "fatal":
-          logger.fatal({ message, error });
+          logger.fatal(message, { error });
           break;
         case "error":
-          logger.error({ message, error });
+          logger.error(message, { error });
           break;
         default:
-          logger.error({ message, cause: error });
+          logger.error(message, { cause: error });
+          break;
       }
     } else if (context && Object.keys(context).length > 0) {
       switch (level) {
@@ -169,6 +171,7 @@ export function createLogger(options: LoggerOptions = {}): Readonly<{
   };
 
   return {
+    log: (message: string, context?: Record<string, unknown>) => log("info", message, context),
     debug: (message: string, context?: Record<string, unknown>) => log("debug", message, context),
     info: (message: string, context?: Record<string, unknown>) => log("info", message, context),
     warn: (message: string, context?: Record<string, unknown>) => log("warn", message, context),
