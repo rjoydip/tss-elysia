@@ -15,6 +15,7 @@ import { ThemeProvider } from "~/context/theme-provider";
 import { queryClient } from "~/router";
 import appCss from "~/styles/app.css?url";
 import { SearchProvider } from "~/context/search-provider";
+import { GITHUB_REPO_URL } from "~/config";
 
 export const Route = createRootRoute({
   head: () => ({
@@ -45,7 +46,7 @@ export const Route = createRootRoute({
           "@type": "WebApplication",
           name: "tsse-elysia",
           description: "A modern full-stack framework powered by Elysia, TanStack Start, and React",
-          url: "https://github.com/anomalyco/tsse-elysia",
+          url: GITHUB_REPO_URL,
           applicationCategory: "DeveloperApplication",
           operatingSystem: "Windows, macOS, Linux",
           offers: {
@@ -56,7 +57,7 @@ export const Route = createRootRoute({
           author: {
             "@type": "Organization",
             name: "tsse-elysia",
-            url: "https://github.com/anomalyco/tsse-elysia",
+            url: GITHUB_REPO_URL,
           },
         }),
       },
