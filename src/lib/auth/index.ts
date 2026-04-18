@@ -12,8 +12,9 @@ import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { db, schema, getDatabaseType } from "~/lib/db";
 import { env } from "~/config/env";
 import type { SubscriptionTier } from "~/types/subscription";
-import { isBun, isTest, sessionConfig } from "~/config";
+import { isTest, sessionConfig } from "~/config";
 import { logger } from "~/lib/logger";
+import { decodePassword } from "~/lib/utils/encryption";
 
 /**
  * Creates and configures the Better Auth instance.
@@ -73,12 +74,13 @@ export function createAuth() {
           if (!input) {
             throw new Error("Password cannot be empty");
           }
-          return isBun ? await Bun.password.hash(input) : await hash(input, hashOpts);
+          const decoded = await decodePassword(input);
+          return await hash(decoded, hashOpts);
         },
-        verify: async ({ password, hash }) =>
-          isBun
-            ? await Bun.password.verify(password, hash)
-            : await verify(hash, password, hashOpts),
+        verify: async ({ password, hash }) => {
+          const decoded = await decodePassword(password);
+          return await verify(hash, decoded, hashOpts);
+        },
       },
     },
 
@@ -145,16 +147,12 @@ function getAuth() {
  * await auth.api.signIn.email({ email, password })
  * const session = await auth.api.getSession({ headers })
  */
-export const auth = new Proxy(
-  // eslint_disable_next-line @typescript-eslint/no-explicit-any
-  {} as any,
-  {
-    get(_target, prop) {
-      const authInstance = getAuth();
-      return authInstance[prop as keyof typeof authInstance];
-    },
+export const auth = new Proxy({} as any, {
+  get(_target, prop) {
+    const authInstance = getAuth();
+    return authInstance[prop as keyof typeof authInstance];
   },
-);
+});
 
 // Type exports for use in route handlers and API responses
 export type Session = typeof auth.$Infer.Session.session;

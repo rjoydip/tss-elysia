@@ -5,7 +5,7 @@
  * @module rate-limit/store
  */
 
-import { getRedisClient } from "~/lib/redis";
+import { getStorage } from "~/lib/redis";
 import { redisLogger } from "~/lib/logger";
 import { rateLimitConfig } from "~/config";
 
@@ -187,46 +187,36 @@ class InMemoryRateLimitStore implements RateLimitStoreInterface {
 }
 
 /**
- * Redis-based rate limit store for distributed deployments.
- * Uses Redis INCRBY with TTL for atomic counter management.
+ * Unstorage-based rate limit store for distributed deployments.
+ * Uses atomic operations via unstorage for counter management.
  *
  * Features:
- * - Automatic cleanup via Redis TTL expiration
- * - Fallback to memory store if Redis unavailable
+ * - Automatic cleanup via TTL expiration
+ * - Fallback to memory store if storage unavailable
  * - Thread-safe atomic operations
  */
-class RedisRateLimitStore implements RateLimitStoreInterface {
-  /** Key prefix for Redis storage */
+class StorageRateLimitStore implements RateLimitStoreInterface {
+  /** Key prefix for storage */
   private readonly prefix = "ratelimit:";
 
-  /** Lua script for atomic INCRBY with EXPIRE */
-  private readonly atomicScript = `
-    local count = redis.call('INCRBY', KEYS[1], 1)
-    if count == 1 then
-      redis.call('EXPIRE', KEYS[1], ARGV[1])
-    end
-    local ttl = redis.call('TTL', KEYS[1])
-    return {count, ttl}
-  `;
-
   /**
-   * Gets the Redis client, returning null if unavailable.
+   * Gets the storage instance, returning null if unavailable.
    * Logs a warning when falling back to memory store.
    *
-   * @returns RedisClient instance or null
+   * @returns Storage instance or null
    */
-  private getClient() {
-    const client = getRedisClient();
-    if (!client) {
-      redisLogger.warn("Redis not available, falling back to memory store");
+  private getStorageInstance() {
+    const storage = getStorage();
+    if (!storage) {
+      redisLogger.warn("Storage not available, falling back to memory store");
       return null;
     }
-    return client;
+    return storage;
   }
 
   /**
-   * Checks rate limit using Redis atomic operations.
-   * Uses Lua script to ensure INCRBY and EXPIRE are atomic.
+   * Checks rate limit using atomic operations.
+   * Uses unstorage for atomic counter management.
    *
    * @param keyId - Unique identifier for rate limit scope
    * @param limit - Maximum requests allowed
@@ -238,8 +228,8 @@ class RedisRateLimitStore implements RateLimitStoreInterface {
     limit: number,
     duration: number,
   ): Promise<{ allowed: boolean; remaining: number; resetAt: number }> {
-    const client = this.getClient();
-    if (!client) {
+    const storage = this.getStorageInstance();
+    if (!storage) {
       return memoryStore.check(keyId, limit, duration);
     }
 
@@ -247,25 +237,31 @@ class RedisRateLimitStore implements RateLimitStoreInterface {
       return { allowed: true, remaining: limit, resetAt: Date.now() + Math.max(duration, 0) };
     }
 
-    const redisKey = `${this.prefix}${keyId}`;
+    const storeKey = `${this.prefix}${keyId}`;
 
     try {
       const now = Date.now();
       const ttlSeconds = Math.ceil(Math.max(duration, 0) / 1000);
       const resetAt = now + duration;
 
-      const [[, resultStr]] = await client.send("EVAL", [
-        this.atomicScript,
-        "1",
-        redisKey,
-        String(ttlSeconds),
-      ]);
+      const value = await storage.getItem(storeKey);
+      let count = 0;
 
-      const [countStr, ttlStr] = (resultStr as string).split(":");
-      const count = Number.parseInt(countStr ?? "0", 10);
-      const ttl = Number.parseInt(ttlStr ?? "0", 10);
+      if (value) {
+        try {
+          const parsed = JSON.parse(value as string);
+          count = parsed.count ?? 0;
+        } catch {
+          count = 0;
+        }
+      }
+
+      count++;
+
+      await storage.setItem(storeKey, JSON.stringify({ count, resetAt }), { ttl: ttlSeconds });
 
       if (count > limit) {
+        const ttl = ttlSeconds;
         const actualResetAt = now + ttl * 1000;
         return { allowed: false, remaining: 0, resetAt: actualResetAt };
       }
@@ -276,39 +272,39 @@ class RedisRateLimitStore implements RateLimitStoreInterface {
         resetAt,
       };
     } catch (error) {
-      redisLogger.error("Redis rate limit check failed", error as Error);
+      redisLogger.error("Storage rate limit check failed", error as Error);
       return memoryStore.check(keyId, limit, duration);
     }
   }
 
   /**
-   * Resets rate limit for a key by deleting the Redis key.
+   * Resets rate limit for a key by removing the storage key.
    *
    * @param keyId - Key identifier to reset
    */
   async reset(keyId: string): Promise<void> {
-    const client = this.getClient();
-    if (!client) {
+    const storage = this.getStorageInstance();
+    if (!storage) {
       return memoryStore.reset(keyId);
     }
 
-    const redisKey = `${this.prefix}${keyId}`;
+    const storeKey = `${this.prefix}${keyId}`;
 
     try {
-      await client.send("DEL", [redisKey]);
+      await storage.removeItem(storeKey);
     } catch (error) {
-      redisLogger.error("Redis rate limit reset failed", error as Error);
+      redisLogger.error("Storage rate limit reset failed", error as Error);
     }
   }
 
   /**
-   * Cleanup is automatic via Redis TTL.
-   * Returns 0 as Redis handles expiration internally.
+   * Cleanup is automatic via TTL.
+   * Returns 0 as storage handles expiration internally.
    *
    * @returns Always returns 0 (no manual cleanup needed)
    */
   async cleanup(): Promise<number> {
-    redisLogger.debug("Redis cleanup is automatic via TTL");
+    redisLogger.debug("Storage cleanup is automatic via TTL");
     return 0;
   }
 }
@@ -319,19 +315,19 @@ class RedisRateLimitStore implements RateLimitStoreInterface {
 const memoryStore = new InMemoryRateLimitStore();
 
 /**
- * Redis store instance.
+ * Storage store instance.
  */
-const redisStore = new RedisRateLimitStore();
+const storageStore = new StorageRateLimitStore();
 
 /**
- * Gets the rate limit store based on Redis availability.
- * Uses Redis if available, otherwise falls back to in-memory.
+ * Gets the rate limit store based on storage availability.
+ * Uses storage if available, otherwise falls back to in-memory.
  *
  * @returns Rate limit store instance
  */
 export function getRateLimitStore(): RateLimitStoreInterface {
-  const client = getRedisClient();
-  return client ? redisStore : memoryStore;
+  const storage = getStorage();
+  return storage ? storageStore : memoryStore;
 }
 
 /**
@@ -339,7 +335,12 @@ export function getRateLimitStore(): RateLimitStoreInterface {
  */
 export const rateLimitStore = getRateLimitStore();
 export const memoryRateLimitStore = memoryStore;
-export const redisRateLimitStore = redisStore;
+export const storageRateLimitStore = storageStore;
+
+/**
+ * @deprecated Use storageRateLimitStore instead. Kept for backward compatibility.
+ */
+export const redisRateLimitStore = storageStore;
 
 /**
  * Checks rate limit using the configured store.

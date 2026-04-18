@@ -32,11 +32,6 @@ describe("_env", () => {
       expect(typeof env.PORT).toBe("number");
     });
 
-    it("should have DATABASE_URL from env", async () => {
-      const { env } = await import(envPath);
-      expect(env.DATABASE_URL).toBeDefined();
-    });
-
     it("should export Env type", async () => {
       const { env } = await import(envPath);
       expect(env).toBeDefined();

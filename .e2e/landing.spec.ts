@@ -114,11 +114,11 @@ test.describe("Landing Page Footer", () => {
 test.describe("404 Page", () => {
   test("should show 404 for unknown route", async ({ page }) => {
     await page.goto("/unknown-route");
-    await expect(page.getByText("404: Page Not Found")).toBeVisible();
+    await expect(page.getByText("Oops! Page Not Found!")).toBeVisible();
   });
 
   test("should show 404 for deeply nested unknown route", async ({ page }) => {
     await page.goto("/some/deeply/nested/route");
-    await expect(page.getByText("404: Page Not Found")).toBeVisible();
+    await expect(page.getByText("Oops! Page Not Found!")).toBeVisible();
   });
 });

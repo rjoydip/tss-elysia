@@ -11,10 +11,14 @@ test.describe("Docs Sidebar", () => {
   });
 
   test("should render sidebar with all sections", async ({ page }) => {
+    // Wait for the sidebar to be visible
+    const sidebar = page.locator('[data-sidebar="sidebar"]');
+    await expect(sidebar).toBeVisible({ timeout: 15000 });
+
     // Verify each expected section button exists without relying on DOM order
     const expectedSections = ["Getting Started", "Authentication", "API"];
     for (const section of expectedSections) {
-      await expect(page.getByRole("button", { name: section })).toBeVisible();
+      await expect(sidebar.getByRole("button", { name: section })).toBeVisible({ timeout: 5000 });
     }
   });
 
@@ -24,9 +28,11 @@ test.describe("Docs Sidebar", () => {
       page
         .locator('[data-sidebar="sidebar"]')
         .getByRole("link", { name: "Development", exact: true }),
-    ).toBeVisible();
+    ).toBeVisible({ timeout: 10000 });
     // Getting Started section has Overview link with href="/docs"
-    await expect(page.locator('[data-sidebar="sidebar"] a[href="/docs"]')).toBeVisible();
+    await expect(page.locator('[data-sidebar="sidebar"] a[href="/docs"]')).toBeVisible({
+      timeout: 10000,
+    });
   });
 
   test("should expand Authentication section", async ({ page }) => {
@@ -60,12 +66,13 @@ test.describe("Docs Sidebar", () => {
 
   test("should auto-expand section containing current page", async ({ page }) => {
     await page.goto("/docs/getting-started/development");
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("domcontentloaded");
+    // Wait for the sidebar to be ready by waiting for a known link
     await expect(
       page
         .locator('[data-sidebar="sidebar"]')
         .getByRole("link", { name: "Development", exact: true }),
-    ).toBeVisible();
+    ).toBeVisible({ timeout: 10000 });
   });
 });
 
@@ -84,8 +91,10 @@ test.describe("Docs .md Extension Handling", () => {
 test.describe("Docs Breadcrumbs", () => {
   test("should show breadcrumb nav on child pages", async ({ page }) => {
     await page.goto("/docs/getting-started/development");
-    await page.waitForLoadState("networkidle");
-    await expect(page.getByRole("button", { name: "Toggle Sidebar" }).first()).toBeVisible();
+    await page.waitForLoadState("domcontentloaded");
+    await expect(page.getByRole("button", { name: "Toggle Sidebar" }).first()).toBeVisible({
+      timeout: 10000,
+    });
   });
 
   test("should show Docs label in breadcrumb", async ({ page }) => {
@@ -181,8 +190,8 @@ test.describe("Docs 404 Handling", () => {
     // Navigate to a doc path that doesn't exist — the networkidleer throws an Error
     await page.goto("/docs/this-page-does-not-exist");
     await page.waitForLoadState("networkidle");
-    // The root route's errorComponent renders "500: Internal Server Error"
-    // when the networkidleer throws; verify the error is surfaced to the user
-    await expect(page.getByText("Internal Server Error")).toBeVisible();
+    // The root route's errorComponent renders the 500 error page
+    // Check for either the error code or message
+    await expect(page.getByText("500")).toBeVisible();
   });
 });

@@ -23,10 +23,10 @@
  *   bun run scripts/setup.ts --skip-db
  */
 
-import { existsSync, copyFileSync } from "node:fs";
-import { join, dirname } from "node:path";
-import { fileURLToPath } from "node:url";
-import { logger } from "./_logger";
+import { existsSync, copyFileSync } from "fs";
+import { join, dirname } from "path";
+import { fileURLToPath } from "url";
+import { scriptLogger as logger } from "../src/lib/logger";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const rootDir = join(__dirname, "..");

@@ -4,19 +4,29 @@
  */
 
 import { type ElysiaConfig } from "elysia";
-import { version as pkgVersion } from "../../package.json";
+
+/**
+ * Safely get environment variable with fallback.
+ * Handles cases where import.meta.env might be undefined in SSR.
+ */
+function getEnvVar(key: string, fallback: string): string {
+  if (typeof import.meta !== "undefined" && import.meta.env) {
+    return (import.meta.env[key] as string) ?? fallback;
+  }
+  return fallback;
+}
 
 /**
  * Application version from package.json.
  * Automatically synced with the root package.json version.
  */
-export const APP_VERSION = pkgVersion;
+export const APP_VERSION = "0.0.0";
 
 /**
  * API route prefix - defaults to /api.
  * Used for organizing API endpoints under a common path.
  */
-export const API_PREFIX = import.meta.env.API_PREFIX ?? `/api`;
+export const API_PREFIX = getEnvVar("API_PREFIX", "/api");
 
 /**
  * Authentication route pattern - catches all auth-related requests.
@@ -29,25 +39,25 @@ export const AUTH_PREFIX = "/auth/*";
  * Used in the footer and documentation links.
  * Should be updated to point to the actual repository when available.
  */
-export const GITHUB_REPO_URL = "https://github.com/rjoydip/tss-elysia";
+export const GITHUB_REPO_URL = "https://github.com/rjoydip/tsse-elysia";
 
 /**
  * Application name for display and OpenAPI documentation.
  * Falls back to "TSS ELYSIA" if not set in environment.
  */
-export const APP_NAME = import.meta.env.VITE_APP_NAME ?? "TSSE";
+export const APP_NAME = getEnvVar("VITE_APP_NAME", "TSSE");
 
 /**
  * Server host - defaults to localhost for development.
  * Should be configured for production deployments.
  */
-export const HOST = import.meta.env.HOST || "localhost";
+export const HOST = getEnvVar("HOST", "localhost");
 
 /**
  * Server port - defaults to 3000 for local development.
  * Must match the port the Vite dev server runs on.
  */
-export const PORT = parseInt(import.meta.env.PORT || "3000", 10);
+export const PORT = parseInt(getEnvVar("PORT", "3000"), 10);
 
 /**
  * Runtime environment detection - checks if code runs in browser.
@@ -245,3 +255,23 @@ export const helmetConfig = {
   xPoweredBy: false, // Hide server technology info
   xXssProtection: false, // Deprecated, rely on CSP instead
 };
+
+/**
+ * List of available font names (visit the url `/settings/appearance`).
+ * This array is used to generate dynamic font classes (e.g., `font-inter`, `font-manrope`).
+ *
+ * 📝 How to Add a New Font (Tailwind v4+):
+ * 1. Add the font name here.
+ * 2. Update the `<link>` tag in 'index.html' to include the new font from Google Fonts (or any other source).
+ * 3. Add the new font family to 'index.css' using the `@theme inline` and `font-family` CSS variable.
+ *
+ * Example:
+ * fonts.ts           → Add 'roboto' to this array.
+ * index.html         → Add Google Fonts link for Roboto.
+ * index.css          → Add the new font in the CSS, e.g.:
+ *   @theme inline {
+ *      // ... other font families
+ *      --font-roboto: 'Roboto', var(--font-sans);
+ *   }
+ */
+export const fonts = ["inter", "manrope", "system"] as const;

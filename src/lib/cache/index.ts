@@ -11,7 +11,7 @@
  * @module cache
  */
 
-import { getRedisClient } from "~/lib/redis";
+import { getStorage } from "~/lib/redis";
 import { redisLogger } from "~/lib/logger";
 
 /**
@@ -102,9 +102,9 @@ class MemoryCache {
 }
 
 /**
- * Redis-backed cache store.
+ * Unstorage-backed cache store.
  */
-class RedisCache {
+class StorageCache {
   private readonly prefix: string;
 
   constructor(namespace: string = DEFAULT_NAMESPACE) {
@@ -112,10 +112,10 @@ class RedisCache {
   }
 
   /**
-   * Gets the Redis client.
+   * Gets the storage instance.
    */
-  private getClient() {
-    return getRedisClient();
+  private getStorage() {
+    return getStorage();
   }
 
   /**
@@ -125,27 +125,25 @@ class RedisCache {
    * @returns Cached value or null if not found
    */
   async get<T>(key: string): Promise<T | null> {
-    const client = this.getClient();
-    if (!client) {
+    const storage = this.getStorage();
+    if (!storage) {
       return memoryCache.get<T>(key);
     }
 
     try {
-      const redisKey = `${this.prefix}${key}`;
-      const result = await client.send("GET", [redisKey]);
+      const storeKey = `${this.prefix}${key}`;
+      const value = await storage.getItem(storeKey);
+      if (!value) return null;
 
-      if (!result) return null;
-
-      const str = Array.isArray(result) ? result[0] : result;
-      if (!str) return null;
+      // Try to parse as JSON, if that fails return as-is (for strings)
       try {
-        return JSON.parse(str) as T;
+        return JSON.parse(value as string) as T;
       } catch {
-        redisLogger.warn("Failed to parse cache JSON", { key });
-        return null;
+        // If JSON parse fails, return the value directly
+        return value as T;
       }
     } catch (error) {
-      redisLogger.error("Redis cache get failed", error as Error);
+      redisLogger.error("Storage cache get failed", error as Error);
       return memoryCache.get<T>(key);
     }
   }
@@ -160,19 +158,18 @@ class RedisCache {
   async set<T>(key: string, value: T, ttlSeconds: number = DEFAULT_TTL): Promise<void> {
     const ttlSecondsInt = ttlSeconds > 0 ? Math.floor(ttlSeconds) : DEFAULT_TTL;
 
-    const client = this.getClient();
-    if (!client) {
+    const storage = this.getStorage();
+    if (!storage) {
       memoryCache.set(key, value, ttlSecondsInt);
       return;
     }
 
     try {
-      const redisKey = `${this.prefix}${key}`;
-      const serialized = JSON.stringify(value);
-
-      await client.send("SET", [redisKey, serialized, "EX", String(ttlSecondsInt)]);
+      const storeKey = `${this.prefix}${key}`;
+      const serialized = typeof value === "string" ? value : JSON.stringify(value);
+      await storage.setItem(storeKey, serialized, { ttl: ttlSecondsInt });
     } catch (error) {
-      redisLogger.error("Redis cache set failed", error as Error);
+      redisLogger.error("Storage cache set failed", error as Error);
       memoryCache.set(key, value, ttlSecondsInt);
     }
   }
@@ -183,17 +180,17 @@ class RedisCache {
    * @param key - Cache key to delete
    */
   async delete(key: string): Promise<void> {
-    const client = this.getClient();
-    if (!client) {
+    const storage = this.getStorage();
+    if (!storage) {
       memoryCache.delete(key);
       return;
     }
 
     try {
-      const redisKey = `${this.prefix}${key}`;
-      await client.send("DEL", [redisKey]);
+      const storeKey = `${this.prefix}${key}`;
+      await storage.removeItem(storeKey);
     } catch (error) {
-      redisLogger.error("Redis cache delete failed", error as Error);
+      redisLogger.error("Storage cache delete failed", error as Error);
     }
   }
 
@@ -201,35 +198,17 @@ class RedisCache {
    * Clears all keys in the namespace.
    */
   async clear(): Promise<void> {
-    const client = this.getClient();
-    if (!client) {
+    const storage = this.getStorage();
+    if (!storage) {
       await memoryCache.clear();
       return;
     }
 
     try {
-      // Use SCAN to find keys, then delete in batch using pipeline
-      let cursor = "0";
-      do {
-        const [nextCursor, keys] = await client.send("SCAN", [
-          cursor,
-          "MATCH",
-          `${this.prefix}*`,
-          "COUNT",
-          "100",
-        ]);
-        cursor = nextCursor;
-
-        if (keys && keys.length > 0) {
-          // Use pipeline for batch deletion
-          const pipelineCommands: [string, string[]][] = keys.map((key: string) => ["DEL", [key]]);
-          await Promise.all(
-            pipelineCommands.map(([cmd, args]) => client.send(cmd as string, args)),
-          );
-        }
-      } while (cursor !== "0");
+      const keys = await storage.getKeys(this.prefix);
+      await Promise.all(keys.map((k: string) => storage.removeItem(k)));
     } catch (error) {
-      redisLogger.error("Redis cache clear failed", error as Error);
+      redisLogger.error("Storage cache clear failed", error as Error);
     }
   }
 
@@ -240,17 +219,17 @@ class RedisCache {
    * @returns True if key exists
    */
   async has(key: string): Promise<boolean> {
-    const client = this.getClient();
-    if (!client) {
+    const storage = this.getStorage();
+    if (!storage) {
       return memoryCache.has(key);
     }
 
     try {
-      const redisKey = `${this.prefix}${key}`;
-      const result = await client.send("EXISTS", [redisKey]);
-      return result === 1;
+      const storeKey = `${this.prefix}${key}`;
+      const value = await storage.getItem(storeKey);
+      return value !== null && value !== undefined;
     } catch (error) {
-      redisLogger.error("Redis cache has failed", error as Error);
+      redisLogger.error("Storage cache has failed", error as Error);
       return memoryCache.has(key);
     }
   }
@@ -264,7 +243,7 @@ const memoryCache = new MemoryCache();
 /**
  * Redis cache instance (for type inference).
  */
-export const redisCache = new RedisCache();
+export const redisCache = new StorageCache();
 
 /**
  * Cache interface for type-safe operations.
@@ -278,15 +257,15 @@ export interface CacheInterface {
 }
 
 /**
- * Gets a cache instance based on Redis availability.
+ * Gets a cache instance based on storage availability.
  *
  * @param options - Cache options
  * @returns Cache interface instance
  */
 export function getCache(options: CacheOptions = {}): CacheInterface {
-  const client = getRedisClient();
-  if (client) {
-    return new RedisCache(options.namespace);
+  const storage = getStorage();
+  if (storage) {
+    return new StorageCache(options.namespace);
   }
   return memoryCache as unknown as CacheInterface;
 }

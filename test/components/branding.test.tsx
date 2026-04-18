@@ -5,7 +5,12 @@
 
 import { describe, expect, it } from "bun:test";
 import { renderToString } from "react-dom/server";
-import { Branding, BrandTitle, BrandDescription, BrandLogo } from "../../src/components/branding";
+import {
+  Branding,
+  BrandTitle,
+  BrandDescription,
+  BrandLogo,
+} from "../../src/components/layout/landing/branding";
 
 describe("Branding", () => {
   it("should render without crashing", () => {

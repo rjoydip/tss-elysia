@@ -91,24 +91,25 @@ function formatName(slug: string): string {
 /**
  * Scan all markdown files in /docs and build the sidebar config.
  * In Vite: import.meta.glob is replaced at build time with eager imports.
- * In Bun tests: falls back to filesystem scanning via createRequire.
- * Using createRequire avoids Vite transforming bare `require()` calls.
+ * In test environments: falls back to filesystem scanning using require.
+ * Using require avoids Vite attempting to bundle "fs" in test environments.
  */
 function scanDocModules(): Record<string, string> {
   try {
     // Vite transforms this call at build time into static imports.
-    // If not transformed (e.g. Bun tests), import.meta.glob is undefined and throws.
+    // If not transformed (e.g. in tests), import.meta.glob is undefined and throws.
     return import.meta.glob("../../docs/**/*.md", {
       query: "?raw",
       import: "default",
       eager: true,
     }) as Record<string, string>;
   } catch {
-    // Bun test fallback: use createRequire so Vite doesn't attempt to bundle node:fs
-    const { createRequire } = require("node:module") as typeof import("node:module");
-    const nodeRequire = createRequire(import.meta.url);
-    const { readdirSync, readFileSync } = nodeRequire("node:fs") as typeof import("node:fs");
-    const { join } = nodeRequire("node:path") as typeof import("node:path");
+    // Test environment fallback: use require for fs and path
+    // This works in both Node.js and Bun test environments
+    const fs = require("fs");
+    const path = require("path");
+    const { readdirSync, readFileSync } = fs;
+    const { join } = path;
     const docsDir = join(__dirname, "../../docs");
     const modules: Record<string, string> = {};
 

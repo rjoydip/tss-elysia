@@ -1,6 +1,6 @@
 import { describe, expect, it, mock } from "bun:test";
 import { renderToString } from "react-dom/server";
-import { Header } from "../../src/components/header";
+import { Header } from "../../src/components/layout/landing/header";
 
 // Mock auth client
 let mockSession: any = null;
@@ -14,9 +14,14 @@ mock.module("../../src/hooks/use-scroll-direction", () => ({
   useScrollDirection: () => true, // default to visible
 }));
 
-// Mock ThemeToggle component
-mock.module("../../src/components/theme/toggle", () => ({
-  ThemeToggle: () => <button>Toggle theme</button>,
+// Mock Search component
+mock.module("../../src/components/search", () => ({
+  Search: ({ className }: any) => <button className={className}>Search</button>,
+}));
+
+// Mock ThemeSwitch component
+mock.module("../../src/components/theme-switch", () => ({
+  ThemeSwitch: () => <button>Toggle theme</button>,
 }));
 
 // Mock TanStack Router's Link component
@@ -71,10 +76,16 @@ describe("Header", () => {
       expect(html).toContain('aria-label="GitHub"');
     });
 
-    it("should render Login button when not logged in", () => {
+    it("should render Search when not logged in", () => {
       mockSession = null;
       const html = renderToString(<Header />);
-      expect(html).toContain('href="/account/login"');
+      expect(html).toContain("Search");
+    });
+
+    it("should render ThemeSwitch when not logged in", () => {
+      mockSession = null;
+      const html = renderToString(<Header />);
+      expect(html).toContain("Toggle theme");
     });
   });
 
@@ -87,25 +98,28 @@ describe("Header", () => {
       expect(html).not.toContain("Changelog");
     });
 
-    it("should hide GitHub link when logged in", () => {
+    it("should show GitHub link when logged in", () => {
       mockSession = { user: { id: "1", name: "Test User" } };
       const html = renderToString(<Header />);
-      expect(html).not.toContain('aria-label="GitHub"');
+      expect(html).toContain('aria-label="GitHub"');
     });
 
-    it("should hide Theme Toggle when logged in", () => {
+    it("should show Theme Toggle when logged in", () => {
       mockSession = { user: { id: "1", name: "Test User" } };
       const html = renderToString(<Header />);
-      // ThemeToggle renders as a button with theme icons
-      expect(html).not.toContain("Toggle theme");
+      expect(html).toContain("Toggle theme");
     });
 
-    it("should render user profile when logged in", () => {
+    it("should show Search when logged in", () => {
       mockSession = { user: { id: "1", name: "Test User" } };
       const html = renderToString(<Header />);
-      expect(html).toContain("Test User");
-      // Sign In should be hidden
-      expect(html).not.toContain('href="/account/login"');
+      expect(html).toContain("Search");
+    });
+
+    it("should show Dashboard link when logged in", () => {
+      mockSession = { user: { id: "1", name: "Test User" } };
+      const html = renderToString(<Header />);
+      expect(html).toContain('aria-label="Dashboard"');
     });
   });
 });

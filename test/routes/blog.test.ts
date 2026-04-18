@@ -4,7 +4,12 @@
  */
 
 import { describe, expect, it } from "bun:test";
-import { blogPosts, getBlogPost, getFeaturedPost, getRecentPosts } from "../../src/lib/blog/data";
+import {
+  blogPosts,
+  getBlogPost,
+  getFeaturedPost,
+  getRecentPosts,
+} from "../../src/features/landing/data/blog/data";
 
 describe("blogPosts", () => {
   it("should be a non-empty array", () => {
@@ -64,9 +69,9 @@ describe("blogPosts", () => {
 
 describe("getBlogPost", () => {
   it("should return post for valid slug", () => {
-    const post = getBlogPost("introducing-tss-elysia");
+    const post = getBlogPost("introducing-tsse-elysia");
     expect(post).toBeDefined();
-    expect(post!.slug).toBe("introducing-tss-elysia");
+    expect(post!.slug).toBe("introducing-tsse-elysia");
     expect(post!.title).toContain("TSS Elysia");
   });
 
@@ -79,7 +84,7 @@ describe("getBlogPost", () => {
   });
 
   it("should be case-sensitive", () => {
-    expect(getBlogPost("Introducing-TSS-Elysia")).toBeUndefined();
+    expect(getBlogPost("Introducing-tsse-elysia")).toBeUndefined();
   });
 
   it("should return the correct post for each slug", () => {

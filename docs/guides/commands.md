@@ -29,9 +29,9 @@ This document lists all available npm scripts in `package.json`.
 
 | Script             | Command                          | Description                      |
 | ------------------ | -------------------------------- | -------------------------------- |
-| `test:unit`        | `bun test`                       | Run unit tests                   |
-| `test:watch`       | `bun test --watch`               | Run tests in watch mode          |
-| `test:coverage`    | `bun test --coverage`            | Run tests with coverage report   |
+| `test:unit`        | `bun test:unit`                  | Run unit tests                   |
+| `test:watch`       | `bun test:unit --watch`          | Run tests in watch mode          |
+| `test:coverage`    | `bun test:unit --coverage`       | Run tests with coverage report   |
 | `test:e2e`         | `playwright test`                | Run end-to-end tests             |
 | `test:e2e:ui`      | `bun playwright test --ui`       | Run E2E tests with Playwright UI |
 | `test:e2e:headed`  | `bun playwright test --headed`   | Run E2E tests in headed mode     |
@@ -65,7 +65,7 @@ This document lists all available npm scripts in `package.json`.
 | `lint`         | `oxlint . --format=github`                        | Lint code               |
 | `lint:ci`      | `bun run lint && bun run fmt:check && actions-up` | CI linting pipeline     |
 | `lint:fix`     | `oxlint . --fix && oxfmt .`                       | Auto-fix linting issues |
-| `typecheck`    | `tsgo --noEmit`                                   | Type check TypeScript   |
+| `typecheck`    | `tsc --noEmit`                                    | Type check TypeScript   |
 | `react:doctor` | `react-doctor . -y`                               | Run React Doctor        |
 
 ---
@@ -121,5 +121,5 @@ bun run preview
 
 - Most scripts use `bun` as the runtime
 - E2E tests require the dev server to be running (or use `preview`)
-- Database scripts assume `DATABASE_URL` is configured in `.env`
+- Database scripts assume `SQLITE_URL` is configured in `.env`
 - Load tests use `bunx k6` (runs k6 via bunx)

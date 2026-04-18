@@ -1,4 +1,4 @@
-import path from "node:path";
+import path from "path";
 import { defineConfig } from "vite";
 import { tanstackStart } from "@tanstack/react-start/plugin/vite";
 import viteReact from "@vitejs/plugin-react";
@@ -11,7 +11,6 @@ export default defineConfig(() => ({
   plugins: [tanstackStart(), viteReact(), tailwindcss()],
   ssr: {
     noExternal: ["drizzle-orm"],
-    external: ["bun"],
   },
   environments: {
     ssr: {

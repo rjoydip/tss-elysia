@@ -10,13 +10,13 @@ describe("Separator", () => {
   it("should render horizontal separator by default", () => {
     const html = renderToString(<Separator />);
     expect(html).toContain("w-full");
-    expect(html).toContain("h-[1px]");
+    expect(html).toContain("h-px");
   });
 
   it("should render vertical separator", () => {
     const html = renderToString(<Separator orientation="vertical" />);
     expect(html).toContain("h-full");
-    expect(html).toContain("w-[1px]");
+    expect(html).toContain("w-px");
   });
 
   it("should have role=none when decorative (default)", () => {

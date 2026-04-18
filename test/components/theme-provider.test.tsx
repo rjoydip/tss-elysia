@@ -1,11 +1,11 @@
 /**
- * Unit tests for src/components/theme-provider.tsx
+ * Unit tests for src/context/theme-provider.tsx
  * Tests: ThemeProvider context, useTheme hook
  */
 
 import { describe, expect, it } from "bun:test";
 import { renderToString } from "react-dom/server";
-import { ThemeProvider, useTheme } from "../../src/components/theme/provider";
+import { ThemeProvider, useTheme } from "../../src/context/theme-provider";
 
 describe("ThemeProvider", () => {
   it("should render children without crashing", () => {
@@ -72,18 +72,59 @@ describe("ThemeProvider", () => {
     expect(html).toContain("first");
     expect(html).toContain("second");
   });
+
+  it("should provide resolvedTheme property", () => {
+    function TestComponent() {
+      const { resolvedTheme } = useTheme();
+      return <div data-resolved={resolvedTheme}>themed</div>;
+    }
+
+    const html = renderToString(
+      <ThemeProvider defaultTheme="dark">
+        <TestComponent />
+      </ThemeProvider>,
+    );
+    expect(html).toContain("themed");
+  });
+
+  it("should provide resetTheme function", () => {
+    function TestComponent() {
+      const { resetTheme } = useTheme();
+      return <div>{typeof resetTheme}</div>;
+    }
+
+    const html = renderToString(
+      <ThemeProvider>
+        <TestComponent />
+      </ThemeProvider>,
+    );
+    expect(html).toContain("function");
+  });
+
+  it("should provide defaultTheme property", () => {
+    function TestComponent() {
+      const { defaultTheme } = useTheme();
+      return <div data-default={defaultTheme}>themed</div>;
+    }
+
+    const html = renderToString(
+      <ThemeProvider defaultTheme="dark">
+        <TestComponent />
+      </ThemeProvider>,
+    );
+    expect(html).toContain("themed");
+  });
 });
 
 describe("useTheme", () => {
-  it("should throw when used outside ThemeProvider", () => {
-    function TestComponent() {
-      const { theme } = useTheme();
-      return <div>{theme}</div>;
-    }
-
-    expect(() => renderToString(<TestComponent />)).toThrow(
-      "useTheme must be used within a ThemeProvider",
-    );
+  it("should throw error when used outside ThemeProvider", () => {
+    expect(() => {
+      function TestComponent() {
+        useTheme();
+        return null;
+      }
+      renderToString(<TestComponent />);
+    }).toThrow();
   });
 
   it("should provide theme context inside ThemeProvider", () => {

@@ -1,25 +1,38 @@
 import { describe, expect, it, beforeEach } from "bun:test";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
-import { drizzle } from "drizzle-orm/bun-sqlite";
-import { Database } from "bun:sqlite";
+import { createClient } from "@libsql/client";
+import { drizzle } from "drizzle-orm/libsql";
 import { faker } from "@faker-js/faker";
 import * as schema from "../../../src/lib/db/schema";
-import { CREATE_TABLES_SQL } from "../../fixtures/db";
 
-function createTestDatabase(): ReturnType<typeof drizzle> {
-  const sqlite = new Database(":memory:");
-  sqlite.exec(CREATE_TABLES_SQL);
-  return drizzle(sqlite, { schema });
+const TEST_DB_PATH = ":memory:";
+
+async function createTestDatabase() {
+  const client = createClient({ url: TEST_DB_PATH });
+  const tables = [
+    `CREATE TABLE IF NOT EXISTS "user" ("id" text PRIMARY KEY, "name" text, "email" text NOT NULL UNIQUE, "emailVerified" integer NOT NULL DEFAULT 0, "image" text, "createdAt" integer NOT NULL, "updatedAt" integer NOT NULL, "subscriptionTier" text NOT NULL DEFAULT 'free', "subscriptionId" text, "subscriptionStatus" text, "subscriptionExpiresAt" integer)`,
+    `CREATE TABLE IF NOT EXISTS "session" ("id" text PRIMARY KEY, "expiresAt" integer NOT NULL, "token" text NOT NULL UNIQUE, "createdAt" integer NOT NULL, "updatedAt" integer NOT NULL, "ipAddress" text, "userAgent" text, "userId" text NOT NULL REFERENCES "user"("id") ON DELETE CASCADE)`,
+    `CREATE TABLE IF NOT EXISTS "account" ("id" text PRIMARY KEY, "accountId" text NOT NULL, "providerId" text NOT NULL, "userId" text NOT NULL REFERENCES "user"("id") ON DELETE CASCADE, "accessToken" text, "refreshToken" text, "idToken" text, "accessTokenExpiresAt" integer, "refreshTokenExpiresAt" integer, "scope" text, "password" text, "createdAt" integer NOT NULL, "updatedAt" integer NOT NULL)`,
+    `CREATE TABLE IF NOT EXISTS "verification" ("id" text PRIMARY KEY, "identifier" text NOT NULL, "value" text NOT NULL, "expiresAt" integer NOT NULL, "createdAt" integer, "updatedAt" integer)`,
+    `CREATE TABLE IF NOT EXISTS "subscription_plan" ("id" text PRIMARY KEY, "name" text NOT NULL, "description" text, "price" integer NOT NULL, "currency" text NOT NULL DEFAULT 'USD', "interval" text NOT NULL, "intervalCount" integer NOT NULL DEFAULT 1, "features" text, "rateLimit" integer NOT NULL, "rateLimitDuration" integer NOT NULL DEFAULT 60000, "createdAt" integer NOT NULL, "updatedAt" integer NOT NULL)`,
+    `CREATE TABLE IF NOT EXISTS "subscription" ("id" text PRIMARY KEY, "userId" text NOT NULL REFERENCES "user"("id") ON DELETE CASCADE, "planId" text NOT NULL REFERENCES "subscription_plan"("id") ON DELETE CASCADE, "status" text NOT NULL DEFAULT 'active', "currentPeriodStart" integer NOT NULL, "currentPeriodEnd" integer NOT NULL, "cancelAtPeriodEnd" integer NOT NULL DEFAULT 0, "createdAt" integer NOT NULL, "updatedAt" integer NOT NULL)`,
+    `CREATE TABLE IF NOT EXISTS "mcp_api_key" ("id" text PRIMARY KEY, "name" text NOT NULL, "keyHash" text NOT NULL UNIQUE, "userId" text NOT NULL REFERENCES "user"("id") ON DELETE CASCADE, "organizationId" text, "permissions" text, "rateLimit" integer NOT NULL DEFAULT 100, "rateLimitDuration" integer NOT NULL DEFAULT 60000, "lastUsedAt" integer, "expiresAt" integer, "createdAt" integer NOT NULL, "updatedAt" integer NOT NULL)`,
+  ];
+
+  for (const sql of tables) {
+    await client.execute({ sql, args: [] });
+  }
+
+  return drizzle(client, { schema });
 }
 
 describe("Authentication", () => {
   let db: ReturnType<typeof drizzle>;
-  // eslint_disable-next-line @typescript-eslint/no-explicit-any
   let auth: any;
 
-  beforeEach(() => {
-    db = createTestDatabase();
+  beforeEach(async () => {
+    db = await createTestDatabase();
     auth = betterAuth({
       database: drizzleAdapter(db, {
         provider: "sqlite",

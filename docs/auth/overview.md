@@ -20,8 +20,9 @@ BETTER_AUTH_SECRET=your-32-char-secret-key
 # Optional - Auth base URL (defaults to http://localhost:3000/api/auth)
 BETTER_AUTH_URL=http://localhost:3000/api/auth
 
-DATABASE_PATH=tss-elysia.db
-DATABASE_NAME=tss-elysia.db
+# Database Configuration
+DATABASE_TYPE=sqlite
+SQLITE_URL=file:.artifacts/tsse-elysia.db
 ```
 
 ### Database Setup
@@ -168,7 +169,7 @@ await auth.api.signOut({
 ### Unit Tests
 
 ```bash
-bun test test/routes/api/auth/$.test.ts test/lib/store/auth.test.ts
+bun test:unit test/routes/api/auth/$.test.ts test/lib/store/auth.test.ts
 ```
 
 Tests cover: sign-up/sign-in route behavior, duplicate email handling path, auth UI store state transitions, session management, sign-out, and handler integration.

@@ -13,7 +13,7 @@ services:
   # ---------------------------------------------------------------------------
   redis:
     image: redis:7-alpine
-    container_name: tss-elysia-redis
+    container_name: tsse-elysia-redis
     ports:
       - "6379:6379"
     volumes:
@@ -44,7 +44,7 @@ services:
   # ---------------------------------------------------------------------------
   postgres-primary:
     image: postgres:16-alpine
-    container_name: tss-elysia-postgres-primary
+    container_name: tsse-elysia-postgres-primary
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-tsse}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-tsse_password}
@@ -75,7 +75,7 @@ services:
   # ---------------------------------------------------------------------------
   postgres-replica-1:
     image: postgres:16-alpine
-    container_name: tss-elysia-postgres-replica-1
+    container_name: tsse-elysia-postgres-replica-1
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-tsse}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-tsse_password}
@@ -108,7 +108,7 @@ services:
   # ---------------------------------------------------------------------------
   postgres-replica-2:
     image: postgres:16-alpine
-    container_name: tss-elysia-postgres-replica-2
+    container_name: tsse-elysia-postgres-replica-2
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-tsse}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-tsse_password}
@@ -143,7 +143,7 @@ services:
     build:
       context: ..
       dockerfile: docker/Dockerfile
-    container_name: tss-elysia-prod
+    container_name: tsse-elysia-prod
     ports:
       - "3000:3000"
     environment:
@@ -152,8 +152,7 @@ services:
       - NODE_ENV=production
       # Required: Generate a secure secret (min 32 chars)
       - AUTH_SECRET=${AUTH_SECRET:?AUTH_SECRET is required}
-      - DATABASE_PATH=.artifacts
-      - DATABASE_NAME=tss-elysia.db
+      - SQLITE_URL=file:.artifacts/tsse-elysia.db
       # PostgreSQL primary connection
       - POSTGRES_URL=postgresql://${POSTGRES_USER:-tsse}:${POSTGRES_PASSWORD:-tsse_password}@postgres-primary:5432/${POSTGRES_DB:-tsse_dev}
       # PostgreSQL read replicas (JSON array format)
@@ -201,7 +200,7 @@ services:
     build:
       context: ..
       dockerfile: docker/Dockerfile.dev
-    container_name: tss-elysia-dev
+    container_name: tsse-elysia-dev
     ports:
       - "3000:3000"
     environment:
@@ -210,8 +209,7 @@ services:
       - NODE_ENV=development
       # Dev secret (auto-generated if not provided)
       - AUTH_SECRET=${AUTH_SECRET:-dev-secret-min-32-chars-here}
-      - DATABASE_PATH=.artifacts
-      - DATABASE_NAME=tss-elysia.db
+      - SQLITE_URL=file:.artifacts/tsse-elysia.db
       # PostgreSQL primary connection
       - POSTGRES_URL=postgresql://${POSTGRES_USER:-tsse}:${POSTGRES_PASSWORD:-tsse_password}@postgres-primary:5432/${POSTGRES_DB:-tsse_dev}
       # PostgreSQL read replicas (JSON array format)

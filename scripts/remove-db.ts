@@ -1,7 +1,7 @@
-import { existsSync, unlinkSync } from "node:fs";
-import { resolve } from "node:path";
+import { existsSync, unlinkSync } from "fs";
+import { resolve } from "path";
 import { Client } from "pg";
-import { logger } from "./_logger";
+import { scriptLogger as logger } from "../src/lib/logger";
 
 async function removePostgresDatabase() {
   const host = process.env.POSTGRES_HOST || "localhost";
@@ -55,16 +55,9 @@ async function removeSQLiteDatabase(dbPath: string) {
 
 async function main() {
   const dbType = process.env.DATABASE_TYPE || "sqlite";
-  const _dbPath = ".artifacts/tss-elysia.db";
+  const sqliteDbUrl = process.env.SQLITE_URL || "file:.artifacts/tsse-elysia.db";
 
-  const dbPath =
-    process.env.DATABASE_PATH && process.env.DATABASE_NAME
-      ? `${process.env.DATABASE_PATH}/${process.env.DATABASE_NAME}`
-      : process.env.DATABASE_NAME && !process.env.DATABASE_PATH
-        ? `.artifacts/${process.env.DATABASE_NAME}`
-        : process.env.NODE_ENV === "test"
-          ? _dbPath
-          : _dbPath;
+  const dbPath = sqliteDbUrl.replace(/^file:/, "");
 
   if (dbType === "postgres") {
     await removePostgresDatabase();

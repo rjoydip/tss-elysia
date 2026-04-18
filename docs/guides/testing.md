@@ -12,10 +12,10 @@ This project uses two testing approaches: unit tests with Bun and E2E tests with
 ### Running Tests
 
 ```bash
-bun test              # Run all tests
-bun test --watch      # Watch mode
-bun test --coverage  # With coverage report
-bun test test/config/docs.test.ts  # Run specific test file
+bun test:unit              # Run all tests
+bun test:unit --watch      # Watch mode
+bun test:unit --coverage  # With coverage report
+bun test:unit test/config/docs.test.ts  # Run specific test file
 ```
 
 ### Test Structure
@@ -262,12 +262,12 @@ docker-scan:
         context: .
         file: docker/Dockerfile
         load: true
-        tags: tss-elysia:${{ github.sha }}
+        tags: tsse-elysia:${{ github.sha }}
 
     - name: Run Trivy vulnerability scanner
       uses: aquasecurity/trivy-action@master
       with:
-        image-ref: "tss-elysia:${{ github.sha }}"
+        image-ref: "tsse-elysia:${{ github.sha }}"
         severity: "CRITICAL,HIGH"
         exit-code: "1"
         ignore-unfixed: true
@@ -296,10 +296,10 @@ bun run test:load:stress # Run stress test
 
 ### Load Test Structure
 
-Load tests are in `test/load-tests/`:
+Load tests are in `.k6/`:
 
 ```bash
-test/load-tests/
+.k6/
   smoke-test.js   # Basic smoke test
   api-test.js    # API endpoint load test
   stress-test.js # Stress test

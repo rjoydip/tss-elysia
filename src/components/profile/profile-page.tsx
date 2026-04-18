@@ -93,7 +93,7 @@ function ProfileContent() {
           <h1 className="text-3xl font-bold text-foreground">Profile</h1>
           <p className="text-muted-foreground mt-1">Manage your account information</p>
         </div>
-        <Link to="/settings">
+        <Link to="/dashboard/settings">
           <Button variant="outline">
             <svg
               xmlns="http://www.w3.org/2000/svg"

@@ -5,7 +5,7 @@
  * Uses centralized TanStack store for state management.
  */
 
-import { usePreferences, setPreferences } from "~/lib/store/preferences";
+import { usePreferences, setPreferences } from "~/lib/stores/preferences";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";
 import { Label } from "~/components/ui/label";
 import { Switch } from "~/components/ui/switch";

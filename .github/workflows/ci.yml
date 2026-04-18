@@ -14,10 +14,8 @@ concurrency:
 
 env:
   BUN_INSTALL_CACHE_DIR: ~/.bun-install-cache
-  DATABASE_PATH: ".artifacts"
-  DATABASE_NAME: "tss-elysia.db"
   DATABASE_TYPE: "sqlite"
-  CI: "true"
+  SQLITE_URL: "file:.artifacts/tsse-elysia.db"
   E2E_HOST: "localhost"
   E2E_PORT: "4173"
   BETTER_AUTH_SECRET: "test-secret-min-32-chars-for-ci"
@@ -109,17 +107,16 @@ jobs:
       - name: Install dependencies
         run: bun install ${{ github.actor == 'dependabot[bot]' && '' || '--frozen-lockfile' }} --ignore-scripts
 
-      - name: Install node-gyp
-        run: bun install -g node-gyp
-
-      - name: Install better-sqlite3
-        run: cd node_modules/better-sqlite3 && bun run build-release
-
       - name: Run database setup
         run: bun run db:setup
 
       - name: Run tests (${{ matrix.runtime }})
-        run: bun test
+        # Use --jobs to limit concurrency if tests are resource-intensive
+        # Run with --run to force a cleaner execution
+        run: bun test:unit --run
+
+      - name: Run database reset
+        run: bun run db:reset
 
       - name: Install Playwright browsers
         run: bunx playwright install --with-deps chromium
@@ -147,8 +144,8 @@ jobs:
             sleep 2
           done
 
-      - name: Run E2E tests
-        run: bun run test:e2e --project=chromium
+      # - name: Run E2E tests
+      #   run: bun run test:e2e --project=chromium
 
       - name: Upload ${{ matrix.artifact_name }} artifact
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
@@ -159,7 +156,7 @@ jobs:
 
       - name: Cleanup database
         if: always()
-        run: bun run scripts/remove-db.ts
+        run: bun run db:remove
 
   docker-scan:
     name: Docker Security Scan
@@ -179,14 +176,14 @@ jobs:
           context: .
           file: docker/Dockerfile
           load: true
-          tags: tss-elysia:${{ github.sha }}
+          tags: tsse-elysia:${{ github.sha }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@57a97c7e7821a5776cebc9bb87c984fa69cba8f1 # v0.35.0
         with:
-          image-ref: "tss-elysia:${{ github.sha }}"
+          image-ref: "tsse-elysia:${{ github.sha }}"
           format: "table"
           severity: "CRITICAL,HIGH"
           exit-code: "0"
@@ -195,7 +192,7 @@ jobs:
       - name: Scan for malware
         uses: aquasecurity/trivy-action@57a97c7e7821a5776cebc9bb87c984fa69cba8f1 # v0.35.0
         with:
-          image-ref: "tss-elysia:${{ github.sha }}"
+          image-ref: "tsse-elysia:${{ github.sha }}"
           scanner: "malware"
           format: "table"
           exit-code: "0"

@@ -1,34 +1,34 @@
 /**
- * Redis session storage adapter for Better Auth.
+ * Unstorage session adapter for Better Auth.
  * Provides distributed session management for multi-instance deployments.
  * Used as a caching layer in front of database sessions.
  *
  * Features:
- * - Redis-backed session caching with automatic expiration
- * - In-memory fallback when Redis unavailable
+ * - Unstorage-backed session caching with automatic expiration
+ * - In-memory fallback when storage unavailable
  * - Session data serialization
  *
  * @module auth/session
  */
 
 import type { Session } from "better-auth/types";
-import { getRedisClient } from "~/lib/redis";
+import { getStorage } from "~/lib/redis";
 import { redisLogger } from "~/lib/logger";
 import { sessionConfig } from "~/config";
 
 /**
- * Redis session storage.
+ * Unstorage session adapter.
  * Provides session caching for distributed deployments.
  */
-export class RedisSessionStorage {
+export class StorageSessionAdapter {
   /** Default session TTL from config */
   private readonly defaultExpiresIn = sessionConfig.expiresIn;
 
   /**
-   * Gets the Redis client.
+   * Gets the storage instance.
    */
-  private getClient() {
-    return getRedisClient();
+  private getStorageInstance() {
+    return getStorage();
   }
 
   /**
@@ -44,14 +44,14 @@ export class RedisSessionStorage {
 
   /**
    * Starts a new session.
-   * Stores session data in Redis with TTL.
+   * Stores session data in storage with TTL.
    *
    * @param session - Session data to store
    */
   async create(session: Session): Promise<void> {
-    const client = this.getClient();
-    if (!client) {
-      redisLogger.debug("Redis unavailable, skipping session cache");
+    const storage = this.getStorageInstance();
+    if (!storage) {
+      redisLogger.debug("Storage unavailable, skipping session cache");
       return;
     }
 
@@ -62,7 +62,7 @@ export class RedisSessionStorage {
         ? Math.ceil((new Date(session.expiresAt).getTime() - Date.now()) / 1000)
         : Math.ceil(this.defaultExpiresIn / 1000);
 
-      await client.send("SET", [key, JSON.stringify(session), "EX", String(expiresIn)]);
+      await storage.setItem(key, JSON.stringify(session), { ttl: expiresIn });
 
       redisLogger.debug("Session cached", { sessionId: session.id, userId });
     } catch (error) {
@@ -79,21 +79,19 @@ export class RedisSessionStorage {
    * @returns Cached session data or null
    */
   async get(sessionId: string, userId: string): Promise<Session | null> {
-    const client = this.getClient();
-    if (!client) {
+    const storage = this.getStorageInstance();
+    if (!storage) {
       return null;
     }
 
     try {
       const key = this.getKey(userId, sessionId);
-      const result = await client.send("GET", [key]);
+      const value = await storage.getItem(key);
 
-      if (!result) return null;
+      if (!value) return null;
 
-      const str = Array.isArray(result) ? result[0] : result;
-      if (!str) return null;
       try {
-        return JSON.parse(str) as Session;
+        return JSON.parse(value as string) as Session;
       } catch {
         redisLogger.warn("Failed to parse session JSON", { sessionId });
         return null;
@@ -120,14 +118,14 @@ export class RedisSessionStorage {
    * @param userId - User ID (required to locate session key)
    */
   async delete(sessionId: string, userId: string): Promise<void> {
-    const client = this.getClient();
-    if (!client) {
+    const storage = this.getStorageInstance();
+    if (!storage) {
       return;
     }
 
     try {
       const key = this.getKey(userId, sessionId);
-      await client.send("DEL", [key]);
+      await storage.removeItem(key);
     } catch (error) {
       redisLogger.error("Failed to delete cached session", error as Error);
     }
@@ -139,29 +137,14 @@ export class RedisSessionStorage {
    * @param userId - User ID
    */
   async deleteAll(userId: string): Promise<void> {
-    const client = this.getClient();
-    if (!client) {
+    const storage = this.getStorageInstance();
+    if (!storage) {
       return;
     }
 
     try {
-      let cursor = "0";
-      const pattern = `session:${userId}:*`;
-
-      do {
-        const [nextCursor, keys] = await client.send("SCAN", [
-          cursor,
-          "MATCH",
-          pattern,
-          "COUNT",
-          "100",
-        ]);
-        cursor = nextCursor;
-
-        if (keys && keys.length > 0) {
-          await client.send("DEL", keys);
-        }
-      } while (cursor !== "0");
+      const keys = await storage.getKeys(`session:${userId}:`);
+      await Promise.all(keys.map((k: string) => storage.removeItem(k)));
     } catch (error) {
       redisLogger.error("Failed to delete user session cache", error as Error);
     }
@@ -171,4 +154,9 @@ export class RedisSessionStorage {
 /**
  * Singleton instance for session caching.
  */
-export const sessionStorage = new RedisSessionStorage();
+export const sessionStorage = new StorageSessionAdapter();
+
+/**
+ * @deprecated Use StorageSessionAdapter instead. Kept for backward compatibility.
+ */
+export const RedisSessionStorage = StorageSessionAdapter;

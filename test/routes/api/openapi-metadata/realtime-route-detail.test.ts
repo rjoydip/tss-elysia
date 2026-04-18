@@ -1,5 +1,7 @@
 import { describe, expect, it } from "bun:test";
-import { apiRoutes } from "../../../../src/routes/api/$";
+import { createApiRoutes } from "../../../../src/routes/api/$";
+
+const apiRoutes = createApiRoutes();
 
 describe("Realtime API route OpenAPI detail (hooks.detail)", () => {
   it("documents realtime GET /api/realtime/ with responses metadata", () => {

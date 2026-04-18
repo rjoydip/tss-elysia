@@ -5,7 +5,7 @@
  *
  * @example
  * // Server-side: full access to all variables
- * const dbUrl = env.DATABASE_URL;
+ * const dbUrl = env.SQLITE_URL;
  *
  * // Client-side: only client vars accessible
  * const apiUrl = env.VITE_API_URL;
@@ -172,8 +172,6 @@ const _getEnv = (key: string, defaultValue: string = ""): string => {
  * These are used when environment variables are not explicitly set.
  */
 const _BASE_URL = `http://localhost:${PORT}`;
-const _DEFAULT_DB_PATH = ".artifacts";
-const _DEFAULT_DB_NAME = "tss-elysia.db";
 
 /**
  * Retrieves and validates the Better Auth secret key.
@@ -201,15 +199,16 @@ function _getAuthSecret(): string {
 export const env = await _createEnv({
   client: {
     VITE_API_URL: t.String(),
-    DATABASE_NAME: t.String(),
+    VITE_PASS_ENCRYPTION_KEY: t.String(),
+    FEATURE_MULTI_TEAM: t.Boolean(),
   },
   server: {
     API_URL: t.String(),
     BETTER_AUTH_URL: t.String(),
     BETTER_AUTH_SECRET: t.String(),
-    DATABASE_URL: t.String(),
-    DATABASE_PATH: t.String(),
     DATABASE_TYPE: t.Union([t.Literal("sqlite"), t.Literal("postgres")]),
+    SQLITE_URL: t.Optional(t.String()),
+    SQLITE_AUTH_TOKEN: t.Optional(t.String()),
     POSTGRES_USER: t.Optional(t.String()),
     POSTGRES_PASSWORD: t.Optional(t.String()),
     POSTGRES_DB: t.Optional(t.String()),
@@ -227,13 +226,16 @@ export const env = await _createEnv({
   },
   runtimeEnv: () => ({
     VITE_API_URL: _getEnv("VITE_API_URL", ""),
+    VITE_PASS_ENCRYPTION_KEY: _getEnv(
+      "VITE_PASS_ENCRYPTION_KEY",
+      "default-pass-key-replace-me-in-prod",
+    ),
     API_URL: _getEnv("API_URL", `${_BASE_URL}/api`),
     BETTER_AUTH_URL: _getEnv("BETTER_AUTH_URL", `${_BASE_URL}/api/auth`),
     BETTER_AUTH_SECRET: _getAuthSecret(),
-    DATABASE_URL: _getEnv("DATABASE_URL", ""),
-    DATABASE_PATH: _getEnv("DATABASE_PATH", _DEFAULT_DB_PATH),
-    DATABASE_NAME: _getEnv("DATABASE_NAME", _DEFAULT_DB_NAME),
     DATABASE_TYPE: _getEnv("DATABASE_TYPE", "sqlite") as "sqlite" | "postgres",
+    SQLITE_URL: _getEnv("SQLITE_URL", "") || undefined,
+    SQLITE_AUTH_TOKEN: _getEnv("SQLITE_AUTH_TOKEN", "") || undefined,
     POSTGRES_USER: _getEnv("POSTGRES_USER", "") || undefined,
     POSTGRES_PASSWORD: _getEnv("POSTGRES_PASSWORD", "") || undefined,
     POSTGRES_DB: _getEnv("POSTGRES_DB", "") || undefined,
@@ -265,6 +267,7 @@ export const env = await _createEnv({
     WS_MAX_MESSAGE_SIZE: parseInt(_getEnv("WS_MAX_MESSAGE_SIZE", ""), 10) || undefined,
     WS_RATE_LIMIT_MESSAGES: parseInt(_getEnv("WS_RATE_LIMIT_MESSAGES", ""), 10) || undefined,
     WS_RATE_LIMIT_WINDOW: parseInt(_getEnv("WS_RATE_LIMIT_WINDOW", ""), 10) || undefined,
+    FEATURE_MULTI_TEAM: _getEnv("FEATURE_MULTI_TEAM", "false") === "true",
   }),
 });
 

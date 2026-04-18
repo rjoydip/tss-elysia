@@ -5,6 +5,7 @@
  */
 
 import { createAuthClient } from "better-auth/react";
+import { encodePassword } from "~/lib/utils/encryption";
 
 /**
  * Auth client instance configured for the application.
@@ -78,9 +79,10 @@ export async function signUpWithEmail(name: string, email: string, password: str
      * Better Auth may throw for non-2xx responses depending on transport/runtime.
      * Normalize to `{ data, error }` so UI can always show feedback.
      */
+    const err = error instanceof Error ? error : new Error(String(error));
     return {
       data: null,
-      error,
+      error: err,
     };
   }
 }
@@ -116,8 +118,8 @@ export async function updateUserProfile(data: { name?: string; image?: string })
  */
 export async function changePassword(currentPassword: string, newPassword: string) {
   return authClient.changePassword({
-    currentPassword,
-    newPassword,
+    currentPassword: await encodePassword(currentPassword),
+    newPassword: await encodePassword(newPassword),
   });
 }
 
@@ -223,7 +225,7 @@ export async function resetPassword(newPassword: string, token: string) {
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ newPassword, token }),
+    body: JSON.stringify({ newPassword: await encodePassword(newPassword), token }),
   });
 
   if (!response.ok) {

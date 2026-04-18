@@ -5,7 +5,7 @@ description: System architecture and design patterns
 
 ## Architecture
 
-This document describes the system architecture of the tss-elysia project.
+This document describes the system architecture of the tsse-elysia project.
 
 ## Overview
 
@@ -182,13 +182,14 @@ src/
 │   │   └── tools/     # MCP tools
 │   │       ├── catalog.ts
 │   │       └── users.ts
-│   ├── db/           # Database (Drizzle + SQLite)
+│   ├── db/           # Database (Drizzle + SQLite/PostgreSQL)
 │   │   ├── index.ts
 │   │   └── schema.ts
-│   ├── redis/        # Redis client and Pub/Sub
-│   │   ├── index.ts
-│   │   └── pubsub.ts
-│   ├── cache/        # Cache utilities
+│   ├── redis/        # Storage & Pub/Sub
+│   │   ├── index.ts   # Unstorage with Redis/Postgres/LRU backends
+│   │   └── pubsub.ts  # Redis Pub/Sub (requires REDIS_URL)
+│   ├── cache/        # Cache layer (Unstorage-backed)
+│   │   └── index.ts   # Multi-backend cache support
 │   ├── realtime/      # WebSocket realtime
 │   ├── rate-limit/   # Rate limiting
 │   ├── store/        # State management

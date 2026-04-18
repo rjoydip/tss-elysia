@@ -4,7 +4,7 @@
  */
 
 import { test, expect } from "@playwright/test";
-import { E2E_BASE_URL } from "../_config";
+import { E2E_BASE_URL } from "../config";
 
 test.describe("Skeleton Component", () => {
   test("should render skeleton on page load", async ({ page }) => {

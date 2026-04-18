@@ -1,22 +1,27 @@
 /**
- * Database connection and initialization using Drizzle ORM.
- * Supports both SQLite (Bun) and PostgreSQL based on environment.
+ * Database connection and initialization using Drizzle ORM with LibSQL.
+ * Supports SQLite (local/in-memory/Turso) and PostgreSQL based on environment.
  *
- * PostgreSQL setup includes:
- * - One primary (write) pool
- * - Multiple read replica pools for read queries (configurable via POSTGRES_REPLICAS env var)
+ * SQLite Configuration:
+ * - If SQLITE_URL is set, use it (supports Turso, file paths, etc.)
+ * - If POSTGRES_URL is set, use it (Superbase, file paths, etc.)
+ * - Otherwise use sqlite database (`fallback`)
+ *
+ * PostgreSQL Configuration:
+ * - Used in production when POSTGRES_URL is available
+ * - Supports read replicas via POSTGRES_REPLICAS env var
  *
  * Only initializes on server-side (typeof window === "undefined")
  * to prevent client-side bundle from including database code.
  */
 
-import { drizzle as drizzleSQLite } from "drizzle-orm/bun-sqlite";
-import { Database } from "bun:sqlite";
-import { drizzle as drizzlePg } from "drizzle-orm/node-postgres";
+import { createClient, type Client } from "@libsql/client";
 import { Pool } from "pg";
+import { drizzle as drizzleLibsql } from "drizzle-orm/libsql";
+import { drizzle as drizzlePg } from "drizzle-orm/node-postgres";
 import * as schema from "./schema";
 import { env } from "~/config/env";
-import { isCI, isDev, isStage, isQA, isProduction, isTest } from "~/config";
+import { isCI, isDev, isStage, isQA, isProduction } from "~/config";
 
 /**
  * Database type based on environment configuration.
@@ -33,12 +38,12 @@ export interface DatabasePoolConfig {
 }
 
 /**
- * SQLite database instance - Bun's native SQLite driver
+ * LibSQL database client for SQLite
  */
-let sqlite: Database | undefined;
+let sqliteClient: Client | undefined;
 
 /**
- * PostgreSQL primary (write) pool instance - node-postgres driver
+ * PostgreSQL primary (write) pool instance
  */
 let pgPoolPrimary: Pool | undefined;
 
@@ -54,17 +59,25 @@ let replicaRoundRobinIndex = 0;
 
 /**
  * Drizzle ORM instance with typed schema (primary/write)
- * eslint-disable-next-line @typescript-eslint/no-explicit-any
  */
 let db: any;
 
 /**
  * Gets the database type based on environment configuration.
- * CI always uses SQLite, otherwise uses DATABASE_TYPE env var.
+ *
+ * Priority order:
+ * 1. If SQLITE_URL is set -> SQLite (supports Turso or file)
+ * 2. If POSTGRES_URL is set (non-dev) -> PostgreSQL
+ * 3. Otherwise -> SQLite (in-memory)
  *
  * @returns The configured database type
  */
 export function getDatabaseType(): DatabaseType {
+  // If SQLITE_URL is explicitly set, use SQLite (Turso, file, etc.)
+  if (env.SQLITE_URL) {
+    return "sqlite";
+  }
+
   // CI always uses SQLite regardless of DATABASE_TYPE setting
   if (isCI) {
     return "sqlite";
@@ -91,20 +104,32 @@ export function getDatabaseType(): DatabaseType {
 }
 
 /**
- * Creates a SQLite database connection using Bun's native driver.
+ * Creates a SQLite database connection using LibSQL client.
+ * Supports file-based, in-memory, and Turso/remote databases.
+ * Falls back to in-memory database if SQLITE_URL is not set.
  *
- * @returns SQLite database instance and Drizzle ORM
+ * @returns SQLite database client and Drizzle ORM
  */
-function createSQLiteConnection() {
-  const dbName = getDatabaseName();
-  const dbPath = `${env.DATABASE_PATH}/${dbName}`;
+export function createSQLiteConnection(): {
+  sqliteClient: Client;
+  db: typeof db;
+} {
+  const url = env.SQLITE_URL || ":memory:";
+  const authToken = env.SQLITE_AUTH_TOKEN;
 
-  sqlite = new Database(dbPath);
-  db = drizzleSQLite(sqlite, {
+  // Use LibSQL client for SQLite
+  sqliteClient = createClient({
+    url,
+    authToken,
+  });
+
+  db = drizzleLibsql(sqliteClient, {
     schema,
   });
 
-  return { sqlite, db };
+  console.log(`[DB] Using SQLite: ${url === ":memory:" ? "in-memory" : url}`);
+
+  return { sqliteClient, db };
 }
 
 /**
@@ -112,7 +137,11 @@ function createSQLiteConnection() {
  *
  * @returns PostgreSQL pools and Drizzle ORM instances
  */
-function createPostgresConnection() {
+function createPostgresConnection(): {
+  pgPoolPrimary: Pool;
+  pgPoolsReplicas: Pool[];
+  db: typeof db;
+} {
   const connectionString = env.POSTGRES_URL || buildPostgresConnectionString();
 
   // Primary (write) pool
@@ -158,36 +187,6 @@ function buildPostgresConnectionString(): string {
 }
 
 /**
- * Gets the appropriate database filename based on environment.
- *
- * @returns Database filename
- */
-function getDatabaseName(): string {
-  // Test environment always uses test database
-  if (isTest || isCI) {
-    return "tss-elysia.db";
-  }
-
-  // Extract environment from NODE_ENV
-  const nodeEnv = isDev
-    ? "development"
-    : isStage
-      ? "stage"
-      : isQA
-        ? "qa"
-        : isProduction
-          ? "production"
-          : "development";
-
-  // Use custom name if set, otherwise use environment-specific name
-  if (env.DATABASE_NAME && !env.DATABASE_NAME.includes("tss-elysia")) {
-    return env.DATABASE_NAME;
-  }
-
-  return `tsse-${nodeEnv}.db`;
-}
-
-/**
  * Returns the write (primary) database instance.
  * For read-heavy workloads, use getReadDb() for read queries.
  *
@@ -223,13 +222,13 @@ export function getReadDb() {
 /**
  * Returns all database pools for health checks.
  *
- * @returns Object containing all database pools
+ * @returns Object containing all database pools/instances
  */
 export function getDatabasePools() {
   return {
     primary: pgPoolPrimary,
     replicas: pgPoolsReplicas,
-    sqlite,
+    sqlite: sqliteClient,
   };
 }
 
@@ -281,6 +280,8 @@ export function getDatabasePoolConfigs(): DatabasePoolConfig[] {
  * @returns The initialized Drizzle ORM instance
  */
 export function initializeDatabase() {
+  if (db) return db; // Return existing instance if already initialized
+
   const dbType = getDatabaseType();
 
   // Initialize only in server-side context
@@ -296,7 +297,6 @@ export function initializeDatabase() {
       break;
     case "sqlite":
     default:
-      console.log("[DB] Using SQLite");
       createSQLiteConnection();
       break;
   }
@@ -310,5 +310,5 @@ if (typeof window === "undefined") {
 }
 
 // Export for use in other modules (auth, migrations, etc.)
-export { sqlite, pgPoolPrimary, pgPoolsReplicas, db, schema };
+export { sqliteClient, pgPoolPrimary, pgPoolsReplicas, db, schema };
 export type DbType = NonNullable<typeof db>;

@@ -14,7 +14,7 @@ import { useSession } from "~/lib/auth/client";
  * @property children - Content to Render when authenticated
  * @property fallback - Optional redirect path for unauthenticated users (defaults to /auth/login)
  */
-interface AuthGuardProps {
+export interface AuthGuardProps {
   children: React.ReactNode;
   fallback?: string;
 }
@@ -35,7 +35,7 @@ interface AuthGuardProps {
  *   <ProtectedContent />
  * </AuthGuard>
  */
-export function AuthGuard({ children, fallback = "/account/login" }: AuthGuardProps) {
+export function AuthGuard({ children, fallback = "/sign-in" }: AuthGuardProps) {
   const { data: session, isPending, error } = useSession();
   const navigate = useNavigate();
 

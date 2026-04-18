@@ -221,3 +221,48 @@ export const redisLogger = createLogger({
   minLevel: isProduction ? "warn" : "debug",
   prefix: "redis",
 });
+
+const colors = {
+  reset: "\x1b[0m",
+  bright: "\x1b[1m",
+  dim: "\x1b[2m",
+  red: "\x1b[31m",
+  green: "\x1b[32m",
+  yellow: "\x1b[33m",
+  blue: "\x1b[34m",
+  magenta: "\x1b[35m",
+  cyan: "\x1b[36m",
+};
+
+export const scriptLogger = {
+  section: (title: string) => {
+    console.log(`\n${colors.bright}${colors.blue}${title}${colors.reset}`);
+    console.log(colors.blue + "=".repeat(title.length) + colors.reset);
+  },
+  step: (step: number, title: string) => {
+    console.log(`\n${colors.bright}Step ${step}:${colors.reset} ${title}`);
+  },
+  list: (message: string) => {
+    console.log(`  ${colors.dim}•${colors.reset}`, message);
+  },
+  command: (cmd: string) => {
+    console.log(`  ${colors.cyan}$${colors.reset}`, cmd);
+  },
+  success: (message: string) => {
+    console.log(`${colors.green}✓${colors.reset}`, message);
+  },
+  info: (message: string) => {
+    console.log(`${colors.cyan}ℹ${colors.reset}`, message);
+  },
+  warn: (message: string) => {
+    console.warn(`${colors.yellow}⚠${colors.reset}`, message);
+  },
+  error: (message: string) => {
+    console.error(`${colors.red}✗${colors.reset}`, message);
+  },
+  debug: (message: string) => {
+    if (!isProduction) {
+      console.log(`${colors.magenta}⚡${colors.reset}`, message);
+    }
+  },
+};

@@ -3,16 +3,16 @@ title: TSS Elysia
 description: A full-stack TypeScript application using TanStack Start, Elysia, React 19, and Bun
 ---
 
-## tss-elysia
+## tsse-elysia
 
-[![React Doctor](https://www.react.doctor/share/badge?p=tss-elysia&s=98&w=3&f=3)](https://www.react.doctor/share?p=tss-elysia&s=98&w=3&f=3)
-[![License](https://img.shields.io/github/license/rjoydip/tss-elysia)](https://github.com/rjoydip/tss-elysia/blob/main/LICENSE)
+[![React Doctor](https://www.react.doctor/share/badge?p=tsse-elysia&s=98&w=3&f=3)](https://www.react.doctor/share?p=tsse-elysia&s=98&w=3&f=3)
+[![License](https://img.shields.io/github/license/rjoydip/tsse-elysia)](https://github.com/rjoydip/tsse-elysia/blob/main/LICENSE)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.7-blue)](https://www.typescriptlang.org/)
 [![Bun](https://img.shields.io/badge/Bun-1.2+-green)](https://bun.sh)
 
 A full-stack TypeScript application using TanStack Start, Elysia, React 19, and Bun.
 
-> **Project Roadmap**: See [PLAN.md](./.artifacts/PLAN.md) for detailed feature planning and progress tracking.
+> **Project Roadmap**: See [PLAN.md](./knowledge/PLAN.md) for detailed feature planning and progress tracking.
 
 ## Quick Start
 
@@ -23,25 +23,25 @@ bun run dev
 
 ## Commands
 
-| Command                | Description                              |
-| ---------------------- | ---------------------------------------- |
-| `bun run setup`        | Run full project setup (recommended)     |
-| `bun run cleanup`      | Clean up build/test artifacts            |
-| `bun run dev`          | Start Vite dev server                    |
-| `bun run build`        | Build for production                     |
-| `bun run start`        | Run production server                    |
-| `bun run lint`         | Run oxlint with GitHub format            |
-| `bun run lint:ci`      | Lint + format check (CI mode)            |
-| `bun run lint:fix`     | Auto-fix lint issues and format          |
-| `bun run fmt`          | Format code with oxfmt                   |
-| `bun run fmt:check`    | Check formatting without fixing          |
-| `bun run typecheck`    | TypeScript type checking (tsgo --noEmit) |
-| `bun run react:doctor` | React doctor diagnostics                 |
-| `bun run changeset`    | Create a changeset                       |
-| `bun run prepare`      | Install git hooks                        |
-| `bun run test:unit`    | Unit tests with Bun                      |
-| `bun run test:e2e`     | E2E tests with Playwright                |
-| `bun run test:load`    | Load tests with k6                       |
+| Command                | Description                             |
+| ---------------------- | --------------------------------------- |
+| `bun run setup`        | Run full project setup (recommended)    |
+| `bun run cleanup`      | Clean up build/test artifacts           |
+| `bun run dev`          | Start Vite dev server                   |
+| `bun run build`        | Build for production                    |
+| `bun run start`        | Run production server                   |
+| `bun run lint`         | Run oxlint with GitHub format           |
+| `bun run lint:ci`      | Lint + format check (CI mode)           |
+| `bun run lint:fix`     | Auto-fix lint issues and format         |
+| `bun run fmt`          | Format code with oxfmt                  |
+| `bun run fmt:check`    | Check formatting without fixing         |
+| `bun run typecheck`    | TypeScript type checking (tsc --noEmit) |
+| `bun run react:doctor` | React doctor diagnostics                |
+| `bun run changeset`    | Create a changeset                      |
+| `bun run prepare`      | Install git hooks                       |
+| `bun run test:unit`    | Unit tests with Bun                     |
+| `bun run test:e2e`     | E2E tests with Playwright               |
+| `bun run test:load`    | Load tests with k6                      |
 
 ### Setup Script
 
@@ -79,8 +79,8 @@ Options:
 - `--keep-db` - Preserve database files (`.artifacts/*.db`)
 - `--full` - Full reset including `node_modules` (rarely needed)
 
-> **Note:** Executable files like `k9.exe` in `.artifacts/` are automatically preserved during cleanup.
-> Before load test make sure to ran vite preview `bun preview --host`
+> **Note:** Executable files like `k6.exe` in `.artifacts/` are automatically preserved during cleanup.
+> Before load test make sure to run vite preview `bun run preview`
 
 ## Documentation
 
@@ -106,11 +106,16 @@ Detailed documentation available in `docs/`:
 - **Server**: Elysia
 - **Runtime**: Bun
 - **UI**: React 19 + TypeScript
-- **Form**: Tanstack Form
+- **Form**: TanStack Form
+- **Table**: TanStack Table v8
 - **State Management**: TanStack Store
-- **Function Execution Timing**: Tanstack Pacer
+- **Function Execution Timing**: TanStack Pacer
 - **Styling**: Tailwind CSS v4
-- **Cache/Pub-Sub**: Redis / Upstash (Bun native `RedisClient`)
+- **Cache**: Unstorage with multi-backend support
+  - Redis (when `REDIS_URL` is set)
+  - PostgreSQL (when `DATABASE_TYPE=postgres`)
+  - LRU Cache (default for SQLite)
+- **Pub/Sub**: Redis-only (Bun native `RedisClient`) - requires `REDIS_URL`
 
 ## Project Structure
 
@@ -141,6 +146,13 @@ src/
 │   │   ├── tabs.tsx
 │   │   ├── tooltip.tsx
 │   │   └── markdown.tsx # Markdown renderer with Shiki
+│   ├── data-table/    # TanStack Table components
+│   │   ├── index.ts         # Exports
+│   │   ├── pagination.tsx   # Pagination controls
+│   │   ├── column-header.tsx # Sortable column headers
+│   │   ├── toolbar.tsx      # Table toolbar with filters
+│   │   ├── bulk-actions.tsx # Bulk operation toolbar
+│   │   └── view-options.tsx  # Column visibility toggle
 │   ├── auth/          # Auth components
 │   │   ├── form/       # Auth form components
 │   │   │   ├── login.tsx
@@ -151,6 +163,10 @@ src/
 │   │   └── footer.tsx       # Common footer
 │   ├── docs/           # Documentation components
 │   │   └── sidebar.tsx  # Docs sidebar
+│   ├── layout/        # Layout components
+│   │   ├── app-sidebar.tsx
+│   │   ├── header.tsx
+│   │   └── main.tsx
 │   ├── profile/        # Profile components
 │   │   └── profile-page.tsx
 │   ├── settings/      # Settings components
@@ -168,19 +184,51 @@ src/
 │       ├── provider.tsx
 │       ├── toggle.tsx
 │       └── context.tsx
+├── features/          # Feature modules with data, components, and pages
+│   ├── dashboard/     # Dashboard feature
+│   │   ├── index.tsx            # Dashboard page
+│   │   └── components/
+│   │       ├── overview.tsx     # Stats overview
+│   │       ├── recent-sales.tsx # Recent sales
+│   │       └── analytics.tsx    # Analytics charts
+│   ├── users/        # User management feature
+│   │   ├── index.tsx            # Users page
+│   │   ├── data/
+│   │   │   ├── schema.ts        # Zod schema types
+│   │   │   └── users.ts         # Mock data
+│   │   └── components/
+│   │       ├── users-table.tsx
+│   │       ├── users-columns.tsx
+│   │       ├── users-dialogs.tsx
+│   │       └── ...
+│   ├── tasks/        # Task management feature
+│   │   ├── index.tsx            # Tasks page
+│   │   ├── data/
+│   │   │   ├── schema.ts        # Zod schema types
+│   │   │   └── tasks.ts         # Mock data
+│   │   └── components/
+│   │       ├── tasks-table.tsx
+│   │       ├── tasks-columns.tsx
+│   │       ├── tasks-dialogs.tsx
+│   │       └── ...
+│   └── ...
 ├── env.ts             # Isomorphic env fetching with type-safe validation
 ├── lib/               # Library code
 │   ├── auth/          # Authentication (Better Auth)
 │   │   ├── index.ts   # Server auth instance
 │   │   └── client.ts  # Client auth hooks and methods
-│   ├── db/            # Database (Drizzle + SQLite)
+│   ├── cache/         # Cache layer (Unstorage-backed)
+│   │   └── index.ts   # Cache with multi-backend support
+│   ├── db/            # Database (Drizzle + SQLite/PostgreSQL)
 │   │   ├── index.ts
 │   │   ├── schema.ts
 │   │   └── heartbeat.ts
-│   ├── redis/         # Redis cache and Pub/Sub (Bun native)
-│   │   ├── index.ts   # Redis client singleton, health check
-│   │   └── pubsub.ts  # Typed Pub/Sub channels and helpers
+│   ├── redis/         # Storage & Pub/Sub (Unstorage + Bun native)
+│   │   ├── index.ts   # Unstorage with Redis/Postgres/LRU backends
+│   │   └── pubsub.ts  # Redis Pub/Sub (requires REDIS_URL)
 │   └── utils.ts       # Utility functions (cn, etc.)
+├── hooks/             # Custom React hooks
+│   └── use-table-url-state.ts  # URL state for data tables
 ├── logger.ts          # Logger configuration
 ├── middlewares/       # Middleware implementations
 │   ├── cors.ts        # CORS headers
@@ -204,6 +252,21 @@ src/
 │   ├── blog.tsx        # Blog routes
 │   ├── changelog.tsx   # Changelog routes
 │   ├── status.tsx      # Health monitoring dashboard
+│   ├── (auth)/         # Auth routes (sign-in, sign-up, OTP)
+│   │   ├── sign-in.tsx
+│   │   ├── sign-up.tsx
+│   │   └── otp.tsx
+│   ├── (errors)/       # Error pages (401, 403, 404, 500, 503)
+│   ├── _authenticated/ # Protected routes (wrapped with AuthGuard)
+│   │   ├── route.tsx   # Auth layout wrapper
+│   │   ├── dashboard/  # Dashboard routes
+│   │   ├── tasks/      # Tasks routes
+│   │   ├── users/      # Users routes
+│   │   ├── chats/      # Chats routes
+│   │   ├── apps/       # Apps routes
+│   │   ├── help-center/
+│   │   ├── errors/
+│   │   └── settings/   # Settings sub-routes
 │   └── api/            # API routes
 │       ├── $.ts       # API catch-all route
 │       └── auth/      # Auth routes (Better Auth)
@@ -276,6 +339,11 @@ test/                  # Unit tests (Bun)
 ├── landing.spec.ts   # Landing page tests
 ├── navigation.spec.ts # Navigation tests
 └── config.ts         # E2E configuration
+
+.k6/                  # Load tests (k6)
+├── api-test.js
+├── smoke-test.js
+└── stress-test.js
 ```
 
 ## Code Style
@@ -354,4 +422,4 @@ Common issues:
 
 For detailed agent coding guidelines, see [AGENTS.md](./AGENTS.md).
 
-For feature planning and progress tracking, see [PLAN.md](./.artifacts/PLAN.md).
+For feature planning and progress tracking, see [PLAN.md](./knowledge/PLAN.md).

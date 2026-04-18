@@ -4,9 +4,8 @@
  */
 
 import { describe, expect, it, mock } from "bun:test";
-import React from "react";
 import { renderToString } from "react-dom/server";
-import { Footer } from "../../src/components/footer";
+import { Footer } from "../../src/components/layout/landing/footer";
 
 // Mock auth client
 let mockSession: any = null;

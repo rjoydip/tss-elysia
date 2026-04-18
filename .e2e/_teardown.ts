@@ -2,9 +2,9 @@
  * Test cleanup utilities for database cleanup after tests.
  * Uses Node.js SQLite driver to avoid bun: protocol issues in Playwright teardown.
  */
-import Database from "better-sqlite3";
 import { eq, like } from "drizzle-orm";
-import { drizzle } from "drizzle-orm/better-sqlite3";
+import { createClient } from "@libsql/client";
+import { drizzle } from "drizzle-orm/libsql";
 import * as schema from "../src/lib/db/schema";
 
 /**
@@ -18,30 +18,18 @@ const TEST_PREFIX = "test-";
 const TEST_DOMAIN = "example.com";
 
 /**
- * Get database path based on environment.
+ * Database URL from environment or default file path.
  */
-function getDbPath(): string {
-  const _dbPath = ".artifacts/tss-elysia.db";
-
-  const dbPath =
-    process.env.DATABASE_PATH && process.env.DATABASE_NAME
-      ? `${process.env.DATABASE_PATH}/${process.env.DATABASE_NAME}`
-      : process.env.DATABASE_NAME && !process.env.DATABASE_PATH
-        ? `.artifacts/${process.env.DATABASE_NAME}`
-        : process.env.NODE_ENV === "test"
-          ? _dbPath
-          : _dbPath;
-
-  return dbPath;
-}
+const sqliteUrl = process.env.SQLITE_URL || "file:.artifacts/tsse-elysia.db";
 
 /**
- * Create a Drizzle instance using better-sqlite3.
+ * Creates a connection to the SQLite database.
  */
 function createDbConnection() {
-  const dbPath = getDbPath();
-  const sqlite = new Database(dbPath);
-  return drizzle(sqlite, { schema });
+  const client = createClient({
+    url: sqliteUrl,
+  });
+  return drizzle(client, { schema });
 }
 
 /**

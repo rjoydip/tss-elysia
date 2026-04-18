@@ -5,7 +5,7 @@ description: Deployment and infrastructure documentation
 
 ## Infrastructure
 
-Deployment and infrastructure documentation for the tss-elysia stack.
+Deployment and infrastructure documentation for the tsse-elysia stack.
 
 ## Topics
 

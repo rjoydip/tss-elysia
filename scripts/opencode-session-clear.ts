@@ -2,7 +2,7 @@
 
 import { exec } from "child_process";
 import { promisify } from "util";
-import { logger } from "./_logger";
+import { scriptLogger as logger } from "../src/lib/logger";
 
 const execAsync = promisify(exec);
 
@@ -15,7 +15,7 @@ async function getSessionIds(): Promise<string[]> {
       .map((line) => line.trim().split(/\s+/)[0])
       .filter((id) => id.startsWith("ses_"));
   } catch (error) {
-    logger.error("Failed to fetch session list:", error);
+    logger.error(`Failed to fetch session list: ${error}`);
     process.exit(1);
   }
 }
@@ -26,7 +26,7 @@ async function deleteSession(sessionId: string) {
     await execAsync(`opencode session delete ${sessionId}`);
     logger.success(`Deleted ${sessionId}`);
   } catch (error) {
-    logger.error(`Failed to delete ${sessionId}:`, error);
+    logger.error(`Failed to delete ${sessionId}: ${error}`);
   }
 }
 

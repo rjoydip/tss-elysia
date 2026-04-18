@@ -3,7 +3,7 @@
  */
 
 import { test, expect } from "@playwright/test";
-import { E2E_BASE_URL } from "./_config";
+import { E2E_BASE_URL } from "./config";
 
 test.describe("Mobile Behavior", () => {
   test.describe("Sidebar Mobile", () => {
@@ -42,7 +42,9 @@ test.describe("Mobile Behavior", () => {
       await page.waitForLoadState("load");
       const sidebar = page.locator('[data-sidebar="sidebar"]');
       await expect(sidebar).toBeVisible();
-      const sections = page.getByRole("button", { name: /Getting Started|Authentication|API/ });
+      const sections = page.getByRole("button", {
+        name: /Getting Started|Authentication|API/,
+      });
       await expect(sections.first()).toBeVisible();
     });
   });

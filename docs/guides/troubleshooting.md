@@ -46,13 +46,13 @@ If warnings persist, increase the limit or consider:
 
 ---
 
-### Bun:sqlite Externalized Warning
+### LibSQL/Node SQLite Module Issues
 
 ```txt
-Module "bun:sqlite" has been externalized for browser compatibility
+Module "libsql" has been externalized for browser compatibility
 ```
 
-**Cause**: The database driver (`bun:sqlite`) is server-only but Vite tries to bundle it for the browser.
+**Cause**: The database driver (`@libsql/client`) is server-only but Vite tries to bundle it for the browser.
 
 **Solution**: This is expected behavior. The module is correctly externalized for SSR. To suppress the warning:
 
@@ -68,8 +68,6 @@ export default defineConfig({
 Or in `src/lib/db/index.ts`, add a check:
 
 ```typescript
-import { Database } from "bun:sqlite";
-
 // This file only runs on server
 if (typeof window !== "undefined") {
   throw new Error("Database can only be used server-side");
@@ -154,10 +152,10 @@ Error: unable to open database file
    bun run db:migrate
    ```
 
-3. Set DATABASE_NAME in environment:
+3. Set SQLITE_URL in environment:
 
    ```bash
-   DATABASE_NAME=data/.db bun run db:migrate
+   SQLITE_URL=file:data/.db bun run db:migrate
    ```
 
 ---
@@ -174,12 +172,6 @@ SQLiteError: UNIQUE constraint failed
 bun run db:seed
 ```
 
-Or reset the database entirely:
-
-```bash
-bun run db:reset
-```
-
 ---
 
 ## Docker Issues
@@ -189,7 +181,7 @@ bun run db:reset
 1. Check BETTER_AUTH_SECRET is set:
 
    ```bash
-   docker logs tss-elysia
+   docker logs tsse-elysia
    ```
 
 2. Verify port availability:
@@ -201,7 +193,7 @@ bun run db:reset
 3. Check volume permissions:
 
    ```bash
-   docker exec tss-elysia ls -la /app/.artifacts
+   docker exec tsse-elysia ls -la /app/.artifacts
    ```
 
 ---

@@ -246,14 +246,14 @@ export const env = await _createEnv({
   server: {
     API_URL: t.String(),
     BETTER_AUTH_SECRET: t.String(),
-    DATABASE_URL: t.String(),
+    SQLITE_URL: t.String(),
     PORT: t.Number(),
   },
   runtimeEnv: () => ({
     VITE_API_URL: _getEnv("VITE_API_URL", ""),
     API_URL: _getEnv("API_URL", "http://localhost:3000/api"),
     BETTER_AUTH_SECRET: _getAuthSecret(),
-    DATABASE_URL: _getEnv("DATABASE_URL", ""),
+    SQLITE_URL: _getEnv("SQLITE_URL", ""),
     PORT: parseInt(_getEnv("PORT", "3000"), 10),
   }),
 });

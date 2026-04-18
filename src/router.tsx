@@ -1,13 +1,94 @@
+/**
+ * Application Router Configuration
+ * Sets up TanStack Router with error handling and authentication.
+ */
+
 import { createRouter } from "@tanstack/react-router";
-import { routeTree } from "./routeTree.gen.ts";
+import { toast } from "sonner";
+import { QueryCache, QueryClient } from "@tanstack/react-query";
+import { routeTree } from "./routeTree.gen";
+import { getErrorMessage, getErrorStatus, isAuthError, isServerError } from "~/lib/errors";
+import { authActions } from "./lib/stores/auth-store";
+import { logger } from "./lib/logger";
+
+const router = createRouter({
+  routeTree,
+  defaultPreload: "intent",
+  defaultPreloadStaleTime: 0,
+  scrollRestoration: true,
+});
+
+function handleServerError(error: Error) {
+  logger.error(String(error));
+
+  const status = getErrorStatus(error);
+  const message = getErrorMessage(error);
+
+  if (status === 204) {
+    toast.error("Content not found.");
+    return;
+  }
+
+  if (message) {
+    toast.error(message);
+  } else {
+    toast.error("Something went wrong!");
+  }
+}
+
+declare module "@tanstack/react-router" {
+  interface Register {
+    router: typeof router;
+  }
+}
 
 export function getRouter() {
-  const router = createRouter({
-    routeTree,
-    defaultPreload: "intent",
-    defaultErrorComponent: () => <div>Internal Server Error</div>,
-    defaultNotFoundComponent: () => <div>Not Found</div>,
-    scrollRestoration: true,
-  });
   return router;
 }
+
+export const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: (failureCount, error) => {
+        // eslint-disable-next-line no-console
+        if (import.meta.env.DEV) console.log({ failureCount, error });
+
+        if (failureCount >= 0 && import.meta.env.DEV) return false;
+        if (failureCount > 3 && import.meta.env.PROD) return false;
+
+        const status = getErrorStatus(error);
+        return !status || ![401, 403].includes(status);
+      },
+      refetchOnWindowFocus: import.meta.env.PROD,
+      staleTime: 10 * 1000, // 10s
+    },
+    mutations: {
+      onError: (error) => {
+        handleServerError(error);
+
+        const status = getErrorStatus(error);
+        if (status === 304) {
+          toast.error("Content not modified!");
+        }
+      },
+    },
+  },
+  queryCache: new QueryCache({
+    onError: (error) => {
+      if (isAuthError(error)) {
+        toast.error("Session expired!");
+        authActions.reset();
+        router.navigate({
+          to: "/sign-in",
+          search: { redirect: `${router.history.location.href}` },
+        });
+      }
+      if (isServerError(error)) {
+        toast.error("Internal Server Error!");
+        if (import.meta.env.PROD) {
+          router.navigate({ to: "/" });
+        }
+      }
+    },
+  }),
+});

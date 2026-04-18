@@ -7,14 +7,14 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { buttonVariants } from "~/components/ui/button";
 import { Badge } from "~/components/ui/badge";
-import { Header } from "~/components/header";
-import { Footer } from "~/components/footer";
-import { CodeHighlight } from "~/components/code-highlight";
+import { Header } from "~/components/layout/landing/header";
+import { Footer } from "~/components/layout/landing/footer";
+import { CodeHighlight } from "~/components/docs/code-highlight";
 import { cn } from "~/lib/utils";
 import { APP_VERSION, GITHUB_REPO_URL } from "~/config";
-import { BrandDescription, BrandTitle } from "~/components/branding";
+import { BrandDescription, BrandTitle } from "~/components/layout/landing/branding";
 import { getShikiHighlighter } from "~/lib/shiki";
-import { AnimatedPageBackground } from "~/components/background/animated-page-background";
+import { AnimatedPageBackground } from "~/components/animated-page-background";
 
 export const Route = createFileRoute("/")({
   component: Home,
