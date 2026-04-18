@@ -8,8 +8,7 @@
 import { describe, it, expect } from "bun:test";
 import { blogPosts } from "../../src/features/landing/data/blog/data";
 import { changelogData } from "../../src/features/landing/data/changelog/data";
-
-const BASE_URL = "https://github.com/rjoydip/tsse-elysia";
+import { API_PREFIX } from "../../src/config";
 
 interface JsonLdSchema {
   "@context": string;
@@ -50,7 +49,7 @@ describe("LLMO Blog API", () => {
           name: post.author.name,
         },
         image: post.author.avatar,
-        url: `${BASE_URL}/blog/${post.slug}`,
+        url: `${API_PREFIX}/blog/${post.slug}`,
       };
 
       expect(isValidJsonLd(articleSchema)).toBe(true);
@@ -67,7 +66,7 @@ describe("LLMO Blog API", () => {
       itemListElement: blogPosts.map((post, index) => ({
         "@type": "ListItem",
         position: index + 1,
-        url: `${BASE_URL}/blog/${post.slug}`,
+        url: `${API_PREFIX}/blog/${post.slug}`,
         name: post.title,
         description: post.excerpt,
       })),
@@ -120,7 +119,7 @@ describe("LLMO Docs API", () => {
           "@type": "Thing",
           name: doc.category,
         },
-        url: `${BASE_URL}/docs/${doc.slug}`,
+        url: `${API_PREFIX}/docs/${doc.slug}`,
       };
 
       expect(isValidJsonLd(techArticleSchema)).toBe(true);
@@ -136,7 +135,7 @@ describe("LLMO Docs API", () => {
       itemListElement: docsData.map((doc, index) => ({
         "@type": "ListItem",
         position: index + 1,
-        url: `${BASE_URL}/docs/${doc.slug}`,
+        url: `${API_PREFIX}/docs/${doc.slug}`,
         name: doc.title,
       })),
     };
