@@ -70,6 +70,7 @@ A comprehensive plan to build a production-ready, full-stack TypeScript applicat
 - [ ] Implement rate limiting per API key
 - [ ] Add tool execution sandboxing (timeout wrapper)
 - [x] Documentation and discovery endpoints
+- [x] LLM Optimization (LLMO) features: JSON-LD structured data, machine-readable API endpoints (blog, docs, changelog, FAQ, server info, capabilities, llms.txt)
 
 ### Phase 10: Advanced Database Strategy (Planned)
 

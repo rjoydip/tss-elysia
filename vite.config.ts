@@ -1,8 +1,8 @@
 import path from "path";
-import { defineConfig } from "vite";
 import { tanstackStart } from "@tanstack/react-start/plugin/vite";
 import viteReact from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
+import { defineConfig } from "vite";
 
 const host = process.env.HOST || "localhost";
 const port = parseInt(process.env.PORT || "3000", 10);

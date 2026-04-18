@@ -8,9 +8,9 @@
 import { Elysia } from "elysia";
 import { blogPosts, getBlogPost } from "~/features/landing/data/blog/data";
 import { changelogData, getLatestVersion } from "~/features/landing/data/changelog/data";
-import { APP_NAME, API_PREFIX } from "~/config";
+import { APP_NAME, API_PREFIX, GITHUB_REPO_URL } from "~/config";
 
-const BASE_URL = "https://github.com/rjoydip/tsse-elysia";
+const BASE_URL = GITHUB_REPO_URL;
 
 const docsData = [
   { slug: "getting-started", title: "Getting Started", category: "Guide" },
@@ -140,7 +140,7 @@ function handleDocs({ request }: { request: Request }) {
       "@context": "https://schema.org",
       "@type": "TechArticle",
       headline: doc.title,
-      description: doc.category,
+      about: doc.category,
     });
   }
 
