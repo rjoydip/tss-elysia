@@ -26,6 +26,7 @@ All workflows run the following checks:
 2. **TypeScript** - Type checking
 3. **Tests** - Unit and E2E tests
 4. **Security Audit** - Dependency vulnerabilities
+5. **Container Security** - Trivy image scanning (vulnerabilities and malware)
 
 ## CI Process
 
@@ -44,7 +45,8 @@ Steps executed:
 1. Checkout code
 2. Install dependencies
 3. Run lint, typecheck, tests
-4. Build application
+4. Build Docker image and run Trivy scan
+5. Build application
 
 ## Release Process
 
@@ -56,10 +58,11 @@ Releases are **automatically** created when:
 2. The GitHub Actions workflow runs
 3. All quality checks pass (lint, typecheck, tests)
 4. Security audit passes
-5. Build completes successfully
-6. Version is bumped and changelog is updated
-7. **Git tag is created** (e.g., `v1.2.0`)
-8. A GitHub Release is created with release notes
+5. Docker image scan (Trivy) passes
+6. Build completes successfully
+7. Version is bumped and changelog is updated
+8. **Git tag is created** (e.g., `v1.2.0`)
+9. A GitHub Release is created with release notes
 
 ### Release Workflow Steps
 
@@ -70,16 +73,19 @@ Releases are **automatically** created when:
 
  1. VALIDATION         2. QUALITY          3. BUILD
     ├─ Working tree      ├─ Lint            ├─ Run db:setup
-    └─ Changesets       ├─ Typecheck       └─ Build app
-                       ├─ Tests
-                       └─ Security audit
+    └─ Changesets       ├─ Typecheck       ├─ Build Docker image
+                       ├─ Tests           ├─ Trivy Security Scan
+                       ├─ Security audit  └─ Build app
+                       └─ Trivy Scan
+```
 
- 4. VERSION BUMP      5. GIT TAG          6. GITHUB RELEASE
-    ├─ Run changeset   ├─ Create tag       ├─ Create release
-    │  version         │  vX.Y.Z           └─ Add release notes
+4.  VERSION BUMP 5. GIT TAG 6. GITHUB RELEASE
+    ├─ Run changeset ├─ Create tag ├─ Create release
+    │ version │ vX.Y.Z └─ Add release notes
     ├─ Update CHANGELOG
     └─ Update package.json
-```
+
+````
 
 ### Version Bump Types
 
@@ -127,7 +133,7 @@ bun run release --skip-tag
 
 # Skip push to remote
 bun run release --skip-push
-```
+````
 
 ### Release Validation
 

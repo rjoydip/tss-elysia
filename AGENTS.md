@@ -43,14 +43,15 @@ All AI-generated code must adhere to these standards.
 - **Type Checking**: Ensure `bun run typecheck` passes
 - **Dead Code Prevention**: Run lint and typecheck to detect unused code before committing
 
-### Dead Code Prevention
+### Dead Code Prevention & Security Scanning
 
-This project enforces dead code detection via:
+This project enforces code quality and security via:
 
 | Tool       | Configuration                                            | Detects                   |
 | ---------- | -------------------------------------------------------- | ------------------------- |
 | TypeScript | `tsconfig.json` - `noUnusedLocals`, `noUnusedParameters` | Unused locals, parameters |
 | oxlint     | `.oxlintrc.json` - `no-unused-vars`, `no-unused-imports` | Unused variables, imports |
+| Trivy      | `.github/workflows/ci.yml`                               | OS & App vulnerabilities  |
 
 **Before committing, always verify no dead code:**
 
@@ -78,15 +79,16 @@ test/
 │   ├── cors.test.ts
 │   ├── helmet.test.ts
 │   └── index.test.ts # traceFn, errorFn, composedMiddleware
+├── hooks/            # Hook tests
+├── lib/              # Library tests (logger, blog, utils, changelog)
+│   └── redis/       # Redis tests
+│       ├── redis.test.ts  # Redis client tests
+│       └── pubsub.test.ts # Pub/Sub tests
 ├── routes/           # Route tests
 │   └── status.test.ts
 ├── store/            # Store tests
 ├── components/       # Component tests
 │   └── ui/          # UI component tests
-├── lib/              # Library tests
-│   └── redis/       # Redis tests
-│       ├── redis.test.ts  # Redis client tests
-│       └── pubsub.test.ts # Pub/Sub tests
 └── ...
 ```
 
@@ -103,6 +105,9 @@ test/
 │   ├── endpoints.spec.ts
 │   ├── middlewares.spec.ts
 │   └── redis-health.spec.ts  # Redis heartbeat E2E
+├── mcp/              # MCP tests
+│   ├── mcp.spec.ts
+│   └── mcp-keys.spec.ts
 ├── middlewares/      # Middleware-specific tests
 │   └── rate-limit.spec.ts
 └── auth.spec.ts
@@ -135,7 +140,8 @@ When generating or modifying code, the AI agent must:
 2. **Refactor for clarity** - Add missing comments when modifying existing code
 3. **Follow standards** - Strictly adhere to these coding guidelines
 4. **Verify changes** - Run lint, fmt, and typecheck before finishing
-5. **Keep responses concise** - Answer directly without unnecessary preamble
+5. **Security Scanning** - Be aware that Docker images are scanned by Trivy in CI. Ensure no vulnerable packages are introduced.
+6. **Keep responses concise** - Answer directly without unnecessary preamble
 
 ---
 

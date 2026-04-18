@@ -22,13 +22,7 @@ export interface DocSection {
 }
 
 /** Defines the display order for sidebar sections */
-const SECTION_ORDER = [
-  "getting-started",
-  "auth",
-  "api",
-  "infra",
-  "guides",
-] as const;
+const SECTION_ORDER = ["getting-started", "auth", "api", "infra", "guides"] as const;
 
 /** Maps folder names to sidebar section titles */
 const SECTION_TITLE_MAP: Record<string, string> = {
@@ -75,9 +69,7 @@ export function getSplatPath(params: Record<string, unknown>): string {
  * Builds a lookup map from doc path to raw markdown content.
  * Example: { "auth/overview": "# Auth Overview\n...", "architecture": "# Architecture\n..." }
  */
-export function buildDocMap(
-  modules: Record<string, string>
-): Map<string, string> {
+export function buildDocMap(modules: Record<string, string>): Map<string, string> {
   const docMap = new Map<string, string>();
   for (const [key, content] of Object.entries(modules)) {
     docMap.set(globKeyToDocPath(key), content);
@@ -132,10 +124,7 @@ function scanDocModules(): Record<string, string> {
           walkDir(fullPath, `${prefix}${entry.name}/`);
         } else if (entry.name.endsWith(".md")) {
           // Key format matches Vite glob: "../../docs/<path>.md"
-          modules[`../../docs/${prefix}${entry.name}`] = readFileSync(
-            fullPath,
-            "utf-8"
-          );
+          modules[`../../docs/${prefix}${entry.name}`] = readFileSync(fullPath, "utf-8");
         }
       }
     }
@@ -160,12 +149,10 @@ for (const key of Object.keys(docModules)) {
   // Convert glob key to doc path: "../../docs/getting-started/overview.md" → "getting-started/overview"
   const relPath = key.replace(/^(\.\.\/)*docs\//, "").replace(/\.md$/, "");
   const segments = relPath.split("/");
-  const folder =
-    segments.length > 1 ? (segments[0] as string) : "getting-started";
+  const folder = segments.length > 1 ? (segments[0] as string) : "getting-started";
   const fileName = segments[segments.length - 1] as string;
   // Build the route href: root overview → "/docs", others → "/docs/<path>"
-  const href =
-    relPath === "getting-started/overview" ? "/docs" : `/docs/${relPath}`;
+  const href = relPath === "getting-started/overview" ? "/docs" : `/docs/${relPath}`;
 
   // Overview pages always display as "Overview", other files use formatted file name
   const name = fileName === "overview" ? "Overview" : getDisplayName(fileName);
@@ -182,23 +169,20 @@ for (const key of Object.keys(docModules)) {
  * The "Overview" item in Getting Started uses href "/docs" so the sidebar
  * auto-expands when the user is on the docs landing page.
  */
-export const docsConfig: DocSection[] = SECTION_ORDER.reduce(
-  (acc: DocSection[], folder) => {
-    const items = groups.get(folder);
-    if (items && items.length > 0) {
-      // Sort: overview first, then alphabetical by name
-      const sortedItems = [...items].sort((a, b) => {
-        if (a.name === "Overview") return -1;
-        if (b.name === "Overview") return 1;
-        return a.name.localeCompare(b.name);
-      });
+export const docsConfig: DocSection[] = SECTION_ORDER.reduce((acc: DocSection[], folder) => {
+  const items = groups.get(folder);
+  if (items && items.length > 0) {
+    // Sort: overview first, then alphabetical by name
+    const sortedItems = [...items].sort((a, b) => {
+      if (a.name === "Overview") return -1;
+      if (b.name === "Overview") return 1;
+      return a.name.localeCompare(b.name);
+    });
 
-      acc.push({
-        title: SECTION_TITLE_MAP[folder] ?? formatName(folder),
-        items: sortedItems,
-      });
-    }
-    return acc;
-  },
-  []
-);
+    acc.push({
+      title: SECTION_TITLE_MAP[folder] ?? formatName(folder),
+      items: sortedItems,
+    });
+  }
+  return acc;
+}, []);

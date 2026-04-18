@@ -13,6 +13,7 @@
     "proxy:foreground": "bun --run portless proxy start --foreground",
     "proxy:stop": "bun --run portless proxy stop --https",
     "build": "bun --bun vite build",
+    "patch:server": "bun run ./scripts/patch-server.mjs",
     "dev": "bun --bun vite dev",
     "preview": "bun --bun vite preview",
     "routes:generate": "tsr generate",

@@ -9,6 +9,7 @@ import { QueryCache, QueryClient } from "@tanstack/react-query";
 import { routeTree } from "./routeTree.gen";
 import { getErrorMessage, getErrorStatus, isAuthError, isServerError } from "~/lib/errors";
 import { authActions } from "./lib/stores/auth-store";
+import { logger } from "./lib/logger";
 
 const router = createRouter({
   routeTree,
@@ -17,9 +18,8 @@ const router = createRouter({
   scrollRestoration: true,
 });
 
-function handleServerError(error: unknown) {
-  // eslint-disable-next-line no-console
-  console.log(error);
+function handleServerError(error: Error) {
+  logger.error(String(error));
 
   const status = getErrorStatus(error);
   const message = getErrorMessage(error);

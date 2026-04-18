@@ -296,10 +296,10 @@ bun run test:load:stress # Run stress test
 
 ### Load Test Structure
 
-Load tests are in `test/load-tests/`:
+Load tests are in `.k6/`:
 
 ```bash
-test/load-tests/
+.k6/
   smoke-test.js   # Basic smoke test
   api-test.js    # API endpoint load test
   stress-test.js # Stress test

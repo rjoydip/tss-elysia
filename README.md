@@ -79,8 +79,8 @@ Options:
 - `--keep-db` - Preserve database files (`.artifacts/*.db`)
 - `--full` - Full reset including `node_modules` (rarely needed)
 
-> **Note:** Executable files like `k9.exe` in `.artifacts/` are automatically preserved during cleanup.
-> Before load test make sure to ran vite preview `bun preview --host`
+> **Note:** Executable files like `k6.exe` in `.artifacts/` are automatically preserved during cleanup.
+> Before load test make sure to run vite preview `bun run preview`
 
 ## Documentation
 
@@ -339,6 +339,11 @@ test/                  # Unit tests (Bun)
 ├── landing.spec.ts   # Landing page tests
 ├── navigation.spec.ts # Navigation tests
 └── config.ts         # E2E configuration
+
+.k6/                  # Load tests (k6)
+├── api-test.js
+├── smoke-test.js
+└── stress-test.js
 ```
 
 ## Code Style

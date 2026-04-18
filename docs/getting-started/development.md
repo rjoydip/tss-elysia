@@ -62,7 +62,7 @@ bun run test:load:api    # API load test
 bun run test:load:stress # Stress test
 ```
 
-Test files: `test/load-tests/*.js`
+Test files: `.k6/*.js`
 
 ### Test Commands
 
