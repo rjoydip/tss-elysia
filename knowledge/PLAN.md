@@ -21,7 +21,6 @@ Complete the authentication system with additional security features, set up use
 - [x] Implement real-time features (WebSockets)
 - [x] Build MCP server for external integrations (make product available as MCP tools)
 - [x] Configure multi-database strategy (PostgreSQL prod, SQLite dev, vector/graph for AI)
-- [ ] Implement feature flag handling using unjs/confbox with YML/TOML configuration
 - [ ] Set up Unleash Docker container for feature flag management (future consideration)
 - [ ] Implement contract testing with Pact (Consumer & Provider)
 

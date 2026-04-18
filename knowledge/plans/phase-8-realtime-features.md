@@ -23,8 +23,6 @@ This document provides a comprehensive plan for implementing real-time features 
 
 ```bash
 bun add @elysiajs/ws
-# Optional: For scaling across multiple instances
-bun add ioredis
 ```
 
 ---

@@ -59,7 +59,6 @@ let replicaRoundRobinIndex = 0;
 
 /**
  * Drizzle ORM instance with typed schema (primary/write)
- * eslint-disable-next-line @typescript-eslint/no-explicit-any
  */
 let db: any;
 

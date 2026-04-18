@@ -833,17 +833,15 @@ bun run -e "import { RedisClient } from 'bun'; const r = new RedisClient('redis:
 
 ## Key Design Decisions
 
-1. **No npm packages** — Bun's built-in `RedisClient` is used exclusively. No `ioredis`, `redis`, or `@upstash/redis` needed.
+1. **`REDIS_URL` as single config** — One environment variable controls everything. `redis://` for local Docker, `rediss://` for Upstash TLS. Bun auto-detects the protocol.
 
-2. **`REDIS_URL` as single config** — One environment variable controls everything. `redis://` for local Docker, `rediss://` for Upstash TLS. Bun auto-detects the protocol.
+2. **Optional Redis** — The app runs without Redis. All Redis calls check for `null` client and gracefully degrade. This keeps CI/test environments simple.
 
-3. **Optional Redis** — The app runs without Redis. All Redis calls check for `null` client and gracefully degrade. This keeps CI/test environments simple.
+3. **Separate Pub/Sub connections** — Redis Pub/Sub requires dedicated connections. The `.duplicate()` approach or separate `new RedisClient()` ensures the main client remains available for regular commands.
 
-4. **Separate Pub/Sub connections** — Redis Pub/Sub requires dedicated connections. The `.duplicate()` approach or separate `new RedisClient()` ensures the main client remains available for regular commands.
+4. **Typed channels** — `REDIS_CHANNELS` const provides autocomplete and prevents typos. New features add channels to one place.
 
-5. **Typed channels** — `REDIS_CHANNELS` const provides autocomplete and prevents typos. New features add channels to one place.
-
-6. **redis:7-alpine** — Lightweight (~30MB), production-ready, with full Pub/Sub and persistence support.
+5. **redis:7-alpine** — Lightweight (~30MB), production-ready, with full Pub/Sub and persistence support.
 
 ---
 

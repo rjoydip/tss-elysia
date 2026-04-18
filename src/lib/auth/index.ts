@@ -147,16 +147,12 @@ function getAuth() {
  * await auth.api.signIn.email({ email, password })
  * const session = await auth.api.getSession({ headers })
  */
-export const auth = new Proxy(
-  // eslint_disable_next-line @typescript-eslint/no-explicit-any
-  {} as any,
-  {
-    get(_target, prop) {
-      const authInstance = getAuth();
-      return authInstance[prop as keyof typeof authInstance];
-    },
+export const auth = new Proxy({} as any, {
+  get(_target, prop) {
+    const authInstance = getAuth();
+    return authInstance[prop as keyof typeof authInstance];
   },
-);
+});
 
 // Type exports for use in route handlers and API responses
 export type Session = typeof auth.$Infer.Session.session;

@@ -6,7 +6,6 @@
  * Creates deterministic demo data for local development and testing.
  */
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { createClient } from "@libsql/client";
 import { drizzle } from "drizzle-orm/libsql";
 import { seed, reset } from "drizzle-seed";

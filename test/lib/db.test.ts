@@ -26,7 +26,6 @@ async function createTestDatabase() {
 }
 
 describe("Database Operations", () => {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let db: any;
 
   beforeEach(async () => {
@@ -104,7 +103,6 @@ describe("Database Operations", () => {
     it("should insert and select subscription plans", async () => {
       const now = Date.now();
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const dbAny = db as any;
       await dbAny.insert(schema.subscriptionPlans).values([
         {
@@ -143,7 +141,6 @@ describe("Database Operations", () => {
     it("should query subscription plan by ID", async () => {
       const now = Date.now();
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const dbAny = db as any;
       await dbAny.insert(schema.subscriptionPlans).values({
         id: "enterprise",
@@ -175,7 +172,6 @@ describe("Database Operations", () => {
       const userId = faker.string.uuid();
       const subscriptionId = faker.string.uuid();
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const dbAny = db as any;
       await dbAny.insert(schema.users).values({
         id: userId,
